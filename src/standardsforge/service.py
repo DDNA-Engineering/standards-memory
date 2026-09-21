@@ -10,14 +10,14 @@ import time
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from .errors import StandardsMemoryError, require
+from .errors import StandardsForgeError, require
 from .identity import normalize_identifier
 from .pack import open_validated_pack
 from .policy import authorize_install, load_policy
 from .store import LocalStore
 
 
-class StandardsMemoryService:
+class StandardsForgeService:
     """Application operations shared by local transports."""
 
     def __init__(self, db_path: str | Path, object_root: str | Path) -> None:
@@ -54,7 +54,7 @@ class StandardsMemoryService:
                 break
             packet["budget"]["used"] = len(encoded)
         if max_bytes is not None and len(encoded) > max_bytes:
-            raise StandardsMemoryError(
+            raise StandardsForgeError(
                 "budget_too_small",
                 "The complete atomic evidence unit does not fit the requested byte budget.",
                 {"required_bytes": len(encoded), "max_bytes": max_bytes},
@@ -84,9 +84,9 @@ class StandardsMemoryService:
         normalized = normalize_identifier(identifier)
         rows = self.store.authorized_packages(principal_id, normalized, edition_id)
         if not rows:
-            raise StandardsMemoryError("not_found", "No authorized resource matches the request.")
+            raise StandardsForgeError("not_found", "No authorized resource matches the request.")
         if len(rows) != 1:
-            raise StandardsMemoryError(
+            raise StandardsForgeError(
                 "ambiguous_document",
                 "The identifier does not resolve to exactly one authorized package; provide an edition or package pin.",
                 {
@@ -118,12 +118,12 @@ class StandardsMemoryService:
         try:
             source_path.resolve(strict=True).relative_to(object_path.resolve(strict=True))
         except (OSError, ValueError) as exc:
-            raise StandardsMemoryError("source_integrity_failure", "Stored source evidence escaped its object directory.") from exc
+            raise StandardsForgeError("source_integrity_failure", "Stored source evidence escaped its object directory.") from exc
         try:
             source_bytes = source_path.read_bytes()
             source_text = source_bytes.decode("utf-8")
         except (OSError, UnicodeDecodeError) as exc:
-            raise StandardsMemoryError("source_integrity_failure", "Stored source evidence could not be read.") from exc
+            raise StandardsForgeError("source_integrity_failure", "Stored source evidence could not be read.") from exc
         actual_source_hash = hashlib.sha256(source_bytes).hexdigest()
         actual_quote_hash = hashlib.sha256(row["text"].encode("utf-8")).hexdigest()
         require(actual_source_hash == source["sha256"], "source_integrity_failure", "Stored source evidence failed its digest check.")
@@ -163,7 +163,7 @@ class StandardsMemoryService:
         root = Path(package["object_path"])
         root_record = self.store.record_by_clause(package_digest, clause_reference.strip())
         if root_record is None:
-            raise StandardsMemoryError("not_found", "No authorized resource matches the request.")
+            raise StandardsForgeError("not_found", "No authorized resource matches the request.")
 
         ordered_rows = [root_record]
         relationships: list[dict[str, str]] = []
@@ -180,7 +180,7 @@ class StandardsMemoryService:
                     continue
                 target = self.store.record_by_id(package_digest, target_id)
                 if target is None:
-                    raise StandardsMemoryError("incomplete_dependency", "Required evidence dependency is unavailable.")
+                    raise StandardsForgeError("incomplete_dependency", "Required evidence dependency is unavailable.")
                 visited.add(target_id)
                 ordered_rows.append(target)
                 queue.append(target_id)
@@ -287,13 +287,13 @@ class StandardsMemoryService:
             raw = base64.urlsafe_b64decode(body + "=" * (-len(body) % 4))
             signature = base64.urlsafe_b64decode(tag + "=" * (-len(tag) % 4))
         except (ValueError, TypeError, binascii.Error) as exc:
-            raise StandardsMemoryError("invalid_cursor", "The continuation cursor is invalid.") from exc
+            raise StandardsForgeError("invalid_cursor", "The continuation cursor is invalid.") from exc
         expected = hmac.new(self.store.cursor_secret(), raw, hashlib.sha256).digest()
         require(hmac.compare_digest(signature, expected), "invalid_cursor", "The continuation cursor signature is invalid.")
         try:
             payload = json.loads(raw)
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-            raise StandardsMemoryError("invalid_cursor", "The continuation cursor payload is invalid.") from exc
+            raise StandardsForgeError("invalid_cursor", "The continuation cursor payload is invalid.") from exc
         require(isinstance(payload, dict), "invalid_cursor", "The continuation cursor payload is invalid.")
         required_keys = {
             "version", "package_digest", "principal_fingerprint", "policy_fingerprint",

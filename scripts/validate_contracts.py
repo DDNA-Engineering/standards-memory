@@ -8,8 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from standards_memory.pack import validate_pack_directory  # noqa: E402
-from standards_memory.policy import load_policy  # noqa: E402
+from standardsforge.pack import validate_pack_directory  # noqa: E402
+from standardsforge.policy import load_policy  # noqa: E402
 
 
 def load_json(relative: str):

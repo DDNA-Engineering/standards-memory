@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1.0",
-  "scope": "TASK-001 and TASK-002 acceptance subset; the supplied PRD remains the broader proposed catalog",
+  "scope": "TASK-001 through TASK-003 acceptance subset; the supplied PRD remains the broader proposed catalog",
   "requirements": [
     {"id": "SM-FR-002", "text": "Preserve publisher-scoped document identity separately from editions and packages."},
     {"id": "SM-FR-003", "text": "Resolve identifiers conservatively and report ambiguity."},

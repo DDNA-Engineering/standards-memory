@@ -5,7 +5,7 @@ from typing import Any
 
 
 @dataclass(slots=True)
-class StandardsMemoryError(Exception):
+class StandardsForgeError(Exception):
     """Typed failure safe for a structured CLI or adapter response."""
 
     code: str
@@ -24,4 +24,4 @@ class StandardsMemoryError(Exception):
 
 def require(condition: bool, code: str, message: str, **details: Any) -> None:
     if not condition:
-        raise StandardsMemoryError(code, message, details)
+        raise StandardsForgeError(code, message, details)

@@ -55,6 +55,27 @@
         "Refuse to truncate an atomic packet under a byte budget.",
         "Run every read operation with networking denied and migrate schema version 1 without inventing legacy classifications."
       ]
+    },
+    {
+      "task_id": "TASK-003",
+      "title": "Local read-only MCP adapter with trusted principal binding",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-022",
+        "SM-FR-023",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-039",
+        "SM-FR-046"
+      ],
+      "acceptance": [
+        "Expose exactly the six read operations over local stdio MCP with no administrative tools.",
+        "Bind the principal from trusted server startup configuration and omit it from every tool schema.",
+        "Preserve successful result envelopes and typed domain-error envelopes across the MCP boundary.",
+        "Disable SDK telemetry even when a host process configures an exporter.",
+        "Prove in-memory transport parity with networking denied and prove a real stdio subprocess round trip."
+      ]
     }
   ]
 }

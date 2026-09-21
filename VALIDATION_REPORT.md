@@ -2,13 +2,21 @@
 
 Date: 2026-09-21
 
-Scope: `TASK-001` and `TASK-002` deterministic local evidence engine
+Scope: `TASK-001` through `TASK-003` deterministic local evidence engine and stdio MCP adapter
 
-Repository state at validation: pre-publication working tree; the publication commit is reported in the external handoff
+Repository state at validation: local uncommitted development working tree
+
+## StandardsForge rename verification
+
+The project was renamed locally to StandardsForge on 2026-09-21. The distribution and Python module are `standardsforge`; the console commands are `standardsforge` and `standardsforge-mcp`. The README uses the new name and contains no emojis.
+
+After the rename, editable installation succeeded, all 18 existing tests passed, and contract validation returned the same two fixture digests recorded below. Both renamed console entry points returned help successfully, and both README demo blocks completed successfully. README file links and heading anchors were checked. The old editable distribution was removed from the local virtual environment.
+
+Historical input names, build results, schema IDs, and pack provenance below retain their original identities. Existing evidence was not rewritten. New default local state is stored under `.standardsforge/`; `START_HERE.md` describes how to point the renamed commands at an existing store.
 
 ## Requirements addressed
 
-Twenty bounded requirements are represented in `docs/requirements/requirements.json`, including identity/pinning, exact evidence, dependency context, pack contracts, all six read operations, exhaustive scoped traversal, edition comparison, rights-policy separation, offline operation, continuation binding, rebuildable indexes, and completeness dimensions.
+Twenty bounded requirements are represented in `docs/requirements/requirements.json`, including identity/pinning, exact evidence, dependency context, pack contracts, all six read operations, exhaustive scoped traversal, edition comparison, rights-policy separation, offline operation, continuation binding, rebuildable indexes, and completeness dimensions. `TASK-003` applies the existing read-operation, authorization, offline, administration-separation, continuation, budget, and completeness requirements to the local MCP boundary.
 
 ## Input provenance
 
@@ -23,21 +31,27 @@ The attached documents were treated as proposed product/build guidance and were 
 
 ## Commands and observed results
 
-Environment: Windows, Python 3.12.14, SQLite 3.53.1, setuptools 84.0.0.
+Environment: Windows, Python 3.12.14, SQLite 3.53.1, setuptools 84.0.0, MCP Python SDK 2.2.0.
+
+```powershell
+python -m pip install -e ".[mcp]"
+```
+
+Observed: exit 0; the editable package and exact `mcp==2.2.0` optional dependency installed into an isolated local virtual environment. `python -m pip check` subsequently reported no broken requirements.
 
 ```powershell
 $env:PYTHONPATH = Join-Path $PWD 'src'
 python scripts/validate_contracts.py
 ```
 
-Observed: exit 0. Six machine contract documents parsed; 20 task requirements resolved across `TASK-001` and `TASK-002`; both three-record fixture packs validated.
+Observed: exit 0. Seven machine contract documents parsed; 20 task requirements resolved across `TASK-001` through `TASK-003`; both three-record fixture packs validated.
 
 ```powershell
 $env:PYTHONPATH = Join-Path $PWD 'src'
 python -m unittest discover -s tests -v
 ```
 
-Observed: exit 0; 14 tests passed in 1.214 seconds. The suite exercised authorized install, all six read operations with sockets denied, multi-clause dependency deduplication, signed policy-bound pagination, dependency-sensitive edition comparison, schema v1-to-v2 migration, ZIP portability, edition pin stability, inventory tampering, untracked executable content, rights-policy denial, atomic byte-budget refusal, revocation recheck, and authorization-scoped FTS5 search.
+Observed: exit 0; 18 tests passed in 2.196 seconds. The suite exercised authorized install, all six core read operations with sockets denied, multi-clause dependency deduplication, signed policy-bound pagination, dependency-sensitive edition comparison, schema v1-to-v2 migration, ZIP portability, edition pin stability, inventory tampering, untracked executable content, rights-policy denial, atomic byte-budget refusal, revocation recheck, and authorization-scoped FTS5 search. Four MCP tests additionally proved the exact six-tool schema, read-only/closed-world annotations, absence of caller-selected principal/admin inputs, disabled server telemetry middleware, all-operation result parity with socket creation denied, typed non-leaking denial, and a real stdio subprocess round trip.
 
 ```powershell
 $env:PYTHONPATH = Join-Path $PWD 'src'
@@ -50,7 +64,7 @@ Observed: exit 0.
 python -m pip wheel . --no-deps --no-build-isolation --wheel-dir <temporary-directory>
 ```
 
-Observed: exit 0; `standards_memory-0.1.0a1-py3-none-any.whl` built successfully. The temporary artifact was removed after validation.
+Observed: exit 0; `standards_memory-0.1.0a1-py3-none-any.whl` built successfully and contained the MCP server module plus both console entry points. The temporary artifact was removed after validation.
 
 The pre-publication credential-pattern and absolute-local-path scans passed with zero matches.
 
@@ -65,6 +79,8 @@ The pre-publication credential-pattern and absolute-local-path scans passed with
 
 Pack rights records are preserved as claims and cannot authorize installation or serving. An external operator policy must authorize the exact pack ID and content class; its fingerprint is stored with a digest-bound principal grant. Reads check active authorization before access and again before returning an evidence packet. Query operations do not import, activate, publish, execute, download, invoke models, or create sockets.
 
+The MCP adapter accepts its principal only from trusted process startup configuration and exposes no administrative tool. It runs only over stdio, creates no listener, and removes the pinned SDK's OpenTelemetry middleware before accepting calls. Expected domain failures are marked as MCP errors and carry the existing typed JSON error envelope without returning the bound principal.
+
 Data-only suffix restrictions, inventory closure, byte counts, hashes, source quote checks, dependency resolution, path traversal checks, symlink denial, and bounded archive size/file counts are enforced during validation.
 
 ## Migration and rollback
@@ -74,6 +90,6 @@ The local database is schema version 2. A tested v1-to-v2 migration adds explici
 ## Limitations
 
 - Synthetic text fixtures only; no real PDF, table, figure, OCR, or visual-fidelity qualification.
-- The six read operations are implemented in the local library/CLI; formal HTTP/MCP transport schemas and conformance tests are not yet implemented.
-- No HTTP/MCP server, reader UI, compilation worker, model adapter, PostgreSQL profile, shared tenancy, performance benchmark, SBOM, or signed release artifact.
+- The six read operations are implemented in the local library, CLI, and stdio MCP adapter; no HTTP transport or shared-server profile is implemented.
+- No reader UI, compilation worker, model adapter, PostgreSQL profile, shared tenancy, performance benchmark, SBOM, or signed release artifact.
 - Exact quote presence is not proof of PDF fidelity, and returned evidence is not an applicability, compliance, or human approval decision.

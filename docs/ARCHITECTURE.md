@@ -1,10 +1,10 @@
-# Standards Memory reference architecture
+# StandardsForge reference architecture
 
 Document `SM-ARCH-001`, version `0.1.0-design`, is a proposed reference design. The current code implements one local vertical slice, not the complete architecture.
 
 ## Position
 
-The core is a framework-light Python library. Canonical data-only packs and preserved sources carry evidence; SQLite stores installed snapshots, local grants, and rebuildable lexical indexes. DDNA is not imported by the core. Querying never invokes a generation model.
+The core is a framework-light Python library. Canonical data-only packs and preserved sources carry evidence; SQLite stores installed snapshots, local grants, and rebuildable lexical indexes. The core does not import host applications. Querying never invokes a generation model.
 
 The ingestion and query paths are separate:
 
@@ -26,5 +26,6 @@ Rights statements inside a pack are provenance only. Operational authorization c
 - `store`: SQLite snapshot metadata, grants, records, and FTS5 projection.
 - `service`: all six read operations, signed policy-bound continuations, and separate install/revoke administration.
 - `cli`: separate administrative and read-only query commands.
+- `mcp_server`: local stdio adapter exposing exactly the six read operations under a startup-bound principal, with no administration, listener, or telemetry middleware.
 
-The future compiler, HTTP/MCP adapters, optional semantic adapters, reader, and shared-server profile remain outside the completed local read core.
+The future compiler, HTTP adapter, optional semantic adapters, reader, and shared-server profile remain outside the completed local read core. The local MCP adapter is not a shared-server authorization design.

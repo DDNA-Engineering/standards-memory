@@ -1,6 +1,6 @@
 # Coding-agent instructions
 
-This package is the build baseline for Standards Memory, a standalone open-source standards compiler and evidence engine. DDNA is a consumer, not a core dependency.
+This package is the build baseline for StandardsForge, a standalone open-source standards compiler and evidence engine. Integrations are consumers, not core dependencies.
 
 Read `START_HERE.md`, `docs/PRD.md`, `docs/ARCHITECTURE.md`, the relevant ADRs, and the selected record in `backlog/tasks.json` before implementation. Preserve exact sources, edition/package identities, conditions, and exceptions. Keep source evidence, derivations, automated checks, and human approval separate.
 

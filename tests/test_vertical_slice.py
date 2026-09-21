@@ -16,9 +16,9 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from standards_memory.errors import StandardsMemoryError  # noqa: E402
-from standards_memory.pack import validate_pack_directory  # noqa: E402
-from standards_memory.service import StandardsMemoryService  # noqa: E402
+from standardsforge.errors import StandardsForgeError  # noqa: E402
+from standardsforge.pack import validate_pack_directory  # noqa: E402
+from standardsforge.service import StandardsForgeService  # noqa: E402
 
 
 PACK_V1 = ROOT / "examples" / "packs" / "fictional-adapter-v1"
@@ -29,9 +29,9 @@ DENY_POLICY = ROOT / "examples" / "policies" / "deny-install.json"
 
 class VerticalSliceTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.temp = tempfile.TemporaryDirectory(prefix="standards-memory-test-")
+        self.temp = tempfile.TemporaryDirectory(prefix="standardsforge-test-")
         base = Path(self.temp.name)
-        self.service = StandardsMemoryService(base / "memory.db", base / "objects")
+        self.service = StandardsForgeService(base / "memory.db", base / "objects")
 
     def tearDown(self) -> None:
         self.temp.cleanup()
@@ -82,7 +82,7 @@ class VerticalSliceTests(unittest.TestCase):
         second_digest = self.service.install_pack(PACK_V2, POLICY)["package_digest"]
         self.assertNotEqual(first_digest, second_digest)
 
-        with self.assertRaises(StandardsMemoryError) as caught:
+        with self.assertRaises(StandardsForgeError) as caught:
             self.service.resolve_document("EXAMPLE-SPEC-100", "local-user")
         self.assertEqual("ambiguous_document", caught.exception.code)
 
@@ -97,7 +97,7 @@ class VerticalSliceTests(unittest.TestCase):
         shutil.copytree(PACK_V1, candidate)
         with (candidate / "sources" / "example-spec-100a.txt").open("a", encoding="utf-8") as stream:
             stream.write("tamper")
-        with self.assertRaises(StandardsMemoryError) as caught:
+        with self.assertRaises(StandardsForgeError) as caught:
             validate_pack_directory(candidate)
         self.assertIn(caught.exception.code, {"pack_size_mismatch", "pack_hash_mismatch"})
 
@@ -105,7 +105,7 @@ class VerticalSliceTests(unittest.TestCase):
         candidate = Path(self.temp.name) / "untracked"
         shutil.copytree(PACK_V1, candidate)
         (candidate / "payload.py").write_text("raise SystemExit", encoding="utf-8")
-        with self.assertRaises(StandardsMemoryError) as caught:
+        with self.assertRaises(StandardsForgeError) as caught:
             validate_pack_directory(candidate)
         self.assertEqual("untracked_pack_content", caught.exception.code)
 
@@ -119,13 +119,13 @@ class VerticalSliceTests(unittest.TestCase):
         self.assertEqual(directory_digest, verified["package_digest"])
 
     def test_pack_rights_claim_does_not_override_operator_denial(self) -> None:
-        with self.assertRaises(StandardsMemoryError) as caught:
+        with self.assertRaises(StandardsForgeError) as caught:
             self.service.install_pack(PACK_V1, DENY_POLICY)
         self.assertEqual("policy_denied", caught.exception.code)
 
     def test_atomic_evidence_is_not_truncated_to_fit_budget(self) -> None:
         digest = self._install_v1()
-        with self.assertRaises(StandardsMemoryError) as caught:
+        with self.assertRaises(StandardsForgeError) as caught:
             self.service.get_clause(digest, "4.2.1", "local-user", max_bytes=100)
         self.assertEqual("budget_too_small", caught.exception.code)
         self.assertGreater(caught.exception.details["required_bytes"], 100)
@@ -133,7 +133,7 @@ class VerticalSliceTests(unittest.TestCase):
     def test_revocation_is_checked_on_next_read(self) -> None:
         digest = self._install_v1()
         self.assertTrue(self.service.revoke(digest, "local-user")["revoked"])
-        with self.assertRaises(StandardsMemoryError) as caught:
+        with self.assertRaises(StandardsForgeError) as caught:
             self.service.get_clause(digest, "4.2.1", "local-user")
         self.assertEqual("not_found", caught.exception.code)
 
@@ -154,7 +154,7 @@ class VerticalSliceTests(unittest.TestCase):
             [item["record_id"] for item in packet["evidence"]],
         )
         self.assertEqual("obligation", packet["evidence"][0]["derivation"]["statement_role"])
-        with self.assertRaises(StandardsMemoryError) as caught:
+        with self.assertRaises(StandardsForgeError) as caught:
             self.service.build_context(digest, ["4.2.1", "4.2.2"], "local-user", max_bytes=200)
         self.assertEqual("budget_too_small", caught.exception.code)
 
@@ -174,7 +174,7 @@ class VerticalSliceTests(unittest.TestCase):
         self.assertTrue(second["completeness"]["complete_for_requested_scope"])
 
         tampered = cursor[:-1] + ("A" if cursor[-1] != "A" else "B")
-        with self.assertRaises(StandardsMemoryError) as caught:
+        with self.assertRaises(StandardsForgeError) as caught:
             self.service.enumerate_obligations(
                 digest, "local-user", scope_prefix="4.2", limit=1, cursor=tampered
             )
@@ -185,7 +185,7 @@ class VerticalSliceTests(unittest.TestCase):
         policy_data["policy_id"] = "replacement-policy"
         replacement_policy.write_text(json.dumps(policy_data), encoding="utf-8")
         self.service.install_pack(PACK_V1, replacement_policy)
-        with self.assertRaises(StandardsMemoryError) as caught:
+        with self.assertRaises(StandardsForgeError) as caught:
             self.service.enumerate_obligations(
                 digest, "local-user", scope_prefix="4.2", limit=1, cursor=cursor
             )
@@ -226,7 +226,7 @@ class VerticalSliceTests(unittest.TestCase):
                 );
                 """
             )
-        StandardsMemoryService(db_path, migration_root / "objects")
+        StandardsForgeService(db_path, migration_root / "objects")
         with closing(sqlite3.connect(db_path)) as connection, connection:
             version = connection.execute("SELECT value FROM metadata WHERE key = 'schema_version'").fetchone()[0]
             columns = {row[1] for row in connection.execute("PRAGMA table_info(records)")}

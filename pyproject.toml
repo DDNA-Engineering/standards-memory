@@ -3,12 +3,11 @@ requires = ["setuptools==84.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "standards-memory"
+name = "standardsforge"
 version = "0.1.0a1"
 description = "Offline-first standards pack compiler and evidence engine"
 readme = "README.md"
 license = "Apache-2.0"
-authors = [{name = "DDNA Engineering"}]
 requires-python = ">=3.11"
 dependencies = []
 keywords = ["standards", "evidence", "retrieval", "offline"]
@@ -19,12 +18,12 @@ classifiers = [
   "Programming Language :: Python :: 3.12"
 ]
 
-[project.urls]
-Repository = "https://github.com/DDNA-Engineering/standards-memory"
-Issues = "https://github.com/DDNA-Engineering/standards-memory/issues"
+[project.optional-dependencies]
+mcp = ["mcp==2.2.0"]
 
 [project.scripts]
-standards-memory = "standards_memory.cli:main"
+standardsforge = "standardsforge.cli:main"
+standardsforge-mcp = "standardsforge.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

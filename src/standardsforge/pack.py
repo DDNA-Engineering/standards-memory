@@ -10,7 +10,7 @@ from datetime import date
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterator
 
-from .errors import StandardsMemoryError, require
+from .errors import StandardsForgeError, require
 from .identity import normalize_identifier
 from .models import InventoryEntry, ValidatedPack
 
@@ -91,10 +91,10 @@ def _read_json(path: Path) -> Any:
         size = path.stat().st_size
         require(size <= MAX_JSON_BYTES, "pack_limit_exceeded", "A JSON file exceeds the size limit.", path=path.name)
         return json.loads(path.read_text(encoding="utf-8"))
-    except StandardsMemoryError:
+    except StandardsForgeError:
         raise
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise StandardsMemoryError("invalid_pack_json", "A required pack JSON file is invalid.", {"path": path.name}) from exc
+        raise StandardsForgeError("invalid_pack_json", "A required pack JSON file is invalid.", {"path": path.name}) from exc
 
 
 def _strict_object(value: Any, allowed: set[str], code: str, label: str) -> dict[str, Any]:
@@ -169,7 +169,7 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
     try:
         date.fromisoformat(manifest["publication_date"])
     except ValueError as exc:
-        raise StandardsMemoryError("invalid_manifest", "publication_date must be an ISO calendar date.") from exc
+        raise StandardsForgeError("invalid_manifest", "publication_date must be an ISO calendar date.") from exc
     require(manifest["inventory_path"] == "inventory.json", "invalid_manifest", "The inventory path must be inventory.json.")
     require(manifest["rights_path"] == "rights.json", "invalid_manifest", "The rights path must be rights.json.")
     require(manifest["records_path"] == "records.json", "invalid_manifest", "The records path must be records.json.")
@@ -267,7 +267,7 @@ def open_validated_pack(source: str | Path) -> Iterator[ValidatedPack]:
         return
     require(source_path.is_file() and source_path.suffix.lower() == ".zip", "pack_not_found", "Pack source must be a directory or .zip file.")
 
-    with tempfile.TemporaryDirectory(prefix="standards-memory-pack-") as temp:
+    with tempfile.TemporaryDirectory(prefix="standardsforge-pack-") as temp:
         target = Path(temp)
         try:
             with zipfile.ZipFile(source_path) as archive:
@@ -289,5 +289,5 @@ def open_validated_pack(source: str | Path) -> Iterator[ValidatedPack]:
                         while chunk := reader.read(1024 * 1024):
                             writer.write(chunk)
         except (zipfile.BadZipFile, OSError) as exc:
-            raise StandardsMemoryError("invalid_pack_archive", "The pack archive is invalid.") from exc
+            raise StandardsForgeError("invalid_pack_archive", "The pack archive is invalid.") from exc
         yield validate_pack_directory(target)

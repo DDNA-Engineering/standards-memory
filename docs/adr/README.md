@@ -14,7 +14,7 @@ The supplied architecture selects 16 proposed decisions. None is silently treate
 | ADR-008 | Revision- and policy-aware caches | No packet cache yet |
 | ADR-009 | Separate facts, derivations, and approvals | Source records separated |
 | ADR-010 | Offline-first security and rights policy | Implemented local boundary |
-| ADR-011 | Six read-only operations and separate admin | Local library/CLI implemented |
+| ADR-011 | Six read-only operations and separate admin | Local library/CLI/MCP implemented |
 | ADR-012 | Dependency-sensitive edition comparison | Exact-ID comparison implemented |
 | ADR-013 | Quality-constrained performance gates | Planned |
 | ADR-014 | Apache-2.0 code, separate content permissions | Proposed; release gate open |

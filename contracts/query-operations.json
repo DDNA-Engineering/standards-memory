@@ -13,6 +13,13 @@
     {"name": "install", "requires_operator_policy": true},
     {"name": "revoke", "requires_existing_grant": true}
   ],
+  "local_mcp_adapter": {
+    "transport": "stdio",
+    "principal_binding": "trusted_server_startup_configuration",
+    "principal_argument_exposed": false,
+    "admin_operations_exposed": false,
+    "telemetry": "disabled"
+  },
   "invariants": [
     "query operations do not fetch or activate content",
     "package rights claims do not grant operational access",

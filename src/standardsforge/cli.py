@@ -6,14 +6,14 @@ import sys
 from pathlib import Path
 from typing import Any, Sequence
 
-from .errors import StandardsMemoryError
-from .service import StandardsMemoryService
+from .errors import StandardsForgeError
+from .service import StandardsForgeService
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="standards-memory", description="Offline-first standards evidence engine")
-    parser.add_argument("--db", default=".standards-memory/memory.db", help="SQLite metadata database")
-    parser.add_argument("--store", default=".standards-memory/objects", help="Immutable object directory")
+    parser = argparse.ArgumentParser(prog="standardsforge", description="Offline-first standards evidence engine")
+    parser.add_argument("--db", default=".standardsforge/memory.db", help="SQLite metadata database")
+    parser.add_argument("--store", default=".standardsforge/objects", help="Immutable object directory")
     commands = parser.add_subparsers(dest="command", required=True)
 
     verify = commands.add_parser("verify-pack", help="Validate a data-only pack without installing it")
@@ -68,7 +68,7 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def _run(args: argparse.Namespace) -> dict[str, Any]:
-    service = StandardsMemoryService(Path(args.db), Path(args.store))
+    service = StandardsForgeService(Path(args.db), Path(args.store))
     if args.command == "verify-pack":
         return service.verify_pack(args.source)
     if args.command == "install":
@@ -91,7 +91,7 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
         return service.search(args.query, args.principal, args.limit)
     if args.command == "revoke":
         return service.revoke(args.package_digest, args.principal)
-    raise StandardsMemoryError("unsupported_operation", "The requested operation is not implemented.")
+    raise StandardsForgeError("unsupported_operation", "The requested operation is not implemented.")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -99,7 +99,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         result = _run(args)
-    except StandardsMemoryError as exc:
+    except StandardsForgeError as exc:
         print(json.dumps({"ok": False, "error": exc.as_dict()}, sort_keys=True), file=sys.stderr)
         return 2
     except Exception:

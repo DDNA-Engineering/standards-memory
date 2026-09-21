@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://standards-memory.invalid/contracts/pack-manifest-0.1.0.schema.json",
-  "title": "Standards Memory pack manifest 0.1.0",
+  "title": "StandardsForge pack manifest 0.1.0",
   "type": "object",
   "additionalProperties": false,
   "required": [

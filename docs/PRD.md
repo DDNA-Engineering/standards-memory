@@ -1,4 +1,4 @@
-# Standards Memory product baseline
+# StandardsForge product baseline
 
 Document `SM-PRD-001`, version `0.1.0-design`, is a proposed baseline derived from the supplied PRD. Product and release ownership remain unassigned.
 
@@ -6,9 +6,9 @@ The product compiles authorized technical documents into immutable, source-linke
 
 The standalone core owns source identities, exact citations, package validation, deterministic local retrieval, coverage accounting, and portable exports. Host systems own project baselines, applicability, decisions, and approvals. Public accessibility, processing permission, model permission, and redistribution permission are separate decisions.
 
-The initial supported jobs are exact identifier lookup, clause evidence retrieval, lexical discovery, scoped exhaustive traversal, edition comparison, and evidence packet assembly. The current `TASK-001` slice implements only strict synthetic-pack validation and installation, exact pinned resolution, and clause-plus-governing-note retrieval.
+The initial supported jobs are exact identifier lookup, clause evidence retrieval, lexical discovery, scoped exhaustive traversal, edition comparison, and evidence packet assembly. `TASK-001` through `TASK-003` implement strict synthetic-pack validation and installation, all six deterministic read operations, and a local read-only stdio MCP boundary.
 
-No runtime claim is made for real PDF extraction, semantic retrieval, shared-server isolation, production speed, catalog synchronization, certification, or controlled workloads. Numerical performance and quality targets in the supplied PRD remain unmeasured release targets.
+No runtime claim is made for real PDF extraction, semantic retrieval, HTTP serving, shared-server isolation, production speed, catalog synchronization, certification, or controlled workloads. Numerical performance and quality targets in the supplied PRD remain unmeasured release targets.
 
 ## Invariants
 

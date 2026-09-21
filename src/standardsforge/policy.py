@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .errors import StandardsMemoryError, require
+from .errors import StandardsForgeError, require
 from .models import LocalPolicy, ValidatedPack
 
 
@@ -30,7 +30,7 @@ def load_policy(path: str | Path) -> LocalPolicy:
         raw = policy_path.read_bytes()
         data = json.loads(raw)
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise StandardsMemoryError("invalid_policy", "The local policy could not be read as JSON.") from exc
+        raise StandardsForgeError("invalid_policy", "The local policy could not be read as JSON.") from exc
 
     require(isinstance(data, dict), "invalid_policy", "The local policy must be a JSON object.")
     unknown = sorted(set(data) - _POLICY_KEYS)

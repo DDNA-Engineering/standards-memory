@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterator
 
-from .errors import StandardsMemoryError, require
+from .errors import StandardsForgeError, require
 from .identity import normalize_identifier
 from .models import LocalPolicy, ValidatedPack
 from .pack import validate_pack_directory
@@ -139,7 +139,7 @@ class LocalStore:
                     )
                     connection.execute("UPDATE metadata SET value = ? WHERE key = 'schema_version'", (str(SCHEMA_VERSION),))
                 elif int(row["value"]) != SCHEMA_VERSION:
-                    raise StandardsMemoryError("unsupported_database_version", "The local database schema is unsupported.")
+                    raise StandardsForgeError("unsupported_database_version", "The local database schema is unsupported.")
                 connection.execute(
                     "CREATE INDEX IF NOT EXISTS records_role_scope_idx ON records(package_digest, statement_role, clause_reference, ordinal)"
                 )
@@ -147,7 +147,7 @@ class LocalStore:
                 if cursor_secret is None:
                     connection.execute("INSERT INTO metadata(key, value) VALUES('cursor_secret', ?)", (secrets.token_hex(32),))
         except sqlite3.Error as exc:
-            raise StandardsMemoryError("storage_error", "The local store could not be initialized.") from exc
+            raise StandardsForgeError("storage_error", "The local store could not be initialized.") from exc
 
     def _copy_pack(self, pack: ValidatedPack) -> Path:
         destination = self.object_root / pack.package_digest
@@ -277,7 +277,7 @@ class LocalStore:
                     (policy.principal_id, pack.package_digest, int(policy.allow_serve), policy.policy_id, policy.fingerprint),
                 )
         except sqlite3.Error as exc:
-            raise StandardsMemoryError("storage_error", "The pack could not be installed into the local store.") from exc
+            raise StandardsForgeError("storage_error", "The pack could not be installed into the local store.") from exc
 
         return {
             "package_digest": pack.package_digest,
@@ -316,7 +316,7 @@ class LocalStore:
                 (package_digest, principal_id),
             ).fetchone()
         if row is None:
-            raise StandardsMemoryError("not_found", "No authorized resource matches the request.")
+            raise StandardsForgeError("not_found", "No authorized resource matches the request.")
         return row
 
     def record_by_clause(self, package_digest: str, clause_reference: str) -> sqlite3.Row | None:
@@ -413,11 +413,11 @@ class LocalStore:
         with self._connection() as connection:
             row = connection.execute("SELECT value FROM metadata WHERE key = 'cursor_secret'").fetchone()
         if row is None:
-            raise StandardsMemoryError("storage_error", "The cursor signing key is unavailable.")
+            raise StandardsForgeError("storage_error", "The cursor signing key is unavailable.")
         try:
             return bytes.fromhex(row["value"])
         except ValueError as exc:
-            raise StandardsMemoryError("storage_error", "The cursor signing key is invalid.") from exc
+            raise StandardsForgeError("storage_error", "The cursor signing key is invalid.") from exc
 
     def search(self, principal_id: str, fts_query: str, limit: int) -> list[sqlite3.Row]:
         try:
@@ -443,7 +443,7 @@ class LocalStore:
                     )
                 )
         except sqlite3.Error as exc:
-            raise StandardsMemoryError("search_error", "The lexical query could not be evaluated.") from exc
+            raise StandardsForgeError("search_error", "The lexical query could not be evaluated.") from exc
 
     def revoke(self, principal_id: str, package_digest: str) -> bool:
         revoked_at = datetime.now(UTC).isoformat()

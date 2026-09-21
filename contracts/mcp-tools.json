@@ -1,0 +1,23 @@
+{
+  "contract_version": "0.1.0",
+  "sdk_requirement": "mcp==2.2.0",
+  "transport": "stdio",
+  "principal_binding": "trusted_server_startup_configuration",
+  "telemetry": "disabled",
+  "tools": [
+    {"name": "search", "arguments": ["query", "limit"]},
+    {"name": "resolve_document", "arguments": ["identifier", "edition_id"]},
+    {"name": "get_clause", "arguments": ["package_digest", "clause_reference", "max_bytes"]},
+    {"name": "build_context", "arguments": ["package_digest", "clause_references", "max_bytes"]},
+    {"name": "enumerate_obligations", "arguments": ["package_digest", "scope_prefix", "limit", "cursor", "max_bytes"]},
+    {"name": "diff_editions", "arguments": ["from_package_digest", "to_package_digest", "max_bytes"]}
+  ],
+  "invariants": [
+    "no principal or authorization selector is accepted from a tool caller",
+    "no administrative operation is exposed",
+    "every tool is marked read-only and closed-world",
+    "successful calls use the same typed envelope as the CLI",
+    "anticipated failures are MCP error results carrying a typed JSON error envelope",
+    "the adapter creates no network listener and has no network or model fallback"
+  ]
+}
