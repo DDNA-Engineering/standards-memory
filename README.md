@@ -4,10 +4,10 @@
 
 # StandardsForge
 
-**Engineering standards. Built into better products.**
+**Defense engineering standards. Built into robust products.**
 
-An offline-first standards compiler and evidence engine.<br>
-Give engineering teams traceable requirements for building robust, reliable products.
+An offline-first compiler and evidence engine for defense engineering standards.<br>
+Give defense engineering teams traceable requirements for building robust, reliable products.
 
 [![Version: 0.1.0a1](https://img.shields.io/badge/version-0.1.0a1-253247?style=flat-square)](pyproject.toml)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
@@ -19,7 +19,7 @@ Give engineering teams traceable requirements for building robust, reliable prod
 [![Storage: SQLite FTS5](https://img.shields.io/badge/storage-SQLite_FTS5-253247?style=flat-square)](docs/ARCHITECTURE.md)
 [![Core dependencies: zero](https://img.shields.io/badge/core_dependencies-zero-253247?style=flat-square)](pyproject.toml)
 
-**Topics:** [engineering](https://github.com/topics/engineering) · [technical-standards](https://github.com/topics/technical-standards) · [requirements-engineering](https://github.com/topics/requirements-engineering) · [document-processing](https://github.com/topics/document-processing) · [mcp](https://github.com/topics/mcp) · [offline-first](https://github.com/topics/offline-first)
+**Topics:** [defense-engineering](https://github.com/topics/defense-engineering) · [military-standards](https://github.com/topics/military-standards) · [mil-std](https://github.com/topics/mil-std) · [systems-engineering](https://github.com/topics/systems-engineering) · [requirements-engineering](https://github.com/topics/requirements-engineering) · [mcp](https://github.com/topics/mcp) · [offline-first](https://github.com/topics/offline-first)
 
 [Quickstart](#try-it-locally) · [Commands](#six-ways-to-read) · [Architecture](#under-the-hood) · [Roadmap](#where-this-is-going) · [Contributing](CONTRIBUTING.md)
 
@@ -29,7 +29,7 @@ Give engineering teams traceable requirements for building robust, reliable prod
 
 ## Build on the right standards
 
-Robust products start with understanding the standards they must meet: the right edition, the requirements, and the conditions under which those requirements apply.
+Robust defense products start with understanding the engineering standards they must meet: the right edition, the requirements, and the conditions under which those requirements apply.
 
 For example, a technical standard requires a connector to withstand **80 N for 60 seconds**. A governing note says the assembly must first spend **two hours at 23 °C ± 2 °C**. Retrieve the clause alone and you've lost part of the test.
 
