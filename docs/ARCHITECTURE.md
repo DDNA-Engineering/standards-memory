@@ -17,7 +17,7 @@ operator policy + local pack -> validation -> immutable object store -> atomic S
 principal + explicit selector -> authorization -> snapshot-pinned batched dependency closure -> request-local page/node/relationship span re-verification -> detailed, compact, or concise evidence packet
 ```
 
-The repository carries source metadata and verification code, not third-party PDF bytes. Acquisition is an explicit local administrative action. Query code does not download or synchronize documents.
+The source repository carries source metadata and verification code, not third-party PDF bytes. The separate prepared distribution may carry verified compiled packs containing only components classified by the recorded publisher metadata as Distribution Statement A. Acquisition and compilation are explicit maintainer actions; end-user setup validates and indexes the included packs locally. Query code does not download or synchronize documents.
 
 ## Authority and identity
 

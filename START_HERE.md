@@ -11,11 +11,11 @@ StandardsForge is a standalone, source-first standards compiler and evidence eng
 - `page_text`, `derived_structure`, `reviewed_structure`, and `curated_records` remain distinct representations.
 - MCP initialization and tool descriptions provide the [MIL-STD model reading protocol](docs/MODEL_READING_GUIDE.md).
 
-The observed local DLA corpus contains 438 installed page-text packs covering 912 downloaded PDFs and 35,218 unclassified records. The qualified MIL-STD-810H derived outline contains 7,788 exact-span records; it remains automated and unreviewed. Current evidence and measurements are recorded in [VALIDATION_REPORT.md](VALIDATION_REPORT.md).
+The prepared distribution contains 438 precompiled page-text packs covering 912 verified PDFs and 35,218 unclassified records. Its qualified MIL-STD-810H derived outline contains 7,788 exact-span records; it remains automated and unreviewed. First-run setup validates and indexes those included packs locally without source acquisition or PDF compilation. Current evidence and measurements are recorded in [VALIDATION_REPORT.md](VALIDATION_REPORT.md).
 
 ## Start working
 
-Use the root [README](README.md) for installation, the complete downloaded-corpus-to-MCP workflow, command reference, and limitations. Before changing behavior, also read the [PRD](docs/PRD.md), [architecture](docs/ARCHITECTURE.md), relevant [decision index](docs/adr/README.md), and selected task in [backlog/tasks.json](backlog/tasks.json).
+Use the root [README](README.md) for prepared-release setup, querying, the maintainer rebuild workflow, command reference, and limitations. Before changing behavior, also read the [PRD](docs/PRD.md), [architecture](docs/ARCHITECTURE.md), relevant [decision index](docs/adr/README.md), and selected task in [backlog/tasks.json](backlog/tasks.json).
 
 Run the required checks from the repository root:
 

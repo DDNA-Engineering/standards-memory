@@ -4,10 +4,10 @@
 
 # StandardsForge
 
-**Defense engineering standards. Built into robust products.**
+**Turn MIL-STD evidence into stronger products, requirements, and test plans.**
 
-An offline-first compiler and evidence engine for defense engineering standards.<br>
-Give defense engineering teams traceable requirements for building robust, reliable products.
+StandardsForge helps teams building physical products gather the military standards that may shape their design, retrieve the exact source evidence, and use it to develop requirements, test plans, and a standards-aware product roadmap.<br>
+It is an offline-first compiler and evidence engine: every result stays tied to the source, edition, governing conditions, and known evidence limits.
 
 [![Version: 0.1.0a1](https://img.shields.io/badge/version-0.1.0a1-253247?style=flat-square)](pyproject.toml)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
@@ -21,68 +21,87 @@ Give defense engineering teams traceable requirements for building robust, relia
 
 **Topics:** [defense-engineering](https://github.com/topics/defense-engineering) · [military-standards](https://github.com/topics/military-standards) · [mil-std](https://github.com/topics/mil-std) · [systems-engineering](https://github.com/topics/systems-engineering) · [requirements-engineering](https://github.com/topics/requirements-engineering) · [mcp](https://github.com/topics/mcp) · [offline-first](https://github.com/topics/offline-first)
 
-[Quickstart](#try-it-locally) · [Commands](#six-ways-to-read) · [Architecture](#under-the-hood) · [Roadmap](#where-this-is-going) · [Contributing](CONTRIBUTING.md)
+[Quickstart](#query-the-prebuilt-corpus) · [Commands](#six-ways-to-read) · [Architecture](#under-the-hood) · [Roadmap](#where-this-is-going) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
 ---
 
-## Build on the right standards
+## From physical product to defensible plan
 
-Robust defense products start with understanding the engineering standards they must meet: the right edition, the requirements, and the conditions under which those requirements apply.
+Physical products are shaped by more than a list of standard numbers. Teams need to know which editions they are evaluating, what the source actually says, which conditions and exceptions travel with a requirement, and where that evidence affects the design and verification strategy.
 
-For example, a technical standard requires a connector to withstand **80 N for 60 seconds**. A governing note says the assembly must first spend **two hours at 23 °C ± 2 °C**. Retrieve the clause alone and you've lost part of the test.
+StandardsForge provides the evidence backbone for that work:
 
-StandardsForge follows the pack's declared dependencies and returns both, with exact source text, locations, and hashes. Pin the package once and keep that evidence tied to the same bytes, even when another edition arrives.
+- **Gather authorized MIL-STD sources locally.** Preserve the publisher identity, exact edition, notices, component files, and source hashes instead of building from an untraceable document folder.
+- **Discover standards evidence relevant to the product.** Search an authorized local corpus, resolve the intended edition and representation, and pin the exact package used for the engineering baseline.
+- **Build traceable requirements and test plans.** Retrieve exact clauses with their governing notes, conditions, exceptions, citations, and declared dependencies so engineers can turn evidence into design inputs and verification work.
+- **Harden the product roadmap.** Use source-linked evidence to expose missing decisions, qualification work, test assets, design changes, and review gates before they become late-program surprises.
 
-StandardsForge gives engineers and their tools source-linked requirements they can use in design and verification, with the edition, governing conditions, and evidence limits visible.
+For example, a technical standard may require a connector to withstand **80 N for 60 seconds**, while a governing note requires **two hours at 23 °C ± 2 °C** first. Retrieving only the clause produces an incomplete test basis. StandardsForge follows the pack's declared dependencies and returns both with exact source text, locations, and hashes.
 
-## Try it locally
+The engine supplies evidence, not engineering approval. It does not decide whether a standard applies to a specific product, approve a requirement or test plan, or certify compliance. Those decisions stay with the responsible engineering and program authorities; StandardsForge makes their source basis explicit and reviewable.
 
-You need **Python 3.11+** with SQLite FTS5 support. The core has **no third-party runtime dependencies**. From a local checkout, run these commands in **PowerShell**:
+## Query the prebuilt corpus
+
+The prepared StandardsForge release is already compiled for use. It contains the complete public DLA MIL-STD corpus in verified compressed packs, plus a model-ready MIL-STD-810H derived outline. You do **not** need to download hundreds of PDFs or compile standards before searching them.
+
+The current prepared baseline contains:
+
+- **438** compiled MIL-STD page-text packs from **912** verified source PDFs.
+- **35,218** source-linked page records across **35,235** physical pages.
+- About **1.0 GB** of deterministic compressed packs.
+- A one-command local setup that validates and indexes the included packs for offline queries.
+
+Download and extract [standardsforge-ready-0.1.0a1.zip](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a1/standardsforge-ready-0.1.0a1.zip), and optionally verify its [published SHA-256 checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a1/standardsforge-ready-0.1.0a1.zip.sha256). You need **Python 3.11+** with SQLite FTS5 support. Open **PowerShell** in the extracted directory and run:
 
 ```powershell
-# Point Python at the source tree.
-$env:PYTHONPATH = Join-Path $PWD 'src'
+# Create the isolated local environment and index the included compiled packs.
+.\setup.ps1
 
-# Check the fictional pack, then install it using the example local policy.
-python -m standardsforge verify-pack examples/packs/fictional-adapter-v1
-python -m standardsforge install examples/packs/fictional-adapter-v1 --policy examples/policies/local-synthetic.json
+# Search the installed MIL-STD corpus.
+.\standardsforge.ps1 search "environmental testing" --principal local-user --limit 5
 
-# Resolve an exact edition/representation and capture its immutable package pin.
-$resolved = python -m standardsforge resolve EXAMPLE-SPEC-100 --edition example:spec-100:2025-a --representation curated_records --principal local-user | ConvertFrom-Json
+# Resolve the prepared MIL-STD-810H representation and capture its immutable package pin.
+$resolved = .\standardsforge.ps1 resolve 'MIL-STD-810H(1)' --representation derived_structure --principal local-user | ConvertFrom-Json
 $pin = $resolved.result.package_digest
 
-# Retrieve the clause together with its governing note.
-python -m standardsforge get-clause $pin 4.2.1 --principal local-user
+# Search only that pinned edition and representation.
+.\standardsforge.ps1 search "low pressure" --package-digest $pin --principal local-user --limit 5
 ```
 
-The last command returns a JSON evidence packet containing the connector-retention clause, its conditioning note, source references, and completeness metadata. Local state lives in `.standardsforge/`; use `--db` and `--store` before the command to choose another location.
+The one-time setup installs only the bundled wheel and precompiled packs; it does not fetch standards or call a model. Commands return source-linked JSON with package identity, exact citations, coverage, and interpretation limits. Local state stays inside the extracted distribution.
 
-**Keep exploring:**
+The source repository also supports an optional MCP adapter for local model hosts:
 
 ```powershell
-# Find relevant text in packs this principal can access.
-python -m standardsforge search "connector" --principal local-user
-
-# Narrow discovery to one immutable package and clause scope.
-python -m standardsforge search "adapter" --principal local-user --package-digest $pin --scope-prefix 4.2
-
-# Assemble two clauses, including their required context.
-python -m standardsforge build-context $pin 4.2.1 4.2.2 --principal local-user
-
-# Use the measured concise projection; exact text, citations, governing context, coverage, and authorization remain present.
-python -m standardsforge build-context $pin 4.2.1 4.2.2 --principal local-user --response-profile concise_evidence_v1
-
-# Walk every explicitly classified obligation in section 4.2.
-python -m standardsforge enumerate-obligations $pin --scope 4.2 --principal local-user
+python -m pip install -e ".[mcp]"
+standardsforge-mcp --db .standardsforge/memory.db --store .standardsforge/objects --principal local-user
 ```
 
-Commands emit JSON. Application failures return a typed `error.code` and a nonzero exit status. See `python -m standardsforge --help` for all arguments.
+The host owns the MCP process, so the final command intentionally stays running when launched directly.
 
-## Seed a local official-source corpus
+> **Distribution boundary:** `.standardsforge/` remains excluded from the source-only Git repository because it is machine-local runtime state. The prepared release asset carries the verified precompiled public corpus separately. A plain Git clone contains the compiler and example packs; end users should use the prepared release. The rebuild workflow below is for maintainers creating or refreshing that release.
 
-StandardsForge is clone-and-run software. Each user acquires source documents into ignored local state; the repository tracks provenance and integrity metadata rather than redistributing the PDFs.
+<details>
+<summary><strong>Try the small fictional example instead</strong></summary>
+
+```powershell
+python -m standardsforge verify-pack examples/packs/fictional-adapter-v1
+python -m standardsforge install examples/packs/fictional-adapter-v1 --policy examples/policies/local-synthetic.json
+$example = python -m standardsforge resolve EXAMPLE-SPEC-100 --edition example:spec-100:2025-a --representation curated_records --principal local-user | ConvertFrom-Json
+python -m standardsforge get-clause $example.result.package_digest 4.2.1 --principal local-user
+```
+
+This returns the connector-retention clause with its governing conditioning note and is useful for development without the prepared corpus.
+
+</details>
+
+## Rebuild or refresh the official-source corpus
+
+This is a maintainer workflow, not a prerequisite for using a prepared StandardsForge distribution. Run it only when creating the corpus from authoritative publisher files or refreshing it against a newly approved source baseline.
+
+Source acquisition writes to ignored local state. The repository tracks provenance and integrity metadata rather than committing third-party PDFs.
 
 The first compiler seed catalog contains the current DLA ASSIST editions of MIL-STD-961, MIL-STD-962, and MIL-STD-967—the format authorities for specifications, standards, and handbooks. A separate catalog pins MIL-STD-810 Revision H Change 1 for environmental-engineering compilation and qualification. Catalog inclusion is not a declaration that a standard applies to a particular product.
 
@@ -110,7 +129,7 @@ Verification is offline and closed-set: every declared file must be present, no 
 
 EverySpec is useful for discovery, but its [published terms](https://everyspec.com/terms_of_use.php) prohibit automated downloading and processing. StandardsForge therefore does not scrape it. Bulk acquisition is an explicit administrative action against the official DLA publisher source, separate from every read operation; query tools never fetch URLs.
 
-## Compile a verified PDF
+## Compile verified source material
 
 Install the separately pinned compiler dependency, then compile a catalog-pinned source into an installable local pack:
 
@@ -157,9 +176,9 @@ python -m standardsforge compile-derived-outline <page-pack-or-archive> <output-
 
 The resulting `derived_structure` pack recognizes bounded headings, list items, notes, and table/figure captions while retaining exact source spans. Numeric table rows, repeated table footnotes, repeated method headers, unmatched prefixes, and unparsed pages are retained as unsupported regions. These records are candidates only: they remain `unclassified` and `automated_unreviewed`, produce no confirmed obligations, and make no table-cell, figure-visual, OCR, applicability, or compliance claim.
 
-## From downloaded corpus to first model-ready query
+## Rebuild a model-ready MIL-STD-810H representation
 
-This PowerShell workflow starts from the completed local corpus index, creates a derived outline for MIL-STD-810H, explicitly authorizes exactly that output, installs it, resolves its immutable pin, searches it, and retrieves exact evidence. Run it from the repository root. The output and policy paths must not already exist.
+The prepared workspace already contains this representation. Maintainers can use the following reproducible workflow to rebuild it from the completed corpus index, explicitly authorize exactly that output, install it, resolve its immutable pin, search it, and retrieve exact evidence. Run it from the repository root. The output and policy paths must not already exist.
 
 ```powershell
 # Create an isolated environment and install the CLI, compiler, and MCP adapter.
@@ -324,6 +343,20 @@ python -m unittest discover -s tests -v
 ```
 
 The suite covers pack and source integrity, policy and revocation boundaries, all read operations, MCP in-memory and stdio paths, deterministic PDF/corpus/outline compilation, representation selection, response profiles and budgets, caches, database snapshots, migrations, and negative cases. Real PDFs and generated packs remain ignored local inputs.
+
+Build the prepared release only from the completed local corpus and qualified outline:
+
+```powershell
+python -m pip wheel . --no-deps --wheel-dir build/prepared-wheel
+python scripts/build_prepared_distribution.py `
+  --corpus-index .standardsforge/corpus/mil-std-current/corpus.json `
+  --outline-pack .standardsforge/compiled/mil-std-810h-derived-outline `
+  --wheel build/prepared-wheel/standardsforge-0.1.0a1-py3-none-any.whl `
+  --output build/standardsforge-ready-0.1.0a1.zip `
+  --version 0.1.0a1
+```
+
+The builder rejects incomplete corpora, missing or changed archives, duplicate pack identities, and policies that do not exactly authorize the public compiled pack set. It emits the release ZIP plus a SHA-256 checksum file.
 
 Before contributing, read [CONTRIBUTING.md](CONTRIBUTING.md). Bring synthetic or demonstrably redistributable fixtures, and keep source facts distinct from interpretations.
 
