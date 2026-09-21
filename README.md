@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/brand/standardsforge-mark.png" alt="StandardsForge SF monogram in navy and orange" width="144" height="144">
+
 # StandardsForge
 
 **Engineering standards. Built into better products.**
@@ -7,10 +9,17 @@
 An offline-first standards compiler and evidence engine.<br>
 Give engineering teams traceable requirements for building robust, reliable products.
 
-![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)
-![Status: pre-alpha](https://img.shields.io/badge/status-pre--alpha-orange)
-[![License: Apache 2.0](https://img.shields.io/badge/code-Apache_2.0-blue)](LICENSE)
-![Core runtime dependencies: zero](https://img.shields.io/badge/core_runtime_dependencies-zero-brightgreen)
+[![Version: 0.1.0a1](https://img.shields.io/badge/version-0.1.0a1-253247?style=flat-square)](pyproject.toml)
+[![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-253247?style=flat-square)](LICENSE)
+[![Status: pre-alpha](https://img.shields.io/badge/status-pre--alpha-EA6A23?style=flat-square)](docs/PRD.md)
+
+[![Queries: offline](https://img.shields.io/badge/queries-offline-253247?style=flat-square)](docs/ARCHITECTURE.md)
+[![MCP: local stdio](https://img.shields.io/badge/MCP-local_stdio-253247?style=flat-square)](#connect-a-local-mcp-host)
+[![Storage: SQLite FTS5](https://img.shields.io/badge/storage-SQLite_FTS5-253247?style=flat-square)](docs/ARCHITECTURE.md)
+[![Core dependencies: zero](https://img.shields.io/badge/core_dependencies-zero-253247?style=flat-square)](pyproject.toml)
+
+**Topics:** [engineering](https://github.com/topics/engineering) · [technical-standards](https://github.com/topics/technical-standards) · [requirements-engineering](https://github.com/topics/requirements-engineering) · [document-processing](https://github.com/topics/document-processing) · [mcp](https://github.com/topics/mcp) · [offline-first](https://github.com/topics/offline-first)
 
 [Quickstart](#try-it-locally) · [Commands](#six-ways-to-read) · [Architecture](#under-the-hood) · [Roadmap](#where-this-is-going) · [Contributing](CONTRIBUTING.md)
 
