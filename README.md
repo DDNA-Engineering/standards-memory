@@ -28,9 +28,6 @@ StandardsForge follows the pack's declared dependencies and returns both, with e
 
 StandardsForge gives engineers and their tools source-linked requirements they can use in design and verification, with the edition, governing conditions, and evidence limits visible.
 
-> [!NOTE]
-> **Working today:** a deterministic Python library, CLI, and local read-only MCP adapter for data-only packs, demonstrated with fictional specifications. Document compilation, a reader UI, HTTP serving, and shared-server integration are on the roadmap. The examples contain only synthetic standards content.
-
 ## Try it locally
 
 You need **Python 3.11+** with SQLite FTS5 support. The core has **no third-party runtime dependencies**. From a local checkout, run these commands in **PowerShell**:
