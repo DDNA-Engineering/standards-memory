@@ -1,0 +1,14 @@
+EXAMPLE-SPEC-100 Revision A
+Fictional Vehicle Adapter Environmental Specification
+
+1 Scope
+This synthetic specification defines retention evidence for a fictional vehicle adapter.
+
+4.2.1 Connector retention
+The adapter shall retain the connector under a steady axial load of 80 N for 60 seconds.
+
+NOTE 1 — Governing condition
+Apply the load after conditioning the assembly at 23 °C ± 2 °C for at least two hours.
+
+4.2.2 Interface sealing
+The adapter shall prevent visible water ingress during a 10-minute synthetic spray exposure.

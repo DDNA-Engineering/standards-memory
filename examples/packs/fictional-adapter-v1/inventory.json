@@ -1,0 +1,26 @@
+{
+  "schema_version": "0.1.0",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "manifest.json",
+      "sha256": "ef61d9927f31a029f822f4f1f5a6522e74664d122be153d1dfd2a0b044978466",
+      "bytes": 824
+    },
+    {
+      "path": "records.json",
+      "sha256": "e4d5a5ae703d3f3d168ce888e268641e6ddf94bdf30a54b34fcf0194e2925f91",
+      "bytes": 2581
+    },
+    {
+      "path": "rights.json",
+      "sha256": "596c3c03eb54d8bb605de737205c3d30708b500fea15ae20d38b6120b73a2ad7",
+      "bytes": 378
+    },
+    {
+      "path": "sources/example-spec-100a.txt",
+      "sha256": "2687e9e4b94232323b3c2afb12c498115c94d42ccbda7aeede7f462540ae8e16",
+      "bytes": 536
+    }
+  ]
+}

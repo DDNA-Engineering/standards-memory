@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "standards-memory"
+version = "0.1.0a1"
+description = "Offline-first standards pack compiler and evidence engine"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [{name = "DDNA Engineering"}]
+requires-python = ">=3.11"
+dependencies = []
+keywords = ["standards", "evidence", "retrieval", "offline"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12"
+]
+
+[project.urls]
+Repository = "https://github.com/DDNA-Engineering/standards-memory"
+Issues = "https://github.com/DDNA-Engineering/standards-memory/issues"
+
+[project.scripts]
+standards-memory = "standards_memory.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

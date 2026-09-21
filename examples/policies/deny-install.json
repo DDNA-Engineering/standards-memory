@@ -1,0 +1,9 @@
+{
+  "policy_version": "0.1.0",
+  "policy_id": "deny-install-test",
+  "principal_id": "local-user",
+  "allow_admin_install": false,
+  "allow_serve": false,
+  "allowed_pack_ids": [],
+  "allowed_content_classes": []
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "0.1.0",
+  "scope": "TASK-001 and TASK-002 acceptance subset; the supplied PRD remains the broader proposed catalog",
+  "requirements": [
+    {"id": "SM-FR-002", "text": "Preserve publisher-scoped document identity separately from editions and packages."},
+    {"id": "SM-FR-003", "text": "Resolve identifiers conservatively and report ambiguity."},
+    {"id": "SM-FR-006", "text": "Pin evidence retrieval to an immutable installed edition package."},
+    {"id": "SM-FR-008", "text": "Preserve source bytes and validate their declared hashes."},
+    {"id": "SM-FR-010", "text": "Return exact evidence with required governing context."},
+    {"id": "SM-FR-016", "text": "Track required dependency context across retrieval and edition comparison."},
+    {"id": "SM-FR-018", "text": "Use portable data-only packs with explicit inventories."},
+    {"id": "SM-FR-019", "text": "Validate pack contracts strictly and reject unknown semantic fields."},
+    {"id": "SM-FR-022", "text": "Expose consistent structured read operations."},
+    {"id": "SM-FR-023", "text": "Do not split an atomic evidence unit to satisfy an output budget."},
+    {"id": "SM-FR-024", "text": "Traverse a declared obligation scope with stable pagination and coverage accounting."},
+    {"id": "SM-FR-025", "text": "Keep retrieval and derivation uncertainty explicit rather than converting it to approval."},
+    {"id": "SM-FR-026", "text": "Compare editions conservatively and surface dependency-context impacts."},
+    {"id": "SM-FR-027", "text": "Separate source rights claims from operational authorization."},
+    {"id": "SM-FR-029", "text": "Reauthorize every query against the installed digest grant."},
+    {"id": "SM-FR-030", "text": "Operate locally without network fallback or telemetry."},
+    {"id": "SM-FR-031", "text": "Keep administrative import separate from read-only queries."},
+    {"id": "SM-FR-039", "text": "Bind continuations to immutable snapshots, principals, and current policy state."},
+    {"id": "SM-FR-040", "text": "Treat indexes as rebuildable projections rather than evidence authority."},
+    {"id": "SM-FR-046", "text": "Expose detailed completeness dimensions and budget coverage."}
+  ]
+}

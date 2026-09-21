@@ -1,0 +1,74 @@
+{
+  "schema_version": "0.1.0",
+  "records": [
+    {
+      "record_id": "clause-4.2.1",
+      "edition_id": "example:spec-100:2026-b",
+      "kind": "clause",
+      "clause_reference": "4.2.1",
+      "heading": "Connector retention",
+      "text": "The adapter shall retain the connector under a steady axial load of 100 N for 60 seconds.",
+      "source": {
+        "path": "sources/example-spec-100b.txt",
+        "sha256": "3959ec6bf0d6a1d3b9314476875d3e1727b823cb124d5c9b95fae820db5a9a6e",
+        "page": 1,
+        "locator": "4.2.1",
+        "quote_sha256": "44208bd8e09b48d168c917e221e2fec3b54241905310633f1073335a772d6ffd"
+      },
+      "derivation": {
+        "statement_role": "obligation",
+        "method": "synthetic_fixture_authoring",
+        "review_status": "synthetic_fixture"
+      },
+      "dependencies": [
+        {
+          "relationship": "governed_by",
+          "target_record_id": "note-4.2.1-1",
+          "required": true
+        }
+      ]
+    },
+    {
+      "record_id": "note-4.2.1-1",
+      "edition_id": "example:spec-100:2026-b",
+      "kind": "note",
+      "clause_reference": "4.2.1 NOTE 1",
+      "heading": "Governing condition",
+      "text": "Apply the load after conditioning the assembly at -20 °C ± 2 °C for at least four hours.",
+      "source": {
+        "path": "sources/example-spec-100b.txt",
+        "sha256": "3959ec6bf0d6a1d3b9314476875d3e1727b823cb124d5c9b95fae820db5a9a6e",
+        "page": 1,
+        "locator": "4.2.1 NOTE 1",
+        "quote_sha256": "4ff52c0e344bbc39ee6a4e5dbe2d08e238b085e9bdd59b245bcf99bc207fb93b"
+      },
+      "derivation": {
+        "statement_role": "governing_note",
+        "method": "synthetic_fixture_authoring",
+        "review_status": "synthetic_fixture"
+      },
+      "dependencies": []
+    },
+    {
+      "record_id": "clause-4.2.2",
+      "edition_id": "example:spec-100:2026-b",
+      "kind": "clause",
+      "clause_reference": "4.2.2",
+      "heading": "Interface sealing",
+      "text": "The adapter shall prevent visible water ingress during a 10-minute synthetic spray exposure.",
+      "source": {
+        "path": "sources/example-spec-100b.txt",
+        "sha256": "3959ec6bf0d6a1d3b9314476875d3e1727b823cb124d5c9b95fae820db5a9a6e",
+        "page": 1,
+        "locator": "4.2.2",
+        "quote_sha256": "2eec9ca9a74083a59002cfb4f1de1306945411fb24ec6316743f1e02f5341d92"
+      },
+      "derivation": {
+        "statement_role": "obligation",
+        "method": "synthetic_fixture_authoring",
+        "review_status": "synthetic_fixture"
+      },
+      "dependencies": []
+    }
+  ]
+}

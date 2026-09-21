@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standards-memory.invalid/contracts/local-policy-0.1.0.schema.json",
+  "title": "Standards Memory trusted local policy 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "policy_version", "policy_id", "principal_id", "allow_admin_install",
+    "allow_serve", "allowed_pack_ids", "allowed_content_classes"
+  ],
+  "properties": {
+    "policy_version": {"const": "0.1.0"},
+    "policy_id": {"type": "string", "minLength": 1},
+    "principal_id": {"type": "string", "minLength": 1},
+    "allow_admin_install": {"type": "boolean"},
+    "allow_serve": {"type": "boolean"},
+    "allowed_pack_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "allowed_content_classes": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+  }
+}

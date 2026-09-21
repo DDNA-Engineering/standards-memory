@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.1.0",
+  "pack_id": "example.vehicle-adapter.2.0",
+  "document_family_id": "example:spec-100",
+  "edition_id": "example:spec-100:2026-b",
+  "publisher": "Standards Memory Project",
+  "identifier": "EXAMPLE-SPEC-100",
+  "title": "Fictional Vehicle Adapter Environmental Specification",
+  "revision": "B",
+  "publication_date": "2026-01-15",
+  "category": "synthetic_specification",
+  "inventory_path": "inventory.json",
+  "rights_path": "rights.json",
+  "records_path": "records.json",
+  "coverage": {
+    "corpus_scope": "single_synthetic_document",
+    "edition_composition": "complete",
+    "parsed_source_coverage": "complete_for_fixture",
+    "dependency_closure": "complete_for_fixture",
+    "enumeration_traversal": "not_evaluated",
+    "output_budget_coverage": "computed_at_query_time"
+  }
+}

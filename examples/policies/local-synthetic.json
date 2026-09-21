@@ -1,0 +1,14 @@
+{
+  "policy_version": "0.1.0",
+  "policy_id": "local-synthetic-development",
+  "principal_id": "local-user",
+  "allow_admin_install": true,
+  "allow_serve": true,
+  "allowed_pack_ids": [
+    "example.vehicle-adapter.1.0",
+    "example.vehicle-adapter.2.0"
+  ],
+  "allowed_content_classes": [
+    "synthetic"
+  ]
+}

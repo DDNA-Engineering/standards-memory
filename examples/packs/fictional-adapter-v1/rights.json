@@ -1,0 +1,12 @@
+{
+  "rights_schema_version": "0.1.0",
+  "content_class": "synthetic",
+  "redistribution": "allowed_for_project_fixture",
+  "processing": [
+    "local_validation",
+    "local_indexing",
+    "local_retrieval"
+  ],
+  "model_use": "not_required",
+  "statement": "Fictional content authored solely as a Standards Memory test fixture; this claim does not grant operational access."
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": "0.1.0",
+  "tasks": [
+    {
+      "task_id": "TASK-001",
+      "title": "Deterministic local pack install and pinned evidence retrieval",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-002",
+        "SM-FR-003",
+        "SM-FR-006",
+        "SM-FR-008",
+        "SM-FR-010",
+        "SM-FR-018",
+        "SM-FR-019",
+        "SM-FR-022",
+        "SM-FR-023",
+        "SM-FR-027",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-040",
+        "SM-FR-046"
+      ],
+      "acceptance": [
+        "Install a validated fictional data-only pack only when trusted local policy authorizes it.",
+        "Resolve an explicit identifier and edition to an immutable package digest.",
+        "Retrieve an exact clause and its required governing note with source hashes and stable locations.",
+        "Repeat the workflow while all network socket creation is denied.",
+        "Install a second edition and prove the first package pin returns unchanged evidence.",
+        "Reject tampered, untracked, executable, unauthorized, ambiguous, and misleadingly under-budget inputs with typed errors."
+      ]
+    },
+    {
+      "task_id": "TASK-002",
+      "title": "Complete deterministic read operations and dependency-sensitive edition comparison",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-016",
+        "SM-FR-022",
+        "SM-FR-023",
+        "SM-FR-024",
+        "SM-FR-025",
+        "SM-FR-026",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-039",
+        "SM-FR-046"
+      ],
+      "acceptance": [
+        "Assemble multiple exact clauses and required dependencies without duplicate evidence.",
+        "Enumerate every explicitly classified obligation in a pinned scope with stable, signed, expiring continuations.",
+        "Bind continuations to package, scope, principal, and current policy fingerprint.",
+        "Compare two editions conservatively by exact record identity and surface dependency-context impacts.",
+        "Refuse to truncate an atomic packet under a byte budget.",
+        "Run every read operation with networking denied and migrate schema version 1 without inventing legacy classifications."
+      ]
+    }
+  ]
+}

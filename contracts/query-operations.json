@@ -1,0 +1,23 @@
+{
+  "contract_version": "0.1.0",
+  "read_operations": [
+    {"name": "search", "requires_principal": true, "requires_package_pin": false},
+    {"name": "resolve_document", "requires_principal": true, "requires_package_pin": false},
+    {"name": "get_clause", "requires_principal": true, "requires_package_pin": true},
+    {"name": "build_context", "requires_principal": true, "requires_package_pin": true},
+    {"name": "enumerate_obligations", "requires_principal": true, "requires_package_pin": true},
+    {"name": "diff_editions", "requires_principal": true, "requires_package_pin": true}
+  ],
+  "admin_operations": [
+    {"name": "verify_pack", "authorization_effect": "none"},
+    {"name": "install", "requires_operator_policy": true},
+    {"name": "revoke", "requires_existing_grant": true}
+  ],
+  "invariants": [
+    "query operations do not fetch or activate content",
+    "package rights claims do not grant operational access",
+    "required evidence is atomic under byte budgets",
+    "continuations bind package, scope, principal, policy, and expiry",
+    "edition diffs do not infer moves from similarity"
+  ]
+}

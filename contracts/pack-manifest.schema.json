@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standards-memory.invalid/contracts/pack-manifest-0.1.0.schema.json",
+  "title": "Standards Memory pack manifest 0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "pack_id", "document_family_id", "edition_id", "publisher",
+    "identifier", "title", "revision", "publication_date", "category",
+    "inventory_path", "rights_path", "records_path", "coverage"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "pack_id": {"type": "string", "minLength": 1},
+    "document_family_id": {"type": "string", "minLength": 1},
+    "edition_id": {"type": "string", "minLength": 1},
+    "publisher": {"type": "string", "minLength": 1},
+    "identifier": {"type": "string", "minLength": 2, "maxLength": 128},
+    "title": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "publication_date": {"type": "string", "format": "date"},
+    "category": {"type": "string", "minLength": 1},
+    "inventory_path": {"const": "inventory.json"},
+    "rights_path": {"const": "rights.json"},
+    "records_path": {"const": "records.json"},
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "corpus_scope", "edition_composition", "parsed_source_coverage",
+        "dependency_closure", "enumeration_traversal", "output_budget_coverage"
+      ],
+      "properties": {
+        "corpus_scope": {"type": "string", "minLength": 1},
+        "edition_composition": {"type": "string", "minLength": 1},
+        "parsed_source_coverage": {"type": "string", "minLength": 1},
+        "dependency_closure": {"type": "string", "minLength": 1},
+        "enumeration_traversal": {"type": "string", "minLength": 1},
+        "output_budget_coverage": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
