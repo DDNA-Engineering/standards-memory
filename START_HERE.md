@@ -1,32 +1,32 @@
 # Start here
 
-StandardsForge is a standalone, source-first standards compiler and evidence engine. Host applications are integration consumers, not core dependencies.
+StandardsForge is a standalone, source-first standards compiler and evidence engine. It runs locally; host applications and models consume its read-only evidence interface rather than becoming core dependencies.
 
-The implementation order is M0 contracts and rights, M1 deterministic local core, M2 compilation and evidence, M3 measured identification/reading improvement, and M4 shared-server integration. The current repository implements the deterministic M1 read core and local MCP boundary in `TASK-001` through `TASK-003`.
+## Current baseline
 
-The first slice installs a fictional data-only pack, resolves its exact identity, retrieves a clause with its governing note, and returns a source-verifiable packet. It repeats without networking and demonstrates that installing a second fictional edition does not mutate evidence from the first pinned edition.
+- Six query operations are implemented in the library, CLI, and principal-bound stdio MCP adapter.
+- Official-source verification, deterministic PDF page compilation, restartable DLA corpus compilation, automated derived outlines, and reviewed structural annotations are separate administrative stages.
+- Installed evidence is immutable and package-pinned. Authorization comes from trusted local policy, not imported rights claims.
+- Search is discovery only. Retrieval reauthorizes, rechecks exact source hashes and spans, and reports coverage and unresolved context.
+- `page_text`, `derived_structure`, `reviewed_structure`, and `curated_records` remain distinct representations.
+- MCP initialization and tool descriptions provide the [MIL-STD model reading protocol](docs/MODEL_READING_GUIDE.md).
 
-The second slice completes the six read operations with multi-clause context assembly, exhaustive obligation traversal over explicit classifications, and dependency-sensitive edition comparison. Its cursors are signed, expire, and bind the package, scope, principal, and current policy fingerprint.
+The observed local DLA corpus contains 438 installed page-text packs covering 912 downloaded PDFs and 35,218 unclassified records. The qualified MIL-STD-810H derived outline contains 7,788 exact-span records; it remains automated and unreviewed. Current evidence and measurements are recorded in [VALIDATION_REPORT.md](VALIDATION_REPORT.md).
 
-The third slice exposes only those six operations through a local stdio MCP adapter. The operator binds one trusted principal at server startup; tool callers cannot select identity or invoke administrative operations. MCP SDK telemetry middleware is removed, and both in-memory socket-denial tests and a real stdio subprocess test cover the boundary.
+## Start working
 
-Working commands:
+Use the root [README](README.md) for installation, the complete downloaded-corpus-to-MCP workflow, command reference, and limitations. Before changing behavior, also read the [PRD](docs/PRD.md), [architecture](docs/ARCHITECTURE.md), relevant [decision index](docs/adr/README.md), and selected task in [backlog/tasks.json](backlog/tasks.json).
+
+Run the required checks from the repository root:
 
 ```powershell
 $env:PYTHONPATH = Join-Path $PWD 'src'
-python -m pip install -e ".[mcp]"
 python scripts/validate_contracts.py
 python -m unittest discover -s tests -v
-python -m standardsforge --help
-python -m standardsforge.mcp_server --help
 ```
 
-These checks cover synthetic packs and the local deterministic path. They do not establish real-PDF extraction fidelity, production performance, tenant isolation, shared-server security, or standards applicability.
+Local state uses `.standardsforge/`. An older `.standards-memory/` store is not moved or rewritten; select it explicitly with `--db .standards-memory/memory.db --store .standards-memory/objects` before a CLI subcommand, or pass the same paths to `standardsforge-mcp`.
 
-## Project rename
+## Boundaries
 
-The distribution, Python import, and CLI are now `standardsforge`; the MCP command is `standardsforge-mcp`. Reinstall the editable package after updating a checkout, and update host launch commands and Python imports. The exported classes are `StandardsForgeService` and `StandardsForgeError`.
-
-New CLI invocations use `.standardsforge/` for local state. To continue using an existing store, pass `--db .standards-memory/memory.db --store .standards-memory/objects` before the CLI subcommand, or as MCP server arguments. The rename does not move or rewrite existing evidence.
-
-Existing fixture publisher statements, schema identifiers, requirement IDs, and historical validation records retain their original identities. These are provenance and contract references, not current product branding.
+Page and derived-outline compilation do not establish document-wide visual fidelity, table-cell or figure interpretation, OCR completeness, reviewed semantic extraction, applicability, compliance, or approval. Restricted content remains outside the supported local public-source profile. Do not commit, publish, or redistribute locally acquired standards bytes without explicit authority.

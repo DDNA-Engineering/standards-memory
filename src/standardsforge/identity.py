@@ -6,7 +6,7 @@ import unicodedata
 from .errors import StandardsForgeError
 
 
-_SAFE_IDENTIFIER = re.compile(r"^[A-Z0-9][A-Z0-9 ./_-]{1,127}$")
+_SAFE_IDENTIFIER = re.compile(r"^[A-Z0-9][A-Z0-9 () ./_-]{1,127}$")
 
 
 def normalize_identifier(value: str) -> str:

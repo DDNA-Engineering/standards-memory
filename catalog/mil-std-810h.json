@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.1.0",
+  "catalog_id": "standardsforge.mil-std-810h",
+  "title": "MIL-STD-810H environmental engineering source",
+  "purpose": "Provide the official incorporated-change edition of MIL-STD-810H for local compiler qualification and engineering evidence retrieval.",
+  "selection_basis": "The user explicitly selected MIL-STD-810H. DLA ASSIST identifies Revision H Change 1 as the current active incorporated-change document on the retrieval date.",
+  "documents": [
+    {
+      "document_id": "MIL-STD-810",
+      "document_family_id": "dla:mil-std-810",
+      "edition_id": "dla:mil-std-810:h-change-1:2022-05-18",
+      "title": "Environmental Engineering Considerations and Laboratory Tests",
+      "publisher": "United States Department of Defense",
+      "status": "Active",
+      "revision": "H",
+      "change": 1,
+      "document_date": "2022-05-18",
+      "distribution_statement": "A",
+      "detail_url": "https://quicksearch.dla.mil/qsDocDetails.aspx?ident_number=35978",
+      "source_origin": "official_dla_assist_quick_search",
+      "local_filename": "MIL-STD-810H_CHG-1_2022-05-18.pdf",
+      "sha256": "b34534a6e849b63b2c31c5a5d235b822e01849300b4ff9d4b18e692161f13935",
+      "byte_length": 35214720,
+      "page_count": 1107,
+      "retrieved_at": "2026-09-21",
+      "rights": {
+        "access_basis": "DLA Quick Search metadata identifies Distribution Statement A and offers public download.",
+        "repository_redistribution": "not_asserted"
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standards-memory.invalid/contracts/records-0.2.0.schema.json",
+  "title": "StandardsForge offset-backed page records 0.2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "records"],
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "record_id", "edition_id", "kind", "clause_reference", "heading",
+          "source", "derivation", "dependencies"
+        ],
+        "properties": {
+          "record_id": {"type": "string", "minLength": 1},
+          "edition_id": {"type": "string", "minLength": 1},
+          "kind": {"const": "page"},
+          "clause_reference": {"type": "string", "minLength": 1},
+          "heading": {"type": "string", "minLength": 1},
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path", "sha256", "text_path", "text_sha256", "text_start_byte",
+              "text_end_byte", "page", "locator", "quote_sha256"
+            ],
+            "properties": {
+              "path": {"type": "string", "pattern": "^sources/.*\\.pdf$"},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "text_path": {"type": "string", "pattern": "^sources/.*\\.(txt|md)$"},
+              "text_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "text_start_byte": {"type": "integer", "minimum": 0},
+              "text_end_byte": {"type": "integer", "minimum": 1},
+              "page": {"type": "integer", "minimum": 1},
+              "locator": {"type": "string", "minLength": 1},
+              "quote_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          },
+          "derivation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["statement_role", "method", "review_status"],
+            "properties": {
+              "statement_role": {"enum": ["obligation", "governing_note", "informative", "unclassified"]},
+              "method": {"type": "string", "minLength": 1},
+              "review_status": {"type": "string", "minLength": 1}
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  }
+}

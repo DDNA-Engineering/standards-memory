@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1.0",
-  "scope": "TASK-001 through TASK-003 acceptance subset; the supplied PRD remains the broader proposed catalog",
+  "scope": "TASK-001 through TASK-016 acceptance subset; the supplied PRD remains the broader proposed catalog",
   "requirements": [
     {"id": "SM-FR-002", "text": "Preserve publisher-scoped document identity separately from editions and packages."},
     {"id": "SM-FR-003", "text": "Resolve identifiers conservatively and report ambiguity."},
@@ -21,6 +21,16 @@
     {"id": "SM-FR-031", "text": "Keep administrative import separate from read-only queries."},
     {"id": "SM-FR-039", "text": "Bind continuations to immutable snapshots, principals, and current policy state."},
     {"id": "SM-FR-040", "text": "Treat indexes as rebuildable projections rather than evidence authority."},
-    {"id": "SM-FR-046", "text": "Expose detailed completeness dimensions and budget coverage."}
+    {"id": "SM-FR-046", "text": "Expose detailed completeness dimensions and budget coverage."},
+    {"id": "SM-FR-047", "text": "Preserve stable official catalog metadata and verify locally acquired source bytes offline without embedding download behavior in query paths."},
+    {"id": "SM-FR-048", "text": "Compile verified PDFs deterministically while preserving raw source bytes separately from hashed extracted-text representations."},
+    {"id": "SM-FR-049", "text": "Expose text-layer, OCR, visual, table, figure, clause-boundary, and obligation-classification fidelity separately without inferring success."},
+    {"id": "SM-FR-050", "text": "Propagate declared pack coverage through search and retrieval, report source interpretation, dependency identification and retrieval, database traversal, and response fit separately, and provide a deterministic evidence-fetch path for every supported search result kind."},
+    {"id": "SM-FR-051", "text": "Represent reviewed document structure with stable edition-scoped logical identities, closed node kinds, typed relationships, and explicit unsupported regions, keeping content hashes and physical locations separate."},
+    {"id": "SM-FR-052", "text": "Bind structural nodes and relationship derivations to exact source spans over verified original bytes and hashed extracted page text, while keeping agent review and human approval distinct."},
+    {"id": "SM-FR-053", "text": "Offer an opt-in compact progressively expandable response profile with deterministic packet-local evidence, source, and derivation references; deduplicate source and derivation metadata without changing exact evidence text, canonical record IDs, completeness, authorization, or the default detailed JSON response."},
+    {"id": "SM-FR-054", "text": "Batch required-evidence retrieval and request-local source verification; use bounded versioned caches whose keys include content, traversal, corpus, ranking, and authorization visibility state; reauthorize and reverify integrity before return; and support explicit package- and clause-scoped lexical discovery without hidden fallback."},
+    {"id": "SM-FR-055", "text": "Verify every returned node and relationship evidence span against request-local immutable bytes; reuse verified bytes and decoded UTF-8 text within one request; batch obligation evidence assembly and edition-diff verification; and keep search filters, request echo, and exact evidence selectors replayable and truthful."},
+    {"id": "SM-FR-056", "text": "Reject inconsistent required-edge projections; bind compiled page evidence to exact byte spans; expose query limits without silently discarding constraints; and provide a measured concise evidence projection that retains exact text, citations, governing relationships, coverage, authorization, and expandable provenance."}
   ]
 }

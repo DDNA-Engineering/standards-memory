@@ -20,7 +20,7 @@
         "properties": {
           "record_id": {"type": "string", "minLength": 1},
           "edition_id": {"type": "string", "minLength": 1},
-          "kind": {"enum": ["clause", "note"]},
+          "kind": {"enum": ["document", "section", "clause", "paragraph", "list", "list_item", "table", "table_row", "table_cell", "definition", "note", "figure", "unsupported_region", "page"]},
           "clause_reference": {"type": "string", "minLength": 1},
           "heading": {"type": "string", "minLength": 1},
           "text": {"type": "string", "minLength": 1},
@@ -31,9 +31,19 @@
             "properties": {
               "path": {"type": "string", "pattern": "^sources/"},
               "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "text_path": {"type": "string", "pattern": "^sources/.*\\.(txt|md)$"},
+              "text_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "text_start_byte": {"type": "integer", "minimum": 0},
+              "text_end_byte": {"type": "integer", "minimum": 1},
               "page": {"type": "integer", "minimum": 1},
               "locator": {"type": "string", "minLength": 1},
               "quote_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            },
+            "dependentRequired": {
+              "text_path": ["text_sha256"],
+              "text_sha256": ["text_path"],
+              "text_start_byte": ["text_end_byte", "text_path", "text_sha256"],
+              "text_end_byte": ["text_start_byte", "text_path", "text_sha256"]
             }
           },
           "derivation": {
@@ -41,7 +51,7 @@
             "additionalProperties": false,
             "required": ["statement_role", "method", "review_status"],
             "properties": {
-              "statement_role": {"enum": ["obligation", "governing_note", "informative"]},
+              "statement_role": {"enum": ["obligation", "governing_note", "informative", "unclassified"]},
               "method": {"type": "string", "minLength": 1},
               "review_status": {"type": "string", "minLength": 1}
             }
@@ -58,8 +68,90 @@
                 "required": {"type": "boolean"}
               }
             }
+          },
+          "structure": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["logical_id", "content_sha256", "parent_logical_id", "ordinal", "source_spans", "relationships"],
+            "properties": {
+              "logical_id": {"type": "string", "minLength": 1},
+              "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "parent_logical_id": {"type": ["string", "null"], "minLength": 1},
+              "ordinal": {"type": "integer", "minimum": 0},
+              "source_spans": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["path", "sha256", "text_path", "text_sha256", "physical_page", "start_byte", "end_byte", "quote_sha256"],
+                  "properties": {
+                    "path": {"type": "string", "pattern": "^sources/"},
+                    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                    "text_path": {"type": "string", "pattern": "^sources/.*\\.(txt|md)$"},
+                    "text_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                    "physical_page": {"type": "integer", "minimum": 1},
+                    "start_byte": {"type": "integer", "minimum": 0},
+                    "end_byte": {"type": "integer", "minimum": 1},
+                    "quote_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+                  }
+                }
+              },
+              "relationships": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["relationship", "target_status", "target_logical_id", "target_locator", "candidate_logical_ids", "required", "method", "review_status", "evidence_spans"],
+                  "properties": {
+                    "relationship": {"enum": ["contains", "sequence_after", "governed_by", "defines", "uses_definition", "qualifies", "exception_to", "references", "caption_of", "table_footnote_for", "footnote_for", "header_for", "illustrates", "continues_on"]},
+                    "target_status": {"enum": ["resolved", "out_of_scope", "unresolved", "ambiguous"]},
+                    "target_logical_id": {"type": ["string", "null"], "minLength": 1},
+                    "target_locator": {"type": ["string", "null"], "minLength": 1},
+                    "candidate_logical_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+                    "required": {"type": "boolean"},
+                    "method": {"type": "string", "minLength": 1},
+                    "review_status": {"type": "string", "minLength": 1}
+                    ,"evidence_spans": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["path", "sha256", "text_path", "text_sha256", "physical_page", "start_byte", "end_byte", "quote_sha256"],
+                        "properties": {
+                          "path": {"type": "string", "pattern": "^sources/"},
+                          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                          "text_path": {"type": "string", "pattern": "^sources/.*\\.(txt|md)$"},
+                          "text_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                          "physical_page": {"type": "integer", "minimum": 1},
+                          "start_byte": {"type": "integer", "minimum": 0},
+                          "end_byte": {"type": "integer", "minimum": 1},
+                          "quote_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "source": {"required": ["text_start_byte"]}
+              }
+            },
+            "then": {
+              "properties": {
+                "kind": {"const": "page"}
+              }
+            }
+          }
+        ]
       }
     }
   }

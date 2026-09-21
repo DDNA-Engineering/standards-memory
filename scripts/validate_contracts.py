@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from standardsforge.pack import validate_pack_directory  # noqa: E402
 from standardsforge.policy import load_policy  # noqa: E402
+from standardsforge.source_catalog import load_source_catalog  # noqa: E402
 
 
 def load_json(relative: str):
@@ -44,6 +45,10 @@ def main() -> int:
         )
 
     policy = load_policy(ROOT / "examples/policies/local-synthetic.json")
+    source_catalogs = [
+        load_source_catalog(ROOT / "catalog/mil-format-authorities.json"),
+        load_source_catalog(ROOT / "catalog/mil-std-810h.json"),
+    ]
     output = {
         "ok": True,
         "task_ids": [task["task_id"] for task in tasks["tasks"]],
@@ -51,9 +56,16 @@ def main() -> int:
         "contract_documents": [path.name for path in contract_files],
         "packs": packs,
         "policy_fingerprint": policy.fingerprint,
+        "source_catalogs": [
+            {
+                "catalog_id": source_catalog["catalog_id"],
+                "documents": [document["document_id"] for document in source_catalog["documents"]],
+            }
+            for source_catalog in source_catalogs
+        ],
         "limitations": [
-            "Synthetic contract fixtures only.",
-            "No real-document extraction or production performance claim."
+            "Real source PDFs are local ignored inputs, not repository fixtures.",
+            "PDF text-layer compilation, one full-document unreviewed derived outline, and one reviewed structural slice are implemented; document-wide visual and reviewed semantic extraction remain unqualified."
         ],
     }
     print(json.dumps(output, indent=2, sort_keys=True))

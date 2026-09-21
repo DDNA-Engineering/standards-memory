@@ -4,20 +4,37 @@
   "transport": "stdio",
   "principal_binding": "trusted_server_startup_configuration",
   "telemetry": "disabled",
+  "model_reading_guidance": [
+    "resolve the exact identifier, edition, and representation before relying on evidence",
+    "treat derived_structure as automated unreviewed navigation and page_text as physical extracted text",
+    "use search only for discovery, then retrieve exact evidence under an immutable package digest",
+    "preserve governing conditions, exceptions, notes, referenced tables or figures, citations, review status, and coverage",
+    "distinguish MIL-STD scope, tailoring, references, definitions, requirements, and verification methods",
+    "do not infer project applicability or compliance from normative wording alone",
+    "zero explicitly classified obligations is not proof of zero requirements when classification is incomplete"
+  ],
   "tools": [
-    {"name": "search", "arguments": ["query", "limit"]},
-    {"name": "resolve_document", "arguments": ["identifier", "edition_id"]},
-    {"name": "get_clause", "arguments": ["package_digest", "clause_reference", "max_bytes"]},
-    {"name": "build_context", "arguments": ["package_digest", "clause_references", "max_bytes"]},
-    {"name": "enumerate_obligations", "arguments": ["package_digest", "scope_prefix", "limit", "cursor", "max_bytes"]},
-    {"name": "diff_editions", "arguments": ["from_package_digest", "to_package_digest", "max_bytes"]}
+    {"name": "search", "description": "Discover authorized records by local lexical search. Results are candidates, not applicability, obligation completeness, or exact document identity; use resolve_document for an identifier and replay a selected evidence_selector through get_clause.", "arguments": ["query", "limit", "package_digest", "scope_prefix"], "optional_arguments": ["limit", "package_digest", "scope_prefix"]},
+    {"name": "resolve_document", "description": "Resolve an exact authorized identifier, optional edition, and representation to an immutable package digest. Specify representation when ambiguous: derived_structure is automated and unreviewed, while page_text is physical extracted text.", "arguments": ["identifier", "edition_id", "representation"], "optional_arguments": ["edition_id", "representation"], "argument_schemas": {"representation": {"enum": ["page_text", "derived_structure", "reviewed_structure", "curated_records"]}}},
+    {"name": "get_clause", "description": "Retrieve one exact package-pinned record and its required evidence context. Interpret exact text with citations, relationships, derivation review status, and coverage; this does not decide applicability or compliance.", "arguments": ["package_digest", "clause_reference", "record_id", "max_bytes", "response_profile"], "optional_arguments": ["clause_reference", "record_id", "max_bytes", "response_profile"], "selector": {"at_least_one": ["clause_reference", "record_id"], "when_both": "must_resolve_to_same_record"}, "argument_schemas": {"response_profile": {"enum": ["compact_evidence_v1", "concise_evidence_v1"]}}},
+    {"name": "build_context", "description": "Retrieve multiple exact package-pinned records with their deduplicated required context. Preserve conditions, exceptions, notes, and unresolved relationships; the packet is evidence, not an approval decision.", "arguments": ["package_digest", "clause_references", "max_bytes", "response_profile"], "optional_arguments": ["max_bytes", "response_profile"], "argument_schemas": {"response_profile": {"enum": ["compact_evidence_v1", "concise_evidence_v1"]}}},
+    {"name": "enumerate_obligations", "description": "Traverse only records explicitly classified as obligations in one immutable package. Always inspect classification and source-interpretation coverage: zero classified rows is not proof of zero requirements.", "arguments": ["package_digest", "scope_prefix", "limit", "cursor", "max_bytes"]},
+    {"name": "diff_editions", "description": "Compare two authorized immutable packages by record identity and dependency context. Report evidence changes without inferring engineering impact, applicability, supersession, or compliance.", "arguments": ["from_package_digest", "to_package_digest", "max_bytes"]}
   ],
   "invariants": [
     "no principal or authorization selector is accepted from a tool caller",
     "no administrative operation is exposed",
     "every tool is marked read-only and closed-world",
     "successful calls use the same typed envelope as the CLI",
+    "server startup result_mode defaults to text_and_structured; structured_only omits successful-call text content while preserving structuredContent",
     "anticipated failures are MCP error results carrying a typed JSON error envelope",
-    "the adapter creates no network listener and has no network or model fallback"
+    "the adapter creates no network listener and has no network or model fallback",
+    "get_clause accepts a clause reference, canonical record ID, or a pair that resolves to the same record",
+    "omitting response_profile preserves detailed JSON; compact_evidence_v1 and concise_evidence_v1 are opt-in",
+    "search package and scope filters are explicit and never trigger hidden fallback",
+    "search rejects more than 32 parsed terms with invalid_query instead of truncating the query",
+    "search results include a source citation, exact indexed-text FTS5 snippet, and available structural heading ancestry",
+    "search declares FTS5 snippet delimiters once at packet level and omits ancestry when unavailable",
+    "search remains lexical and does not silently invoke exact document resolution"
   ]
 }

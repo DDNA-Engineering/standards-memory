@@ -49,8 +49,8 @@ $env:PYTHONPATH = Join-Path $PWD 'src'
 python -m standardsforge verify-pack examples/packs/fictional-adapter-v1
 python -m standardsforge install examples/packs/fictional-adapter-v1 --policy examples/policies/local-synthetic.json
 
-# Resolve an exact edition and capture its immutable package pin.
-$resolved = python -m standardsforge resolve EXAMPLE-SPEC-100 --edition example:spec-100:2025-a --principal local-user | ConvertFrom-Json
+# Resolve an exact edition/representation and capture its immutable package pin.
+$resolved = python -m standardsforge resolve EXAMPLE-SPEC-100 --edition example:spec-100:2025-a --representation curated_records --principal local-user | ConvertFrom-Json
 $pin = $resolved.result.package_digest
 
 # Retrieve the clause together with its governing note.
@@ -65,8 +65,14 @@ The last command returns a JSON evidence packet containing the connector-retenti
 # Find relevant text in packs this principal can access.
 python -m standardsforge search "connector" --principal local-user
 
+# Narrow discovery to one immutable package and clause scope.
+python -m standardsforge search "adapter" --principal local-user --package-digest $pin --scope-prefix 4.2
+
 # Assemble two clauses, including their required context.
 python -m standardsforge build-context $pin 4.2.1 4.2.2 --principal local-user
+
+# Use the measured concise projection; exact text, citations, governing context, coverage, and authorization remain present.
+python -m standardsforge build-context $pin 4.2.1 4.2.2 --principal local-user --response-profile concise_evidence_v1
 
 # Walk every explicitly classified obligation in section 4.2.
 python -m standardsforge enumerate-obligations $pin --scope 4.2 --principal local-user
@@ -74,18 +80,153 @@ python -m standardsforge enumerate-obligations $pin --scope 4.2 --principal loca
 
 Commands emit JSON. Application failures return a typed `error.code` and a nonzero exit status. See `python -m standardsforge --help` for all arguments.
 
+## Seed a local official-source corpus
+
+StandardsForge is clone-and-run software. Each user acquires source documents into ignored local state; the repository tracks provenance and integrity metadata rather than redistributing the PDFs.
+
+The first compiler seed catalog contains the current DLA ASSIST editions of MIL-STD-961, MIL-STD-962, and MIL-STD-967—the format authorities for specifications, standards, and handbooks. A separate catalog pins MIL-STD-810 Revision H Change 1 for environmental-engineering compilation and qualification. Catalog inclusion is not a declaration that a standard applies to a particular product.
+
+Use [DLA ASSIST Quick Search](https://quicksearch.dla.mil/) as the authoritative source. To acquire every current publicly exposed component of every active `MIL-STD-` record, run the resumable administrative downloader and then close the local files against its manifest:
+
+```powershell
+python -m standardsforge acquire-mil-std
+python -m standardsforge verify-mil-std-acquisition `
+  .standardsforge/sources/dla/mil-std/manifest.json
+```
+
+The acquisition scope is explicit: active records only; leading notices plus the first substantive current revision or incorporated change; Distribution Statement A files only. Restricted components remain inventory metadata and are not requested. Each completed PDF is signature-checked, hashed during transfer, atomically installed, and checkpointed for restart. Use `--inventory-only` to enumerate without downloading and `--reuse-inventory` to resume from a completed inventory snapshot.
+
+For the smaller tracked seed catalogs, place each file at the exact name declared by its catalog and verify the sets locally:
+
+```powershell
+python -m standardsforge verify-source-set catalog/mil-format-authorities.json `
+  --source-root .standardsforge/sources/dla/format-authorities
+
+python -m standardsforge verify-source-set catalog/mil-std-810h.json `
+  --source-root .standardsforge/sources/dla/mil-std-810h
+```
+
+Verification is offline and closed-set: every declared file must be present, no unexpected directory entries are accepted, and the PDF signature, byte length, and SHA-256 digest must match. Page counts are recorded publisher/source metadata and are not recomputed by this command.
+
+EverySpec is useful for discovery, but its [published terms](https://everyspec.com/terms_of_use.php) prohibit automated downloading and processing. StandardsForge therefore does not scrape it. Bulk acquisition is an explicit administrative action against the official DLA publisher source, separate from every read operation; query tools never fetch URLs.
+
+## Compile a verified PDF
+
+Install the separately pinned compiler dependency, then compile a catalog-pinned source into an installable local pack:
+
+```powershell
+python -m pip install -e ".[compiler]"
+python -m standardsforge compile-pdf catalog/mil-std-810h.json MIL-STD-810 `
+  .standardsforge/compiled/mil-std-810h `
+  --source-root .standardsforge/sources/dla/mil-std-810h
+```
+
+Create a deterministic compressed transport without changing the package digest:
+
+```powershell
+python -m standardsforge archive-pack .standardsforge/compiled/mil-std-810h .standardsforge/compiled/mil-std-810h.zip
+```
+
+To compile every verified downloaded DLA current component, keep notices and revisions together by DLA record, create an explicit exact-pack local policy, and install the completed corpus:
+
+```powershell
+python -m standardsforge compile-mil-std-corpus `
+  .standardsforge/sources/dla/mil-std/manifest.json `
+  .standardsforge/corpus/mil-std-current `
+  --source-root .standardsforge/sources/dla/mil-std
+python -m standardsforge write-corpus-policy `
+  .standardsforge/corpus/mil-std-current/corpus.json `
+  .standardsforge/policies/mil-std-corpus-local.json `
+  --principal local-user
+python -m standardsforge install-corpus `
+  .standardsforge/corpus/mil-std-current/corpus.json `
+  --policy .standardsforge/policies/mil-std-corpus-local.json
+```
+
+Corpus compilation is restartable and matches the complete ordered composition plus compiler provenance before reusing an archive. One pack represents one ordered DLA current-component set; only Distribution Statement A components may be compiled, records with both public and restricted components remain explicitly partial, and restricted-only records produce no evidence pack. The corpus compiler accepts only empty-password public encryption, namespaces every page by DLA component, and reports pages with malformed or absent text layers instead of inventing OCR or silently calling the edition fully parsed. Reinstallation revokes obsolete active grants for prior generated versions of the same corpus pack identities.
+
+The compiler preserves the original PDF, creates a separately hashed text sidecar, emits a page record for each extractable physical page, and writes a page-level extraction report. It does not silently run OCR, infer clause boundaries, interpret tables or figures, or classify obligations. Every page record remains `unclassified` and `unreviewed` until later compiler stages add evidence-backed structure and review.
+
+`compile-structure` accepts a separate, edition-bound reviewed-annotation document. It emits stable logical node identities and typed relationships whose node and relationship claims are bound to exact physical-page UTF-8 spans. The shipped acceptance slice covers MIL-STD-810H Method 500.6 section 2.2.2 only and remains explicitly incomplete outside that reviewed scope.
+
+To create navigable, explicitly unreviewed structure from any verified page-text pack or archive, run:
+
+```powershell
+python -m standardsforge compile-derived-outline <page-pack-or-archive> <output-directory>
+```
+
+The resulting `derived_structure` pack recognizes bounded headings, list items, notes, and table/figure captions while retaining exact source spans. Numeric table rows, repeated table footnotes, repeated method headers, unmatched prefixes, and unparsed pages are retained as unsupported regions. These records are candidates only: they remain `unclassified` and `automated_unreviewed`, produce no confirmed obligations, and make no table-cell, figure-visual, OCR, applicability, or compliance claim.
+
+## From downloaded corpus to first model-ready query
+
+This PowerShell workflow starts from the completed local corpus index, creates a derived outline for MIL-STD-810H, explicitly authorizes exactly that output, installs it, resolves its immutable pin, searches it, and retrieves exact evidence. Run it from the repository root. The output and policy paths must not already exist.
+
+```powershell
+# Create an isolated environment and install the CLI, compiler, and MCP adapter.
+py -3 -m venv .venv
+$Python = Join-Path $PWD '.venv\Scripts\python.exe'
+& $Python -m pip install --upgrade pip
+& $Python -m pip install -e '.[compiler,mcp]'
+
+# Select MIL-STD-810H from the already compiled downloaded corpus.
+$CorpusIndex = Join-Path $PWD '.standardsforge\corpus\mil-std-current\corpus.json'
+$Corpus = Get-Content -LiteralPath $CorpusIndex -Raw | ConvertFrom-Json
+$Entry = $Corpus.entries | Where-Object { $_.document_id -eq 'MIL-STD-810H(1)' }
+if (@($Entry).Count -ne 1) { throw 'Expected exactly one MIL-STD-810H(1) corpus entry.' }
+$PagePack = Join-Path (Split-Path -Parent $CorpusIndex) $Entry.archive_path
+
+# Compile a separate automated, unreviewed navigation representation.
+$OutlinePack = Join-Path $PWD '.standardsforge\compiled\mil-std-810h-derived-outline'
+& $Python -m standardsforge verify-pack $PagePack
+& $Python -m standardsforge compile-derived-outline $PagePack $OutlinePack
+
+# Explicitly authorize this exact validated pack and expected content class.
+$Policy = Join-Path $PWD '.standardsforge\policies\mil-std-810h-derived-outline-local.json'
+& $Python -m standardsforge write-pack-policy $OutlinePack $Policy `
+  --principal local-user `
+  --content-class public_government_standard
+& $Python -m standardsforge install $OutlinePack --policy $Policy
+
+# Resolve one representation, discover a candidate, then retrieve exact evidence.
+$Resolved = & $Python -m standardsforge resolve 'MIL-STD-810H(1)' `
+  --representation derived_structure `
+  --principal local-user | ConvertFrom-Json
+$Pin = $Resolved.result.package_digest
+$Search = & $Python -m standardsforge search 'low pressure' `
+  --package-digest $Pin `
+  --principal local-user `
+  --limit 3 | ConvertFrom-Json
+$Hit = $Search.result.results | Select-Object -First 1
+if ($null -eq $Hit) { throw 'Search returned no evidence candidate.' }
+$ClauseReference = $Hit.clause_reference
+$RecordId = $Hit.record_id
+& $Python -m standardsforge get-clause $Pin $ClauseReference `
+  --record-id $RecordId `
+  --principal local-user `
+  --response-profile concise_evidence_v1
+
+# Start the read-only model tool server; this process intentionally stays running.
+$Mcp = Join-Path $PWD '.venv\Scripts\standardsforge-mcp.exe'
+& $Mcp --db .standardsforge/memory.db `
+  --store .standardsforge/objects `
+  --principal local-user `
+  --result-mode structured_only
+```
+
+`write-pack-policy` does not silently trust a rights claim. The operator must name the expected content class, the validated pack must match it, and the resulting policy authorizes only that pack ID for the named principal.
+
 ## Six ways to read
 
 | Command | The job |
 | --- | --- |
-| `search` | Discover relevant records through authorized lexical search. |
-| `resolve` | Turn an exact document identifier and edition into a package pin. |
-| `get-clause` | Retrieve a clause and its required dependency context. |
+| `search` | Discover relevant records through authorized lexical search, source-linked snippets, and available heading ancestry. |
+| `resolve` | Turn an exact document identifier, edition, and optional representation into a package pin. |
+| `get-clause` | Retrieve a uniquely referenced clause, note, or compiled page and its required dependency context. |
 | `build-context` | Assemble multiple clauses without duplicating shared evidence. |
 | `enumerate-obligations` | Traverse every explicitly classified obligation in a selected scope, with pagination. |
 | `diff-editions` | Compare records by exact identity and surface changes in their dependency context. |
 
-Pack validation (`verify-pack`) and administration (`install`, `revoke`) are separate from those six read operations.
+Pack validation (`verify-pack`) and administration (`install`, `revoke`) are separate from those six read operations. Source-set verification is also administrative; it does not install, parse, or authorize a document.
 
 ## Connect a local MCP host
 
@@ -105,9 +246,12 @@ The host owns the process and talks over stdin/stdout, so the command intentiona
 
 Successful calls carry the CLI's `{ok,result}` envelope as structured content. Anticipated domain failures are MCP error results whose text is a typed `{ok:false,error}` JSON envelope.
 
+During MCP initialization the server gives the host a MIL-STD reading workflow, and every tool description states its interpretation boundary. Models are told to resolve exact editions and representations, pin package digests, treat search as discovery, retrieve exact evidence and governing context, distinguish tailoring from applicability, and avoid treating zero classified obligations as proof of zero requirements. See the [model reading guide](docs/MODEL_READING_GUIDE.md).
+
 ## What stays attached to the evidence
 
 - **The exact edition.** Edition IDs describe technical editions; package digests pin inventoried content bytes. Installing a newer edition leaves existing pins intact.
+- **The exact representation.** Page text, automated derived structure, reviewed structure, and curated records can coexist for one edition. Resolution reports ambiguity or accepts an explicit representation; evidence reads use the selected package digest.
 - **The governing context.** Required dependencies travel with a clause. A byte budget that cannot hold the required packet produces an error instead of silently dropping evidence.
 - **The original source.** Stored source hashes and exact quoted text are checked when evidence is served.
 - **The access decision.** Trusted local policy authorizes access, and queries recheck it. Rights claims inside an imported pack are provenance, not permission.
@@ -126,7 +270,7 @@ flowchart LR
     Query["Principal + explicit selector"] --> Read["Authorize and resolve"]
     Store --> Read
     Read --> Context["Collect required context"]
-    Context --> Evidence["Reauthorize and return evidence"]
+    Context --> Evidence["Reverify exact spans, reauthorize, and return detailed/concise evidence"]
 ```
 
 The core is a small Python library backed by SQLite and FTS5. Packs contain data and preserved sources. Query paths operate locally, with no network calls, model calls, URL fetching, or pack execution.
@@ -142,6 +286,12 @@ The core is a small Python library backed by SQLite and FTS5. Packs contain data
 | `service` | Provide the six read operations and signed, policy-bound continuations. |
 | `cli` | Expose read operations and separate administrative commands. |
 | `mcp_server` | Expose only the six reads over local stdio under a startup-bound principal. |
+| `source_catalog` | Validate official-source metadata and verify a closed local PDF set offline. |
+| `compiler` | Compile a verified text-layer PDF into a raw-source-preserving, page-indexed pack. |
+| `corpus_compiler` | Compile a verified acquisition manifest into restartable record-scoped archives and install them under exact local policy. |
+| `outline_compiler` | Derive exact-span unreviewed navigation candidates and explicit unsupported regions from page records. |
+| `structure_compiler` | Compile reviewed structural annotations into stable, source-spanned nodes and relationships. |
+| `query_cache` | Keep bounded versioned closure/search projections without caching authorization or source verification. |
 
 Start with [the architecture](docs/ARCHITECTURE.md) or browse [the source](src/standardsforge/).
 
@@ -154,12 +304,13 @@ The larger goal is a **standards compiler and evidence engine**: turn authorized
 | Stage | Scope | Status |
 | --- | --- | --- |
 | M0 · Foundations | Contracts, identities, and rights boundaries | Local pack subset implemented; broader decisions remain proposed |
-| M1 · Local evidence engine | Pack installation, pinned retrieval, all six read operations, local stdio MCP | Implemented in `TASK-001` through `TASK-003` with synthetic fixtures |
-| M2 · Compilation | Document ingestion and source-linked evidence extraction | Planned |
-| M3 · Identification and reading | Measured retrieval improvements and source-first reading | Planned |
-| M4 · Shared integration | Shared-server profile and HTTP adapter | Planned |
+| M1 · Local evidence engine | Pack installation, pinned retrieval, all six read operations | Implemented and locally qualified |
+| M1.5 · Official source boundary | Tracked official metadata and offline local PDF integrity verification | Implemented for public-source local acquisition |
+| M2 · Compilation | Raw-PDF preservation, page text, automated outlines, and reviewed source-spanned structure | Implemented; document-wide review remains incomplete |
+| M3 · Identification and reading | Honest coverage, concise evidence, batched retrieval, caches, and source-linked scoped search | Implemented; derived nodes remain unreviewed candidates |
+| M4 · Model access and onboarding | Principal-bound stdio MCP, model-facing MIL-STD guidance, and copy-paste local setup | Implemented; additional host adapters remain optional |
 
-Real-PDF extraction fidelity, shared-server isolation, and production performance have not been established. See the [validation report](VALIDATION_REPORT.md) for recorded checks and limits, and the [backlog](backlog/tasks.json) for acceptance criteria.
+Full visual fidelity, table-cell and figure-visual interpretation, reviewed document-wide clause segmentation, and obligation classification have not been established. A hosted multi-tenant service is not a product target. See the [validation report](VALIDATION_REPORT.md) for recorded checks and limits, and the [backlog](backlog/tasks.json) for acceptance criteria.
 
 ## Work on it
 
@@ -167,12 +318,12 @@ Run the existing checks from the repository root:
 
 ```powershell
 $env:PYTHONPATH = Join-Path $PWD 'src'
-python -m pip install -e ".[mcp]"
+python -m pip install -e ".[mcp,compiler]"
 python scripts/validate_contracts.py
 python -m unittest discover -s tests -v
 ```
 
-The suite covers the local synthetic-pack path, including networking-denied library and in-memory MCP reads, a real MCP stdio subprocess, edition pin stability, dependency handling, policy denial, revocation, tampering, and insufficient byte budgets.
+The suite covers pack and source integrity, policy and revocation boundaries, all read operations, MCP in-memory and stdio paths, deterministic PDF/corpus/outline compilation, representation selection, response profiles and budgets, caches, database snapshots, migrations, and negative cases. Real PDFs and generated packs remain ignored local inputs.
 
 Before contributing, read [CONTRIBUTING.md](CONTRIBUTING.md). Bring synthetic or demonstrably redistributable fixtures, and keep source facts distinct from interpretations.
 

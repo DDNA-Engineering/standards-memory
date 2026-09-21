@@ -76,6 +76,319 @@
         "Disable SDK telemetry even when a host process configures an exporter.",
         "Prove in-memory transport parity with networking denied and prove a real stdio subprocess round trip."
       ]
+    },
+    {
+      "task_id": "TASK-004",
+      "title": "Official-source local corpus manifest and offline verification",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-019",
+        "SM-FR-027",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-047"
+      ],
+      "acceptance": [
+        "Track stable official DLA ASSIST metadata and exact local filenames, byte counts, and SHA-256 digests for the three MIL format-authority seed documents.",
+        "Keep downloaded PDFs in ignored local state and make no repository-redistribution claim.",
+        "Verify the closed local source set, PDF signatures, byte counts, and digests without network access.",
+        "Reject tampering, path traversal, unknown catalog fields, unexpected directory content, and non-PDF bytes with typed errors.",
+        "Keep source acquisition administrative and outside every query operation."
+      ]
+    },
+    {
+      "task_id": "TASK-005",
+      "title": "Deterministic PDF text-layer compiler and MIL-STD-810H pack",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-010",
+        "SM-FR-018",
+        "SM-FR-019",
+        "SM-FR-025",
+        "SM-FR-027",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-040",
+        "SM-FR-046",
+        "SM-FR-047",
+        "SM-FR-048",
+        "SM-FR-049"
+      ],
+      "acceptance": [
+        "Acquire and catalog the official active MIL-STD-810 Revision H Change 1 incorporated edition from DLA ASSIST.",
+        "Compile a verified PDF deterministically into an installable data-only pack while preserving the original PDF bytes and a separately hashed extracted-text sidecar.",
+        "Produce one source-linked page record for every extractable physical page without silently invoking OCR or classifying obligations.",
+        "Record page-level extraction dimensions and explicit unresolved fidelity for visual layout, tables, figures, clause boundaries, and obligations.",
+        "Reject encrypted PDFs, catalog/page mismatches, unsafe source records, and existing output directories with typed errors.",
+        "Install, resolve, search, and retrieve the full 1,107-page MIL-STD-810H pack offline with raw-PDF and extracted-text integrity rechecked."
+      ]
+    },
+    {
+      "task_id": "TASK-006",
+      "title": "Coverage propagation and discovery-to-evidence closure",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-019",
+        "SM-FR-022",
+        "SM-FR-025",
+        "SM-FR-046",
+        "SM-FR-050"
+      ],
+      "acceptance": [
+        "Propagate the installed pack's declared corpus, edition, extraction, dependency, traversal, and budget coverage into every retrieval packet.",
+        "Expose source interpretation, required-dependency identification and retrieval, database traversal, and response fit as separate machine-readable dimensions.",
+        "Carry declared source and dependency coverage into search results without duplicating it for every hit.",
+        "Keep exact selection/dependency completion distinct from corpus and extraction completeness.",
+        "Make clause, note, and compiled-page search hits directly retrievable through the existing pinned read operation.",
+        "Require unique record references within an edition so discovery selectors are deterministic.",
+        "Avoid duplicate file reads when legacy source bytes are also the evidence text."
+      ]
+    },
+    {
+      "task_id": "TASK-007",
+      "title": "Source-spanned structural compilation with stable logical identity",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-010",
+        "SM-FR-019",
+        "SM-FR-025",
+        "SM-FR-029",
+        "SM-FR-046",
+        "SM-FR-051",
+        "SM-FR-052"
+      ],
+      "acceptance": [
+        "Compile an explicitly reviewed section of a verified PDF into a document tree with closed node kinds and typed relationships.",
+        "Keep logical identity, content digest, and physical source location separate so content or pagination changes do not silently redefine identity.",
+        "Bind every node and relationship to exact text-layer spans using the original PDF digest, page-text digest, physical page, half-open UTF-8 byte offsets, and quote digest.",
+        "Preserve unresolved, ambiguous, and out-of-scope relationships and unsupported regions without inventing targets or completeness.",
+        "Keep agent review, human review, automated validation, and normative source evidence separate.",
+        "Install and retrieve the structural pack through the existing authorization boundary with required governing relationships expanded.",
+        "Reject changed page text, invalid UTF-8 boundaries, unresolved parents or required targets, graph cycles, and unreviewed or mismatched source identities."
+      ]
+    },
+    {
+      "task_id": "TASK-008",
+      "title": "Compact progressively expandable evidence responses",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-010",
+        "SM-FR-022",
+        "SM-FR-023",
+        "SM-FR-029",
+        "SM-FR-046",
+        "SM-FR-053"
+      ],
+      "acceptance": [
+        "Keep detailed JSON as the unchanged default and expose compact_evidence_v1 as an opt-in profile on get_clause and build_context through CLI and MCP.",
+        "Return deterministic packet-local references, unique evidence records, and deduplicated source and derivation dictionaries while preserving canonical record IDs, exact text, citations, and completeness dimensions.",
+        "Preserve typed response envelopes and caller-independent authorization, and reauthorize each compact packet after source integrity checks.",
+        "Measure complete compact UTF-8 JSON bytes; expose token measurement as unavailable unless a configured local tokenizer exists.",
+        "Verify default compatibility, MCP schema parity, exact evidence preservation, deterministic output, budget refusal, invalid profiles, and tampered-source rejection."
+      ]
+    },
+    {
+      "task_id": "TASK-009",
+      "title": "Batched authorization-safe caches and scoped discovery",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-022",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-040",
+        "SM-FR-046",
+        "SM-FR-050",
+        "SM-FR-054"
+      ],
+      "acceptance": [
+        "Read multi-root required-evidence closures in one connection with deterministic legacy-compatible ordering and deduplicated relationships.",
+        "Read and hash each shared source or text sidecar once per request while re-reading it on later requests so warmed caches cannot hide tampering.",
+        "Cache only versioned closure and lexical-search projections in bounded checksum-verified envelopes; never cache an authorization allow decision or source verification result.",
+        "Key search caches by corpus generation, authorization generation, principal visibility fingerprint, filters, limit, and ranker version, and invalidate results across install, grant, and revocation changes.",
+        "Reauthorize before cache lookup and immediately before returning package-pinned evidence or scoped search results.",
+        "Expose exact package and clause-scope filters through the library, CLI, MCP, and machine contracts without network, model, synonym, or broadening fallback.",
+        "Verify cache corruption misses safely, cross-principal results remain isolated, revocation changes results immediately, and batched/cached paths preserve evidence and completeness."
+      ]
+    },
+    {
+      "task_id": "TASK-010",
+      "title": "Integrity-complete optimized retrieval and replayable discovery",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-010",
+        "SM-FR-022",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-040",
+        "SM-FR-046",
+        "SM-FR-052",
+        "SM-FR-054",
+        "SM-FR-055"
+      ],
+      "acceptance": [
+        "Verify every returned structural node span and relationship evidence span against its declared source or text sidecar, exact half-open UTF-8 byte range, and quote digest before returning evidence.",
+        "Read and hash each distinct source artifact once and decode each distinct UTF-8 text artifact once per request without allowing a warmed request or process cache to hide later tampering.",
+        "Assemble one obligation page through a batched evidence graph while preserving the established detailed response shape, ordering, completeness, cursor, and authorization behavior.",
+        "Reuse request-local verification state across edition-diff payloads without sharing integrity results across requests.",
+        "Return the caller's exact search query and filters, keep unpinned filters unpinned, and expose directly replayable exact record selectors through the library, CLI, MCP, and contracts.",
+        "Measure the optimized paths against the pre-change audit fixtures and real local pack, and accept only output-compatible speedups with source-integrity negative cases."
+      ]
+    },
+    {
+      "task_id": "TASK-011",
+      "title": "Accurate concise standards surfacing",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-003",
+        "SM-FR-008",
+        "SM-FR-010",
+        "SM-FR-019",
+        "SM-FR-022",
+        "SM-FR-023",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-046",
+        "SM-FR-050",
+        "SM-FR-052",
+        "SM-FR-053",
+        "SM-FR-056"
+      ],
+      "acceptance": [
+        "Reject any structural pack whose resolved required relationships and retrieval dependencies are not the same typed target edges.",
+        "Compile page records with exact half-open UTF-8 offsets into the preserved text sidecar and verify those slices without repeated whole-sidecar quote searches, while retaining compatibility for previously installed packs.",
+        "Reject lexical queries beyond the supported term limit instead of silently discarding later constraints, and return source-linked matched snippets and structural ancestry where available.",
+        "Expose a versioned concise evidence response through the library, CLI, MCP, and contracts that preserves exact normative text, citations, governing relationships, coverage, authorization, and expandable provenance while reducing measured model-visible tokens on representative packets.",
+        "Measure fixture, full-page, and reviewed-structure paths for packet equality of evidence, tamper rejection, latency, bytes, and configured local tokenizer counts.",
+        "Keep exact package pins authoritative when multiple representations exist for one edition and report representation ambiguity explicitly rather than selecting one silently."
+      ]
+    },
+    {
+      "task_id": "TASK-012",
+      "title": "Lossless physical and response-path compression",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-003",
+        "SM-FR-008",
+        "SM-FR-010",
+        "SM-FR-018",
+        "SM-FR-022",
+        "SM-FR-023",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-040",
+        "SM-FR-046",
+        "SM-FR-052",
+        "SM-FR-053",
+        "SM-FR-056"
+      ],
+      "acceptance": [
+        "Preserve distinct ambiguous structural relationships in concise packets without changing resolved-edge deduplication or exact evidence.",
+        "Calculate packet byte budgets with one full serialization while returning byte-identical packets and exact refusal thresholds.",
+        "Remove duplicate page text from newly compiled portable page records and reconstruct it only from inventoried, hash-verified UTF-8 byte ranges while retaining records 0.1 compatibility.",
+        "Remove the FTS content shadow copy through a rebuildable external-content index with a deterministic migration and unchanged authorized search results.",
+        "Forbid mutable hard-link or symbolic-link sharing between installed package paths; retain independent copies unless copy-on-write block cloning is explicitly supported and verified on the target filesystem.",
+        "Offer a trusted startup-selected MCP response mode that avoids duplicate wire payloads while retaining the backward-compatible default.",
+        "Measure storage bytes, packet equality, query latency, archive size, and negative integrity behavior on representative fixture and real-document paths."
+      ]
+    },
+    {
+      "task_id": "TASK-013",
+      "title": "Manifest-driven full local MIL-STD corpus compilation and installation",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-002",
+        "SM-FR-003",
+        "SM-FR-006",
+        "SM-FR-008",
+        "SM-FR-018",
+        "SM-FR-027",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-046",
+        "SM-FR-047",
+        "SM-FR-048",
+        "SM-FR-049",
+        "SM-FR-050"
+      ],
+      "acceptance": [
+        "Verify the complete local DLA acquisition manifest and compile every record with at least one downloaded current component into one deterministic page-text pack and compressed transport without network access.",
+        "Preserve the exact ordered current-component composition, source digests, component dates, and distribution statements; compile only Distribution Statement A components and declare mixed public and restricted compositions partial rather than silently treating public bytes as the complete edition.",
+        "Use deterministic publisher-scoped family, edition, pack, record, and page-selector identities that remain stable across restart and never merge unrelated DLA records or components.",
+        "Checkpoint a restartable corpus index, validate every reused archive against the complete current composition and compiler provenance before skipping it, and report every extraction failure without claiming the corpus complete.",
+        "Install every compiled pack only under an explicit trusted local policy, revoke obsolete grants for prior generated versions of the same corpus pack identities, then resolve, search, and retrieve exact source-verified evidence from the populated local store.",
+        "Keep physical-page text unreviewed and expose no claim of OCR, visual, table, figure, clause-boundary, obligation, applicability, or human-approval completeness."
+      ]
+    },
+    {
+      "task_id": "TASK-014",
+      "title": "Deterministic derived-outline compilation from verified page evidence",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-010",
+        "SM-FR-019",
+        "SM-FR-025",
+        "SM-FR-049",
+        "SM-FR-051",
+        "SM-FR-052"
+      ],
+      "acceptance": [
+        "Compile an installed or portable page-text pack into a separate deterministic derived-structure pack without networking, model calls, source mutation, or human-review claims.",
+        "Recognize bounded numeric clauses, appendices, method headings, list items, notes, and table or figure captions while preserving every derived node as an exact UTF-8 source span over inventoried page evidence.",
+        "Assign stable edition-scoped logical identities independently from content hashes and retain component and method context so repeated numbering cannot silently merge unrelated nodes.",
+        "Keep every automated node unclassified and automated_unreviewed, expose unmatched and ambiguous text as unsupported-region records, and never enumerate derived candidates as confirmed obligations.",
+        "Preserve the base package digest and coverage in an inventoried derivation report, install under explicit local policy, resolve the derived_structure representation, and retrieve exact source-verified evidence.",
+        "Qualify the compiler on synthetic negative cases and a real full-document MIL-STD pack, reporting observed detection and unsupported-region coverage without claiming semantic correctness."
+      ]
+    },
+    {
+      "task_id": "TASK-015",
+      "title": "Copy-paste local onboarding and model-facing MIL-STD reading guidance",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-022",
+        "SM-FR-025",
+        "SM-FR-027",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-046",
+        "SM-FR-049",
+        "SM-FR-050",
+        "SM-FR-056"
+      ],
+      "acceptance": [
+        "Provide one copy-paste PowerShell workflow from isolated installation through derived-outline compilation, explicit local authorization, installation, resolution, search, exact retrieval, and MCP startup.",
+        "Create an exact one-pack local policy only through an explicit administrative command that requires the operator to name the principal and expected content class; never infer authority from pack rights alone.",
+        "Deliver a concise MIL-STD reading workflow to MCP clients during initialization, covering exact edition and representation selection, immutable package pins, discovery versus evidence, governing context, tailoring and applicability boundaries, notices, and honest completeness.",
+        "Make every MCP tool description state its operation-specific interpretation boundary, including that derived structure is unreviewed and zero classified obligations is not proof of zero requirements.",
+        "Keep the MCP surface read-only, offline, principal-bound, and limited to the existing six query operations.",
+        "Verify policy-writer negative cases, actual client-visible instructions and descriptions, contract parity, copy-paste command syntax, and the complete local test suite."
+      ]
+    },
+    {
+      "task_id": "TASK-016",
+      "title": "Post-build documentation and code-comment scrub",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-019",
+        "SM-FR-022",
+        "SM-FR-025",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-046"
+      ],
+      "acceptance": [
+        "Keep the root README current as the primary installation and usage guide, with working links to retained governance, architecture, security, validation, and model-reading material.",
+        "Remove unreferenced dated audits and duplicated agent workflow documentation whose current outcomes are retained in the validation report and active project instructions.",
+        "Condense required project orientation and brand documentation without removing active migration, rights, security, or evidence-boundary guidance.",
+        "Update stale decision and security wording to the observed TASK-015 implementation without converting proposals into approval claims.",
+        "Remove redundant implementation comments and duplicate MCP function docstrings while retaining comments that explain security, integrity, compatibility, transactional, or algorithmic invariants.",
+        "Verify retained Markdown links, stale documentation references, contract parsing, compilation, and the complete local test suite."
+      ]
     }
   ]
 }

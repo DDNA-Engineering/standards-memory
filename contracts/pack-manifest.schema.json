@@ -20,6 +20,7 @@
     "revision": {"type": "string", "minLength": 1},
     "publication_date": {"type": "string", "format": "date"},
     "category": {"type": "string", "minLength": 1},
+    "representation": {"enum": ["page_text", "derived_structure", "reviewed_structure", "curated_records"]},
     "inventory_path": {"const": "inventory.json"},
     "rights_path": {"const": "rights.json"},
     "records_path": {"const": "records.json"},

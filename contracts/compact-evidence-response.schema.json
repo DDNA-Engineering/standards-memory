@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standards-memory.invalid/contracts/compact-evidence-response-0.1.0.schema.json",
+  "title": "StandardsForge compact evidence response profile compact_evidence_v1",
+  "description": "Opt-in query packet profile. Packet-local refs are navigation handles; record_id remains the canonical identity and text remains exact source evidence.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "operation",
+    "response_profile",
+    "retrieval_mode",
+    "package",
+    "evidence",
+    "required_relationships",
+    "completeness",
+    "limitations",
+    "token_measurement",
+    "budget"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "operation": {"enum": ["get_clause", "build_context"]},
+    "response_profile": {"const": "compact_evidence_v1"},
+    "retrieval_mode": {"enum": ["exact_pinned_clause", "exact_pinned_multi_clause"]},
+    "package": {"$ref": "#/$defs/package"},
+    "requested_clause_references": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["records", "source_files", "derivations"],
+      "properties": {
+        "records": {"type": "array", "items": {"$ref": "#/$defs/record"}},
+        "source_files": {"type": "array", "items": {"$ref": "#/$defs/sourceFile"}},
+        "derivations": {"type": "array", "items": {"$ref": "#/$defs/derivation"}}
+      }
+    },
+    "required_relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_ref", "relationship", "target_ref"],
+        "properties": {
+          "source_ref": {"type": "string", "pattern": "^e[1-9][0-9]*$"},
+          "relationship": {"type": "string", "minLength": 1},
+          "target_ref": {"type": "string", "pattern": "^e[1-9][0-9]*$"}
+        }
+      }
+    },
+    "completeness": {
+      "type": "object",
+      "required": [
+        "corpus_scope",
+        "edition_composition",
+        "parsed_source_coverage",
+        "dependency_closure",
+        "enumeration_traversal",
+        "output_budget_coverage",
+        "complete_for_requested_scope",
+        "scope_interpretation",
+        "declared_pack_coverage",
+        "dimensions"
+      ],
+      "properties": {
+        "corpus_scope": {"type": "string"},
+        "edition_composition": {"type": "string"},
+        "parsed_source_coverage": {"type": "string"},
+        "dependency_closure": {"type": "string"},
+        "enumeration_traversal": {"type": "string"},
+        "output_budget_coverage": {"type": "string"},
+        "complete_for_requested_scope": {"type": "boolean"},
+        "scope_interpretation": {"type": "string"},
+        "declared_pack_coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["corpus_scope", "edition_composition", "parsed_source_coverage", "dependency_closure", "enumeration_traversal", "output_budget_coverage"],
+          "properties": {
+            "corpus_scope": {"type": "string"},
+            "edition_composition": {"type": "string"},
+            "parsed_source_coverage": {"type": "string"},
+            "dependency_closure": {"type": "string"},
+            "enumeration_traversal": {"type": "string"},
+            "output_budget_coverage": {"type": "string"}
+          }
+        },
+        "dimensions": {
+          "type": "object",
+          "required": ["version", "source_interpretation", "required_dependencies", "database_traversal", "response_fit"],
+          "properties": {
+            "version": {"type": "string"},
+            "source_interpretation": {
+              "type": "object",
+              "required": ["complete", "status", "edition_composition", "parsed_source_coverage"],
+              "properties": {
+                "complete": {"type": "boolean"},
+                "status": {"type": "string"},
+                "edition_composition": {"type": "string"},
+                "parsed_source_coverage": {"type": "string"}
+              }
+            },
+            "required_dependencies": {
+              "type": "object",
+              "required": ["identification_complete", "identification_status", "declared_coverage", "retrieval_complete", "retrieval_status"],
+              "properties": {
+                "identification_complete": {"type": "boolean"},
+                "identification_status": {"type": "string"},
+                "declared_coverage": {"type": "string"},
+                "retrieval_complete": {"type": "boolean"},
+                "retrieval_status": {"type": "string"}
+              }
+            },
+            "database_traversal": {
+              "type": "object",
+              "required": ["complete", "status"],
+              "properties": {"complete": {"type": ["boolean", "null"]}, "status": {"type": "string"}}
+            },
+            "response_fit": {
+              "type": "object",
+              "required": ["complete", "status", "unit"],
+              "properties": {"complete": {"type": "boolean"}, "status": {"type": "string"}, "unit": {"const": "bytes"}}
+            }
+          }
+        }
+      }
+    },
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "token_measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {
+        "status": {"const": "unavailable"},
+        "reason": {"const": "no_local_tokenizer_configured"}
+      }
+    },
+    "budget": {"$ref": "#/$defs/budget"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_digest", "pack_id", "document_family_id", "edition_id", "identifier", "revision", "title"],
+      "properties": {
+        "package_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "pack_id": {"type": "string", "minLength": 1},
+        "document_family_id": {"type": "string", "minLength": 1},
+        "edition_id": {"type": "string", "minLength": 1},
+        "identifier": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1}
+      }
+    },
+    "sourceChecks": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_digest_verified": {"type": "boolean"},
+        "extracted_text_digest_verified": {"type": "boolean"},
+        "quote_digest_verified": {"type": "boolean"},
+        "exact_quote_present": {"type": "boolean"}
+      }
+    },
+    "sourceFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "path", "sha256", "source_checks"],
+      "properties": {
+        "ref": {"type": "string", "pattern": "^s[1-9][0-9]*$"},
+        "path": {"type": "string", "pattern": "^sources/"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "text_path": {"type": "string", "pattern": "^sources/.*\\.(txt|md)$"},
+        "text_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "source_checks": {"$ref": "#/$defs/sourceChecks"}
+      },
+      "dependentRequired": {"text_path": ["text_sha256"], "text_sha256": ["text_path"]}
+    },
+    "derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "statement_role", "method", "review_status"],
+      "properties": {
+        "ref": {"type": "string", "pattern": "^d[1-9][0-9]*$"},
+        "statement_role": {"enum": ["obligation", "governing_note", "informative", "unclassified"]},
+        "method": {"type": "string", "minLength": 1},
+        "review_status": {"type": "string", "minLength": 1}
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "record_id", "kind", "clause_reference", "heading", "text", "source_ref", "page", "locator", "quote_sha256", "source_checks", "derivation_ref"],
+      "properties": {
+        "ref": {"type": "string", "pattern": "^e[1-9][0-9]*$"},
+        "record_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["document", "section", "clause", "paragraph", "list", "list_item", "table", "table_row", "table_cell", "definition", "note", "figure", "unsupported_region", "page"]},
+        "clause_reference": {"type": "string", "minLength": 1},
+        "heading": {"type": "string", "minLength": 1},
+        "text": {"type": "string", "minLength": 1},
+        "source_ref": {"type": "string", "pattern": "^s[1-9][0-9]*$"},
+        "page": {"type": "integer", "minimum": 1},
+        "locator": {"type": "string", "minLength": 1},
+        "quote_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "source_checks": {"$ref": "#/$defs/sourceChecks"},
+        "derivation_ref": {"type": "string", "pattern": "^d[1-9][0-9]*$"},
+        "structure": {"type": "object"}
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "used", "limit"],
+      "properties": {
+        "kind": {"const": "bytes"},
+        "used": {"type": "integer", "minimum": 0},
+        "limit": {"type": ["integer", "null"], "minimum": 1}
+      }
+    }
+  }
+}

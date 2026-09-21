@@ -1,0 +1,78 @@
+{
+  "schema_version": "0.1.0",
+  "catalog_id": "standardsforge.mil-format-authorities",
+  "title": "MIL specification, standard, and handbook format authorities",
+  "purpose": "Seed the local compiler corpus with the governing format documents for defense specifications, standards, and handbooks.",
+  "selection_basis": "The supplied product material names MIL-STD-961. MIL-STD-962 and MIL-STD-967 complete the corresponding specification, standard, and handbook format-authority set. This is a compiler seed catalog, not a claim that these are all standards applicable to a product.",
+  "documents": [
+    {
+      "document_id": "MIL-STD-961",
+      "document_family_id": "dla:mil-std-961",
+      "edition_id": "dla:mil-std-961:e-change-5:2025-11-25",
+      "title": "Defense and Program-Unique Specifications Format and Content",
+      "publisher": "United States Department of Defense",
+      "status": "Active",
+      "revision": "E",
+      "change": 5,
+      "document_date": "2025-11-25",
+      "distribution_statement": "A",
+      "detail_url": "https://quicksearch.dla.mil/qsDocDetails.aspx?ident_number=36063",
+      "source_origin": "official_dla_assist_quick_search",
+      "local_filename": "MIL-STD-961E_CHG-5_2025-11-25.pdf",
+      "sha256": "92e0e2c1d39cb1b751d0c6807799ed651c81f20fb102cb3f26c3b392708876bd",
+      "byte_length": 7272070,
+      "page_count": 127,
+      "retrieved_at": "2026-09-21",
+      "rights": {
+        "access_basis": "DLA Quick Search metadata identifies Distribution Statement A and offers public download.",
+        "repository_redistribution": "not_asserted"
+      }
+    },
+    {
+      "document_id": "MIL-STD-962",
+      "document_family_id": "dla:mil-std-962",
+      "edition_id": "dla:mil-std-962:d-change-3:2025-05-06",
+      "title": "Defense Standards Format and Content",
+      "publisher": "United States Department of Defense",
+      "status": "Active",
+      "revision": "D",
+      "change": 3,
+      "document_date": "2025-05-06",
+      "distribution_statement": "A",
+      "detail_url": "https://quicksearch.dla.mil/qsDocDetails.aspx?ident_number=36064",
+      "source_origin": "official_dla_assist_quick_search",
+      "local_filename": "MIL-STD-962D_CHG-3_2025-05-06.pdf",
+      "sha256": "663cf289b6c4ccc4773cd7709b674e6cc6aaa4d670b9db34bfdec96818fea2df",
+      "byte_length": 6099517,
+      "page_count": 85,
+      "retrieved_at": "2026-09-21",
+      "rights": {
+        "access_basis": "DLA Quick Search metadata identifies Distribution Statement A and offers public download.",
+        "repository_redistribution": "not_asserted"
+      }
+    },
+    {
+      "document_id": "MIL-STD-967",
+      "document_family_id": "dla:mil-std-967",
+      "edition_id": "dla:mil-std-967:change-3:2025-08-27",
+      "title": "Defense Handbooks Format and Content",
+      "publisher": "United States Department of Defense",
+      "status": "Active",
+      "revision": null,
+      "change": 3,
+      "document_date": "2025-08-27",
+      "distribution_statement": "A",
+      "detail_url": "https://quicksearch.dla.mil/qsDocDetails.aspx?ident_number=213528",
+      "source_origin": "official_dla_assist_quick_search",
+      "local_filename": "MIL-STD-967_CHG-3_2025-08-27.pdf",
+      "sha256": "f14dce9126a03f08a75a3c4273f42327c499dd074e7a518f9d00252f4a58d661",
+      "byte_length": 4964679,
+      "page_count": 67,
+      "retrieved_at": "2026-09-21",
+      "rights": {
+        "access_basis": "DLA Quick Search metadata identifies Distribution Statement A and offers public download.",
+        "repository_redistribution": "not_asserted"
+      }
+    }
+  ]
+}

@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/structure-annotations.schema.json",
+  "title": "StandardsForge edition-scoped structural annotations",
+  "description": "Agent- or human-reviewed structural interpretation of one pinned document edition. Annotations are derived data and do not replace the preserved source, and review provenance must not be promoted across reviewer types.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document_id",
+    "edition_id",
+    "source_pdf_sha256",
+    "compiler",
+    "extraction_mode",
+    "text_encoding",
+    "offset_convention",
+    "review",
+    "nodes",
+    "relationships",
+    "unsupported_regions"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "document_id": {"type": "string", "minLength": 1},
+    "edition_id": {"type": "string", "minLength": 1},
+    "source_pdf_sha256": {"$ref": "#/$defs/sha256"},
+    "compiler": {"$ref": "#/$defs/compiler"},
+    "extraction_mode": {
+      "enum": ["layout", "simple", "ocr", "manual", "mixed"],
+      "description": "Mode used to produce the page text against which source-span byte offsets are measured."
+    },
+    "text_encoding": {"const": "UTF-8"},
+    "offset_convention": {"const": "half_open_utf8_byte_offsets_per_physical_page"},
+    "review": {"$ref": "#/$defs/review"},
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/node"}
+    },
+    "relationships": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/relationship"}
+    },
+    "unsupported_regions": {
+      "type": "array",
+      "description": "Explicit source regions that this annotation set does not interpret. An empty array means none were identified in its reviewed scope; it does not assert document-wide completeness.",
+      "items": {"$ref": "#/$defs/unsupported_region"}
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "logical_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "description": "Stable logical identity within this edition. It must not be derived from content hashes or physical source locations. Cross-edition identity requires an explicit reconciliation outside this annotation contract."
+    },
+    "node_kind": {
+      "enum": [
+        "document",
+        "section",
+        "clause",
+        "paragraph",
+        "list",
+        "list_item",
+        "table",
+        "table_row",
+        "table_cell",
+        "definition",
+        "note",
+        "figure"
+      ]
+    },
+    "review_status": {
+      "enum": ["agent_reviewed", "human_reviewed", "human_reviewed_with_uncertainty"]
+    },
+    "derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "review_status"],
+      "properties": {
+        "method": {"type": "string", "minLength": 1},
+        "review_status": {"$ref": "#/$defs/review_status"}
+      }
+    },
+    "compiler": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1}
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewer_id", "reviewer_type", "reviewed_at"],
+      "properties": {
+        "reviewer_id": {"type": "string", "minLength": 1},
+        "reviewer_type": {"enum": ["agent", "human"]},
+        "reviewed_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "source_span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "physical_page",
+        "page_text_sha256",
+        "start_byte",
+        "end_byte"
+      ],
+      "properties": {
+        "physical_page": {"type": "integer", "minimum": 1},
+        "page_text_sha256": {
+          "$ref": "#/$defs/sha256",
+          "description": "SHA-256 of the UTF-8 extracted text for this physical page, binding the span to the selected compiler and extraction mode."
+        },
+        "start_byte": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Inclusive UTF-8 byte offset in the page text."
+        },
+        "end_byte": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Exclusive UTF-8 byte offset in the page text; must be greater than start_byte and within the page text byte length."
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logical_id",
+        "kind",
+        "ordinal",
+        "clause_reference",
+        "heading",
+        "statement_role",
+        "exact_text",
+        "source_spans",
+        "content_sha256",
+        "derivation"
+      ],
+      "properties": {
+        "logical_id": {"$ref": "#/$defs/logical_id"},
+        "kind": {"$ref": "#/$defs/node_kind"},
+        "clause_reference": {"type": "string", "minLength": 1},
+        "heading": {"type": "string", "minLength": 1},
+        "statement_role": {"enum": ["obligation", "governing_note", "informative", "unclassified"]},
+        "parent_logical_id": {"$ref": "#/$defs/logical_id"},
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "One-based order among this parent's children, or among root nodes when parent_logical_id is absent."
+        },
+        "exact_text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Node-local text exactly as represented by its source spans; it is not a normalized summary or concatenation of descendant text."
+        },
+        "source_spans": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/source_span"}
+        },
+        "content_sha256": {
+          "$ref": "#/$defs/sha256",
+          "description": "SHA-256 of the UTF-8 bytes of exact_text, independent of logical identity and source location."
+        },
+        "derivation": {"$ref": "#/$defs/derivation"}
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_logical_id",
+        "relationship_type",
+        "target_status",
+        "required",
+        "derivation",
+        "evidence_spans"
+      ],
+      "properties": {
+        "source_logical_id": {"$ref": "#/$defs/logical_id"},
+        "relationship_type": {
+          "enum": [
+            "defines",
+            "uses_definition",
+            "governed_by",
+            "qualifies",
+            "exception_to",
+            "references",
+            "caption_of",
+            "footnote_for",
+            "header_for",
+            "illustrates",
+            "continues_on"
+          ]
+        },
+        "target_status": {
+          "enum": ["resolved", "out_of_scope", "unresolved", "ambiguous"]
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether a resolved target is required governing evidence. Non-resolved targets must be false."
+        },
+        "target_logical_id": {"$ref": "#/$defs/logical_id"},
+        "target_reference": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Exact cited or otherwise observed target label when it is not resolved to an in-scope logical_id."
+        },
+        "candidate_logical_ids": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/logical_id"}
+        },
+        "evidence_spans": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/source_span"}
+        },
+        "derivation": {"$ref": "#/$defs/derivation"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"target_status": {"const": "resolved"}}, "required": ["target_status"]},
+          "then": {
+            "required": ["target_logical_id"],
+            "not": {"anyOf": [{"required": ["target_reference"]}, {"required": ["candidate_logical_ids"]}]}
+          }
+        },
+        {
+          "if": {"properties": {"target_status": {"const": "out_of_scope"}}, "required": ["target_status"]},
+          "then": {
+            "required": ["target_reference"],
+            "not": {"anyOf": [{"required": ["target_logical_id"]}, {"required": ["candidate_logical_ids"]}]}
+          }
+        },
+        {
+          "if": {"properties": {"target_status": {"const": "unresolved"}}, "required": ["target_status"]},
+          "then": {
+            "required": ["target_reference"],
+            "not": {"anyOf": [{"required": ["target_logical_id"]}, {"required": ["candidate_logical_ids"]}]}
+          }
+        },
+        {
+          "if": {"properties": {"target_status": {"const": "ambiguous"}}, "required": ["target_status"]},
+          "then": {
+            "required": ["candidate_logical_ids"],
+            "not": {"anyOf": [{"required": ["target_logical_id"]}, {"required": ["target_reference"]}]}
+          }
+        }
+      ]
+    },
+    "unsupported_region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["region_id", "reason_code", "source_spans", "derivation"],
+      "properties": {
+        "region_id": {"type": "string", "minLength": 1, "maxLength": 512},
+        "reason_code": {
+          "enum": [
+            "no_text_layer",
+            "ambiguous_structure",
+            "ambiguous_reading_order",
+            "unparsed_table",
+            "unparsed_figure",
+            "unclassified_content",
+            "outside_selected_scope",
+            "other"
+          ]
+        },
+        "affected_kinds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/node_kind"}
+        },
+        "description": {"type": "string", "minLength": 1},
+        "source_spans": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/source_span"}
+        },
+        "derivation": {"$ref": "#/$defs/derivation"}
+      }
+    }
+  }
+}

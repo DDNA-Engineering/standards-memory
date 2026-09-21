@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -73,3 +75,75 @@ def authorize_install(policy: LocalPolicy, pack: ValidatedPack) -> None:
         "policy_denied",
         "The local policy does not authorize this content class.",
     )
+
+
+def write_pack_policy(
+    source: str | Path,
+    output_path: str | Path,
+    principal_id: str,
+    content_class: str,
+) -> dict[str, Any]:
+    """Write an exact one-pack policy after explicit operator classification."""
+
+    from .pack import open_validated_pack
+
+    require(
+        isinstance(principal_id, str) and bool(principal_id.strip()),
+        "invalid_policy",
+        "principal_id must be a non-empty string.",
+    )
+    require(
+        isinstance(content_class, str) and bool(content_class.strip()),
+        "invalid_policy",
+        "content_class must be a non-empty string.",
+    )
+    principal = principal_id.strip()
+    expected_content_class = content_class.strip()
+    destination = Path(output_path).resolve()
+    require(not destination.exists(), "policy_output_exists", "The policy output already exists.", path=str(destination))
+    require(destination.suffix.lower() == ".json", "invalid_policy_path", "The policy output must be JSON.")
+
+    with open_validated_pack(source) as pack:
+        actual_content_class = pack.rights["content_class"]
+        require(
+            actual_content_class == expected_content_class,
+            "policy_content_class_mismatch",
+            "The explicitly authorized content class does not match the validated pack claim.",
+            expected=expected_content_class,
+            actual=actual_content_class,
+        )
+        policy = {
+            "policy_version": "0.1.0",
+            "policy_id": f"local-pack-{pack.package_digest[:16]}",
+            "principal_id": principal,
+            "allow_admin_install": True,
+            "allow_serve": True,
+            "allowed_pack_ids": [pack.manifest["pack_id"]],
+            "allowed_content_classes": [expected_content_class],
+        }
+        package_digest = pack.package_digest
+        pack_id = pack.manifest["pack_id"]
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{destination.stem}.", suffix=".json", dir=destination.parent
+    )
+    os.close(descriptor)
+    temporary = Path(temporary_name)
+    try:
+        temporary.write_bytes((json.dumps(policy, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+    written = load_policy(destination)
+    return {
+        "operation": "write_pack_policy",
+        "status": "written",
+        "policy": str(destination),
+        "policy_id": written.policy_id,
+        "principal_id": written.principal_id,
+        "pack_id": pack_id,
+        "package_digest": package_digest,
+        "content_class": expected_content_class,
+    }

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import socket
@@ -17,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from standardsforge.errors import StandardsForgeError  # noqa: E402
+from standardsforge.cli import _parser  # noqa: E402
 from standardsforge.pack import validate_pack_directory  # noqa: E402
 from standardsforge.service import StandardsForgeService  # noqa: E402
 
@@ -39,6 +41,17 @@ class VerticalSliceTests(unittest.TestCase):
     def _install_v1(self) -> str:
         return self.service.install_pack(PACK_V1, POLICY)["package_digest"]
 
+    @staticmethod
+    def _rewrite_inventoried_json(pack_root: Path, relative: str, payload: dict) -> None:
+        data = (json.dumps(payload, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+        (pack_root / relative).write_bytes(data)
+        inventory_path = pack_root / "inventory.json"
+        inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+        entry = next(item for item in inventory["files"] if item["path"] == relative)
+        entry["sha256"] = hashlib.sha256(data).hexdigest()
+        entry["bytes"] = len(data)
+        inventory_path.write_text(json.dumps(inventory, indent=2) + "\n", encoding="utf-8")
+
     def test_install_resolve_and_retrieve_dependency_complete_packet(self) -> None:
         digest = self._install_v1()
         resolved = self.service.resolve_document(
@@ -56,6 +69,426 @@ class VerticalSliceTests(unittest.TestCase):
         self.assertTrue(all(item["source_checks"]["source_digest_verified"] for item in packet["evidence"]))
         encoded = json.dumps(packet, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
         self.assertEqual(len(encoded), packet["budget"]["used"])
+
+    def test_compact_profile_preserves_exact_evidence_and_deduplicates_dictionaries(self) -> None:
+        digest = self._install_v1()
+        detailed = self.service.get_clause(digest, "4.2.1", "local-user")
+        compact = self.service.get_clause(
+            digest, "4.2.1", "local-user", response_profile="compact_evidence_v1"
+        )
+        self.assertEqual("compact_evidence_v1", compact["response_profile"])
+        self.assertEqual(detailed["completeness"], compact["completeness"])
+        self.assertEqual(detailed, self.service.get_clause(digest, "4.2.1", "local-user"))
+        self.assertEqual(
+            [item["record_id"] for item in detailed["evidence"]],
+            [item["record_id"] for item in compact["evidence"]["records"]],
+        )
+        self.assertEqual(
+            [item["text"] for item in detailed["evidence"]],
+            [item["text"] for item in compact["evidence"]["records"]],
+        )
+        self.assertEqual(["e1", "e2"], [item["ref"] for item in compact["evidence"]["records"]])
+        self.assertEqual(1, len(compact["evidence"]["source_files"]))
+        self.assertEqual(2, len(compact["evidence"]["derivations"]))
+        source = compact["evidence"]["source_files"][0]
+        self.assertEqual("sources/example-spec-100a.txt", source["path"])
+        self.assertTrue(source["source_checks"]["source_digest_verified"])
+        for detailed_record, compact_record in zip(detailed["evidence"], compact["evidence"]["records"]):
+            self.assertEqual(detailed_record["record_id"], compact_record["record_id"])
+            self.assertEqual(detailed_record["text"], compact_record["text"])
+            self.assertEqual(detailed_record["citation"]["page"], compact_record["page"])
+            self.assertEqual(detailed_record["citation"]["locator"], compact_record["locator"])
+            self.assertEqual(detailed_record["citation"]["quote_sha256"], compact_record["quote_sha256"])
+            self.assertEqual(source["ref"], compact_record["source_ref"])
+            self.assertTrue(compact_record["source_checks"]["quote_digest_verified"])
+            self.assertTrue(compact_record["source_checks"]["exact_quote_present"])
+            derivation = next(
+                item for item in compact["evidence"]["derivations"] if item["ref"] == compact_record["derivation_ref"]
+            )
+            self.assertEqual(detailed_record["derivation"], {key: value for key, value in derivation.items() if key != "ref"})
+        compact_ids = {item["record_id"]: item["ref"] for item in compact["evidence"]["records"]}
+        self.assertEqual(
+            [{"source_ref": compact_ids["clause-4.2.1"], "relationship": "governed_by", "target_ref": compact_ids["note-4.2.1-1"]}],
+            compact["required_relationships"],
+        )
+        self.assertEqual(
+            {"status": "unavailable", "reason": "no_local_tokenizer_configured"},
+            compact["token_measurement"],
+        )
+        encoded = json.dumps(compact, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        self.assertEqual(len(encoded), compact["budget"]["used"])
+        with self.assertRaises(StandardsForgeError) as caught:
+            self.service.get_clause(digest, "4.2.1", "local-user", max_bytes=100, response_profile="compact_evidence_v1")
+        self.assertEqual("budget_too_small", caught.exception.code)
+        self.assertGreater(caught.exception.details["required_bytes"], 100)
+        self.assertEqual(
+            compact,
+            self.service.get_clause(digest, "4.2.1", "local-user", response_profile="compact_evidence_v1"),
+        )
+
+        detailed_context = self.service.build_context(digest, ["4.2.1", "4.2.2", "4.2.1"], "local-user")
+        compact_context = self.service.build_context(
+            digest,
+            ["4.2.1", "4.2.2", "4.2.1"],
+            "local-user",
+            response_profile="compact_evidence_v1",
+        )
+        self.assertEqual(detailed_context["completeness"], compact_context["completeness"])
+        self.assertEqual(
+            [item["record_id"] for item in detailed_context["evidence"]],
+            [item["record_id"] for item in compact_context["evidence"]["records"]],
+        )
+        context_record_ids = [item["record_id"] for item in compact_context["evidence"]["records"]]
+        self.assertEqual(len(context_record_ids), len(set(context_record_ids)))
+        self.assertEqual(1, len(compact_context["evidence"]["source_files"]))
+        self.assertEqual(2, len(compact_context["evidence"]["derivations"]))
+
+    def test_concise_profile_preserves_citations_completeness_and_reduces_bytes(self) -> None:
+        digest = self._install_v1()
+        detailed = self.service.get_clause(digest, "4.2.1", "local-user")
+        concise = self.service.get_clause(
+            digest, "4.2.1", "local-user", response_profile="concise_evidence_v1"
+        )
+
+        self.assertEqual("concise_evidence_v1", concise["response_profile"])
+        self.assertEqual(detailed["package"], concise["package"])
+        self.assertEqual(
+            {"status": "authorized", "package_digest": digest},
+            concise["authorization"],
+        )
+        self.assertEqual(
+            detailed["completeness"]["declared_pack_coverage"],
+            concise["coverage"]["declared"],
+        )
+        self.assertEqual(
+            detailed["completeness"]["complete_for_requested_scope"],
+            concise["coverage"]["complete_for_requested_scope"],
+        )
+        self.assertEqual(
+            detailed["completeness"]["scope_interpretation"],
+            concise["coverage"]["scope_interpretation"],
+        )
+        self.assertEqual(detailed["limitations"], concise["limitations"])
+        self.assertEqual(
+            [record["record_id"] for record in detailed["evidence"]],
+            [record["record_id"] for record in concise["evidence"]],
+        )
+        for detailed_record, concise_record in zip(detailed["evidence"], concise["evidence"]):
+            self.assertEqual(detailed_record["text"], concise_record["text"])
+            self.assertEqual(detailed_record["kind"], concise_record["kind"])
+            self.assertEqual(detailed_record["clause_reference"], concise_record["clause_reference"])
+            self.assertEqual(detailed_record["heading"], concise_record["heading"])
+            self.assertTrue(concise_record["citation"]["verified"])
+            source = next(
+                item for item in concise["provenance"]["sources"]
+                if item["ref"] == concise_record["citation"]["source_ref"]
+            )
+            self.assertEqual(detailed_record["citation"]["source_path"], source["path"])
+            self.assertEqual(detailed_record["citation"]["source_sha256"], source["sha256"])
+            self.assertTrue(source["verified"])
+            if "text_path" in detailed_record["citation"]:
+                self.assertEqual(detailed_record["citation"]["text_path"], source["text_path"])
+                self.assertEqual(detailed_record["citation"]["text_sha256"], source["text_sha256"])
+            self.assertEqual(detailed_record["citation"]["page"], concise_record["citation"]["page"])
+            self.assertEqual(detailed_record["citation"]["locator"], concise_record["citation"]["locator"])
+            self.assertEqual(detailed_record["citation"]["quote_sha256"], concise_record["citation"]["quote_sha256"])
+
+        refs_by_id = {record["record_id"]: record["ref"] for record in concise["evidence"]}
+        self.assertEqual(
+            [
+                {
+                    "source_ref": refs_by_id[edge["source_record_id"]],
+                    "relationship": edge["relationship"],
+                    "required": True,
+                    "target_status": "resolved",
+                    "target_ref": refs_by_id[edge["target_record_id"]],
+                }
+                for edge in detailed["required_relationships"]
+            ],
+            concise["relationships"],
+        )
+        detailed_size = len(json.dumps(detailed, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
+        compact = self.service.get_clause(digest, "4.2.1", "local-user", response_profile="compact_evidence_v1")
+        compact_size = len(json.dumps(compact, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
+        concise_size = len(json.dumps(concise, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
+        self.assertLess(concise_size, detailed_size)
+        self.assertLess(concise_size, compact_size)
+        self.assertEqual(concise, self.service.get_clause(digest, "4.2.1", "local-user", response_profile="concise_evidence_v1"))
+
+        detailed_context = self.service.build_context(digest, ["4.2.1", "4.2.2"], "local-user")
+        concise_context = self.service.build_context(
+            digest, ["4.2.1", "4.2.2"], "local-user", response_profile="concise_evidence_v1"
+        )
+        self.assertEqual(detailed_context["requested_clause_references"], concise_context["requested_clause_references"])
+        self.assertEqual(
+            [record["record_id"] for record in detailed_context["evidence"]],
+            [record["record_id"] for record in concise_context["evidence"]],
+        )
+        self.assertEqual(
+            [record["text"] for record in detailed_context["evidence"]],
+            [record["text"] for record in concise_context["evidence"]],
+        )
+        self.assertEqual(
+            detailed_context["completeness"]["declared_pack_coverage"],
+            concise_context["coverage"]["declared"],
+        )
+
+    def test_compact_profile_is_opt_in_validated_and_rechecks_tampered_source(self) -> None:
+        digest = self._install_v1()
+        detailed = self.service.get_clause(digest, "4.2.1", "local-user")
+        self.assertNotIn("response_profile", detailed)
+        self.assertEqual(
+            detailed,
+            self.service.get_clause(digest, "4.2.1", "local-user", response_profile="detailed_json_v1"),
+        )
+        with self.assertRaises(StandardsForgeError) as caught:
+            self.service.get_clause(digest, "4.2.1", "local-user", response_profile="unknown_profile")
+        self.assertEqual("invalid_response_profile", caught.exception.code)
+
+        object_path = Path(self.service.store.authorized_package("local-user", digest)["object_path"])
+        source_path = object_path / "sources" / "example-spec-100a.txt"
+        source_path.write_bytes(source_path.read_bytes() + b" tampered")
+        with self.assertRaises(StandardsForgeError) as caught:
+            self.service.get_clause(digest, "4.2.1", "local-user", response_profile="compact_evidence_v1")
+        self.assertEqual("source_integrity_failure", caught.exception.code)
+
+    def test_cli_accepts_versioned_profiles_only_on_exact_retrieval_operations(self) -> None:
+        args = _parser().parse_args(
+            [
+                "get-clause",
+                "a" * 64,
+                "4.2.1",
+                "--principal",
+                "local-user",
+                "--response-profile",
+                "concise_evidence_v1",
+            ]
+        )
+        self.assertEqual("concise_evidence_v1", args.response_profile)
+        context = _parser().parse_args(
+            [
+                "build-context",
+                "a" * 64,
+                "4.2.1",
+                "4.2.2",
+                "--principal",
+                "local-user",
+                "--response-profile",
+                "concise_evidence_v1",
+            ]
+        )
+        self.assertEqual("concise_evidence_v1", context.response_profile)
+
+    def test_concise_profile_keeps_unresolved_and_ambiguous_relationship_meaning(self) -> None:
+        digest = "a" * 64
+        source_sha = "b" * 64
+        text_sha = "c" * 64
+        quote_sha = "d" * 64
+        span = {
+            "path": "sources/spec.pdf",
+            "sha256": source_sha,
+            "text_path": "sources/pages/physical-0001.txt",
+            "text_sha256": text_sha,
+            "physical_page": 1,
+            "start_byte": 0,
+            "end_byte": 10,
+            "quote_sha256": quote_sha,
+        }
+        packet = {
+            "schema_version": "0.1.0",
+            "operation": "get_clause",
+            "retrieval_mode": "exact_pinned_clause",
+            "package": {
+                "package_digest": digest,
+                "pack_id": "fixture",
+                "document_family_id": "test:fixture",
+                "edition_id": "test:fixture:2026",
+                "identifier": "TEST-1",
+                "revision": "A",
+                "title": "Fixture",
+            },
+            "evidence": [
+                {
+                    "record_id": "record-1",
+                    "kind": "clause",
+                    "clause_reference": "1",
+                    "heading": "Requirement",
+                    "text": "Exact text",
+                    "citation": {
+                        "source_path": span["path"],
+                        "source_sha256": source_sha,
+                        "text_path": span["text_path"],
+                        "text_sha256": text_sha,
+                        "page": 1,
+                        "locator": "physical PDF page 1; UTF-8 bytes 0:9",
+                        "quote_sha256": quote_sha,
+                        "text_start_byte": 0,
+                        "text_end_byte": 10,
+                    },
+                    "source_checks": {
+                        "source_digest_verified": True,
+                        "extracted_text_digest_verified": True,
+                        "quote_digest_verified": True,
+                        "exact_quote_present": True,
+                    },
+                    "derivation": {"statement_role": "unclassified", "method": "review", "review_status": "agent_reviewed"},
+                    "structure": {
+                        "logical_id": "test:fixture:1",
+                        "content_sha256": quote_sha,
+                        "parent_logical_id": None,
+                        "ordinal": 1,
+                        "source_spans": [span],
+                        "relationships": [
+                            {
+                                "relationship": "governed_by",
+                                "target_status": "resolved",
+                                "target_logical_id": "test:fixture:target",
+                                "target_locator": None,
+                                "candidate_logical_ids": [],
+                                "required": True,
+                                "method": "review",
+                                "review_status": "agent_reviewed",
+                                "evidence_spans": [span],
+                            },
+                            {
+                                "relationship": "references",
+                                "target_status": "out_of_scope",
+                                "target_logical_id": None,
+                                "target_locator": "Annex Z",
+                                "candidate_logical_ids": [],
+                                "required": False,
+                                "method": "review",
+                                "review_status": "agent_reviewed",
+                                "evidence_spans": [span],
+                            },
+                            {
+                                "relationship": "selects_method",
+                                "target_status": "ambiguous",
+                                "target_logical_id": None,
+                                "target_locator": None,
+                                "candidate_logical_ids": ["method-a", "method-b"],
+                                "required": False,
+                                "method": "review",
+                                "review_status": "agent_reviewed",
+                                "evidence_spans": [span],
+                            },
+                            {
+                                "relationship": "selects_method",
+                                "target_status": "ambiguous",
+                                "target_logical_id": None,
+                                "target_locator": None,
+                                "candidate_logical_ids": ["method-c", "method-d"],
+                                "required": False,
+                                "method": "review",
+                                "review_status": "agent_reviewed",
+                                "evidence_spans": [span],
+                            },
+                            {
+                                "relationship": "selects_method",
+                                "target_status": "ambiguous",
+                                "target_logical_id": None,
+                                "target_locator": None,
+                                "candidate_logical_ids": ["method-c", "method-d"],
+                                "required": False,
+                                "method": "cross_reference_review",
+                                "review_status": "agent_reviewed",
+                                "evidence_spans": [span],
+                            },
+                        ],
+                    },
+                }
+            ],
+            "required_relationships": [
+                {"source_record_id": "record-1", "relationship": "governed_by", "target_record_id": "record-2"}
+            ],
+            "completeness": {
+                "complete_for_requested_scope": False,
+                "scope_interpretation": "selected record only",
+                "declared_pack_coverage": {
+                    "corpus_scope": "one record",
+                    "edition_composition": "exact edition",
+                    "parsed_source_coverage": "partial",
+                    "dependency_closure": "partial",
+                    "enumeration_traversal": "not evaluated",
+                    "output_budget_coverage": "computed at query time",
+                },
+                "dimensions": {
+                    "source_interpretation": {"complete": False, "status": "incomplete"},
+                    "required_dependencies": {
+                        "identification_complete": False,
+                        "identification_status": "incomplete",
+                        "retrieval_complete": True,
+                        "retrieval_status": "complete_for_returned_required_graph",
+                    },
+                    "database_traversal": {"complete": None, "status": "not_requested"},
+                    "response_fit": {"complete": True, "status": "complete", "unit": "bytes"},
+                },
+            },
+            "limitations": [],
+        }
+        target_record = json.loads(json.dumps(packet["evidence"][0]))
+        target_record["record_id"] = "record-2"
+        target_record["clause_reference"] = "2"
+        target_record["heading"] = "Governing note"
+        target_record["derivation"] = {
+            "statement_role": "governing_note",
+            "method": "review",
+            "review_status": "agent_reviewed",
+        }
+        target_record["structure"] = {
+            "logical_id": "test:fixture:target",
+            "content_sha256": quote_sha,
+            "parent_logical_id": None,
+            "ordinal": 2,
+            "source_spans": [span],
+            "relationships": [],
+        }
+        packet["evidence"].append(target_record)
+        concise = StandardsForgeService._render_response_profile(packet, "concise_evidence_v1")
+        self.assertEqual(5, len(concise["relationships"]))
+        self.assertEqual(1, len(concise["provenance"]["spans"]))
+        self.assertEqual(0, concise["evidence"][0]["citation"]["text_start_byte"])
+        self.assertEqual(10, concise["evidence"][0]["citation"]["text_end_byte"])
+        resolved = next(edge for edge in concise["relationships"] if edge["relationship"] == "governed_by")
+        self.assertTrue(resolved["required"])
+        self.assertEqual("resolved", resolved["target_status"])
+        self.assertEqual("e2", resolved["target_ref"])
+        self.assertEqual(["p1"], resolved["evidence_span_refs"])
+        out_of_scope = next(edge for edge in concise["relationships"] if edge["relationship"] == "references")
+        ambiguous = next(edge for edge in concise["relationships"] if edge["relationship"] == "selects_method")
+        self.assertEqual("out_of_scope", out_of_scope["target_status"])
+        self.assertEqual("Annex Z", out_of_scope["target_locator"])
+        self.assertEqual("ambiguous", ambiguous["target_status"])
+        self.assertEqual(["method-a", "method-b"], ambiguous["candidate_logical_ids"])
+        ambiguous_edges = [
+            edge for edge in concise["relationships"] if edge["relationship"] == "selects_method"
+        ]
+        self.assertEqual(3, len(ambiguous_edges))
+        self.assertEqual(
+            [
+                ["method-a", "method-b"],
+                ["method-c", "method-d"],
+                ["method-c", "method-d"],
+            ],
+            [edge["candidate_logical_ids"] for edge in ambiguous_edges],
+        )
+        derivations_by_ref = {
+            item["ref"]: (item["method"], item["review_status"])
+            for item in concise["provenance"]["derivations"]
+        }
+        self.assertEqual(
+            [
+                ("review", "agent_reviewed"),
+                ("review", "agent_reviewed"),
+                ("cross_reference_review", "agent_reviewed"),
+            ],
+            [derivations_by_ref[edge["derivation_ref"]] for edge in ambiguous_edges],
+        )
+        self.assertTrue(all(edge["evidence_span_refs"] == ["p1"] for edge in concise["relationships"]))
+        self.assertEqual(
+            concise,
+            StandardsForgeService._render_response_profile(packet, "concise_evidence_v1"),
+        )
 
     def test_full_workflow_operates_when_network_sockets_are_denied(self) -> None:
         with patch.object(socket, "socket", side_effect=AssertionError("network access attempted")):
@@ -145,6 +578,121 @@ class VerticalSliceTests(unittest.TestCase):
         self.assertEqual("4.2.1", results[0]["clause_reference"])
         self.assertEqual([], self.service.search("axial load", "unknown-principal")["results"])
 
+    def test_search_can_be_pinned_and_scoped_without_fallback(self) -> None:
+        first_digest = self._install_v1()
+        second_digest = self.service.install_pack(PACK_V2, POLICY)["package_digest"]
+
+        scoped = self.service.search(
+            "adapter",
+            "local-user",
+            package_digest=first_digest,
+            scope_prefix="4.2.2",
+        )
+        self.assertEqual(
+            {"package_digest": first_digest, "scope_prefix": "4.2.2"},
+            scoped["filters"],
+        )
+        self.assertEqual(["4.2.2"], [item["clause_reference"] for item in scoped["results"]])
+        self.assertTrue(all(item["package_digest"] == first_digest for item in scoped["results"]))
+
+        other_edition = self.service.search("adapter", "local-user", package_digest=second_digest)
+        self.assertTrue(other_edition["results"])
+        self.assertTrue(all(item["package_digest"] == second_digest for item in other_edition["results"]))
+
+        with self.assertRaises(StandardsForgeError) as caught:
+            self.service.search("adapter", "unknown-principal", package_digest=first_digest)
+        self.assertEqual("not_found", caught.exception.code)
+
+    def test_discovered_note_is_directly_retrievable_and_preserves_declared_coverage(self) -> None:
+        digest = self._install_v1()
+        results = self.service.search("conditioning", "local-user")["results"]
+        note = next(item for item in results if item["kind"] == "note")
+        self.assertEqual(
+            {
+                "operation": "get_clause",
+                "package_digest": digest,
+                "record_id": note["record_id"],
+                "clause_reference": note["clause_reference"],
+            },
+            note["evidence_selector"],
+        )
+        selector_arguments = {
+            key: value
+            for key, value in note["evidence_selector"].items()
+            if key != "operation"
+        }
+        selector_packet = self.service.get_clause(**selector_arguments, principal_id="local-user")
+        packet = self.service.get_clause(digest, note["clause_reference"], "local-user")
+        self.assertEqual(packet, selector_packet)
+        record_id_only_packet = self.service.get_clause(
+            package_digest=digest,
+            principal_id="local-user",
+            record_id=note["record_id"],
+        )
+        self.assertEqual(packet, record_id_only_packet)
+        with self.assertRaises(StandardsForgeError) as caught:
+            self.service.get_clause(
+                digest,
+                note["clause_reference"],
+                "local-user",
+                record_id="different-record",
+            )
+        self.assertEqual("record_selector_mismatch", caught.exception.code)
+        self.assertEqual("note", packet["evidence"][0]["kind"])
+        declared = json.loads((PACK_V1 / "manifest.json").read_text(encoding="utf-8"))["coverage"]
+        self.assertEqual(declared, packet["completeness"]["declared_pack_coverage"])
+        self.assertEqual(declared["parsed_source_coverage"], packet["completeness"]["parsed_source_coverage"])
+        self.assertEqual(
+            "selected_record_and_required_dependencies_only_not_corpus_completeness",
+            packet["completeness"]["scope_interpretation"],
+        )
+
+    def test_incomplete_interpretation_remains_incomplete_through_search_retrieval_and_enumeration(self) -> None:
+        candidate = Path(self.temp.name) / "incomplete-coverage"
+        shutil.copytree(PACK_V1, candidate)
+        manifest = json.loads((candidate / "manifest.json").read_text(encoding="utf-8"))
+        manifest["coverage"].update(
+            {
+                "edition_composition": "incomplete_annexes",
+                "parsed_source_coverage": "partial_missing_tables",
+                "dependency_closure": "not_derived",
+                "enumeration_traversal": "not_evaluated",
+            }
+        )
+        self._rewrite_inventoried_json(candidate, "manifest.json", manifest)
+        records = json.loads((candidate / "records.json").read_text(encoding="utf-8"))
+        for record in records["records"]:
+            record["derivation"]["statement_role"] = "informative"
+        self._rewrite_inventoried_json(candidate, "records.json", records)
+
+        digest = self.service.install_pack(candidate, POLICY)["package_digest"]
+        search = self.service.search("axial load", "local-user")
+        search_dimensions = search["coverage_by_package"][digest]["dimensions"]
+        self.assertFalse(search_dimensions["source_interpretation"]["complete"])
+        self.assertFalse(search_dimensions["required_dependencies"]["identification_complete"])
+
+        packet = self.service.get_clause(digest, "4.2.1", "local-user")
+        dimensions = packet["completeness"]["dimensions"]
+        self.assertFalse(dimensions["source_interpretation"]["complete"])
+        self.assertFalse(dimensions["required_dependencies"]["identification_complete"])
+        self.assertTrue(dimensions["required_dependencies"]["retrieval_complete"])
+        self.assertFalse(packet["completeness"]["complete_for_requested_scope"])
+
+        enumeration = self.service.enumerate_obligations(digest, "local-user")
+        self.assertEqual(0, enumeration["page"]["declared_scope_total"])
+        self.assertTrue(enumeration["completeness"]["dimensions"]["database_traversal"]["complete"])
+        self.assertFalse(enumeration["completeness"]["complete_for_requested_scope"])
+
+    def test_duplicate_record_references_are_rejected(self) -> None:
+        candidate = Path(self.temp.name) / "duplicate-record-reference"
+        shutil.copytree(PACK_V1, candidate)
+        records = json.loads((candidate / "records.json").read_text(encoding="utf-8"))
+        records["records"][1]["clause_reference"] = records["records"][0]["clause_reference"]
+        self._rewrite_inventoried_json(candidate, "records.json", records)
+        with self.assertRaises(StandardsForgeError) as caught:
+            validate_pack_directory(candidate)
+        self.assertEqual("invalid_record", caught.exception.code)
+
     def test_build_context_deduplicates_dependencies_and_refuses_partial_budget(self) -> None:
         digest = self._install_v1()
         packet = self.service.build_context(digest, ["4.2.1", "4.2.2", "4.2.1"], "local-user")
@@ -230,9 +778,10 @@ class VerticalSliceTests(unittest.TestCase):
         with closing(sqlite3.connect(db_path)) as connection, connection:
             version = connection.execute("SELECT value FROM metadata WHERE key = 'schema_version'").fetchone()[0]
             columns = {row[1] for row in connection.execute("PRAGMA table_info(records)")}
-        self.assertEqual("2", version)
+        self.assertEqual("4", version)
         self.assertIn("statement_role", columns)
         self.assertIn("derivation_json", columns)
+        self.assertIn("structure_json", columns)
 
 
 if __name__ == "__main__":
