@@ -96,6 +96,28 @@ python .\run.py search "low pressure" `
 
 The package digest pins the exact installed representation. It does not decide whether that standard applies to a product or select an approved project baseline.
 
+### What this prepared snapshot can answer today
+
+The included packs support authorized document inventory, lexical discovery, exact source-linked page retrieval, and an automated **unreviewed** MIL-STD-810H outline. For example, this exact `0.1.0a5` outline record retrieves a source-verified passage from physical PDF page 22:
+
+```powershell
+python .\run.py get-clause `
+  15546007f5f19963f3fc83cdd3da89484036348c49ff1bdf0c27f7bb42ca8f76 `
+  'derived:5777493-35978-29528947ea16:document:4.2.2.5' `
+  --record-id outline-3302b193c76b284a16ce31d5 `
+  --principal local-user
+```
+
+```sh
+sh ./standardsforge.sh get-clause \
+  15546007f5f19963f3fc83cdd3da89484036348c49ff1bdf0c27f7bb42ca8f76 \
+  'derived:5777493-35978-29528947ea16:document:4.2.2.5' \
+  --record-id outline-3302b193c76b284a16ce31d5 \
+  --principal local-user
+```
+
+On this frozen snapshot, the returned source digests and exact quote checks pass, but `review_status` is `automated_unreviewed`, `required_relationships` is empty, and `complete_for_requested_scope` is false. The 438 page-text packs and this outline have no document-wide reviewed obligation classifications or governing-dependency graph. `enumerate-obligations` therefore reports zero **classified** obligations with incomplete source interpretation; that is not evidence that the standards contain no requirements. `diff-editions` needs two separately installed, authorized editions and has no edition pair in this current-edition snapshot.
+
 On Linux or macOS, replace `python .\run.py` in the query examples with `sh ./standardsforge.sh`. Both launchers validate the manifest-bound receipt and owned runtime, anchor state to the extracted directory, and forward only the CLI arguments. Rerun setup when you want a full closed-bundle revalidation.
 
 For setup details and troubleshooting boundaries, use the [prepared-library guide](docs/wiki/PREPARED_LIBRARY.md).
@@ -594,7 +616,7 @@ Of these packs, **413** contain the complete selected current public composition
 
 ## What the engine preserves
 
-Every result keeps the exact edition and package identity, source citations, governing context, derivation and review status, authorization scope, coverage, and known evidence limits visible.
+Evidence packets retain exact edition and package identity, source citations, any available governing context, derivation and review status, authorization scope, coverage, and known evidence limits. Missing or unclassified context remains explicit rather than being inferred.
 
 StandardsForge supplies evidence. It does not decide applicability, approve requirements or test plans, select a project baseline, or certify compliance. Those decisions remain with the responsible engineering and program authorities.
 
