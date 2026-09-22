@@ -20,7 +20,7 @@ The synthetic starter and prepared distribution are separate products. The start
 
 ## Start working
 
-Use the root [README](README.md) for prepared-release setup, querying, the maintainer rebuild workflow, command reference, and limitations. Before changing behavior, also read the [PRD](docs/PRD.md), [architecture](docs/ARCHITECTURE.md), relevant [decision index](docs/adr/README.md), and selected task in [backlog/tasks.json](backlog/tasks.json).
+Use the root [README](README.md) for the prepared-release quickstart and complete dated library inventory. Use the version-controlled [wiki](docs/wiki/README.md) for query reference, model integration, maintainer rebuilds, architecture and trust boundaries, and release validation. Before changing behavior, also read the [PRD](docs/PRD.md), [architecture](docs/ARCHITECTURE.md), relevant [decision index](docs/adr/README.md), and selected task in [backlog/tasks.json](backlog/tasks.json).
 
 Run the required checks from the repository root:
 
