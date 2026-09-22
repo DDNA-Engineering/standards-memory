@@ -1,5 +1,5 @@
 {
-  "contract_version": "0.3.0",
+  "contract_version": "0.4.0",
   "sdk_requirement": "mcp==2.2.0",
   "transport": "stdio",
   "principal_binding": "trusted_server_startup_configuration",
@@ -14,13 +14,241 @@
     "zero explicitly classified obligations is not proof of zero requirements when classification is incomplete"
   ],
   "tools": [
-    {"name": "search", "description": "Discover authorized records by explicit local lexical mode: exact_phrase preserves token order and adjacency, all_terms requires every parsed term, and any_terms accepts at least one. Results are candidates and include identifier, edition_id, and package_digest for replay; they do not establish applicability, obligation completeness, or exact document identity; use resolve_document for an identifier and replay a selected evidence_selector through get_clause.", "arguments": ["query", "limit", "package_digest", "scope_prefix", "query_mode"], "optional_arguments": ["limit", "package_digest", "scope_prefix", "query_mode"], "argument_schemas": {"query_mode": {"enum": ["exact_phrase", "all_terms", "any_terms"], "default": "all_terms"}}, "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/search"},
-    {"name": "list_documents", "description": "List authorized installed document packages with exact identity, representation, immutable package digest, record count, and declared coverage. Optional normalized identifier-prefix filtering and signed pagination remain bound to the startup principal; current publisher status does not establish a project baseline.", "arguments": ["identifier_prefix", "limit", "cursor"], "optional_arguments": ["identifier_prefix", "limit", "cursor"], "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/listDocuments"},
-    {"name": "resolve_document", "description": "Resolve an exact authorized identifier, optional edition, and representation to an immutable package digest. Specify representation when ambiguous: derived_structure is automated and unreviewed, while page_text is physical extracted text.", "arguments": ["identifier", "edition_id", "representation"], "optional_arguments": ["edition_id", "representation"], "argument_schemas": {"representation": {"enum": ["page_text", "derived_structure", "reviewed_structure", "curated_records"]}}, "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/resolveDocument"},
-    {"name": "get_clause", "description": "Retrieve one exact package-pinned record and its required evidence context. Interpret exact text with citations, relationships, derivation review status, and coverage; this does not decide applicability or compliance.", "arguments": ["package_digest", "clause_reference", "record_id", "max_bytes", "response_profile"], "optional_arguments": ["clause_reference", "record_id", "max_bytes", "response_profile"], "selector": {"at_least_one": ["clause_reference", "record_id"], "when_both": "must_resolve_to_same_record"}, "argument_schemas": {"response_profile": {"enum": ["compact_evidence_v1", "concise_evidence_v1"]}}, "output_contract": "success-response.schema.json + detailed or selected evidence-profile schema"},
-    {"name": "build_context", "description": "Retrieve multiple exact package-pinned records with their deduplicated required context. Preserve conditions, exceptions, notes, and unresolved relationships; the packet is evidence, not an approval decision.", "arguments": ["package_digest", "clause_references", "max_bytes", "response_profile"], "optional_arguments": ["max_bytes", "response_profile"], "argument_schemas": {"response_profile": {"enum": ["compact_evidence_v1", "concise_evidence_v1"]}}, "output_contract": "success-response.schema.json + detailed or selected evidence-profile schema"},
-    {"name": "enumerate_obligations", "description": "Traverse only records explicitly classified as obligations in one immutable package. Always inspect classification and source-interpretation coverage: zero classified rows is not proof of zero requirements.", "arguments": ["package_digest", "scope_prefix", "limit", "cursor", "max_bytes"], "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/enumerateObligations"},
-    {"name": "diff_editions", "description": "Compare two authorized immutable packages by exact record identity. Return review-required logical-key candidates separately and traverse each edition's required-dependency graph independently; do not infer cross-edition equivalence, engineering impact, applicability, supersession, or compliance.", "arguments": ["from_package_digest", "to_package_digest", "max_bytes"], "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/diffEditions"}
+    {
+      "name": "search",
+      "description": "Discover authorized records by explicit local lexical mode: exact_phrase preserves token order and adjacency, all_terms requires every parsed term, any_terms accepts at least one, and natural_language uses bounded stemming with a disclosed one-step relaxation when its strict match is empty. Results are candidates and include identifier, edition_id, and package_digest for replay; they do not establish applicability, obligation completeness, or exact document identity; use resolve_document for an identifier and replay a selected evidence_selector through get_clause.",
+      "arguments": [
+        "query",
+        "limit",
+        "package_digest",
+        "scope_prefix",
+        "query_mode"
+      ],
+      "optional_arguments": [
+        "limit",
+        "package_digest",
+        "scope_prefix",
+        "query_mode"
+      ],
+      "argument_schemas": {
+        "query": {
+          "description": "Search text; parsed locally and never sent to a network service."
+        },
+        "limit": {
+          "description": "Maximum records to return, from 1 through 100."
+        },
+        "package_digest": {
+          "description": "Optional exact authorized package SHA-256 pin."
+        },
+        "scope_prefix": {
+          "description": "Optional exact clause reference or dot-delimited descendant scope."
+        },
+        "query_mode": {
+          "description": "Explicit lexical interpretation; natural_language applies bounded stemming and discloses any fallback.",
+          "enum": [
+            "exact_phrase",
+            "all_terms",
+            "any_terms",
+            "natural_language"
+          ],
+          "default": "all_terms"
+        }
+      },
+      "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/search",
+      "title": "Search standards evidence"
+    },
+    {
+      "name": "list_documents",
+      "description": "List authorized installed document packages with exact identity, representation, immutable package digest, record count, and declared coverage. Optional normalized identifier-prefix filtering and signed pagination remain bound to the startup principal; current publisher status does not establish a project baseline.",
+      "arguments": [
+        "identifier_prefix",
+        "limit",
+        "cursor"
+      ],
+      "optional_arguments": [
+        "identifier_prefix",
+        "limit",
+        "cursor"
+      ],
+      "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/listDocuments",
+      "title": "List installed standards",
+      "argument_schemas": {
+        "identifier_prefix": {
+          "description": "Optional normalized document-identifier prefix filter."
+        },
+        "limit": {
+          "description": "Maximum documents to return, from 1 through 100."
+        },
+        "cursor": {
+          "description": "Optional opaque signed cursor from the preceding page."
+        }
+      }
+    },
+    {
+      "name": "resolve_document",
+      "description": "Resolve an exact authorized identifier, optional edition, and representation to an immutable package digest. Specify representation when ambiguous: derived_structure is automated and unreviewed, while page_text is physical extracted text.",
+      "arguments": [
+        "identifier",
+        "edition_id",
+        "representation"
+      ],
+      "optional_arguments": [
+        "edition_id",
+        "representation"
+      ],
+      "argument_schemas": {
+        "identifier": {
+          "description": "Exact document identifier to resolve; no fuzzy identifier matching."
+        },
+        "edition_id": {
+          "description": "Optional exact edition identity when more than one is installed."
+        },
+        "representation": {
+          "description": "Optional exact representation; required when the identifier and edition are ambiguous.",
+          "enum": [
+            "page_text",
+            "derived_structure",
+            "reviewed_structure",
+            "curated_records"
+          ]
+        }
+      },
+      "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/resolveDocument",
+      "title": "Resolve a standard edition"
+    },
+    {
+      "name": "get_clause",
+      "description": "Retrieve one exact package-pinned record and its required evidence context. Interpret exact text with citations, relationships, derivation review status, and coverage; this does not decide applicability or compliance.",
+      "arguments": [
+        "package_digest",
+        "clause_reference",
+        "record_id",
+        "max_bytes",
+        "response_profile"
+      ],
+      "optional_arguments": [
+        "clause_reference",
+        "record_id",
+        "max_bytes",
+        "response_profile"
+      ],
+      "selector": {
+        "at_least_one": [
+          "clause_reference",
+          "record_id"
+        ],
+        "when_both": "must_resolve_to_same_record"
+      },
+      "argument_schemas": {
+        "package_digest": {
+          "description": "Exact authorized package SHA-256 pin returned by resolution or search."
+        },
+        "clause_reference": {
+          "description": "Exact clause reference selector; supply this, record_id, or both."
+        },
+        "record_id": {
+          "description": "Exact stable record selector; supply this, clause_reference, or both."
+        },
+        "max_bytes": {
+          "description": "Optional positive response budget in UTF-8 bytes."
+        },
+        "response_profile": {
+          "description": "Optional deterministic evidence projection; omission returns the full packet.",
+          "enum": [
+            "compact_evidence_v1",
+            "concise_evidence_v1"
+          ]
+        }
+      },
+      "output_contract": "success-response.schema.json + detailed or selected evidence-profile schema",
+      "title": "Get exact clause evidence"
+    },
+    {
+      "name": "build_context",
+      "description": "Retrieve multiple exact package-pinned records with their deduplicated required context. Preserve conditions, exceptions, notes, and unresolved relationships; the packet is evidence, not an approval decision.",
+      "arguments": [
+        "package_digest",
+        "clause_references",
+        "max_bytes",
+        "response_profile"
+      ],
+      "optional_arguments": [
+        "max_bytes",
+        "response_profile"
+      ],
+      "argument_schemas": {
+        "package_digest": {
+          "description": "Exact authorized package SHA-256 pin."
+        },
+        "clause_references": {
+          "description": "One or more exact clause references whose required context is assembled."
+        },
+        "max_bytes": {
+          "description": "Optional positive response budget in UTF-8 bytes."
+        },
+        "response_profile": {
+          "description": "Optional deterministic evidence projection; omission returns the full packet.",
+          "enum": [
+            "compact_evidence_v1",
+            "concise_evidence_v1"
+          ]
+        }
+      },
+      "output_contract": "success-response.schema.json + detailed or selected evidence-profile schema",
+      "title": "Build clause context"
+    },
+    {
+      "name": "enumerate_obligations",
+      "description": "Traverse only records explicitly classified as obligations in one immutable package. Always inspect classification and source-interpretation coverage: zero classified rows is not proof of zero requirements.",
+      "arguments": [
+        "package_digest",
+        "scope_prefix",
+        "limit",
+        "cursor",
+        "max_bytes"
+      ],
+      "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/enumerateObligations",
+      "title": "Enumerate classified obligations",
+      "argument_schemas": {
+        "package_digest": {
+          "description": "Exact authorized package SHA-256 pin."
+        },
+        "scope_prefix": {
+          "description": "Optional exact clause reference or dot-delimited descendant scope."
+        },
+        "limit": {
+          "description": "Maximum obligations to return, from 1 through 100."
+        },
+        "cursor": {
+          "description": "Optional opaque signed cursor from the preceding page."
+        },
+        "max_bytes": {
+          "description": "Optional positive response budget in UTF-8 bytes."
+        }
+      }
+    },
+    {
+      "name": "diff_editions",
+      "description": "Compare two authorized immutable packages by exact record identity. Return review-required logical-key candidates separately and traverse each edition's required-dependency graph independently; do not infer cross-edition equivalence, engineering impact, applicability, supersession, or compliance.",
+      "arguments": [
+        "from_package_digest",
+        "to_package_digest",
+        "max_bytes"
+      ],
+      "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/diffEditions",
+      "title": "Compare standard editions",
+      "argument_schemas": {
+        "from_package_digest": {
+          "description": "Exact authorized baseline package SHA-256 pin."
+        },
+        "to_package_digest": {
+          "description": "Exact authorized comparison package SHA-256 pin."
+        },
+        "max_bytes": {
+          "description": "Optional positive response budget in UTF-8 bytes."
+        }
+      }
+    }
   ],
   "invariants": [
     "no principal or authorization selector is accepted from a tool caller",
@@ -34,8 +262,10 @@
     "get_clause accepts a clause reference, canonical record ID, or a pair that resolves to the same record",
     "omitting response_profile preserves detailed JSON; compact_evidence_v1 and concise_evidence_v1 are opt-in",
     "search package and scope filters are explicit and never trigger hidden fallback",
-    "search query mode is explicit, defaults to all_terms for compatibility, and returns its parsed interpretation",
+    "search query mode is explicit, defaults to all_terms for compatibility, and returns its full interpretation including any natural-language relaxation",
     "search rejects more than 32 parsed terms with invalid_query instead of truncating the query",
+    "search bounds raw query characters, UTF-8 bytes, parsed term count, and per-term size before FTS execution",
+    "search ranking is row-local so unauthorized rows cannot alter visible scores or ordering",
     "search results include a source citation, exact indexed-text FTS5 snippet, and available structural heading ancestry",
     "search declares FTS5 snippet delimiters once at packet level and omits ancestry when unavailable",
     "search remains lexical and does not silently invoke exact document resolution"

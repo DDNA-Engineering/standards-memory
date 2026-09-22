@@ -133,6 +133,36 @@ class DoctorTests(unittest.TestCase):
         schema_check = next(item for item in report["checks"] if item["check_id"] == "state.database_schema")
         self.assertEqual("database_schema_invalid", schema_check["code"])
 
+    def test_missing_or_non_porter_natural_index_is_not_ready_or_repaired(self) -> None:
+        with closing(sqlite3.connect(self.db)) as connection, connection:
+            connection.execute("DROP TABLE records_natural_fts")
+        missing_before = self.db.read_bytes()
+        missing = self._run()
+        self.assertFalse(missing["ready"])
+        self.assertEqual(missing_before, self.db.read_bytes())
+
+        with closing(sqlite3.connect(self.db)) as connection, connection:
+            connection.execute(
+                """
+                CREATE VIRTUAL TABLE records_natural_fts USING fts5(
+                    package_digest UNINDEXED, record_id UNINDEXED, heading, text,
+                    content='records', content_rowid='rowid', tokenize='unicode61'
+                )
+                """
+            )
+            connection.execute("INSERT INTO records_natural_fts(records_natural_fts) VALUES('rebuild')")
+        malformed_before = self.db.read_bytes()
+        malformed = self._run()
+        self.assertFalse(malformed["ready"])
+        self.assertEqual(malformed_before, self.db.read_bytes())
+        schema_check = next(
+            item for item in malformed["checks"] if item["check_id"] == "state.database_schema"
+        )
+        natural_valid = next(
+            detail["value"] for detail in schema_check["details"] if detail["name"] == "natural_fts_valid"
+        )
+        self.assertFalse(natural_valid)
+
     def test_policy_drift_wrong_principal_and_path_escape_fail_closed(self) -> None:
         drifted = json.loads(POLICY.read_text(encoding="utf-8"))
         drifted["policy_id"] = "replacement-policy"

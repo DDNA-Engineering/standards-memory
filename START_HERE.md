@@ -7,7 +7,7 @@ StandardsForge is a standalone, source-first standards compiler and evidence eng
 - Seven query operations are implemented in the library, CLI, and principal-bound stdio MCP adapter, including authorization-safe installed-document discovery.
 - Official-source verification, deterministic PDF page compilation, restartable DLA corpus compilation, automated derived outlines, and reviewed structural or bounded semantic annotations are separate administrative stages.
 - Installed evidence is immutable and package-pinned. Authorization comes from trusted local policy, not imported rights claims.
-- Search is discovery only. Retrieval reauthorizes, rechecks exact source hashes and spans, and reports coverage and unresolved context.
+- Search is discovery only. Its compatibility default remains strict `all_terms`; the opt-in `natural_language` mode uses a separate local Porter index, fixed question stop words, and at most one disclosed strict-to-relaxed fallback. Ranking is row-local so records outside the caller's authorization cannot alter visible scores or order. Retrieval reauthorizes, rechecks exact source hashes and spans, and reports coverage and unresolved context.
 - `page_text`, `derived_structure`, `reviewed_structure`, and `curated_records` remain distinct representations.
 - MCP initialization and tool descriptions provide the [MIL-STD model reading protocol](docs/MODEL_READING_GUIDE.md).
 - The CLI `doctor` command diagnoses an existing store without creating or migrating it, reconciles a trusted policy and principal, validates package integrity at an explicit coverage level, and proves one exact source-verifying query through the read-only service path.

@@ -40,9 +40,10 @@ Lexical modes are explicit:
 
 - `all_terms` requires every parsed lexical chunk and is the default;
 - `exact_phrase` requires adjacent chunks in order;
-- `any_terms` accepts at least one chunk.
+- `any_terms` accepts at least one chunk;
+- `natural_language` removes fixed question scaffolding, uses Porter stemming over headings and text, tries strict AND, and attempts one disclosed OR fallback only if strict matching is empty.
 
-Quotes, `OR`, wildcards, and parentheses are treated as input rather than raw FTS syntax. Search returns ranked candidates; it is not exhaustive retrieval or an applicability decision.
+Raw queries, parsed term count, and term size are bounded before local execution. Quotes, `OR`, wildcards, and parentheses are treated as input rather than raw FTS syntax. Natural-language responses disclose effective and ignored terms, tokenizer, ranker, attempted strategies, and the selected strategy. Scores are computed from each visible row rather than global corpus statistics. Search returns ranked candidates; it is not exhaustive retrieval or an applicability decision. Use `list-documents` and `resolve` for exact identifiers rather than relying on lexical matches.
 
 ## Resolve and pin
 

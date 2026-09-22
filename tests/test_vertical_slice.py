@@ -1017,7 +1017,7 @@ class VerticalSliceTests(unittest.TestCase):
         with closing(sqlite3.connect(db_path)) as connection, connection:
             version = connection.execute("SELECT value FROM metadata WHERE key = 'schema_version'").fetchone()[0]
             columns = {row[1] for row in connection.execute("PRAGMA table_info(records)")}
-        self.assertEqual("4", version)
+        self.assertEqual("5", version)
         self.assertIn("statement_role", columns)
         self.assertIn("derivation_json", columns)
         self.assertIn("structure_json", columns)

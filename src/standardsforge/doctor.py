@@ -19,7 +19,15 @@ from .service import StandardsForgeService
 from .store import SCHEMA_VERSION
 
 
-_REQUIRED_TABLES = {"metadata", "packages", "grants", "records", "dependencies", "records_fts"}
+_REQUIRED_TABLES = {
+    "metadata",
+    "packages",
+    "grants",
+    "records",
+    "dependencies",
+    "records_fts",
+    "records_natural_fts",
+}
 _REQUIRED_INDEXES = {"packages_identity_idx", "records_clause_idx", "records_role_scope_idx"}
 _REQUIRED_TRIGGERS = {"records_fts_ai", "records_fts_ad", "records_fts_au"}
 _REQUIRED_METADATA = {"schema_version", "cursor_secret", "corpus_generation", "authorization_generation"}
@@ -177,6 +185,18 @@ def run_doctor(
                     schema_version = None
                 cursor_secret_valid = re.fullmatch(r"[0-9a-f]{64}", metadata.get("cursor_secret", "")) is not None
                 quick_ok = bool(quick_rows) and all(str(row[0]) == "ok" for row in quick_rows)
+                natural_fts_row = connection.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'records_natural_fts'"
+                ).fetchone()
+                natural_fts_sql = (
+                    str(natural_fts_row["sql"] or "").lower()
+                    if natural_fts_row is not None
+                    else ""
+                )
+                natural_fts_valid = (
+                    "content='records'" in natural_fts_sql
+                    and "porter unicode61" in natural_fts_sql
+                )
                 database_usable = (
                     quick_ok
                     and not foreign_key_rows
@@ -185,10 +205,15 @@ def run_doctor(
                     and not missing_triggers
                     and not missing_metadata
                     and cursor_secret_valid
+                    and natural_fts_valid
                     and schema_version == SCHEMA_VERSION
                 )
                 if database_usable:
                     connection.execute("SELECT rowid FROM records_fts WHERE records_fts MATCH ? LIMIT 1", ("doctor",)).fetchall()
+                    connection.execute(
+                        "SELECT rowid FROM records_natural_fts WHERE records_natural_fts MATCH ? LIMIT 1",
+                        ("doctor",),
+                    ).fetchall()
                     package_rows = connection.execute(
                         "SELECT package_digest, pack_id, object_path, rights_json FROM packages ORDER BY package_digest"
                     ).fetchall()
@@ -214,6 +239,7 @@ def run_doctor(
                         quick_check="ok" if quick_ok else "failed",
                         foreign_key_violation_count=len(foreign_key_rows),
                         cursor_secret_valid=cursor_secret_valid,
+                        natural_fts_valid=natural_fts_valid,
                     )
                 )
             finally:

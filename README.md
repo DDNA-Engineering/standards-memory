@@ -62,6 +62,7 @@ This authorization-filtered inventory returns exact identifiers, editions, repre
 ```powershell
 .\standardsforge.ps1 search "environmental testing" `
   --principal local-user `
+  --query-mode natural_language `
   --limit 5
 ```
 

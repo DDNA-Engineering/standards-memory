@@ -762,6 +762,34 @@
         "Version the expanded seven-operation response and MCP contracts, retain query response 0.2 for historical consumers, and validate actual first and final inventory pages plus the closed near-match error envelope.",
         "Prove empty-principal and revocation non-disclosure, stable prefix pagination, replayable hints, invalid limits, tampered cursors, prefix mismatch, and authorization-snapshot invalidation with networking disabled."
       ]
+    },
+    {
+      "task_id": "TASK-034",
+      "title": "Bounded natural-language lexical discovery",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-022",
+        "SM-FR-025",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-040",
+        "SM-FR-050",
+        "SM-FR-054",
+        "SM-FR-055",
+        "SM-FR-057",
+        "SM-FR-062",
+        "SM-FR-074"
+      ],
+      "acceptance": [
+        "Preserve exact_phrase, all_terms, and any_terms with all_terms as the compatibility default, and add an explicit natural_language mode rather than a hidden fallback.",
+        "Build a separate external-content Porter Unicode index over headings and evidence text while retaining the exact Unicode index and exact clause-reference scope controls.",
+        "Compile natural-language questions through a fixed versioned stop-word policy, bounded identifier-like prefix matching, strict stemmed all-terms retrieval, and at most one disclosed stemmed any-terms fallback when the strict authorized result is empty.",
+        "Return parsed, effective, ignored, attempted, and selected query interpretation together with tokenizer and ranker identities; keep cache entries separated by mode, strategy, corpus, and authorization visibility.",
+        "Bound raw query characters, UTF-8 bytes, parsed term count, and individual term characters and bytes before any FTS execution; keep caller operators, wildcards, quotes, and parentheses out of raw FTS syntax.",
+        "Replace corpus-global BM25 with deterministic row-local scoring so unauthorized packages cannot affect visible scores or ordering, lower synthetic clause-reference influence in exact ranking, exclude clause references from natural-language matching, and keep document identifier discovery and exact package selection in list_documents and resolve_document.",
+        "Publish a title and per-argument description for all seven MCP tools without exposing principal, authorization, server-mode, network, model, or administrative controls.",
+        "Prove migration and trigger parity for both indexes, deterministic strict and fallback behavior, singular/plural stemming, identifier-prefix handling, authorization revocation and race safety, cache separation, bounded failures, schema validation, and current-corpus relevance."
+      ]
     }
   ]
 }

@@ -51,7 +51,7 @@ class ContractValidationTests(unittest.TestCase):
         )
         self.assertEqual(
             {
-                "detailed_results": 11,
+                "detailed_results": 12,
                 "profile_results": 4,
                 "doctor_results": 1,
                 "handoff_results": 1,

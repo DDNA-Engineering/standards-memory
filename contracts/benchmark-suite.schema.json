@@ -92,7 +92,7 @@
       "required": ["query", "query_mode", "limit", "package_binding"],
       "properties": {
         "query": {"$ref": "#/$defs/nonEmpty"},
-        "query_mode": {"enum": ["exact_phrase", "all_terms", "any_terms"]},
+        "query_mode": {"enum": ["exact_phrase", "all_terms", "any_terms", "natural_language"]},
         "limit": {"type": "integer", "minimum": 1, "maximum": 100},
         "package_binding": {"$ref": "#/$defs/nonEmpty"}
       }

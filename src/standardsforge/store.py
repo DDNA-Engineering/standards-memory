@@ -19,7 +19,7 @@ from .models import LocalPolicy, ValidatedPack
 from .pack import validate_pack_directory
 
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 
 class LocalStore:
@@ -159,23 +159,34 @@ class LocalStore:
                     connection.execute("ALTER TABLE records ADD COLUMN structure_json TEXT NOT NULL DEFAULT '{}'")
                 elif int(row["value"]) == 2:
                     connection.execute("ALTER TABLE records ADD COLUMN structure_json TEXT NOT NULL DEFAULT '{}'")
-                elif int(row["value"]) not in {3, SCHEMA_VERSION}:
+                elif int(row["value"]) not in {3, 4, SCHEMA_VERSION}:
                     raise StandardsForgeError("unsupported_database_version", "The local database schema is unsupported.")
 
                 fts_row = connection.execute(
                     "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'records_fts'"
                 ).fetchone()
                 fts_sql = str(fts_row["sql"] or "").lower() if fts_row is not None else ""
+                natural_fts_row = connection.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'records_natural_fts'"
+                ).fetchone()
+                natural_fts_sql = (
+                    str(natural_fts_row["sql"] or "").lower()
+                    if natural_fts_row is not None
+                    else ""
+                )
                 needs_fts_rebuild = (
                     previous_version is None
                     or previous_version < SCHEMA_VERSION
                     or "content='records'" not in fts_sql
+                    or "content='records'" not in natural_fts_sql
+                    or "porter unicode61" not in natural_fts_sql
                 )
                 if needs_fts_rebuild:
                     connection.execute("DROP TRIGGER IF EXISTS records_fts_ai")
                     connection.execute("DROP TRIGGER IF EXISTS records_fts_ad")
                     connection.execute("DROP TRIGGER IF EXISTS records_fts_au")
                     connection.execute("DROP TABLE IF EXISTS records_fts")
+                    connection.execute("DROP TABLE IF EXISTS records_natural_fts")
                     connection.execute(
                         """
                         CREATE VIRTUAL TABLE records_fts USING fts5(
@@ -190,12 +201,27 @@ class LocalStore:
                         )
                         """
                     )
+                    connection.execute(
+                        """
+                        CREATE VIRTUAL TABLE records_natural_fts USING fts5(
+                            package_digest UNINDEXED,
+                            record_id UNINDEXED,
+                            heading,
+                            text,
+                            content='records',
+                            content_rowid='rowid',
+                            tokenize='porter unicode61'
+                        )
+                        """
+                    )
 
                 connection.execute(
                     """
                     CREATE TRIGGER IF NOT EXISTS records_fts_ai AFTER INSERT ON records BEGIN
                         INSERT INTO records_fts(rowid, package_digest, record_id, clause_reference, heading, text)
                         VALUES (new.rowid, new.package_digest, new.record_id, new.clause_reference, new.heading, new.text);
+                        INSERT INTO records_natural_fts(rowid, package_digest, record_id, heading, text)
+                        VALUES (new.rowid, new.package_digest, new.record_id, new.heading, new.text);
                     END
                     """
                 )
@@ -204,6 +230,8 @@ class LocalStore:
                     CREATE TRIGGER IF NOT EXISTS records_fts_ad AFTER DELETE ON records BEGIN
                         INSERT INTO records_fts(records_fts, rowid, package_digest, record_id, clause_reference, heading, text)
                         VALUES ('delete', old.rowid, old.package_digest, old.record_id, old.clause_reference, old.heading, old.text);
+                        INSERT INTO records_natural_fts(records_natural_fts, rowid, package_digest, record_id, heading, text)
+                        VALUES ('delete', old.rowid, old.package_digest, old.record_id, old.heading, old.text);
                     END
                     """
                 )
@@ -214,11 +242,16 @@ class LocalStore:
                         VALUES ('delete', old.rowid, old.package_digest, old.record_id, old.clause_reference, old.heading, old.text);
                         INSERT INTO records_fts(rowid, package_digest, record_id, clause_reference, heading, text)
                         VALUES (new.rowid, new.package_digest, new.record_id, new.clause_reference, new.heading, new.text);
+                        INSERT INTO records_natural_fts(records_natural_fts, rowid, package_digest, record_id, heading, text)
+                        VALUES ('delete', old.rowid, old.package_digest, old.record_id, old.heading, old.text);
+                        INSERT INTO records_natural_fts(rowid, package_digest, record_id, heading, text)
+                        VALUES (new.rowid, new.package_digest, new.record_id, new.heading, new.text);
                     END
                     """
                 )
                 if needs_fts_rebuild:
                     connection.execute("INSERT INTO records_fts(records_fts) VALUES('rebuild')")
+                    connection.execute("INSERT INTO records_natural_fts(records_natural_fts) VALUES('rebuild')")
                 if previous_version is not None and previous_version < SCHEMA_VERSION:
                     connection.execute(
                         "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
@@ -707,7 +740,28 @@ class LocalStore:
         limit: int,
         package_digest: str | None = None,
         scope_prefix: str | None = None,
+        index_name: str = "exact",
     ) -> list[dict[str, Any]]:
+        require(
+            index_name in {"exact", "natural"},
+            "invalid_search_index",
+            "The internal lexical index selection is unsupported.",
+        )
+        if index_name == "natural":
+            fts_table = "records_natural_fts"
+            snippet_column = 3
+            rank_expression = """-(
+                2.0 * ((length(highlight(records_natural_fts, 2, '⟦', '⟧')) - length(r.heading)) / 2.0)
+                + ((length(highlight(records_natural_fts, 3, '⟦', '⟧')) - length(r.text)) / 2.0)
+            ) / (1.0 + length(r.heading) / 200.0 + length(r.text) / 1000.0)"""
+        else:
+            fts_table = "records_fts"
+            snippet_column = 4
+            rank_expression = """-(
+                0.25 * ((length(highlight(records_fts, 2, '⟦', '⟧')) - length(r.clause_reference)) / 2.0)
+                + 2.0 * ((length(highlight(records_fts, 3, '⟦', '⟧')) - length(r.heading)) / 2.0)
+                + ((length(highlight(records_fts, 4, '⟦', '⟧')) - length(r.text)) / 2.0)
+            ) / (1.0 + length(r.heading) / 200.0 + length(r.text) / 1000.0)"""
         filters = ""
         params: list[Any] = [fts_query, principal_id]
         if package_digest is not None:
@@ -727,15 +781,15 @@ class LocalStore:
                         SELECT p.package_digest, p.edition_id, p.identifier, p.title, p.manifest_json,
                                r.record_id, r.kind, r.clause_reference, r.heading, r.ordinal,
                                r.source_json, r.structure_json,
-                               snippet(records_fts, 4, '⟦', '⟧', ' … ', 20) AS matched_snippet,
-                               bm25(records_fts, 0.0, 0.0, 3.0, 1.0, 1.0) AS score
-                        FROM records_fts
+                               snippet({fts_table}, {snippet_column}, '⟦', '⟧', ' … ', 20) AS matched_snippet,
+                               {rank_expression} AS score
+                        FROM {fts_table}
                         JOIN records r
-                          ON r.package_digest = records_fts.package_digest
-                         AND r.record_id = records_fts.record_id
+                          ON r.package_digest = {fts_table}.package_digest
+                         AND r.record_id = {fts_table}.record_id
                         JOIN packages p ON p.package_digest = r.package_digest
                         JOIN grants g ON g.package_digest = p.package_digest
-                        WHERE records_fts MATCH ? AND g.principal_id = ?
+                        WHERE {fts_table} MATCH ? AND g.principal_id = ?
                           AND g.can_serve = 1 AND g.revoked_at IS NULL
                           {filters}
                         ORDER BY score, p.package_digest, r.ordinal

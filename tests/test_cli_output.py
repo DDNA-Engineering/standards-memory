@@ -28,7 +28,11 @@ class CLIOutputTests(unittest.TestCase):
 
     def test_search_query_mode_defaults_and_forwards_explicit_choice(self) -> None:
         parser = _parser()
-        for extra, expected in (([], "all_terms"), (["--query-mode", "any_terms"], "any_terms")):
+        for extra, expected in (
+            ([], "all_terms"),
+            (["--query-mode", "any_terms"], "any_terms"),
+            (["--query-mode", "natural_language"], "natural_language"),
+        ):
             with self.subTest(query_mode=expected):
                 args = parser.parse_args(
                     ["search", "axial ingress", "--principal", "local-user", *extra]

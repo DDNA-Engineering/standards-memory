@@ -1,18 +1,151 @@
 {
-  "contract_version": "0.3.0",
+  "contract_version": "0.4.0",
   "read_operations": [
-    {"name": "search", "requires_principal": true, "requires_package_pin": false, "result_schema": "query-response.schema.json#/$defs/search", "optional_arguments": {"package_digest": "authorized immutable package pin", "scope_prefix": "exact clause reference or dot-delimited descendants", "query_mode": "exact_phrase, all_terms, or any_terms; defaults to all_terms"}, "query_limits": {"maximum_parsed_terms": 32, "overflow_error": "invalid_query"}, "query_modes": {"exact_phrase": "parsed terms must be adjacent and ordered", "all_terms": "every parsed term is required", "any_terms": "at least one parsed term is required"}, "packet_fields": {"query_interpretation": "selected mode, normalized query, and exact parsed terms", "snippet_markers": {"start": "⟦", "end": "⟧"}}, "result_fields": {"identifier": "installed document identifier", "edition_id": "installed edition identity", "package_digest": "immutable package pin", "source": "exact installed record citation", "matched_snippet": "FTS5 snippet from the indexed record text", "heading_ancestry": "optional structural parent records in root-to-parent order; omitted when absent"}},
-    {"name": "list_documents", "requires_principal": true, "requires_package_pin": false, "result_schema": "query-response.schema.json#/$defs/listDocuments", "optional_arguments": {"identifier_prefix": "normalized identifier prefix", "limit": "page size from 1 to 100", "cursor": "signed principal, prefix, visibility, and position-bound continuation"}, "result_fields": {"documents": "authorized installed package identities, representations, record counts, and declared coverage", "matching_authorized_package_count": "complete matching count for the cursor snapshot"}},
-    {"name": "resolve_document", "requires_principal": true, "requires_package_pin": false, "result_schema": "query-response.schema.json#/$defs/resolveDocument", "optional_arguments": {"edition_id": "exact edition identity", "representation": ["page_text", "derived_structure", "reviewed_structure", "curated_records"]}},
-    {"name": "get_clause", "requires_principal": true, "requires_package_pin": true, "result_schema": "query-response.schema.json#/$defs/getClause", "profile_schemas": ["compact-evidence-response.schema.json", "concise-evidence-response.schema.json"], "accepted_record_kinds": ["clause", "note", "page"], "selector": {"at_least_one": ["clause_reference", "record_id"], "when_both": "must_resolve_to_same_record"}, "optional_arguments": {"clause_reference": "unique record reference within the pinned package", "record_id": "canonical record identity within the pinned package", "response_profile": ["compact_evidence_v1", "concise_evidence_v1"]}},
-    {"name": "build_context", "requires_principal": true, "requires_package_pin": true, "result_schema": "query-response.schema.json#/$defs/buildContext", "profile_schemas": ["compact-evidence-response.schema.json", "concise-evidence-response.schema.json"], "optional_arguments": {"response_profile": ["compact_evidence_v1", "concise_evidence_v1"]}},
-    {"name": "enumerate_obligations", "requires_principal": true, "requires_package_pin": true, "result_schema": "query-response.schema.json#/$defs/enumerateObligations"},
-    {"name": "diff_editions", "requires_principal": true, "requires_package_pin": true, "identity_authority": "exact_record_id", "alignment_candidates": "non_authoritative_review_required", "dependency_traversal": "separate_before_and_after_required_graphs", "result_schema": "query-response.schema.json#/$defs/diffEditions"}
+    {
+      "name": "search",
+      "requires_principal": true,
+      "requires_package_pin": false,
+      "result_schema": "query-response.schema.json#/$defs/search",
+      "optional_arguments": {
+        "package_digest": "authorized immutable package pin",
+        "scope_prefix": "exact clause reference or dot-delimited descendants",
+        "query_mode": "exact_phrase, all_terms, any_terms, or natural_language; defaults to all_terms"
+      },
+      "query_limits": {
+        "maximum_query_characters": 4096,
+        "maximum_query_utf8_bytes": 16384,
+        "maximum_parsed_terms": 32,
+        "maximum_term_characters": 256,
+        "maximum_term_utf8_bytes": 1024,
+        "overflow_error": "invalid_query"
+      },
+      "query_modes": {
+        "exact_phrase": "parsed terms must be adjacent and ordered",
+        "all_terms": "every parsed term is required",
+        "any_terms": "at least one parsed term is required",
+        "natural_language": "fixed stop words plus Porter stemming; strict all-terms first, then one disclosed any-terms fallback only when strict is empty"
+      },
+      "packet_fields": {
+        "query_interpretation": "selected mode, normalized and parsed terms, plus effective terms, ignored terms, tokenizer, ranker, attempted strategies, and selected strategy for natural_language",
+        "snippet_markers": {
+          "start": "⟦",
+          "end": "⟧"
+        }
+      },
+      "result_fields": {
+        "identifier": "installed document identifier",
+        "edition_id": "installed edition identity",
+        "package_digest": "immutable package pin",
+        "source": "exact installed record citation",
+        "matched_snippet": "FTS5 snippet from the indexed record text",
+        "heading_ancestry": "optional structural parent records in root-to-parent order; omitted when absent"
+      }
+    },
+    {
+      "name": "list_documents",
+      "requires_principal": true,
+      "requires_package_pin": false,
+      "result_schema": "query-response.schema.json#/$defs/listDocuments",
+      "optional_arguments": {
+        "identifier_prefix": "normalized identifier prefix",
+        "limit": "page size from 1 to 100",
+        "cursor": "signed principal, prefix, visibility, and position-bound continuation"
+      },
+      "result_fields": {
+        "documents": "authorized installed package identities, representations, record counts, and declared coverage",
+        "matching_authorized_package_count": "complete matching count for the cursor snapshot"
+      }
+    },
+    {
+      "name": "resolve_document",
+      "requires_principal": true,
+      "requires_package_pin": false,
+      "result_schema": "query-response.schema.json#/$defs/resolveDocument",
+      "optional_arguments": {
+        "edition_id": "exact edition identity",
+        "representation": [
+          "page_text",
+          "derived_structure",
+          "reviewed_structure",
+          "curated_records"
+        ]
+      }
+    },
+    {
+      "name": "get_clause",
+      "requires_principal": true,
+      "requires_package_pin": true,
+      "result_schema": "query-response.schema.json#/$defs/getClause",
+      "profile_schemas": [
+        "compact-evidence-response.schema.json",
+        "concise-evidence-response.schema.json"
+      ],
+      "accepted_record_kinds": [
+        "clause",
+        "note",
+        "page"
+      ],
+      "selector": {
+        "at_least_one": [
+          "clause_reference",
+          "record_id"
+        ],
+        "when_both": "must_resolve_to_same_record"
+      },
+      "optional_arguments": {
+        "clause_reference": "unique record reference within the pinned package",
+        "record_id": "canonical record identity within the pinned package",
+        "response_profile": [
+          "compact_evidence_v1",
+          "concise_evidence_v1"
+        ]
+      }
+    },
+    {
+      "name": "build_context",
+      "requires_principal": true,
+      "requires_package_pin": true,
+      "result_schema": "query-response.schema.json#/$defs/buildContext",
+      "profile_schemas": [
+        "compact-evidence-response.schema.json",
+        "concise-evidence-response.schema.json"
+      ],
+      "optional_arguments": {
+        "response_profile": [
+          "compact_evidence_v1",
+          "concise_evidence_v1"
+        ]
+      }
+    },
+    {
+      "name": "enumerate_obligations",
+      "requires_principal": true,
+      "requires_package_pin": true,
+      "result_schema": "query-response.schema.json#/$defs/enumerateObligations"
+    },
+    {
+      "name": "diff_editions",
+      "requires_principal": true,
+      "requires_package_pin": true,
+      "identity_authority": "exact_record_id",
+      "alignment_candidates": "non_authoritative_review_required",
+      "dependency_traversal": "separate_before_and_after_required_graphs",
+      "result_schema": "query-response.schema.json#/$defs/diffEditions"
+    }
   ],
   "admin_operations": [
-    {"name": "verify_pack", "authorization_effect": "none"},
-    {"name": "install", "requires_operator_policy": true},
-    {"name": "revoke", "requires_existing_grant": true}
+    {
+      "name": "verify_pack",
+      "authorization_effect": "none"
+    },
+    {
+      "name": "install",
+      "requires_operator_policy": true
+    },
+    {
+      "name": "revoke",
+      "requires_existing_grant": true
+    }
   ],
   "local_mcp_adapter": {
     "transport": "stdio",
@@ -23,7 +156,11 @@
   },
   "response_profiles": {
     "default": "detailed_json_v1",
-    "supported": ["detailed_json_v1", "compact_evidence_v1", "concise_evidence_v1"],
+    "supported": [
+      "detailed_json_v1",
+      "compact_evidence_v1",
+      "concise_evidence_v1"
+    ],
     "compact_response_schema": "compact-evidence-response.schema.json",
     "concise_response_schema": "concise-evidence-response.schema.json",
     "token_measurement": "unavailable_without_a_configured_local_tokenizer",
@@ -42,7 +179,9 @@
     "compact and concise evidence profiles preserve exact text and canonical record IDs while deduplicating packet-local source and derivation dictionaries",
     "omitting response_profile preserves the existing detailed JSON representation",
     "search filters are exact local constraints and never relax or invoke network or model fallback",
-    "search quotes and requires every parsed term up to the declared limit; overflow fails with invalid_query rather than dropping terms",
+    "search bounds raw input and parsed terms before local FTS execution",
+    "search scores and ordering are computed from visible matching rows without global corpus statistics",
+    "exact_phrase, all_terms, and any_terms quote every parsed term; natural_language uses a separate Porter index with a bounded, disclosed strict-to-relaxed strategy",
     "search returns a source citation, an FTS5 snippet from the exact indexed record text, and structural heading ancestry when parent records exist",
     "search remains lexical and never silently combines exact document resolution with record search"
   ]

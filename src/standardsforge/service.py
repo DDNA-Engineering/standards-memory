@@ -19,6 +19,66 @@ from .query_cache import VersionedLRUCache
 from .store import LocalStore
 
 
+_SEARCH_QUERY_MAX_CHARS = 4096
+_SEARCH_QUERY_MAX_BYTES = 16384
+_SEARCH_TERM_MAX_CHARS = 256
+_SEARCH_TERM_MAX_BYTES = 1024
+_SEARCH_TERM_MAX_COUNT = 32
+_NATURAL_LANGUAGE_STOP_WORDS = frozenset(
+    {
+        "a",
+        "about",
+        "an",
+        "and",
+        "are",
+        "as",
+        "at",
+        "be",
+        "by",
+        "did",
+        "do",
+        "does",
+        "for",
+        "from",
+        "how",
+        "in",
+        "is",
+        "it",
+        "of",
+        "on",
+        "or",
+        "say",
+        "that",
+        "the",
+        "to",
+        "what",
+        "when",
+        "where",
+        "which",
+        "with",
+    }
+)
+_NATURAL_LANGUAGE_WRAPPER_WORDS = frozenset({"document", "spec", "specification", "standard"})
+
+
+def _quote_fts_term(term: str, *, identifier_prefix: bool = False) -> str:
+    quoted = '"' + term.replace('"', '""') + '"'
+    identifier_like = re.fullmatch(
+        r"(?:[A-Za-z]+[-/][A-Za-z0-9./-]*\d[A-Za-z0-9./-]*|\d{3,}[A-Za-z])",
+        term,
+    )
+    if identifier_prefix and identifier_like is not None:
+        return quoted + "*"
+    return quoted
+
+
+def _natural_language_terms(tokens: list[str]) -> tuple[list[str], list[str]]:
+    ignored_words = _NATURAL_LANGUAGE_STOP_WORDS | _NATURAL_LANGUAGE_WRAPPER_WORDS
+    retained = [token for token in tokens if token.casefold() not in ignored_words]
+    ignored = [token for token in tokens if token.casefold() in ignored_words]
+    return retained, ignored
+
+
 def _decode_utf8(data: bytes) -> str:
     return data.decode("utf-8")
 
@@ -136,7 +196,7 @@ class StandardsForgeService:
     def _configure(self, store: LocalStore) -> None:
         self.store = store
         self._closure_cache = VersionedLRUCache("required-evidence-closure", "1", max_entries=256)
-        self._search_cache = VersionedLRUCache("authorized-lexical-search", "2", max_entries=256)
+        self._search_cache = VersionedLRUCache("authorized-lexical-search", "3", max_entries=256)
 
     @classmethod
     def open_read_only(cls, db_path: str | Path, object_root: str | Path) -> "StandardsForgeService":
@@ -1926,10 +1986,20 @@ class StandardsForgeService:
         require(isinstance(query, str), "invalid_query", "Search query must be text.")
         require(
             isinstance(query_mode, str)
-            and query_mode in {"exact_phrase", "all_terms", "any_terms"},
+            and query_mode in {"exact_phrase", "all_terms", "any_terms", "natural_language"},
             "invalid_query_mode",
-            "Search query mode must be exact_phrase, all_terms, or any_terms.",
+            "Search query mode must be exact_phrase, all_terms, any_terms, or natural_language.",
             query_mode=query_mode,
+        )
+        query_bytes = query.encode("utf-8")
+        require(
+            len(query) <= _SEARCH_QUERY_MAX_CHARS and len(query_bytes) <= _SEARCH_QUERY_MAX_BYTES,
+            "invalid_query",
+            "Search query text exceeds the bounded input size.",
+            max_characters=_SEARCH_QUERY_MAX_CHARS,
+            actual_characters=len(query),
+            max_utf8_bytes=_SEARCH_QUERY_MAX_BYTES,
+            actual_utf8_bytes=len(query_bytes),
         )
         requested_package_digest = package_digest
         requested_scope_prefix = scope_prefix
@@ -1942,35 +2012,82 @@ class StandardsForgeService:
         tokens = re.findall(r"[\w./-]+", query, flags=re.UNICODE)
         require(tokens, "invalid_query", "Search query contains no searchable terms.")
         require(
-            len(tokens) <= 32,
+            len(tokens) <= _SEARCH_TERM_MAX_COUNT,
             "invalid_query",
             "Search queries may contain at most 32 searchable terms.",
-            max_terms=32,
+            max_terms=_SEARCH_TERM_MAX_COUNT,
             actual_terms=len(tokens),
         )
-        quoted_tokens = ['"' + token.replace('"', '""') + '"' for token in tokens]
+        for index, token in enumerate(tokens):
+            token_bytes = token.encode("utf-8")
+            require(
+                len(token) <= _SEARCH_TERM_MAX_CHARS and len(token_bytes) <= _SEARCH_TERM_MAX_BYTES,
+                "invalid_query",
+                "A parsed search term exceeds the bounded input size.",
+                term_index=index,
+                max_characters=_SEARCH_TERM_MAX_CHARS,
+                actual_characters=len(token),
+                max_utf8_bytes=_SEARCH_TERM_MAX_BYTES,
+                actual_utf8_bytes=len(token_bytes),
+            )
+        effective_terms = list(tokens)
+        ignored_terms: list[str] = []
+        index_name = "exact"
+        ranker = "sqlite-fts5-row-local-length-normalized-exact-v1"
+        tokenizer = "unicode61"
+        quoted_tokens = [_quote_fts_term(token) for token in tokens]
         if query_mode == "exact_phrase":
             fts_query = '"' + " ".join(token.replace('"', '""') for token in tokens) + '"'
         elif query_mode == "all_terms":
             fts_query = " AND ".join(quoted_tokens)
-        else:
+        elif query_mode == "any_terms":
             fts_query = " OR ".join(quoted_tokens)
+        else:
+            effective_terms, ignored_terms = _natural_language_terms(tokens)
+            require(
+                effective_terms,
+                "invalid_query",
+                "Natural-language search contains no effective engineering terms after fixed question scaffolding is removed.",
+                stop_word_policy="standardsforge-question-stopwords-v1",
+            )
+            natural_tokens = [
+                _quote_fts_term(term, identifier_prefix=True) for term in effective_terms
+            ]
+            fts_query = " AND ".join(natural_tokens)
+            relaxed_fts_query = " OR ".join(natural_tokens)
+            index_name = "natural"
+            ranker = "sqlite-fts5-row-local-length-normalized-natural-v1"
+            tokenizer = "porter_unicode61"
         query_interpretation = {
             "mode": query_mode,
             "normalized_query": " ".join(tokens),
             "parsed_terms": tokens,
         }
+        if query_mode == "natural_language":
+            query_interpretation.update(
+                {
+                    "effective_terms": effective_terms,
+                    "ignored_terms": ignored_terms,
+                    "attempted_strategies": [],
+                    "selected_strategy": "stemmed_all_terms",
+                    "tokenizer": tokenizer,
+                    "ranker": ranker,
+                    "stop_word_policy": "standardsforge-question-stopwords-v1",
+                }
+            )
         for _ in range(2):
             state = self.store.cache_state(principal_id)
             cache_key = self._search_cache.key(
                 {
                     "principal_sha256": hashlib.sha256(principal_id.encode("utf-8")).hexdigest(),
                     "fts_query": fts_query,
+                    "relaxed_fts_query": relaxed_fts_query if query_mode == "natural_language" else None,
                     "query_mode": query_mode,
+                    "index_name": index_name,
                     "limit": limit,
                     "package_digest": requested_package_digest,
                     "scope_prefix": scope_prefix,
-                    "ranker": "sqlite-fts5-bm25-v2-snippet-projection",
+                    "ranker": ranker,
                     **state,
                 }
             )
@@ -1979,6 +2096,14 @@ class StandardsForgeService:
                 if self.store.cache_state(principal_id) == state:
                     if requested_package_digest is not None:
                         self.store.authorized_package(principal_id, requested_package_digest)
+                    if query_mode == "natural_language":
+                        cached_interpretation = cached["query_interpretation"]
+                        query_interpretation["attempted_strategies"] = cached_interpretation[
+                            "attempted_strategies"
+                        ]
+                        query_interpretation["selected_strategy"] = cached_interpretation[
+                            "selected_strategy"
+                        ]
                     cached["query"] = query
                     cached["query_interpretation"] = query_interpretation
                     cached["filters"] = {
@@ -1988,7 +2113,30 @@ class StandardsForgeService:
                     return cached
                 continue
 
-            rows = self.store.search(principal_id, fts_query, limit, requested_package_digest, scope_prefix)
+            rows = self.store.search(
+                principal_id,
+                fts_query,
+                limit,
+                requested_package_digest,
+                scope_prefix,
+                index_name,
+            )
+            if query_mode == "natural_language":
+                attempted_strategies = ["stemmed_all_terms"]
+                selected_strategy = "stemmed_all_terms"
+                if not rows and relaxed_fts_query != fts_query:
+                    rows = self.store.search(
+                        principal_id,
+                        relaxed_fts_query,
+                        limit,
+                        requested_package_digest,
+                        scope_prefix,
+                        index_name,
+                    )
+                    attempted_strategies.append("stemmed_any_terms")
+                    selected_strategy = "stemmed_any_terms"
+                query_interpretation["attempted_strategies"] = attempted_strategies
+                query_interpretation["selected_strategy"] = selected_strategy
             coverage_by_package: dict[str, dict[str, Any]] = {}
             for row in rows:
                 result_package_digest = row["package_digest"]
@@ -2050,8 +2198,15 @@ class StandardsForgeService:
                     },
                     "response_fit": {"complete": True, "status": "complete", "unit": "records"},
                 },
-                "limitations": ["Lexical rank is a discovery signal, not applicability or compliance."],
+                "limitations": [
+                    "Lexical rank is a discovery signal, not applicability or compliance.",
+                    "Document identifiers remain an explicit list_documents and resolve_document workflow; lexical search never selects a package baseline.",
+                ],
             }
+            if query_mode == "natural_language" and query_interpretation["selected_strategy"] == "stemmed_any_terms":
+                packet["limitations"].append(
+                    "The natural-language strict match was empty, so the disclosed relaxed strategy returned records matching at least one effective term."
+                )
             if self.store.cache_state(principal_id) == state:
                 if requested_package_digest is not None:
                     self.store.authorized_package(principal_id, requested_package_digest)

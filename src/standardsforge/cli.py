@@ -199,7 +199,7 @@ def _parser() -> argparse.ArgumentParser:
     search.add_argument("--scope-prefix")
     search.add_argument(
         "--query-mode",
-        choices=("exact_phrase", "all_terms", "any_terms"),
+        choices=("exact_phrase", "all_terms", "any_terms", "natural_language"),
         default="all_terms",
     )
 

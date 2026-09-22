@@ -272,6 +272,11 @@ def validate_actual_query_contracts(
             service.search(
                 "axial ingress", "local-user", query_mode="any_terms"
             ),
+            service.search(
+                "How should connectors be retained under loads?",
+                "local-user",
+                query_mode="natural_language",
+            ),
         ]
         profile_results = [
             service.get_clause(
@@ -469,6 +474,28 @@ def validate_actual_query_contracts(
             pass
         else:
             raise AssertionError("An undeclared search query mode passed response validation.")
+
+        missing_natural_strategy = json.loads(json.dumps(detailed_results[-1]))
+        del missing_natural_strategy["query_interpretation"]["selected_strategy"]
+        try:
+            validate_with_schema(
+                schemas, registry, "query-response.schema.json", missing_natural_strategy
+            )
+        except ValidationError:
+            pass
+        else:
+            raise AssertionError("A natural-language response without its selected strategy passed validation.")
+
+        exact_with_natural_fields = json.loads(json.dumps(detailed_results[0]))
+        exact_with_natural_fields["query_interpretation"]["selected_strategy"] = "stemmed_all_terms"
+        try:
+            validate_with_schema(
+                schemas, registry, "query-response.schema.json", exact_with_natural_fields
+            )
+        except ValidationError:
+            pass
+        else:
+            raise AssertionError("An exact search response carrying natural-only fields passed validation.")
 
         malformed_diff_packets: list[tuple[dict[str, Any], str]] = []
         moved_without_after = json.loads(json.dumps(diff_result))

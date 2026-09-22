@@ -91,10 +91,12 @@ class StoreSnapshotTests(unittest.TestCase):
     def test_external_content_fts_tracks_install_update_delete_and_reinstall(self) -> None:
         digest = self.service.install_pack(PACK_V1, POLICY)["package_digest"]
 
-        def matching_ids(query: str) -> list[str]:
+        def matching_ids(query: str, index_name: str = "exact") -> list[str]:
             return [
                 row["record_id"]
-                for row in self.service.store.search("local-user", query, 20, digest)
+                for row in self.service.store.search(
+                    "local-user", query, 20, digest, index_name=index_name
+                )
             ]
 
         self.assertCountEqual(
@@ -111,7 +113,12 @@ class StoreSnapshotTests(unittest.TestCase):
             fts_sql = connection.execute(
                 "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'records_fts'"
             ).fetchone()[0]
+            natural_fts_sql = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'records_natural_fts'"
+            ).fetchone()[0]
             self.assertIn("content='records'", fts_sql)
+            self.assertIn("content='records'", natural_fts_sql)
+            self.assertIn("porter unicode61", natural_fts_sql)
             self.assertEqual(
                 3,
                 connection.execute(
@@ -129,6 +136,7 @@ class StoreSnapshotTests(unittest.TestCase):
 
         self.assertNotIn("clause-4.2.1", matching_ids("adapter"))
         self.assertEqual(["clause-4.2.1"], matching_ids("sensor"))
+        self.assertEqual(["clause-4.2.1"], matching_ids("sensors", "natural"))
 
         with closing(sqlite3.connect(self.db_path)) as connection, connection:
             connection.execute("DELETE FROM dependencies WHERE package_digest = ?", (digest,))
@@ -137,8 +145,9 @@ class StoreSnapshotTests(unittest.TestCase):
                 (digest, "clause-4.2.1"),
             )
         self.assertEqual([], matching_ids("sensor"))
+        self.assertEqual([], matching_ids("sensors", "natural"))
 
-    def test_schema_three_migration_rebuilds_legacy_fts_from_records(self) -> None:
+    def test_schema_four_migration_adds_natural_index_and_rebuilds_legacy_fts(self) -> None:
         digest = self.service.install_pack(PACK_V1, POLICY)["package_digest"]
         with closing(sqlite3.connect(self.db_path)) as connection, connection:
             connection.execute("DROP TABLE records_fts")
@@ -154,7 +163,8 @@ class StoreSnapshotTests(unittest.TestCase):
                 "INSERT INTO records_fts(package_digest, record_id, clause_reference, heading, text) VALUES (?, ?, ?, ?, ?)",
                 (digest, "stale-record", "stale", "stale", "stale legacy index content"),
             )
-            connection.execute("UPDATE metadata SET value = '3' WHERE key = 'schema_version'")
+            connection.execute("DROP TABLE records_natural_fts")
+            connection.execute("UPDATE metadata SET value = '4' WHERE key = 'schema_version'")
 
         self.service = StandardsForgeService(self.db_path, self.service.store.object_root)
         self.assertCountEqual(
@@ -165,13 +175,26 @@ class StoreSnapshotTests(unittest.TestCase):
             ],
         )
         self.assertEqual([], self.service.store.search("local-user", "stale", 20, digest))
+        self.assertEqual(
+            ["clause-4.2.1"],
+            [
+                row["record_id"]
+                for row in self.service.store.search(
+                    "local-user", '"connectors" AND "retained"', 20, digest, index_name="natural"
+                )
+            ],
+        )
         with closing(sqlite3.connect(self.db_path)) as connection, connection:
             version = connection.execute("SELECT value FROM metadata WHERE key = 'schema_version'").fetchone()[0]
             fts_sql = connection.execute(
                 "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'records_fts'"
             ).fetchone()[0]
-        self.assertEqual("4", version)
+            natural_fts_sql = connection.execute(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'records_natural_fts'"
+            ).fetchone()[0]
+        self.assertEqual("5", version)
         self.assertIn("content='records'", fts_sql)
+        self.assertIn("porter unicode61", natural_fts_sql)
 
 
 if __name__ == "__main__":
