@@ -778,10 +778,17 @@ class VerticalSliceTests(unittest.TestCase):
         with closing(sqlite3.connect(db_path)) as connection, connection:
             version = connection.execute("SELECT value FROM metadata WHERE key = 'schema_version'").fetchone()[0]
             columns = {row[1] for row in connection.execute("PRAGMA table_info(records)")}
-        self.assertEqual("4", version)
+            indexes = {
+                row[0]
+                for row in connection.execute(
+                    "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('records_fts', 'records_natural_fts')"
+                )
+            }
+        self.assertEqual("5", version)
         self.assertIn("statement_role", columns)
         self.assertIn("derivation_json", columns)
         self.assertIn("structure_json", columns)
+        self.assertEqual({"records_fts", "records_natural_fts"}, indexes)
 
 
 if __name__ == "__main__":

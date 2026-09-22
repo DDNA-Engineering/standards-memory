@@ -26,6 +26,31 @@ class CLIOutputTests(unittest.TestCase):
         decoded = stream.buffer.getvalue().decode("utf-8")
         self.assertEqual({"snippet": "exact ⟦source⟧ evidence"}, json.loads(decoded))
 
+    def test_search_query_mode_defaults_and_forwards_explicit_choice(self) -> None:
+        parser = _parser()
+        for extra, expected in (
+            ([], "all_terms"),
+            (["--query-mode", "any_terms"], "any_terms"),
+            (["--query-mode", "natural_language"], "natural_language"),
+        ):
+            with self.subTest(query_mode=expected):
+                args = parser.parse_args(
+                    ["search", "axial ingress", "--principal", "local-user", *extra]
+                )
+                with patch(
+                    "standardsforge.cli.StandardsForgeService.search",
+                    return_value={"operation": "search"},
+                ) as search:
+                    self.assertEqual({"operation": "search"}, _run(args))
+                search.assert_called_once_with(
+                    "axial ingress",
+                    "local-user",
+                    20,
+                    package_digest=None,
+                    scope_prefix=None,
+                    query_mode=expected,
+                )
+
     def test_list_documents_forwards_prefix_pagination_and_bound_principal(self) -> None:
         args = _parser().parse_args(
             ["list-documents", "--identifier-prefix", "MIL-STD-810", "--limit", "25", "--cursor", "signed-cursor", "--principal", "local-user"]

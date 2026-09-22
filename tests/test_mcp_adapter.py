@@ -23,6 +23,7 @@ from standardsforge.mcp_server import (  # noqa: E402
     MCP_SERVER_INSTRUCTIONS,
     MCP_TOOL_DESCRIPTIONS,
     MCP_TOOL_NAMES,
+    MCP_TOOL_TITLES,
     create_mcp_server,
 )
 from standardsforge.service import StandardsForgeService  # noqa: E402
@@ -165,11 +166,17 @@ class MCPAdapterTests(unittest.TestCase):
             self.assertEqual(set(expected_arguments), {tool.name for tool in listed.tools})
             for tool in listed.tools:
                 self.assertEqual(expected_arguments[tool.name], set(tool.input_schema["properties"]))
+                self.assertEqual(MCP_TOOL_TITLES[tool.name], tool.title)
                 self.assertEqual(MCP_TOOL_DESCRIPTIONS[tool.name], tool.description)
-                self.assertEqual(
-                    next(item["description"] for item in contract["tools"] if item["name"] == tool.name),
-                    tool.description,
-                )
+                contract_tool = next(item for item in contract["tools"] if item["name"] == tool.name)
+                self.assertEqual(contract_tool["title"], tool.title)
+                self.assertEqual(contract_tool["description"], tool.description)
+                for argument, schema in tool.input_schema["properties"].items():
+                    self.assertTrue(schema.get("description"), (tool.name, argument))
+                    self.assertEqual(
+                        contract_tool["argument_schemas"][argument]["description"],
+                        schema["description"],
+                    )
                 self.assertNotIn("principal", tool.input_schema["properties"])
                 self.assertNotIn("principal_id", tool.input_schema["properties"])
                 self.assertNotIn("result_mode", tool.input_schema["properties"])
@@ -182,6 +189,15 @@ class MCPAdapterTests(unittest.TestCase):
                     self.assertIn("record_id", tool.input_schema["properties"])
                     self.assertNotIn("clause_reference", tool.input_schema.get("required", []))
                     self.assertNotIn("record_id", tool.input_schema.get("required", []))
+                if tool.name == "search":
+                    self.assertEqual(
+                        ["exact_phrase", "all_terms", "any_terms", "natural_language"],
+                        tool.input_schema["properties"]["query_mode"]["enum"],
+                    )
+                    self.assertEqual(
+                        "all_terms",
+                        tool.input_schema["properties"]["query_mode"]["default"],
+                    )
                 self.assertTrue(tool.annotations.read_only_hint)
                 self.assertFalse(tool.annotations.open_world_hint)
 
@@ -217,6 +233,35 @@ class MCPAdapterTests(unittest.TestCase):
 
         self.assertEqual(results[0], results[1])
         self.assertEqual("invalid_selector", results[0]["error"]["code"])
+
+    def test_invalid_argument_values_remain_typed_domain_errors(self) -> None:
+        server = create_mcp_server(self.service, "local-user")
+        cases = (
+            ("search", {"query": "adapter", "limit": 0}, "invalid_limit"),
+            (
+                "build_context",
+                {"package_digest": self.first_digest, "clause_references": []},
+                "invalid_clause_reference",
+            ),
+            (
+                "get_clause",
+                {
+                    "package_digest": self.first_digest,
+                    "clause_reference": "4.2.1",
+                    "max_bytes": 0,
+                },
+                "invalid_budget",
+            ),
+        )
+
+        async def scenario() -> None:
+            async with Client(server, raise_exceptions=True) as client:
+                for name, arguments, expected_code in cases:
+                    result = await client.call_tool(name, arguments)
+                    self.assertTrue(result.is_error, name)
+                    self.assertEqual(expected_code, _text_payload(result)["error"]["code"])
+
+        _run_with_socket_creation_denied(scenario())
 
     def test_compact_profile_matches_core_packet_and_envelope(self) -> None:
         server = create_mcp_server(self.service, "local-user")
@@ -288,12 +333,18 @@ class MCPAdapterTests(unittest.TestCase):
         cases = [
             (
                 "search",
-                {"query": "axial load", "package_digest": self.first_digest, "scope_prefix": "4.2"},
+                {
+                    "query": "axial ingress",
+                    "package_digest": self.first_digest,
+                    "scope_prefix": "4.2",
+                    "query_mode": "any_terms",
+                },
                 self.service.search(
-                    "axial load",
+                    "axial ingress",
                     "local-user",
                     package_digest=self.first_digest,
                     scope_prefix="4.2",
+                    query_mode="any_terms",
                 ),
             ),
             (

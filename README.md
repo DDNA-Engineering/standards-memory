@@ -9,7 +9,7 @@
 StandardsForge helps teams building physical products gather the military standards that may shape their design, retrieve the exact source evidence, and use it to develop requirements, test plans, and a standards-aware product roadmap.<br>
 It is an offline-first compiler and evidence engine: every result stays tied to the source, edition, governing conditions, and known evidence limits.
 
-[![Version: 0.1.0a2](https://img.shields.io/badge/version-0.1.0a2-253247?style=flat-square)](pyproject.toml)
+[![Version: 0.1.0a3](https://img.shields.io/badge/version-0.1.0a3-253247?style=flat-square)](pyproject.toml)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-253247?style=flat-square)](LICENSE)
 [![Status: pre-alpha](https://img.shields.io/badge/status-pre--alpha-EA6A23?style=flat-square)](docs/PRD.md)
@@ -53,14 +53,14 @@ The current prepared baseline contains:
 - About **1.0 GB** of deterministic compressed packs.
 - A one-command local setup that validates and indexes the included packs for offline queries.
 
-Download and extract [standardsforge-ready-0.1.0a2.zip](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a2/standardsforge-ready-0.1.0a2.zip), and optionally verify its [published SHA-256 checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a2/standardsforge-ready-0.1.0a2.zip.sha256). You need **Python 3.11+** with SQLite FTS5 support. Open **PowerShell** in the extracted directory and run:
+Download and extract [standardsforge-ready-0.1.0a3.zip](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a3/standardsforge-ready-0.1.0a3.zip), and optionally verify its [published SHA-256 checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a3/standardsforge-ready-0.1.0a3.zip.sha256). You need **Python 3.11+** with SQLite FTS5 support. Open **PowerShell** in the extracted directory and run:
 
 ```powershell
 # Create the isolated local environment and index the included compiled packs.
 .\setup.ps1
 
-# Search the installed MIL-STD corpus.
-.\standardsforge.ps1 search "environmental testing" --principal local-user --limit 5
+# Search the installed MIL-STD corpus using bounded lexical stemming.
+.\standardsforge.ps1 search "How should equipment be tested under environmental conditions?" --query-mode natural_language --principal local-user --limit 5
 
 # Resolve the prepared MIL-STD-810H representation and capture its immutable package pin.
 $resolved = .\standardsforge.ps1 resolve 'MIL-STD-810H(1)' --representation derived_structure --principal local-user | ConvertFrom-Json
@@ -69,6 +69,8 @@ $pin = $resolved.result.package_digest
 # Search only that pinned edition and representation.
 .\standardsforge.ps1 search "low pressure" --package-digest $pin --principal local-user --limit 5
 ```
+
+`natural_language` is offline lexical search, not semantic or model search. Its response reports the effective and ignored terms and whether strict matching or the single bounded fallback produced the candidates. Use `exact_phrase`, `all_terms`, or `any_terms` when you need explicit token behavior; use `list-documents` and `resolve` for document identifiers and edition selection.
 
 The one-time setup installs only the bundled wheel and precompiled packs; it does not fetch standards or call a model. Commands return source-linked JSON with package identity, exact citations, coverage, and interpretation limits. Local state stays inside the extracted distribution.
 
@@ -352,9 +354,9 @@ python -m pip wheel . --no-deps --wheel-dir build/prepared-wheel
 python scripts/build_prepared_distribution.py `
   --corpus-index .standardsforge/corpus/mil-std-current/corpus.json `
   --outline-pack .standardsforge/compiled/mil-std-810h-derived-outline `
-  --wheel build/prepared-wheel/standardsforge-0.1.0a2-py3-none-any.whl `
-  --output build/standardsforge-ready-0.1.0a2.zip `
-  --version 0.1.0a2
+  --wheel build/prepared-wheel/standardsforge-0.1.0a3-py3-none-any.whl `
+  --output build/standardsforge-ready-0.1.0a3.zip `
+  --version 0.1.0a3
 ```
 
 The builder rejects incomplete corpora, missing or changed archives, duplicate pack identities, and policies that do not exactly authorize the public compiled pack set. It emits the release ZIP plus a SHA-256 checksum file.

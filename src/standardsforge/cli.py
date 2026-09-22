@@ -176,6 +176,11 @@ def _parser() -> argparse.ArgumentParser:
     search.add_argument("--limit", type=int, default=20)
     search.add_argument("--package-digest")
     search.add_argument("--scope-prefix")
+    search.add_argument(
+        "--query-mode",
+        choices=("exact_phrase", "all_terms", "any_terms", "natural_language"),
+        default="all_terms",
+    )
 
     revoke = commands.add_parser("revoke", help="Administrative: immediately revoke a principal's package grant")
     revoke.add_argument("package_digest")
@@ -287,6 +292,7 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
             args.limit,
             package_digest=args.package_digest,
             scope_prefix=args.scope_prefix,
+            query_mode=args.query_mode,
         )
     if args.command == "revoke":
         return service.revoke(args.package_digest, args.principal)

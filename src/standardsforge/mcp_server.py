@@ -9,6 +9,7 @@ from typing import Annotated, Any, Callable, Literal, Sequence
 from mcp.server import MCPServer
 from mcp.server._otel import OpenTelemetryMiddleware
 from mcp.types import CallToolResult, TextContent, ToolAnnotations
+from pydantic import Field
 
 from . import __version__
 from .errors import StandardsForgeError, require
@@ -24,6 +25,15 @@ MCP_TOOL_NAMES = (
     "enumerate_obligations",
     "diff_editions",
 )
+MCP_TOOL_TITLES = {
+    "search": "Search standards evidence",
+    "list_documents": "List installed standards",
+    "resolve_document": "Resolve a standard edition",
+    "get_clause": "Get exact clause evidence",
+    "build_context": "Build clause context",
+    "enumerate_obligations": "Enumerate classified obligations",
+    "diff_editions": "Compare standard editions",
+}
 MCP_SERVER_INSTRUCTIONS = (
     "Read MIL-STDs as edition-pinned evidence, not as free-floating prose. If the exact identifier is unknown, "
     "list the authorized installed documents first. Then resolve the exact "
@@ -42,8 +52,10 @@ MCP_SERVER_INSTRUCTIONS = (
 )
 MCP_TOOL_DESCRIPTIONS = {
     "search": (
-        "Discover authorized records by local lexical search. Results include identifier, edition_id, and package_digest "
-        "for replay; they are candidates, not applicability, "
+        "Discover authorized records by explicit local lexical mode: exact_phrase preserves token order and adjacency, "
+        "all_terms requires every parsed term, any_terms accepts at least one, and natural_language uses bounded "
+        "stemming with a disclosed one-step relaxation when its strict match is empty. Results include identifier, "
+        "edition_id, and package_digest for replay; they are candidates, not applicability, "
         "obligation completeness, or exact document identity; use resolve_document for an identifier and replay "
         "a selected evidence_selector through get_clause."
     ),
@@ -155,12 +167,16 @@ def create_mcp_server(
     _disable_telemetry(server)
     read_only = ToolAnnotations(read_only_hint=True, open_world_hint=False)
 
-    @server.tool(description=MCP_TOOL_DESCRIPTIONS["search"], annotations=read_only)
+    @server.tool(title=MCP_TOOL_TITLES["search"], description=MCP_TOOL_DESCRIPTIONS["search"], annotations=read_only)
     def search(
-        query: str,
-        limit: int = 20,
-        package_digest: str | None = None,
-        scope_prefix: str | None = None,
+        query: Annotated[str, Field(description="Search text; parsed locally and never sent to a network service.")],
+        limit: Annotated[int, Field(description="Maximum records to return, from 1 through 100.")] = 20,
+        package_digest: Annotated[str | None, Field(description="Optional exact authorized package SHA-256 pin.")] = None,
+        scope_prefix: Annotated[str | None, Field(description="Optional exact clause reference or dot-delimited descendant scope.")] = None,
+        query_mode: Annotated[
+            Literal["exact_phrase", "all_terms", "any_terms", "natural_language"],
+            Field(description="Explicit lexical interpretation; natural_language applies bounded stemming and discloses any fallback."),
+        ] = "all_terms",
     ) -> StructuredToolResult:
         return _invoke(
             lambda: service.search(
@@ -169,39 +185,46 @@ def create_mcp_server(
                 limit,
                 package_digest=package_digest,
                 scope_prefix=scope_prefix,
+                query_mode=query_mode,
             ),
             result_mode=result_mode,
         )
 
-    @server.tool(description=MCP_TOOL_DESCRIPTIONS["list_documents"], annotations=read_only)
+    @server.tool(title=MCP_TOOL_TITLES["list_documents"], description=MCP_TOOL_DESCRIPTIONS["list_documents"], annotations=read_only)
     def list_documents(
-        identifier_prefix: str | None = None,
-        limit: int = 50,
-        cursor: str | None = None,
+        identifier_prefix: Annotated[str | None, Field(description="Optional normalized document-identifier prefix filter.")] = None,
+        limit: Annotated[int, Field(description="Maximum documents to return, from 1 through 100.")] = 50,
+        cursor: Annotated[str | None, Field(description="Optional opaque signed cursor from the preceding page.")] = None,
     ) -> StructuredToolResult:
         return _invoke(
             lambda: service.list_documents(bound_principal, identifier_prefix, limit, cursor),
             result_mode=result_mode,
         )
 
-    @server.tool(description=MCP_TOOL_DESCRIPTIONS["resolve_document"], annotations=read_only)
+    @server.tool(title=MCP_TOOL_TITLES["resolve_document"], description=MCP_TOOL_DESCRIPTIONS["resolve_document"], annotations=read_only)
     def resolve_document(
-        identifier: str,
-        edition_id: str | None = None,
-        representation: Literal["page_text", "derived_structure", "reviewed_structure", "curated_records"] | None = None,
+        identifier: Annotated[str, Field(description="Exact document identifier to resolve; no fuzzy identifier matching.")],
+        edition_id: Annotated[str | None, Field(description="Optional exact edition identity when more than one is installed.")] = None,
+        representation: Annotated[
+            Literal["page_text", "derived_structure", "reviewed_structure", "curated_records"] | None,
+            Field(description="Optional exact representation; required when the identifier and edition are ambiguous."),
+        ] = None,
     ) -> StructuredToolResult:
         return _invoke(
             lambda: service.resolve_document(identifier, bound_principal, edition_id, representation),
             result_mode=result_mode,
         )
 
-    @server.tool(description=MCP_TOOL_DESCRIPTIONS["get_clause"], annotations=read_only)
+    @server.tool(title=MCP_TOOL_TITLES["get_clause"], description=MCP_TOOL_DESCRIPTIONS["get_clause"], annotations=read_only)
     def get_clause(
-        package_digest: str,
-        clause_reference: str | None = None,
-        record_id: str | None = None,
-        max_bytes: int | None = None,
-        response_profile: Literal["compact_evidence_v1", "concise_evidence_v1"] | None = None,
+        package_digest: Annotated[str, Field(description="Exact authorized package SHA-256 pin returned by resolution or search.")],
+        clause_reference: Annotated[str | None, Field(description="Exact clause reference selector; supply this, record_id, or both.")] = None,
+        record_id: Annotated[str | None, Field(description="Exact stable record selector; supply this, clause_reference, or both.")] = None,
+        max_bytes: Annotated[int | None, Field(description="Optional positive response budget in UTF-8 bytes.")] = None,
+        response_profile: Annotated[
+            Literal["compact_evidence_v1", "concise_evidence_v1"] | None,
+            Field(description="Optional deterministic evidence projection; omission returns the full packet."),
+        ] = None,
     ) -> StructuredToolResult:
         def retrieve() -> dict[str, Any]:
             for name, value in (
@@ -229,12 +252,15 @@ def create_mcp_server(
 
         return _invoke(retrieve, result_mode=result_mode)
 
-    @server.tool(description=MCP_TOOL_DESCRIPTIONS["build_context"], annotations=read_only)
+    @server.tool(title=MCP_TOOL_TITLES["build_context"], description=MCP_TOOL_DESCRIPTIONS["build_context"], annotations=read_only)
     def build_context(
-        package_digest: str,
-        clause_references: list[str],
-        max_bytes: int | None = None,
-        response_profile: Literal["compact_evidence_v1", "concise_evidence_v1"] | None = None,
+        package_digest: Annotated[str, Field(description="Exact authorized package SHA-256 pin.")],
+        clause_references: Annotated[list[str], Field(description="One or more exact clause references whose required context is assembled.")],
+        max_bytes: Annotated[int | None, Field(description="Optional positive response budget in UTF-8 bytes.")] = None,
+        response_profile: Annotated[
+            Literal["compact_evidence_v1", "concise_evidence_v1"] | None,
+            Field(description="Optional deterministic evidence projection; omission returns the full packet."),
+        ] = None,
     ) -> StructuredToolResult:
         return _invoke(
             lambda: service.build_context(
@@ -247,13 +273,13 @@ def create_mcp_server(
             result_mode=result_mode,
         )
 
-    @server.tool(description=MCP_TOOL_DESCRIPTIONS["enumerate_obligations"], annotations=read_only)
+    @server.tool(title=MCP_TOOL_TITLES["enumerate_obligations"], description=MCP_TOOL_DESCRIPTIONS["enumerate_obligations"], annotations=read_only)
     def enumerate_obligations(
-        package_digest: str,
-        scope_prefix: str | None = None,
-        limit: int = 50,
-        cursor: str | None = None,
-        max_bytes: int | None = None,
+        package_digest: Annotated[str, Field(description="Exact authorized package SHA-256 pin.")],
+        scope_prefix: Annotated[str | None, Field(description="Optional exact clause reference or dot-delimited descendant scope.")] = None,
+        limit: Annotated[int, Field(description="Maximum obligations to return, from 1 through 100.")] = 50,
+        cursor: Annotated[str | None, Field(description="Optional opaque signed cursor from the preceding page.")] = None,
+        max_bytes: Annotated[int | None, Field(description="Optional positive response budget in UTF-8 bytes.")] = None,
     ) -> StructuredToolResult:
         return _invoke(
             lambda: service.enumerate_obligations(
@@ -267,11 +293,11 @@ def create_mcp_server(
             result_mode=result_mode,
         )
 
-    @server.tool(description=MCP_TOOL_DESCRIPTIONS["diff_editions"], annotations=read_only)
+    @server.tool(title=MCP_TOOL_TITLES["diff_editions"], description=MCP_TOOL_DESCRIPTIONS["diff_editions"], annotations=read_only)
     def diff_editions(
-        from_package_digest: str,
-        to_package_digest: str,
-        max_bytes: int | None = None,
+        from_package_digest: Annotated[str, Field(description="Exact authorized baseline package SHA-256 pin.")],
+        to_package_digest: Annotated[str, Field(description="Exact authorized comparison package SHA-256 pin.")],
+        max_bytes: Annotated[int | None, Field(description="Optional positive response budget in UTF-8 bytes.")] = None,
     ) -> StructuredToolResult:
         return _invoke(
             lambda: service.diff_editions(
