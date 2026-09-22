@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from standardsforge.errors import StandardsForgeError  # noqa: E402
-from standardsforge.outline_compiler import compile_derived_outline_pack  # noqa: E402
+from standardsforge.outline_compiler import _candidate_matches, compile_derived_outline_pack  # noqa: E402
 from standardsforge.pack import open_validated_pack, validate_pack_directory  # noqa: E402
 from standardsforge.service import StandardsForgeService  # noqa: E402
 
@@ -215,6 +215,54 @@ class OutlineCompilerTests(unittest.TestCase):
         with self.assertRaises(StandardsForgeError) as caught:
             compile_derived_outline_pack(self.base_pack, self.root / "tampered-output")
         self.assertEqual("pack_hash_mismatch", caught.exception.code)
+
+    def test_method_numbered_captions_keep_complete_distinct_source_bound_identity(self) -> None:
+        class CaptionFixture(OutlineCompilerTests):
+            def _write_base_page_pack(self) -> None:
+                self.page_text = (
+                    "METHOD 500.6\n"
+                    "Table 500.6-I. First qualification limits.\n"
+                    "Table 500.6-II. Second qualification limits.\n"
+                    "Figure 500.6-1. Test arrangement.\n"
+                    "Figure 514.8C-7. Instrument setup.\n"
+                    "Table 501.7-                    III. High temperature cycles.\n"
+                    "Figure 1-4a. Generalized lifecycle.\n"
+                    "Table 500.6-III. TOC leaders ............ 42\n"
+                    "Table 500.6-IV. Actual later caption.\n"
+                )
+                super()._write_base_page_pack()
+
+        fixture = CaptionFixture(methodName="test_compiles_installs_resolves_and_retrieves_unreviewed_outline_offline")
+        fixture.setUp()
+        try:
+            first = compile_derived_outline_pack(fixture.base_pack, fixture.root / "caption-first")
+            second = compile_derived_outline_pack(fixture.base_pack, fixture.root / "caption-second")
+            self.assertEqual(first["package_digest"], second["package_digest"])
+            with open_validated_pack(fixture.root / "caption-first") as pack:
+                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v2"))
+                captions = [record for record in pack.records if record["kind"] in {"table", "figure"}]
+                references = {record["clause_reference"].split(":")[-1] for record in captions}
+                self.assertEqual({
+                    "TABLE-500.6-I", "TABLE-500.6-II", "TABLE-500.6-IV", "FIGURE-500.6-1",
+                    "FIGURE-514.8C-7", "TABLE-501.7-III", "FIGURE-1-4A",
+                }, references)
+                self.assertEqual(len(captions), len({record["structure"]["logical_id"] for record in captions}))
+                self.assertTrue(all(record["derivation"]["review_status"] == "automated_unreviewed" for record in captions))
+                self.assertTrue(all(record["derivation"]["statement_role"] == "unclassified" for record in captions))
+                self.assertTrue(all("TOC leaders" not in record["text"] for record in captions))
+                for record in captions:
+                    span = record["structure"]["source_spans"][0]
+                    sidecar = (pack.root / span["text_path"]).read_bytes()
+                    self.assertEqual(record["text"], sidecar[span["start_byte"]:span["end_byte"]].decode("utf-8"))
+        finally:
+            fixture.tearDown()
+
+    def test_caption_parser_rejects_partial_designator_and_toc_leaders(self) -> None:
+        self.assertEqual([], _candidate_matches("Table 500.6-I-A. Unknown composite label"))
+        self.assertEqual("toc_caption", _candidate_matches("Figure 500.6-1. Instrument setup ......... 42")[0]["type"])
+        self.assertEqual([], _candidate_matches("Figure 500.6-1.\n"))
+        candidates = _candidate_matches("2  22 (49.5) 32 (71.9) 43 (96.7)\n2.3.1  Equipment shall withstand 15 kPa.\n")
+        self.assertEqual(["ambiguous_numbered", "numbered"], [candidate["type"] for candidate in candidates])
 
 
 if __name__ == "__main__":

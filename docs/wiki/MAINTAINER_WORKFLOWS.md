@@ -67,6 +67,8 @@ One pack represents one ordered DLA current-component set. Mixed public/restrict
 
 Derived outlines preserve exact spans and unsupported regions. They are automated navigation candidates, not reviewed semantic interpretation, applicability, or compliance.
 
+Compiler version 0.2 emits a distinct `outline-v2` pack identity. It recognizes complete method-numbered table/figure IDs, including layout spacing around the hyphen, and keeps TOC-leader captions explicitly unsupported. Existing `outline-v1` packs remain separate immutable representations and are not silently upgraded; rebuild and re-review any selected candidates against the new pack digest before using the review-shard workflow. Caption counts are detection counts, not a precision or document-completeness measure.
+
 ## Review one outline candidate against its exact page pack
 
 Select the derived outline, its exact base page-text pack (the digest is inventoried in the outline's `derivations/base-pack.json`), and one candidate `record_id`. The exporter verifies both complete packs, source component and sidecar identities, quote hashes, and UTF-8 boundaries before rebasing the outline's global sidecar span to the same page's local layout-text coordinates. It does not re-extract in simple mode or claim review.

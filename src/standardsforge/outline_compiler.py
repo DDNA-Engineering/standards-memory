@@ -14,7 +14,7 @@ from .errors import StandardsForgeError, require
 from .pack import open_validated_pack, validate_pack_directory
 
 
-OUTLINE_COMPILER_VERSION = "0.1.0"
+OUTLINE_COMPILER_VERSION = "0.2.0"
 _METHOD = re.compile(
     r"(?mi)^[^\S\r\n]*(?P<label>M\s*E\s*T\s*H\s*O\s*D\s+(?P<method_number>\d+(?:\.\d+)*))[^\S\r\n]*(?:\r?\n|$)"
 )
@@ -24,8 +24,9 @@ _NUMBERED = re.compile(
 )
 _LIST_ITEM = re.compile(r"(?m)^[^\S\r\n]+(?P<label>[a-z])\.[ \t]+(?P<body>\S[^\r\n]*)")
 _NOTE = re.compile(r"(?mi)^[^\S\r\n]*(?P<label>NOTE(?:\s+\d+)?)[.:]?[ \t]+(?P<body>\S[^\r\n]*)")
+_CAPTION_DESIGNATOR = r"(?:\d+(?:\.\d+)*(?:[A-Z])?(?:[ \t]*-[ \t]*(?:[IVXLCDM]+|\d+[A-Z]?))?|[IVXLCDM]+|[A-Z])"
 _CAPTION = re.compile(
-    r"(?mi)^[^\S\r\n]*(?P<label>(?:TABLE\s+[A-Z]?-?[IVXLCDM0-9]+|FIGURE\s+[A-Z]?-?\d+))[.:]?[ \t]+(?P<body>\S[^\r\n]*)"
+    rf"(?mi)^[^\S\r\n]*(?P<label>(?:TABLE|FIGURE)[ \t]+{_CAPTION_DESIGNATOR})(?:[.:][ \t]+|[ \t]{{2,}})(?P<body>\S[^\r\n]*)"
 )
 _TOC_LEADERS = re.compile(r"\.{3,}|…{2,}")
 _NUMERIC_TOKEN = re.compile(r"^[+\-±<>~]?[([]?\d")
@@ -110,22 +111,25 @@ def _candidate_matches(text: str) -> list[dict[str, Any]]:
     )
     for priority, match_type, pattern in patterns:
         for match in pattern.finditer(text):
+            candidate_type = match_type
             body = match.groupdict().get("body")
-            if match_type == "numbered" and body:
+            if candidate_type in {"numbered", "caption"} and body:
                 if _TOC_LEADERS.search(body):
-                    continue
-                if _looks_like_table_row(body):
-                    match_type = "ambiguous_numbered"
+                    if candidate_type == "numbered":
+                        continue
+                    candidate_type = "toc_caption"
+                if candidate_type == "numbered" and _looks_like_table_row(body):
+                    candidate_type = "ambiguous_numbered"
             label_start = match.start("label")
             label = match.group("label").strip()
-            if match_type == "method":
+            if candidate_type == "method":
                 label = f"METHOD {match.group('method_number')}"
             matches.append(
                 {
                     "start": label_start,
                     "line_end": match.end(),
                     "priority": priority,
-                    "type": match_type,
+                    "type": candidate_type,
                     "label": label,
                     "body": body,
                 }
@@ -382,6 +386,11 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
                         local_reference = f"page-{page_record['source']['page']:04d}-ambiguous-numbered-{index + 1}"
                         parent = None
                         unsupported_regions += 1
+                    elif match_type == "toc_caption":
+                        kind = "unsupported_region"
+                        local_reference = f"page-{page_record['source']['page']:04d}-toc-caption-{index + 1}"
+                        parent = None
+                        unsupported_regions += 1
                     elif match_type == "numbered":
                         parts = label.split(".")
                         parent_reference = ".".join(parts[:-1])
@@ -399,7 +408,8 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
                     elif match_type == "caption":
                         is_table = label.upper().startswith("TABLE")
                         kind = "table" if is_table else "figure"
-                        local_reference = label.upper().replace(" ", "-")
+                        normalized_label = re.sub(r"\s*([.-])\s*", r"\1", label.upper())
+                        local_reference = re.sub(r"\s+", "-", normalized_label)
                         detected[kind] += 1
                     logical_id = add_record(
                         page_record,
@@ -451,7 +461,7 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
             }
             manifest = {
                 "schema_version": "0.1.0",
-                "pack_id": f"derived.{base.manifest['pack_id']}.outline-v1",
+                "pack_id": f"derived.{base.manifest['pack_id']}.outline-v2",
                 "document_family_id": base.manifest["document_family_id"],
                 "edition_id": base.manifest["edition_id"],
                 "publisher": base.manifest["publisher"],

@@ -843,6 +843,18 @@
         "Reject missing, duplicate, stale, cross-pack, cross-component, unreviewed, false-parent, overlapping, UTF-8-splitting, or over-limit inputs before activation; preserve legacy annotation and query behavior.",
         "Prove synthetic mixed-reviewer multi-node deterministic replay, negative cases, and one selected real 810H shard locally; keep protected CI and publication as separate evidence."
       ]
+    },
+    {
+      "task_id": "TASK-038",
+      "title": "Full method-numbered caption identities in derived outlines",
+      "status": "complete",
+      "requirements": ["SM-FR-078"],
+      "acceptance": [
+        "Verify current caption truncation and omission against synthetic examples and the real 810H source; do not infer its frequency from raw detected-kind counts.",
+        "Parse complete table and figure designators, including method numbers, suffix letters, Roman numerals, and layout spacing around separators; never promote a table-of-contents leader as a substantive caption.",
+        "Use stable distinct identity and preserve exact source text and global UTF-8 spans, with every derived record still automated, unclassified, and unreviewed.",
+        "Version changed outline output identity, retain the old pack as separately addressable, and prove deterministic synthetic and real-corpus replay plus focused negative cases."
+      ]
     }
   ]
 }
