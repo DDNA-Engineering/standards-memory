@@ -239,7 +239,7 @@ class OutlineCompilerTests(unittest.TestCase):
             second = compile_derived_outline_pack(fixture.base_pack, fixture.root / "caption-second")
             self.assertEqual(first["package_digest"], second["package_digest"])
             with open_validated_pack(fixture.root / "caption-first") as pack:
-                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v2"))
+                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v3"))
                 captions = [record for record in pack.records if record["kind"] in {"table", "figure"}]
                 references = {record["clause_reference"].split(":")[-1] for record in captions}
                 self.assertEqual({
@@ -263,6 +263,44 @@ class OutlineCompilerTests(unittest.TestCase):
         self.assertEqual([], _candidate_matches("Figure 500.6-1.\n"))
         candidates = _candidate_matches("2  22 (49.5) 32 (71.9) 43 (96.7)\n2.3.1  Equipment shall withstand 15 kPa.\n")
         self.assertEqual(["ambiguous_numbered", "numbered"], [candidate["type"] for candidate in candidates])
+
+    def test_body_part_boundary_resets_method_scope_without_promoting_toc_or_header(self) -> None:
+        class PartFixture(OutlineCompilerTests):
+            def _write_base_page_pack(self) -> None:
+                self.page_text = (
+                    "METHOD 528.1\n"
+                    "1.1  Previous method purpose.\n"
+                    "P  AR T  THREE – WORLD CLIMATIC REGIONS – GUIDANCE\n"
+                    "SECTION I - INTRODUCTION\n"
+                    "1.1  Purpose. New part purpose.\n"
+                    "1.2  Part Three Organization.\n"
+                )
+                super()._write_base_page_pack()
+
+        fixture = PartFixture(methodName="test_compiles_installs_resolves_and_retrieves_unreviewed_outline_offline")
+        fixture.setUp()
+        try:
+            first = compile_derived_outline_pack(fixture.base_pack, fixture.root / "part-first")
+            second = compile_derived_outline_pack(fixture.base_pack, fixture.root / "part-second")
+            self.assertEqual(first["package_digest"], second["package_digest"])
+            with open_validated_pack(fixture.root / "part-first") as pack:
+                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v3"))
+                part = next(record for record in pack.records if record["clause_reference"].endswith(":PART-THREE"))
+                self.assertEqual("section", part["kind"])
+                self.assertIsNone(part["structure"]["parent_logical_id"])
+                clauses = [record for record in pack.records if record["kind"] == "clause"]
+                self.assertEqual(3, len(clauses))
+                self.assertEqual(1, sum(":METHOD-528.1:" in record["clause_reference"] for record in clauses))
+                part_clauses = [record for record in clauses if ":PART-THREE:" in record["clause_reference"]]
+                self.assertEqual(2, len(part_clauses))
+                self.assertTrue(all(record["structure"]["parent_logical_id"] == part["structure"]["logical_id"] for record in part_clauses))
+                self.assertTrue(all(record["derivation"]["review_status"] == "automated_unreviewed" for record in part_clauses))
+        finally:
+            fixture.tearDown()
+
+        self.assertFalse(any(item["type"] == "part" for item in _candidate_matches("P ART  THREE\n1.1  Purpose.\n")))
+        self.assertFalse(any(item["type"] == "part" for item in _candidate_matches("PART THREE – WORLD CLIMATIC REGIONS\nCONTENTS\n")))
+        self.assertFalse(any(item["type"] == "part" for item in _candidate_matches("PART THREE – WORLD CLIMATIC REGIONS\n1.1  Purpose ........ 5\n")))
 
 
 if __name__ == "__main__":

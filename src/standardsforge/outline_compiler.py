@@ -14,11 +14,14 @@ from .errors import StandardsForgeError, require
 from .pack import open_validated_pack, validate_pack_directory
 
 
-OUTLINE_COMPILER_VERSION = "0.2.0"
+OUTLINE_COMPILER_VERSION = "0.3.0"
 _METHOD = re.compile(
     r"(?mi)^[^\S\r\n]*(?P<label>M\s*E\s*T\s*H\s*O\s*D\s+(?P<method_number>\d+(?:\.\d+)*))[^\S\r\n]*(?:\r?\n|$)"
 )
 _APPENDIX = re.compile(r"(?mi)^[^\S\r\n]*(?P<label>APPENDIX\s+[A-Z])[^\S\r\n]*(?:\r?\n|$)")
+_PART_BODY = re.compile(
+    r"(?mi)^[^\S\r\n]*(?P<label>P[ \t]*A[ \t]*R[ \t]*T[ \t]+(?P<part>O[ \t]*N[ \t]*E|T[ \t]*W[ \t]*O|T[ \t]*H[ \t]*R[ \t]*E[ \t]*E))[ \t]*(?:–|--?)[ \t]*(?P<body>[^\r\n]*)(?:\r?\n|$)"
+)
 _NUMBERED = re.compile(
     r"(?m)^[^\S\r\n]*(?P<label>(?:[A-Z]\.)?\d+(?:\.\d+){0,7})[ \t]{2,}(?P<body>\S[^\r\n]*)"
 )
@@ -104,6 +107,7 @@ def _candidate_matches(text: str) -> list[dict[str, Any]]:
     patterns = (
         (0, "method", _METHOD),
         (0, "appendix", _APPENDIX),
+        (0, "part", _PART_BODY),
         (1, "numbered", _NUMBERED),
         (2, "note", _NOTE),
         (3, "caption", _CAPTION),
@@ -113,6 +117,13 @@ def _candidate_matches(text: str) -> list[dict[str, Any]]:
         for match in pattern.finditer(text):
             candidate_type = match_type
             body = match.groupdict().get("body")
+            if candidate_type == "part":
+                following = next(
+                    (item for item in _NUMBERED.finditer(text, match.end()) if item.start() < match.end() + 4000),
+                    None,
+                )
+                if following is None or following.group("label") != "1.1" or _TOC_LEADERS.search(following.group("body")):
+                    continue
             if candidate_type in {"numbered", "caption"} and body:
                 if _TOC_LEADERS.search(body):
                     if candidate_type == "numbered":
@@ -124,6 +135,8 @@ def _candidate_matches(text: str) -> list[dict[str, Any]]:
             label = match.group("label").strip()
             if candidate_type == "method":
                 label = f"METHOD {match.group('method_number')}"
+            elif candidate_type == "part":
+                label = f"PART {''.join(match.group('part').upper().split())}"
             matches.append(
                 {
                     "start": label_start,
@@ -225,9 +238,10 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
             occurrence_by_scope: dict[tuple[str, str, str], int] = {}
             current_context_by_component: dict[str, str] = {}
             current_parent_by_component: dict[str, str | None] = {}
+            part_root_by_context: dict[tuple[str, str], str] = {}
             unsupported_pages = 0
             unsupported_regions = 0
-            detected = {key: 0 for key in ("method", "appendix", "section", "clause", "list_item", "note", "table", "figure")}
+            detected = {key: 0 for key in ("method", "appendix", "part", "section", "clause", "list_item", "note", "table", "figure")}
 
             def add_record(
                 page_record: dict[str, Any],
@@ -381,6 +395,13 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
                         kind = "section"
                         parent = None
                         detected["appendix"] += 1
+                    elif match_type == "part":
+                        context = label.replace(" ", "-")
+                        local_reference = context
+                        current_context_by_component[component] = context
+                        kind = "section"
+                        parent = None
+                        detected["part"] += 1
                     elif match_type == "ambiguous_numbered":
                         kind = "unsupported_region"
                         local_reference = f"page-{page_record['source']['page']:04d}-ambiguous-numbered-{index + 1}"
@@ -395,6 +416,8 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
                         parts = label.split(".")
                         parent_reference = ".".join(parts[:-1])
                         parent = node_by_scoped_reference.get((component, context, parent_reference)) if parent_reference else current_parent
+                        if parent is None:
+                            parent = part_root_by_context.get((component, context))
                         kind = "section" if len(parts) == 1 else "clause"
                         detected[kind] += 1
                     elif match_type == "list_item":
@@ -422,7 +445,9 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
                         ordinal=index + 1,
                         context=context,
                     )
-                    if match_type in {"appendix", "numbered"} or match_type == "method" and kind == "section":
+                    if match_type == "part":
+                        part_root_by_context[(component, context)] = logical_id
+                    if match_type in {"appendix", "part", "numbered"} or match_type == "method" and kind == "section":
                         current_parent = logical_id
                         current_parent_by_component[component] = logical_id
 
@@ -461,7 +486,7 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
             }
             manifest = {
                 "schema_version": "0.1.0",
-                "pack_id": f"derived.{base.manifest['pack_id']}.outline-v2",
+                "pack_id": f"derived.{base.manifest['pack_id']}.outline-v3",
                 "document_family_id": base.manifest["document_family_id"],
                 "edition_id": base.manifest["edition_id"],
                 "publisher": base.manifest["publisher"],

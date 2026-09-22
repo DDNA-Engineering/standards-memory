@@ -867,6 +867,17 @@
         "Require an explicit reviewed structural kind and corrected clause reference in a content-bound decision before promotion; reject copied unsupported kind, unchanged synthetic reference, stale proposal, false provenance, and invalid spans.",
         "Prove synthetic parameterized-clause review and a real 810H ambiguous-row rejection or explicitly unreviewed state; preserve 0.1 draft/decision behavior and report the remaining uncertainty."
       ]
+    },
+    {
+      "task_id": "TASK-040",
+      "title": "Source-evidenced PART outline boundaries without stale method scope",
+      "status": "complete",
+      "requirements": ["SM-FR-080"],
+      "acceptance": [
+        "Detect only a body PART title supported by same-page numbered structural text, not a running header or TOC title; retain exact text, source coordinates, and automated unreviewed status.",
+        "Reset prior method numbering and parent state at the boundary, give subsequent numbered candidates a distinct PART scope, and keep old outline packs separately addressable.",
+        "Prove synthetic positive and TOC/header negatives, then replay exact 810H pages 9, 1051, and 1055 to show Part Three 1.1 and 1.2 no longer inherit METHOD-528.1; report any remaining Annex and table false-positive limits."
+      ]
     }
   ]
 }

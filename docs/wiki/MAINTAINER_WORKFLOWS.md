@@ -67,7 +67,7 @@ One pack represents one ordered DLA current-component set. Mixed public/restrict
 
 Derived outlines preserve exact spans and unsupported regions. They are automated navigation candidates, not reviewed semantic interpretation, applicability, or compliance.
 
-Compiler version 0.2 emits a distinct `outline-v2` pack identity. It recognizes complete method-numbered table/figure IDs, including layout spacing around the hyphen, and keeps TOC-leader captions explicitly unsupported. Existing `outline-v1` packs remain separate immutable representations and are not silently upgraded; rebuild and re-review any selected candidates against the new pack digest before using the review-shard workflow. Caption counts are detection counts, not a precision or document-completeness measure.
+Compiler version 0.3 emits a distinct `outline-v3` pack identity. It retains complete method-numbered table/figure IDs and recognizes a PART body title only when a same-page `1.1` heading supports it; running headers and TOC titles are not PART boundaries. The boundary resets preceding method scope and parent state, but it does not resolve ANNEX text, table cells, or cross-page continuation. Existing `outline-v1` and `outline-v2` packs remain separate immutable representations and are not silently upgraded; rebuild and re-review selected candidates against the new pack digest before using the review-shard workflow. Detection counts are not precision or document-completeness measures.
 
 ## Review one outline candidate against its exact page pack
 
