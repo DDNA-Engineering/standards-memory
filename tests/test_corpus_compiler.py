@@ -316,6 +316,40 @@ class CorpusCompilerTests(unittest.TestCase):
         )
         self.assertEqual([second_entry["package_digest"]], [grant["package_digest"] for grant in active])
 
+    def test_install_accepts_sealed_0_3_corpus_but_compilation_does_not_resume_it(self) -> None:
+        output = self.root / "sealed-corpus"
+        compile_mil_std_corpus(self.manifest_path, self.sources, output)
+        index_path = output / "corpus.json"
+        index = json.loads(index_path.read_text(encoding="utf-8"))
+        index["compiler_version"] = "0.3.0"
+        index_path.write_text(json.dumps(index), encoding="utf-8")
+        policy = self.root / "sealed-policy.json"
+
+        write_corpus_policy(index_path, policy, "corpus-test-user")
+        result = install_compiled_corpus(
+            index_path,
+            policy,
+            self.root / "sealed-memory.db",
+            self.root / "sealed-objects",
+        )
+        self.assertEqual(1, result["installed_pack_count"])
+
+        with self.assertRaises(StandardsForgeError) as caught:
+            compile_mil_std_corpus(self.manifest_path, self.sources, output)
+        self.assertEqual("corpus_index_mismatch", caught.exception.code)
+
+    def test_install_rejects_unknown_corpus_compiler_version(self) -> None:
+        output = self.root / "future-corpus"
+        compile_mil_std_corpus(self.manifest_path, self.sources, output)
+        index_path = output / "corpus.json"
+        index = json.loads(index_path.read_text(encoding="utf-8"))
+        index["compiler_version"] = "99.0.0"
+        index_path.write_text(json.dumps(index), encoding="utf-8")
+
+        with self.assertRaises(StandardsForgeError) as caught:
+            write_corpus_policy(index_path, self.root / "future-policy.json", "corpus-test-user")
+        self.assertEqual("invalid_corpus_index", caught.exception.code)
+
 
 if __name__ == "__main__":
     unittest.main()

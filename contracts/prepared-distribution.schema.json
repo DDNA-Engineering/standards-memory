@@ -6,13 +6,13 @@
   "additionalProperties": false,
   "required": ["schema_version", "product", "version", "build", "state", "files"],
   "properties": {
-    "schema_version": {"const": "1.2"},
+    "schema_version": {"const": "1.3"},
     "product": {"const": "StandardsForge prepared distribution"},
     "version": {"type": "string", "minLength": 1},
     "build": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["archive_source_date_epoch", "archive_timestamp", "wheel_build_backend", "wheel_generator", "wheel_sha256", "wheel_provenance_sha256", "mcp_requirement", "mcp_wheel_count", "mcp_wheelhouse_sha256", "mcp_requirements_sha256", "runtime_python", "runtime_platform", "corpus_compiler_version"],
+      "required": ["archive_source_date_epoch", "archive_timestamp", "wheel_build_backend", "wheel_generator", "wheel_sha256", "wheel_provenance_sha256", "mcp_requirement", "mcp_wheel_count", "mcp_wheelhouse_sha256", "mcp_requirements_sha256", "core_runtime_python", "core_runtime_platforms", "mcp_runtime_python", "mcp_runtime_platform", "corpus_compiler_version"],
       "properties": {
         "archive_source_date_epoch": {"const": 1767225600},
         "archive_timestamp": {"const": "2026-01-01T00:00:00Z"},
@@ -24,8 +24,12 @@
         "mcp_wheel_count": {"type": "integer", "minimum": 1},
         "mcp_wheelhouse_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "mcp_requirements_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "runtime_python": {"const": "CPython 3.12"},
-        "runtime_platform": {"const": "win_amd64"},
+        "core_runtime_python": {"const": "CPython >=3.11"},
+        "core_runtime_platforms": {
+          "const": ["windows_x86_64", "linux_x86_64", "macos_arm64", "macos_x86_64"]
+        },
+        "mcp_runtime_python": {"const": "CPython 3.12"},
+        "mcp_runtime_platform": {"const": "win_amd64"},
         "corpus_compiler_version": {"type": "string", "minLength": 1}
       }
     },

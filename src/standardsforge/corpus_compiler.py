@@ -24,6 +24,10 @@ from .pdf_protocol import DEFAULT_LIMITS, LIMIT_POLICY_VERSION, PROTOCOL_VERSION
 
 
 CORPUS_COMPILER_VERSION = "0.4.0"
+
+
+def _supported_corpus_install_versions() -> frozenset[str]:
+    return frozenset({"0.3.0", CORPUS_COMPILER_VERSION})
 MAX_ACQUISITION_MANIFEST_BYTES = 16 * 1024 * 1024
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _TOKEN = re.compile(r"^[0-9]+\.[0-9]+$")
@@ -815,7 +819,7 @@ def _load_complete_corpus_index(path: str | Path) -> tuple[Path, dict[str, Any]]
         isinstance(index, dict)
         and index.get("schema_version") == "0.1.0"
         and index.get("corpus_id") == "dla-active-mil-std-current-page-text"
-        and index.get("compiler_version") == CORPUS_COMPILER_VERSION
+        and index.get("compiler_version") in _supported_corpus_install_versions()
         and isinstance(index.get("entries"), list)
         and isinstance(index.get("failures"), list)
         and isinstance(index.get("summary"), dict),

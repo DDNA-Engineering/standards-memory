@@ -1,0 +1,178 @@
+name: Accept published prepared distribution
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Published release tag
+        required: true
+        type: string
+      asset_name:
+        description: Exact prepared ZIP asset name
+        required: true
+        type: string
+      expected_sha256:
+        description: Independently recorded lowercase SHA-256
+        required: true
+        type: string
+      expected_bytes:
+        description: Independently recorded byte count
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prepared-acceptance-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  native-prepared-acceptance:
+    name: ${{ matrix.os }} / CPython 3.12
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      ASSET_NAME: ${{ inputs.asset_name }}
+      EXPECTED_SHA256: ${{ inputs.expected_sha256 }}
+      EXPECTED_BYTES: ${{ inputs.expected_bytes }}
+      NATIVE_OS: ${{ runner.os }}
+    steps:
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Download exact published assets and verify outer identity
+        shell: pwsh
+        run: |
+          if ($env:EXPECTED_SHA256 -cnotmatch '^[0-9a-f]{64}$') { throw 'expected_sha256 must be 64 lowercase hexadecimal characters.' }
+          try { $expectedBytes = [long]$env:EXPECTED_BYTES } catch { throw 'expected_bytes must be an integer.' }
+          if ($expectedBytes -le 0) { throw 'expected_bytes must be positive.' }
+          if ([IO.Path]::GetFileName($env:ASSET_NAME) -ne $env:ASSET_NAME -or -not $env:ASSET_NAME.EndsWith('.zip', [StringComparison]::Ordinal)) {
+            throw 'asset_name must be a plain ZIP filename.'
+          }
+          $release = gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --json tagName,isDraft,publishedAt | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0 -or $release.tagName -ne $env:RELEASE_TAG -or $release.isDraft -or -not $release.publishedAt) {
+            throw 'The requested tag is not an exact published release.'
+          }
+          $download = Join-Path $env:RUNNER_TEMP 'published-prepared'
+          New-Item -ItemType Directory -Path $download -Force | Out-Null
+          gh release download $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --pattern $env:ASSET_NAME --pattern "$($env:ASSET_NAME).sha256" --dir $download
+          if ($LASTEXITCODE -ne 0) { throw 'Release asset download failed.' }
+          $archive = Join-Path $download $env:ASSET_NAME
+          $sidecar = "$archive.sha256"
+          if (-not (Test-Path -LiteralPath $archive -PathType Leaf) -or -not (Test-Path -LiteralPath $sidecar -PathType Leaf)) {
+            throw 'The exact ZIP and checksum sidecar were not both downloaded.'
+          }
+          $actualBytes = (Get-Item -LiteralPath $archive).Length
+          $actualSha256 = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          $sidecarLine = [IO.File]::ReadAllText($sidecar, [Text.Encoding]::ASCII).TrimEnd("`r", "`n")
+          if ($actualBytes -ne $expectedBytes -or $actualSha256 -cne $env:EXPECTED_SHA256 -or $sidecarLine -cne "$($env:EXPECTED_SHA256)  $($env:ASSET_NAME)") {
+            throw 'The published prepared asset does not match its independently recorded identity.'
+          }
+          "ARCHIVE_PATH=$archive" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Extract safely into a path containing spaces and non-ASCII text
+        shell: pwsh
+        run: |
+          $extract = Join-Path $env:RUNNER_TEMP 'StandardsForge acceptance ü'
+          New-Item -ItemType Directory -Path $extract -Force | Out-Null
+          @'
+          import os, stat, sys, zipfile
+          from pathlib import Path, PurePosixPath
+          archive, destination, github_env = map(Path, sys.argv[1:])
+          with zipfile.ZipFile(archive) as bundle:
+              infos = bundle.infolist()
+              names = [item.filename for item in infos]
+              if not infos or len(names) != len(set(names)):
+                  raise SystemExit("archive is empty or contains duplicate members")
+              roots = set()
+              for item in infos:
+                  value = item.filename.rstrip("/")
+                  relative = PurePosixPath(value)
+                  if (not value or "\\" in item.filename or relative.is_absolute() or ".." in relative.parts or ":" in relative.parts[0] or ((item.external_attr >> 16) & 0o170000) == stat.S_IFLNK):
+                      raise SystemExit(f"unsafe archive member: {item.filename!r}")
+                  roots.add(relative.parts[0])
+              if len(roots) != 1:
+                  raise SystemExit(f"expected one distribution root, observed {sorted(roots)!r}")
+              bundle.extractall(destination)
+          root = destination / roots.pop()
+          if not (root / "bundle-manifest.json").is_file() or " " not in str(root) or str(root).isascii():
+              raise SystemExit("acceptance extraction path or manifest is invalid")
+          with github_env.open("a", encoding="utf-8") as output:
+              output.write(f"PREPARED_ROOT={root}{os.linesep}")
+          '@ | python - "$env:ARCHIVE_PATH" "$extract" "$env:GITHUB_ENV"
+          if ($LASTEXITCODE -ne 0) { throw 'Safe extraction failed.' }
+      - name: Run first and repeat portable core setup outside the distribution
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = $null
+          $env:PYTHONHOME = $null
+          $env:VIRTUAL_ENV = $null
+          Push-Location $env:RUNNER_TEMP
+          try {
+            for ($attempt = 1; $attempt -le 2; $attempt++) {
+              $log = Join-Path $env:RUNNER_TEMP "setup-$attempt.log"
+              if ($env:NATIVE_OS -eq 'Windows') { & python (Join-Path $env:PREPARED_ROOT 'setup.py') *> $log }
+              else { & sh (Join-Path $env:PREPARED_ROOT 'setup.sh') *> $log }
+              $exitCode = $LASTEXITCODE
+              Get-Content -LiteralPath $log
+              if ($exitCode -ne 0) { throw "Portable setup attempt $attempt failed." }
+              if ($attempt -eq 2 -and -not (Select-String -LiteralPath $log -SimpleMatch '"status": "already_ready"' -Quiet)) {
+                throw 'Repeat setup did not report already_ready.'
+              }
+            }
+          } finally { Pop-Location }
+      - name: Prove full doctor and natural-language search
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = $null
+          $env:PYTHONHOME = $null
+          $env:VIRTUAL_ENV = $null
+          $policy = Join-Path $env:PREPARED_ROOT 'policies/prepared-local.json'
+          $doctor = Join-Path $env:RUNNER_TEMP 'doctor.json'
+          $search = Join-Path $env:RUNNER_TEMP 'search.json'
+          Push-Location $env:RUNNER_TEMP
+          try {
+            if ($env:NATIVE_OS -eq 'Windows') {
+              & python (Join-Path $env:PREPARED_ROOT 'run.py') doctor --policy $policy --principal local-user --full-integrity > $doctor
+              if ($LASTEXITCODE -ne 0) { throw 'Doctor command failed.' }
+              & python (Join-Path $env:PREPARED_ROOT 'run.py') search 'environmental testing' --principal local-user --query-mode natural_language --limit 3 > $search
+              if ($LASTEXITCODE -ne 0) { throw 'Search command failed.' }
+            } else {
+              & sh (Join-Path $env:PREPARED_ROOT 'standardsforge.sh') doctor --policy $policy --principal local-user --full-integrity > $doctor
+              if ($LASTEXITCODE -ne 0) { throw 'Doctor command failed.' }
+              & sh (Join-Path $env:PREPARED_ROOT 'standardsforge.sh') search 'environmental testing' --principal local-user --query-mode natural_language --limit 3 > $search
+              if ($LASTEXITCODE -ne 0) { throw 'Search command failed.' }
+            }
+          } finally { Pop-Location }
+          @'
+          import json, os, platform, sys
+          from pathlib import Path
+          root = Path(sys.argv[1])
+          doctor = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8-sig"))
+          search = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8-sig"))
+          receipt = json.loads((root / ".standardsforge/prepared-distribution.json").read_text(encoding="utf-8-sig"))
+          manifest = json.loads((root / "bundle-manifest.json").read_text(encoding="utf-8"))
+          if doctor.get("ready") is not True or doctor.get("integrity", {}).get("complete") is not True:
+              raise SystemExit("doctor did not prove complete readiness")
+          if not isinstance(search.get("results"), list) or not search["results"]:
+              raise SystemExit("natural-language search returned no evidence")
+          if receipt.get("status") != "ready" or receipt.get("bundle_manifest_sha256") is None:
+              raise SystemExit("prepared receipt is not ready and manifest-bound")
+          evidence = {
+              "release_tag": os.environ["RELEASE_TAG"], "asset_name": os.environ["ASSET_NAME"],
+              "archive_bytes": int(os.environ["EXPECTED_BYTES"]), "archive_sha256": os.environ["EXPECTED_SHA256"],
+              "distribution_version": manifest["version"], "runner_os": os.environ["NATIVE_OS"],
+              "machine": platform.machine(), "python": platform.python_version(), "repeat_setup": "already_ready",
+              "doctor_ready": True, "full_integrity_complete": True, "search_result_count": len(search["results"]),
+          }
+          print(json.dumps(evidence, indent=2, sort_keys=True))
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as output:
+              output.write("## Prepared distribution acceptance\n\n```json\n" + json.dumps(evidence, indent=2, sort_keys=True) + "\n```\n")
+          '@ | python - "$env:PREPARED_ROOT" "$doctor" "$search"
+          if ($LASTEXITCODE -ne 0) { throw 'Acceptance-result validation failed.' }

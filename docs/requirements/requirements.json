@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1.0",
-  "scope": "TASK-001 through TASK-034 acceptance subset; the supplied PRD remains the broader proposed catalog",
+  "scope": "TASK-001 through TASK-035 acceptance subset; the supplied PRD remains the broader proposed catalog",
   "requirements": [
     {"id": "SM-FR-002", "text": "Preserve publisher-scoped document identity separately from editions and packages."},
     {"id": "SM-FR-003", "text": "Resolve identifiers conservatively and report ambiguity."},
@@ -49,6 +49,7 @@
     {"id": "SM-FR-071", "text": "Represent reviewed procedure-step ordering as an exact source-bound relationship between list-item siblings, reject ambiguous, cross-procedure, backward, or optional predecessor claims, and retrieve the ordered predecessor as required evidence context."},
     {"id": "SM-FR-072", "text": "Make the prepared distribution model-ready offline by inventorying its pinned MCP dependency closure, installing with package-index access disabled, binding launchers to absolute distribution-local state and a fixed trusted principal, and proving the complete declared read-tool stdio surface plus authorized discovery and query operations before readiness."},
     {"id": "SM-FR-073", "text": "Provide authorization-safe, stable paginated discovery of installed document packages with exact identity, representation, immutable package pins, record counts, declared coverage, and bounded replayable near-match hints without fuzzy, network, model, or authorization fallback."},
-    {"id": "SM-FR-074", "text": "Provide an explicit bounded natural-language lexical mode over a separate stemmed heading-and-text projection, with deterministic question-term filtering, disclosed strict-to-relaxed execution, authorization-safe caching and reauthorization, exact-mode compatibility, and complete MCP argument guidance without hidden network, model, or identifier-resolution fallback."}
+    {"id": "SM-FR-074", "text": "Provide an explicit bounded natural-language lexical mode over a separate stemmed heading-and-text projection, with deterministic question-term filtering, disclosed strict-to-relaxed execution, authorization-safe caching and reauthorization, exact-mode compatibility, and complete MCP argument guidance without hidden network, model, or identifier-resolution fallback."},
+    {"id": "SM-FR-075", "text": "Provide a closed-manifest, offline prepared-corpus core setup and root-anchored CLI launcher for supported Windows, Linux, and macOS runtimes, publish the independently qualified code wheel and source distribution through OIDC trusted publishing as a separate channel, and prove native clean-install behavior without adding network, model, or arbitrary-fetch behavior to query paths."}
   ]
 }

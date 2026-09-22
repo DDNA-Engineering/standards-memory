@@ -538,7 +538,7 @@ def _build_distribution_scope(
 def _write_file(archive: zipfile.ZipFile, source: Path, destination: str) -> None:
     info = zipfile.ZipInfo(destination, FIXED_ZIP_TIME)
     info.compress_type = zipfile.ZIP_STORED if source.suffix.lower() in {".zip", ".whl"} else zipfile.ZIP_DEFLATED
-    info.external_attr = 0o100644 << 16
+    info.external_attr = (0o100755 if destination.endswith(".sh") else 0o100644) << 16
     with source.open("rb") as input_stream, archive.open(info, "w", force_zip64=True) as output_stream:
         shutil.copyfileobj(input_stream, output_stream, BUFFER_SIZE)
 
@@ -688,6 +688,11 @@ def build_distribution(
     static_root = REPOSITORY_ROOT / "scripts" / "prepared_distribution"
     static_files = [
         (static_root / "README.md", "README.md"),
+        (static_root / "prepared_runtime.py", "prepared_runtime.py"),
+        (static_root / "setup.py", "setup.py"),
+        (static_root / "run.py", "run.py"),
+        (static_root / "setup.sh", "setup.sh"),
+        (static_root / "standardsforge.sh", "standardsforge.sh"),
         (static_root / "setup.ps1", "setup.ps1"),
         (static_root / "standardsforge.ps1", "standardsforge.ps1"),
         (static_root / "standardsforge-mcp.ps1", "standardsforge-mcp.ps1"),
@@ -716,10 +721,32 @@ def build_distribution(
         )
         outline_archive = Path(temporary) / "mil-std-810h-derived-outline.zip"
         write_pack_archive(outline_pack, outline_archive, compresslevel=compresslevel)
+        prepared_policy_path = Path(temporary) / "prepared-local.json"
+        prepared_policy_path.write_text(
+            json.dumps(
+                {
+                    "policy_version": "0.1.0",
+                    "policy_id": f"prepared-{version}-local",
+                    "principal_id": "local-user",
+                    "allow_admin_install": True,
+                    "allow_serve": True,
+                    "allowed_pack_ids": sorted(
+                        {entry["pack_id"] for entry in entries} | {outline.manifest["pack_id"]}
+                    ),
+                    "allowed_content_classes": ["public_government_standard"],
+                },
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
         payload_files = [
             *static_files,
             *mcp_payloads,
             (scope_path, "provenance/source-baseline.json"),
+            (prepared_policy_path, "policies/prepared-local.json"),
             *corpus_payloads,
             (outline_archive, "packs/mil-std-810h-derived-outline.zip"),
         ]
@@ -740,7 +767,7 @@ def build_distribution(
             "source_baseline_id": distribution_scope["baseline_id"],
         }
         manifest = {
-            "schema_version": "1.2",
+            "schema_version": "1.3",
             "product": "StandardsForge prepared distribution",
             "version": version,
             "build": {
@@ -754,8 +781,15 @@ def build_distribution(
                 "mcp_wheel_count": len(mcp_payloads),
                 "mcp_wheelhouse_sha256": mcp_wheelhouse_sha256,
                 "mcp_requirements_sha256": mcp_requirements_sha256,
-                "runtime_python": "CPython 3.12",
-                "runtime_platform": "win_amd64",
+                "core_runtime_python": "CPython >=3.11",
+                "core_runtime_platforms": [
+                    "windows_x86_64",
+                    "linux_x86_64",
+                    "macos_arm64",
+                    "macos_x86_64",
+                ],
+                "mcp_runtime_python": "CPython 3.12",
+                "mcp_runtime_platform": "win_amd64",
                 "corpus_compiler_version": index.get("compiler_version"),
             },
             "state": distribution_summary,

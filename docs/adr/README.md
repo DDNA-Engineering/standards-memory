@@ -14,7 +14,7 @@ The supplied architecture defines 16 proposed decisions. Implementation status b
 | ADR-008 | Revision- and policy-aware caches | Bounded closure and search caches implemented |
 | ADR-009 | Separate facts, derivations, and approvals | Implemented |
 | ADR-010 | Offline-first security and rights policy | Implemented local boundary |
-| ADR-011 | Six read-only operations and separate admin | Library, CLI, and stdio MCP implemented |
+| ADR-011 | Seven read-only operations and separate admin | Library, CLI, and stdio MCP implemented |
 | ADR-012 | Dependency-sensitive edition comparison | Exact identity is authoritative; review candidates are separate and required-dependency paths are side-qualified |
 | ADR-013 | Quality-constrained performance gates | Local measurements implemented; release targets remain unapproved |
 | ADR-014 | Apache-2.0 code, separate content permissions | License and rights separation implemented; release approval remains external |

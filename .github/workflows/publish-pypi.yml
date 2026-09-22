@@ -1,0 +1,134 @@
+name: Publish PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Require exact tag and source version identity
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python - <<'PY'
+          import os, pathlib, re, tomllib
+          project = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))
+          version = project["project"]["version"]
+          runtime = re.search(r'^__version__ = "([^"]+)"$', pathlib.Path("src/standardsforge/__init__.py").read_text(encoding="utf-8"), re.MULTILINE).group(1)
+          tag = os.environ["RELEASE_TAG"]
+          if tag != f"v{version}" or runtime != version:
+              raise SystemExit(f"version mismatch: tag={tag!r} project={version!r} runtime={runtime!r}")
+          PY
+      - name: Install pinned release tooling
+        run: python -m pip install --disable-pip-version-check build==1.3.0 twine==6.2.0 jsonschema==4.26.0
+      - name: Acquire locked build backend
+        run: >-
+          python -m pip download
+          --disable-pip-version-check
+          --no-deps
+          --only-binary=:all:
+          --dest build/toolchain-cache
+          setuptools==84.0.0
+      - name: Activate the exact source-distribution backend
+        run: python -m pip install --disable-pip-version-check --no-index --no-deps build/toolchain-cache/setuptools-84.0.0-py3-none-any.whl
+      - name: Build twice and validate canonical wheel
+        run: |
+          python scripts/validate_installed_wheel.py --build-tool-dir build/toolchain-cache --output-dir dist/publish
+          mkdir -p dist/evidence
+          mv dist/publish/*.provenance.json dist/evidence/
+      - name: Build source distribution from the same tagged tree
+        run: python -m build --sdist --no-isolation --outdir dist/publish
+      - name: Check package metadata and archive version identity
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python -m twine check dist/publish/*.whl dist/publish/*.tar.gz
+          python - <<'PY'
+          import email, glob, os, pathlib, tarfile, zipfile
+          version = os.environ["RELEASE_TAG"].removeprefix("v")
+          wheels = glob.glob("dist/publish/*.whl")
+          sdists = glob.glob("dist/publish/*.tar.gz")
+          if len(wheels) != 1 or len(sdists) != 1:
+              raise SystemExit("expected exactly one wheel and one source distribution")
+          with zipfile.ZipFile(wheels[0]) as archive:
+              name = next(item for item in archive.namelist() if item.endswith(".dist-info/METADATA"))
+              wheel_version = email.message_from_bytes(archive.read(name))["Version"]
+          with tarfile.open(sdists[0], "r:gz") as archive:
+              name = next(item for item in archive.getnames() if item.endswith("/PKG-INFO"))
+              source_version = email.message_from_bytes(archive.extractfile(name).read())["Version"]
+          if wheel_version != version or source_version != version:
+              raise SystemExit(f"archive version mismatch: {wheel_version!r}, {source_version!r}, {version!r}")
+          pathlib.Path("dist/wheel.sha256").write_text(__import__("hashlib").sha256(pathlib.Path(wheels[0]).read_bytes()).hexdigest() + "\n", encoding="ascii")
+          PY
+      - name: Upload immutable publication candidate
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pypi-candidate-${{ github.sha }}
+          path: |
+            dist/publish/*.whl
+            dist/publish/*.tar.gz
+            dist/evidence/*.provenance.json
+            dist/wheel.sha256
+          if-no-files-found: error
+
+  native-install:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
+        python-version: ["3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v8.0.0
+        with:
+          name: pypi-candidate-${{ github.sha }}
+          path: dist
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install and exercise the exact universal wheel without an index
+        shell: bash
+        run: |
+          python - <<'PY'
+          import glob, pathlib, subprocess, sys
+          wheels = glob.glob("dist/publish/*.whl")
+          if len(wheels) != 1:
+              raise SystemExit("expected exactly one wheel")
+          subprocess.run([sys.executable, "-m", "pip", "install", "--disable-pip-version-check", "--no-index", "--no-deps", "--force-reinstall", wheels[0]], check=True)
+          subprocess.run([sys.executable, "-I", "-m", "standardsforge", "--help"], check=True)
+          from standardsforge import __version__
+          expected = pathlib.Path("dist/wheel.sha256").read_text(encoding="ascii").strip()
+          if __version__ != pathlib.Path(wheels[0]).name.split("-")[1] or len(expected) != 64:
+              raise SystemExit("installed wheel identity is invalid")
+          PY
+
+  publish:
+    needs: [build, native-install]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/standardsforge/${{ github.ref_name }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v8.0.0
+        with:
+          name: pypi-candidate-${{ github.sha }}
+          path: dist
+      - name: Publish exact candidate with OIDC trusted publishing
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
+        with:
+          packages-dir: dist/publish/
+          attestations: true

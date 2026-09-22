@@ -2,7 +2,11 @@
 
 StandardsForge gives a model read-only, principal-bound access to the same local evidence service used by the CLI. The model host owns process launch and model execution; StandardsForge does not call a model.
 
-## Install the adapter
+## Keep corpus and code channels separate
+
+The prepared corpus is a rights-qualified GitHub release artifact. PyPI publishes independently built StandardsForge code and optional dependencies only. Installing `standardsforge` from PyPI does not install, download, or authorize the prepared standards corpus.
+
+From a source checkout and isolated development environment, the adapter can be installed with:
 
 From a source checkout and isolated environment:
 
@@ -10,18 +14,18 @@ From a source checkout and isolated environment:
 python -m pip install -e ".[mcp]"
 ```
 
-The core remains dependency-free. The MCP SDK is an optional, separately pinned dependency. The prepared release already carries its hash-inventoried dependency closure and proves a stdio search during setup, so prepared-release users do not run this install command.
+The core remains dependency-free. The MCP SDK is an optional, separately pinned dependency.
 
-## Configure the prepared release
+## Configure the fully offline Windows profile
 
-The prepared release provides `standardsforge-mcp.ps1`, which anchors Python, the database, the object store, and the fixed `local-user` principal to the extracted directory. Replace the example with its absolute path. Claude Desktop and Cursor both accept this `mcpServers` entry; for Cursor place it in `.cursor/mcp.json`:
+On 64-bit Windows with CPython 3.12, `setup.ps1` installs the archive's exact hash-inventoried Windows MCP dependency closure with package indexes disabled and proves a stdio search. The included `standardsforge-mcp.ps1` anchors Python, the database, the object store, and the fixed `local-user` principal to the extracted directory. Replace the example version and directory with the absolute path to the extracted release. Claude Desktop and Cursor both accept this `mcpServers` entry; for Cursor place it in `.cursor/mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "standardsforge": {
       "command": "powershell.exe",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a2\\standardsforge-mcp.ps1"]
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-<version>\\standardsforge-mcp.ps1"]
     }
   }
 }
@@ -30,9 +34,29 @@ The prepared release provides `standardsforge-mcp.ps1`, which anchors Python, th
 Claude Code can register the identical process:
 
 ```powershell
-claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-0.1.0a2\standardsforge-mcp.ps1"
+claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-<version>\standardsforge-mcp.ps1"
 claude mcp get standardsforge
 ```
+
+## Configure Linux or macOS against prepared state
+
+First run the prepared archive's offline core setup with `sh ./setup.sh`. Then create an MCP environment outside the prepared directory and install the exact code/MCP extra from PyPI:
+
+```sh
+MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
+PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a4
+python3 -m venv "$MCP_VENV"
+"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a4"
+"$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
+  --db "$PREPARED_ROOT/.standardsforge/memory.db" \
+  --store "$PREPARED_ROOT/.standardsforge/objects" \
+  --principal local-user \
+  --result-mode structured_only
+```
+
+The pip step is networked and installs code and dependencies only. The server uses the prepared distribution's local database and object store; it does not fetch corpus content. Keep the MCP environment outside `PREPARED_ROOT` so the prepared archive's closed inventory continues to validate.
+
+For a model host, set the command to the absolute path of `$MCP_VENV/bin/python` and pass `-I`, `-m`, `standardsforge.mcp_server`, and the same absolute state, principal, and result-mode arguments. Do not let the model choose the principal or state paths.
 
 ## Start the local stdio server
 
@@ -53,6 +77,7 @@ The command intentionally remains running when launched directly because the hos
 The server exposes exactly:
 
 - `search`
+- `list_documents`
 - `resolve_document`
 - `get_clause`
 - `build_context`

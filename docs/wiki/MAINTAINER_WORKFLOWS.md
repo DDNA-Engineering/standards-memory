@@ -77,7 +77,7 @@ First build and retain the reproducible wheel:
   --output-dir build/prepared-wheel
 ```
 
-Acquire the pinned MCP dependency closure into a dedicated wheelhouse. This is a maintainer build input; prepared setup never contacts a package index:
+Acquire the pinned Windows MCP dependency closure into a dedicated wheelhouse. This is a maintainer build input; portable core setup and the Windows offline MCP setup never contact a package index:
 
 ```powershell
 & $Python -m pip download `
@@ -90,18 +90,19 @@ Acquire the pinned MCP dependency closure into a dedicated wheelhouse. This is a
 Then bind the completed corpus, acquisition snapshot, qualified outline, wheel, policy, and provenance:
 
 ```powershell
+$PreparedVersion = '0.1.0a4'
 & $Python scripts/build_prepared_distribution.py `
   --corpus-index .standardsforge/corpus/mil-std-current/corpus.json `
   --acquisition-manifest .standardsforge/sources/dla/mil-std/manifest.json `
   --outline-pack .standardsforge/compiled/mil-std-810h-derived-outline `
-  --wheel build/prepared-wheel/standardsforge-0.1.0a2-py3-none-any.whl `
-  --wheel-provenance build/prepared-wheel/standardsforge-0.1.0a2-py3-none-any.whl.provenance.json `
+  --wheel "build/prepared-wheel/standardsforge-$PreparedVersion-py3-none-any.whl" `
+  --wheel-provenance "build/prepared-wheel/standardsforge-$PreparedVersion-py3-none-any.whl.provenance.json" `
   --mcp-wheelhouse build/prepared-mcp-wheelhouse `
-  --output build/standardsforge-ready-0.1.0a2.zip `
-  --version 0.1.0a2
+  --output "build/standardsforge-ready-$PreparedVersion.zip" `
+  --version $PreparedVersion
 ```
 
-The builder must reject incomplete scope, mismatched acquisition identity, changed archives, duplicate packages, unauthorized policy scope, unqualified outline claims, wheel/source drift, a malformed or unpinned MCP wheelhouse, and an unclosed final archive.
+The builder must reject incomplete scope, mismatched acquisition identity, changed archives, duplicate packages, unauthorized policy scope, unqualified outline claims, wheel/source drift, a malformed or unpinned MCP wheelhouse, and an unclosed final archive. The wheelhouse is the fully offline Windows x64 CPython 3.12 MCP profile. The portable prepared core uses the bundled dependency-free wheel on each declared platform; POSIX MCP is installed later through the separate PyPI code channel and is not part of corpus acquisition or compilation.
 
 ## Rights boundary
 

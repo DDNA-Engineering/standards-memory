@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "standardsforge"
-version = "0.1.0a1"
+version = "0.1.0a4"
 description = "Offline-first standards pack compiler and evidence engine"
 readme = "README.md"
 license = "Apache-2.0"
@@ -13,10 +13,19 @@ dependencies = []
 keywords = ["standards", "evidence", "retrieval", "offline"]
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12"
 ]
+
+[project.urls]
+Homepage = "https://github.com/DDNA-Engineering/standards-memory"
+Documentation = "https://github.com/DDNA-Engineering/standards-memory/wiki"
+Issues = "https://github.com/DDNA-Engineering/standards-memory/issues"
+Source = "https://github.com/DDNA-Engineering/standards-memory"
 
 [project.optional-dependencies]
 mcp = ["mcp==2.2.0"]

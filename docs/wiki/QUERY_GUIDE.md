@@ -14,14 +14,14 @@ StandardsForge exposes seven read operations. Administration, acquisition, compi
 | `enumerate-obligations` | Traverse explicitly classified obligations in a selected scope. |
 | `diff-editions` | Compare exact record identities and report review-required alignment candidates separately. |
 
-All examples below assume a prepared distribution PowerShell opened in its extracted root and the principal `local-user`.
+The examples below use the prepared core's PowerShell form, `python .\run.py`, and principal `local-user`. On Linux or macOS, replace that launcher with `sh ./standardsforge.sh`; both launchers anchor state to the extracted distribution and validate the bundle and receipt before use.
 
 ## Discover
 
 When the exact installed identifier is unknown, inventory the caller's authorized packages first:
 
 ```powershell
-.\standardsforge.ps1 list-documents `
+python .\run.py list-documents `
   --identifier-prefix 'MIL-STD-810' `
   --principal local-user `
   --limit 50
@@ -30,7 +30,7 @@ When the exact installed identifier is unknown, inventory the caller's authorize
 The result includes exact edition and representation identities, immutable package digests, record counts, declared coverage, and a signed continuation when another page exists. Prefix matching is normalized and literal, not fuzzy or wildcard search. The inventory is authorization-filtered and publisher currentness does not select a project baseline.
 
 ```powershell
-.\standardsforge.ps1 search "steady axial load" `
+python .\run.py search "steady axial load" `
   --principal local-user `
   --query-mode exact_phrase `
   --limit 10
@@ -48,7 +48,7 @@ Raw queries, parsed term count, and term size are bounded before local execution
 ## Resolve and pin
 
 ```powershell
-$resolved = .\standardsforge.ps1 resolve 'MIL-STD-810H(1)' `
+$resolved = python .\run.py resolve 'MIL-STD-810H(1)' `
   --representation derived_structure `
   --principal local-user | ConvertFrom-Json
 
@@ -62,7 +62,7 @@ Use `$pin` for subsequent reads. Page text, automated derived structure, reviewe
 Use the record and clause selectors returned by `search`:
 
 ```powershell
-.\standardsforge.ps1 get-clause $pin '<clause-reference>' `
+python .\run.py get-clause $pin '<clause-reference>' `
   --record-id '<record-id>' `
   --principal local-user `
   --response-profile concise_evidence_v1
@@ -73,7 +73,7 @@ The detailed profile remains the compatibility default. Compact and concise prof
 ## Build context
 
 ```powershell
-.\standardsforge.ps1 build-context $pin `
+python .\run.py build-context $pin `
   --record-id '<record-id-1>' `
   --record-id '<record-id-2>' `
   --principal local-user

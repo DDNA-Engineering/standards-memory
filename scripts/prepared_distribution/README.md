@@ -6,16 +6,53 @@ The exact acquisition snapshot is preserved at `provenance/acquisition-manifest.
 
 `provenance/wheel-build.json` binds the bundled wheel to its exact source-file inventory, fixed source epoch, pinned build backend, two byte-identical clean builds, and isolated core smoke. `bundle-manifest.json` records and inventories that provenance alongside every release file.
 
-## Start
+## Start the offline core
 
-Install 64-bit CPython 3.12 for Windows, open PowerShell in this directory, and run:
+The prepared core supports 64-bit Windows and Linux plus Intel and Apple silicon macOS with CPython 3.11 or newer. It installs the bundled core wheel and corpus with package-index access disabled. Choose the commands for the host platform.
+
+PowerShell:
+
+```powershell
+python .\setup.py
+python .\run.py search "environmental testing" --principal local-user --limit 5
+```
+
+POSIX shell:
+
+```sh
+sh ./setup.sh
+sh ./standardsforge.sh search "environmental testing" --principal local-user --limit 5
+```
+
+`setup.py` is the portable implementation; `setup.sh` invokes it with `python3`. `run.py` and `standardsforge.sh` validate the manifest-bound receipt and owned runtime before every launch, anchor the database and object store to this extracted directory, and forward only the CLI arguments. Rerun setup for a full closed-bundle revalidation. Setup validates and installs the already-compiled packs and proves full-integrity doctor plus a real search. It does not acquire standards, compile PDFs, call a model, or resolve a package from the network.
+
+## Choose an MCP channel
+
+The prepared GitHub archive and the PyPI project are separate distribution channels. This archive contains the rights-qualified corpus and never needs PyPI for core setup or query. The PyPI project contains independently built code only; it neither bundles nor downloads standards content.
+
+For a fully offline MCP installation, use 64-bit Windows with CPython 3.12:
 
 ```powershell
 .\setup.ps1
-.\standardsforge.ps1 search "environmental testing" --principal local-user --limit 5
 ```
 
-`setup.ps1` creates an isolated Python 3.12 environment, installs StandardsForge and its exact hash-locked Windows x64 MCP dependency closure only from the offline wheelhouse, validates and installs the precompiled packs, and proves both a local query and a real stdio MCP round trip. Subsequent queries use `standardsforge.ps1`; model hosts use `standardsforge-mcp.ps1`. Both launchers resolve state from this extracted directory, independent of the host working directory.
+That Windows-only path installs StandardsForge and its exact hash-locked MCP dependency closure from the included wheelhouse, then proves a real stdio MCP round trip. Model hosts use `standardsforge-mcp.ps1`.
+
+On Linux or macOS, first complete the offline core setup above. MCP then requires this explicit networked code/dependency install from PyPI into a separate environment outside the distribution; replace `PREPARED_VERSION` with the exact `version` in `bundle-manifest.json`:
+
+```sh
+MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
+PREPARED_ROOT=/absolute/path/to/standardsforge-ready-PREPARED_VERSION
+python3 -m venv "$MCP_VENV"
+"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==PREPARED_VERSION"
+"$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
+  --db "$PREPARED_ROOT/.standardsforge/memory.db" \
+  --store "$PREPARED_ROOT/.standardsforge/objects" \
+  --principal local-user \
+  --result-mode structured_only
+```
+
+Keep the networked MCP environment outside the extracted archive so the archive's closed inventory remains unchanged. The server command uses the distribution-local corpus state and does not fetch standards. Use the same absolute paths in a model host.
 
 ## Connect Claude Desktop, Claude Code, or Cursor
 
@@ -26,7 +63,7 @@ Replace the example directory with the absolute path to this extracted release. 
   "mcpServers": {
     "standardsforge": {
       "command": "powershell.exe",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a2\\standardsforge-mcp.ps1"]
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-PREPARED_VERSION\\standardsforge-mcp.ps1"]
     }
   }
 }
@@ -35,7 +72,7 @@ Replace the example directory with the absolute path to this extracted release. 
 Claude Code can register the same local stdio process:
 
 ```powershell
-claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-0.1.0a2\standardsforge-mcp.ps1"
+claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-PREPARED_VERSION\standardsforge-mcp.ps1"
 claude mcp get standardsforge
 ```
 

@@ -56,6 +56,15 @@ All untrusted PDF parsing runs in a disposable resource-limited worker. Parser f
 
 Public accessibility, processing permission, model-use permission, and redistribution permission are separate. The Apache-2.0 code license does not grant rights to third-party standards. Restricted content is outside the prepared public-source profile.
 
+## Distribution channels
+
+The prepared GitHub archive and PyPI serve different trust and rights boundaries:
+
+- The prepared archive carries the qualified corpus, its acquisition and scope evidence, the exact bundled core wheel, and portable offline core setup. Its Windows x64 CPython 3.12 profile also carries a closed offline MCP wheelhouse.
+- PyPI carries independently built StandardsForge code artifacts and optional dependencies only. It does not contain or fetch standards content. Linux and macOS MCP use this explicit networked code channel, then operate on the prepared distribution's local database and object store.
+
+After installation, CLI and MCP query paths remain local and do not acquire documents or invoke a model.
+
 ## Current limits
 
 - Physical page text is not document-wide visual fidelity.

@@ -309,6 +309,11 @@ class DistributionScopeTests(unittest.TestCase):
             static_root.mkdir(parents=True)
             for name in (
                 "README.md",
+                "prepared_runtime.py",
+                "setup.py",
+                "run.py",
+                "setup.sh",
+                "standardsforge.sh",
                 "setup.ps1",
                 "standardsforge.ps1",
                 "standardsforge-mcp.ps1",
@@ -543,6 +548,8 @@ class DistributionScopeTests(unittest.TestCase):
                         acquisition_path.read_bytes(),
                         built.read(prefix + "provenance/acquisition-manifest.json"),
                     )
+                    self.assertEqual(0o100755, built.getinfo(prefix + "setup.sh").external_attr >> 16)
+                    self.assertEqual(0o100755, built.getinfo(prefix + "standardsforge.sh").external_attr >> 16)
                     manifest = json.loads(built.read(prefix + "bundle-manifest.json"))
                     paths = {item["path"] for item in manifest["files"]}
                     self.assertIn("provenance/source-baseline.json", paths)
@@ -550,12 +557,23 @@ class DistributionScopeTests(unittest.TestCase):
                     self.assertIn("provenance/wheel-build.json", paths)
                     self.assertIn("wheelhouse/mcp-2.2.0-py3-none-any.whl", paths)
                     self.assertIn("standardsforge-mcp.ps1", paths)
+                    self.assertIn("prepared_runtime.py", paths)
+                    self.assertIn("setup.py", paths)
+                    self.assertIn("run.py", paths)
+                    self.assertIn("setup.sh", paths)
+                    self.assertIn("standardsforge.sh", paths)
+                    self.assertIn("policies/prepared-local.json", paths)
                     self.assertIn("smoke_mcp.py", paths)
                     self.assertIn("verify_mcp_environment.py", paths)
                     self.assertEqual("mcp==2.2.0", manifest["build"]["mcp_requirement"])
                     self.assertEqual(1, manifest["build"]["mcp_wheel_count"])
-                    self.assertEqual("CPython 3.12", manifest["build"]["runtime_python"])
-                    self.assertEqual("win_amd64", manifest["build"]["runtime_platform"])
+                    self.assertEqual("CPython >=3.11", manifest["build"]["core_runtime_python"])
+                    self.assertEqual(
+                        ["windows_x86_64", "linux_x86_64", "macos_arm64", "macos_x86_64"],
+                        manifest["build"]["core_runtime_platforms"],
+                    )
+                    self.assertEqual("CPython 3.12", manifest["build"]["mcp_runtime_python"])
+                    self.assertEqual("win_amd64", manifest["build"]["mcp_runtime_platform"])
                     self.assertEqual(
                         hashlib.sha256(mcp_requirements.read_bytes()).hexdigest(),
                         manifest["build"]["mcp_requirements_sha256"],

@@ -790,6 +790,29 @@
         "Publish a title and per-argument description for all seven MCP tools without exposing principal, authorization, server-mode, network, model, or administrative controls.",
         "Prove migration and trigger parity for both indexes, deterministic strict and fallback behavior, singular/plural stemming, identifier-prefix handling, authorization revocation and race safety, cache separation, bounded failures, schema validation, and current-corpus relevance."
       ]
+    },
+    {
+      "task_id": "TASK-035",
+      "title": "Cross-platform prepared core and trusted package channel",
+      "status": "active",
+      "requirements": [
+        "SM-FR-018",
+        "SM-FR-025",
+        "SM-FR-030",
+        "SM-FR-057",
+        "SM-FR-059",
+        "SM-FR-065",
+        "SM-FR-068",
+        "SM-FR-075"
+      ],
+      "acceptance": [
+        "Keep the prepared corpus as a rights-qualified GitHub release artifact, and keep the PyPI project limited to independently reproducible StandardsForge code artifacts without bundling or fetching standards content.",
+        "Add a standard-library-only portable setup that validates the complete closed archive, exact wheel and provenance, source baseline and acquisition binding before state mutation; installs the bundled core wheel with package indexes disabled; installs the corpus and derived outline; and proves full-integrity doctor and real search before writing a receipt.",
+        "Provide root-anchored Windows and POSIX CLI launchers that work independently of the caller working directory, preserve the fixed local principal and distribution-local state, forward only CLI arguments, validate the manifest-bound receipt and owned virtual environment before use, and require an explicit setup rerun for full closed-bundle revalidation.",
+        "Preserve the exact hash-locked Windows offline MCP profile while documenting the separately installed PyPI MCP extra as a networked code-install path rather than an offline corpus install.",
+        "Build the universal wheel and source distribution from the tagged revision, verify version identity and clean installs on Windows, Linux, and macOS, and publish only through a tag-gated GitHub environment using OIDC trusted publishing.",
+        "Prove portable setup and repeated-use behavior on native Windows, Linux, and macOS runners, including spaces and non-ASCII paths plus tampered, missing, extra, duplicate, unsafe-link, wrong-version, and unowned-state failures."
+      ]
     }
   ]
 }

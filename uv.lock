@@ -732,7 +732,7 @@ wheels = [
 
 [[package]]
 name = "standardsforge"
-version = "0.1.0a1"
+version = "0.1.0a4"
 source = { editable = "." }
 
 [package.optional-dependencies]

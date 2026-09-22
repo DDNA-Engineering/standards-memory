@@ -8,12 +8,12 @@
 
 Download one prepared archive, run one setup command, and search **438 compiled MIL-STD packs** locally. No Git clone, PDF acquisition, corpus compilation, network query, or model call is required to use the included snapshot.
 
-[![Prepared release: 0.1.0a3](https://img.shields.io/badge/prepared_release-0.1.0a3-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a3)
+[![Prepared release: 0.1.0a4](https://img.shields.io/badge/prepared_release-0.1.0a4-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a4)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
 [![Queries: offline](https://img.shields.io/badge/queries-offline-253247?style=flat-square)](docs/wiki/ARCHITECTURE_AND_TRUST.md)
 [![Library: 438 packs](https://img.shields.io/badge/library-438_packs-EA6A23?style=flat-square)](#complete-prepared-library-snapshot)
 
-[Download the prepared library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a3/standardsforge-ready-0.1.0a3.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a3/standardsforge-ready-0.1.0a3.zip.sha256) · [Wiki](docs/wiki/README.md) · [Contributing](CONTRIBUTING.md)
+[Download the prepared library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a4/standardsforge-ready-0.1.0a4.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a4/standardsforge-ready-0.1.0a4.zip.sha256) · [Wiki](docs/wiki/README.md) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -21,28 +21,39 @@ Download one prepared archive, run one setup command, and search **438 compiled 
 
 ## Start the offline library
 
-You need Windows PowerShell, Python 3.11 or newer, SQLite FTS5 support, and space for the approximately 1 GB archive plus its extracted local state.
+The prepared core supports 64-bit Windows and Linux plus Intel and Apple silicon macOS. You need CPython 3.11 or newer with SQLite FTS5 support, the platform shell shown below, and space for the approximately 1 GB archive plus its extracted local state. The fully offline MCP profile has the narrower requirement of 64-bit Windows and CPython 3.12.
 
 ### 1. Download and extract
 
-Download [`standardsforge-ready-0.1.0a3.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a3/standardsforge-ready-0.1.0a3.zip), extract it to a durable local directory, and open PowerShell in that extracted directory.
+Download [`standardsforge-ready-0.1.0a4.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a4/standardsforge-ready-0.1.0a4.zip), extract it to a durable local directory, and open PowerShell or a POSIX shell in that extracted directory.
 
-The [published checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a3/standardsforge-ready-0.1.0a3.zip.sha256) is available when you want to verify the downloaded archive before extraction.
+The [published checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a4/standardsforge-ready-0.1.0a4.zip.sha256) is available when you want to verify the downloaded archive before extraction.
 
 ### 2. Set up the included corpus
 
 ```powershell
-.\setup.ps1
+python .\setup.py
 ```
 
-Setup validates the bundle, creates its isolated Python environment, installs the bundled wheel, validates and installs the already-compiled packs, builds the local index, and records a receipt. It does not download standards or compile PDFs.
+```sh
+sh ./setup.sh
+```
+
+`setup.py` is the portable implementation; `setup.sh` invokes it with `python3`. Setup validates the bundle, creates its isolated Python environment, installs the bundled wheel with package indexes disabled, validates and installs the already-compiled packs, builds the local index, proves full-integrity doctor and a real search, and records a receipt. It does not download standards or compile PDFs.
 
 ### 3. Prove the installation is ready
 
 ```powershell
-.\standardsforge.ps1 doctor `
-  --policy policies\mil-std-corpus-local.json `
+python .\run.py doctor `
+  --policy policies\prepared-local.json `
   --principal local-user `
+  --full-integrity
+```
+
+```sh
+sh ./standardsforge.sh doctor \
+  --policy policies/prepared-local.json \
+  --principal local-user \
   --full-integrity
 ```
 
@@ -51,7 +62,7 @@ A ready report exits `0`. The check opens the installed state read-only, validat
 ### 4. Inventory and search the installed library
 
 ```powershell
-.\standardsforge.ps1 list-documents `
+python .\run.py list-documents `
   --identifier-prefix 'MIL-STD-810' `
   --principal local-user `
   --limit 20
@@ -60,7 +71,7 @@ A ready report exits `0`. The check opens the installed state read-only, validat
 This authorization-filtered inventory returns exact identifiers, editions, representations, immutable package digests, record counts, and declared coverage. Use it before resolution when an exact installed identifier or suffix is unknown.
 
 ```powershell
-.\standardsforge.ps1 search "environmental testing" `
+python .\run.py search "environmental testing" `
   --principal local-user `
   --query-mode natural_language `
   --limit 5
@@ -71,13 +82,13 @@ The result is source-linked JSON with the exact package identity, citations, cov
 ### Pin an exact edition and representation
 
 ```powershell
-$resolved = .\standardsforge.ps1 resolve 'MIL-STD-810H(1)' `
+$resolved = python .\run.py resolve 'MIL-STD-810H(1)' `
   --representation derived_structure `
   --principal local-user | ConvertFrom-Json
 
 $pin = $resolved.result.package_digest
 
-.\standardsforge.ps1 search "low pressure" `
+python .\run.py search "low pressure" `
   --package-digest $pin `
   --principal local-user `
   --limit 5
@@ -85,7 +96,37 @@ $pin = $resolved.result.package_digest
 
 The package digest pins the exact installed representation. It does not decide whether that standard applies to a product or select an approved project baseline.
 
+On Linux or macOS, replace `python .\run.py` in the query examples with `sh ./standardsforge.sh`. Both launchers validate the manifest-bound receipt and owned runtime, anchor state to the extracted directory, and forward only the CLI arguments. Rerun setup when you want a full closed-bundle revalidation.
+
 For setup details and troubleshooting boundaries, use the [prepared-library guide](docs/wiki/PREPARED_LIBRARY.md).
+
+## Choose an MCP channel
+
+The GitHub prepared archive and PyPI are deliberately separate. The GitHub artifact carries the rights-qualified corpus and supports offline core setup. PyPI carries independently built StandardsForge code and optional dependencies only; it does not bundle, fetch, or authorize standards content.
+
+For a fully offline MCP installation on 64-bit Windows with CPython 3.12, run:
+
+```powershell
+.\setup.ps1
+```
+
+That Windows-only path installs the archive's exact hash-locked MCP dependency closure from its wheelhouse and proves a real stdio round trip. Point the model host at the absolute path to `standardsforge-mcp.ps1`.
+
+On Linux or macOS, first complete the offline core setup above. Then create an environment outside the closed prepared directory and install the exact MCP code package from PyPI:
+
+```sh
+MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
+PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a4
+python3 -m venv "$MCP_VENV"
+"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a4"
+"$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
+  --db "$PREPARED_ROOT/.standardsforge/memory.db" \
+  --store "$PREPARED_ROOT/.standardsforge/objects" \
+  --principal local-user \
+  --result-mode structured_only
+```
+
+The pip step is an explicit networked code/dependency install. The server then uses distribution-local corpus state and does not acquire standards. See [model integration](docs/wiki/MODEL_INTEGRATION.md) for model-host configuration and trust boundaries.
 
 ## What is included
 
@@ -94,7 +135,7 @@ The prepared snapshot contains:
 - **438** compressed MIL-STD page-text packs compiled from **912** verified source PDFs;
 - **35,218** source-linked page records across **35,235** physical pages;
 - an automated, explicitly unreviewed MIL-STD-810H derived outline;
-- the dependency-free StandardsForge core wheel, a hash-inventoried offline MCP dependency wheelhouse, exact local policies, setup and root-anchored CLI/MCP launchers, inventory, and provenance;
+- the dependency-free StandardsForge core wheel, portable offline core setup and root-anchored CLI launchers, a Windows x64 CPython 3.12 hash-inventoried offline MCP wheelhouse and launcher, exact local policies, inventory, and provenance;
 - one-command local indexing for offline queries.
 
 The acquisition snapshot completed **September 21, 2026** against the official DLA ASSIST dataset marked updated September 18, 2026. It includes the selected current publicly exposed components at that cutoff. It does not include historical editions, restricted bytes, other DLA document classes, or document-wide reviewed semantic interpretation.

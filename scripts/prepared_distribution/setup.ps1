@@ -6,6 +6,7 @@ $Python = Join-Path $VirtualEnvironment 'Scripts\python.exe'
 $Database = Join-Path $DistributionRoot '.standardsforge\memory.db'
 $ObjectStore = Join-Path $DistributionRoot '.standardsforge\objects'
 $ReadyMarker = Join-Path $DistributionRoot '.standardsforge\prepared-distribution.json'
+$VenvMarker = Join-Path $VirtualEnvironment '.standardsforge-prepared-venv.json'
 $BundleManifest = Join-Path $DistributionRoot 'bundle-manifest.json'
 $McpRequirementsPath = Join-Path $DistributionRoot 'provenance\mcp-wheelhouse-win-amd64-cp312.txt'
 
@@ -18,15 +19,15 @@ function Test-PreparedDistribution {
     } catch {
         throw 'The prepared-distribution manifest is not valid JSON.'
     }
-    if ($Manifest.schema_version -ne '1.2' -or $Manifest.product -ne 'StandardsForge prepared distribution') {
+    if ($Manifest.schema_version -ne '1.3' -or $Manifest.product -ne 'StandardsForge prepared distribution') {
         throw 'The prepared-distribution manifest identity is invalid.'
     }
     if ($Manifest.build.archive_source_date_epoch -ne 1767225600 -or
         $Manifest.build.wheel_build_backend -ne 'setuptools==84.0.0' -or
         $Manifest.build.wheel_generator -ne 'setuptools (84.0.0)' -or
         $Manifest.build.mcp_requirement -ne 'mcp==2.2.0' -or
-        $Manifest.build.runtime_python -ne 'CPython 3.12' -or
-        $Manifest.build.runtime_platform -ne 'win_amd64' -or
+        $Manifest.build.mcp_runtime_python -ne 'CPython 3.12' -or
+        $Manifest.build.mcp_runtime_platform -ne 'win_amd64' -or
         [int]$Manifest.build.mcp_wheel_count -lt 1) {
         throw 'The prepared-distribution build identity is invalid.'
     }
@@ -119,6 +120,7 @@ function Test-PreparedDistribution {
 }
 
 $Manifest = Test-PreparedDistribution
+$ManifestDigest = (Get-FileHash -LiteralPath $BundleManifest -Algorithm SHA256).Hash.ToLowerInvariant()
 $RuntimeProbe = "import platform,sys; raise SystemExit(0 if sys.implementation.name == 'cpython' and sys.version_info[:2] == (3, 12) and platform.machine().lower() in {'amd64', 'x86_64'} else 1)"
 
 if (-not (Test-Path -LiteralPath $Python)) {
@@ -135,6 +137,10 @@ if (-not (Test-Path -LiteralPath $Python)) {
     }
     if ($LASTEXITCODE -ne 0) { throw 'Unable to create the StandardsForge virtual environment.' }
 }
+
+$Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+$VenvMarkerJson = @{ bundle_manifest_sha256 = $ManifestDigest } | ConvertTo-Json
+[System.IO.File]::WriteAllText($VenvMarker, $VenvMarkerJson + "`n", $Utf8NoBom)
 
 & $Python -I -c $RuntimeProbe
 if ($LASTEXITCODE -ne 0) { throw 'The prepared distribution requires 64-bit CPython 3.12 on Windows.' }
@@ -170,13 +176,15 @@ if ($LASTEXITCODE -ne 0) { throw 'The prepared MIL-STD corpus did not pass its s
 if ($LASTEXITCODE -ne 0) { throw 'The prepared MIL-STD MCP server did not pass its stdio smoke query.' }
 
 $Marker = @{
-    installed_at = (Get-Date).ToUniversalTime().ToString('o')
+    bundle_manifest_sha256 = $ManifestDigest
     principal_id = 'local-user'
     status = 'ready'
     mcp_status = 'ready'
+    version = [string]$Manifest.version
+    wheel_sha256 = [string]$Manifest.build.wheel_sha256
 } | ConvertTo-Json
 New-Item -ItemType Directory -Path (Split-Path -Parent $ReadyMarker) -Force | Out-Null
-Set-Content -LiteralPath $ReadyMarker -Value $Marker -Encoding utf8
+[System.IO.File]::WriteAllText($ReadyMarker, $Marker + "`n", $Utf8NoBom)
 
 Write-Host 'StandardsForge is ready.'
 Write-Host '.\standardsforge.ps1 search "environmental testing" --principal local-user --limit 5'
