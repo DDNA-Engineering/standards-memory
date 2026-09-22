@@ -98,7 +98,7 @@ class StructureCompilerTests(unittest.TestCase):
         font_reference = writer._add_object(font)
         for text in (
             b"Synthetic environmental requirement. Temperature 25\\260C. The equipment shall maintain 25\\260C when energized.",
-            b"Unless safety override is active, continued condition applies. Governing note remains in force. Safety override means a protective shutdown. Temperature limit. 25\\260C maximum. Footnote A: apply when energized.",
+            b"Unless safety override is active, continued condition applies. Governing note remains in force. Safety override means a protective shutdown. Temperature limit. 25\\260C maximum. Footnote A: apply when energized. The operator shall verify shutdown after the test.",
         ):
             page = writer.add_blank_page(width=612, height=792)
             page[NameObject("/Resources")] = DictionaryObject(
@@ -186,6 +186,263 @@ class StructureCompilerTests(unittest.TestCase):
                 }
             ],
         }
+
+    def _procedure_annotations(self) -> dict:
+        parent_id = "test:procedure:1"
+        first_id = "test:procedure:1:step:1"
+        second_id = "test:procedure:1:step:2"
+        first_text = "The equipment shall maintain 25°C when energized."
+        second_text = "The operator shall verify shutdown after the test."
+        annotations = {
+            "schema_version": "0.3.0",
+            "document_id": self.document["document_id"],
+            "edition_id": self.document["edition_id"],
+            "source_pdf_sha256": self.document["sha256"],
+            "compiler": {"name": "pypdf", "version": PYPDF_VERSION},
+            "extraction_mode": "simple",
+            "text_encoding": "UTF-8",
+            "offset_convention": "half_open_utf8_byte_offsets_per_physical_page",
+            "review": {
+                "reviewer_id": "synthetic-agent",
+                "reviewer_type": "agent",
+                "reviewed_at": "2026-09-22T12:00:00Z",
+                "method": "synthetic_reviewed_procedure_annotation",
+                "tool": {
+                    "name": "synthetic-review-agent",
+                    "version": "1.0",
+                    "configuration_sha256": "a" * 64,
+                },
+                "unresolved_issues": [],
+                "attestation": "extraction_review_not_project_applicability_or_approval",
+            },
+            "nodes": [
+                self._node(
+                    parent_id,
+                    "section",
+                    "procedure-1",
+                    "Synthetic procedure",
+                    "Synthetic environmental requirement.",
+                    1,
+                ),
+                self._node(
+                    first_id,
+                    "list_item",
+                    "procedure-1.step-1",
+                    "Maintain temperature",
+                    first_text,
+                    1,
+                    parent_id,
+                ),
+                self._node(
+                    second_id,
+                    "list_item",
+                    "procedure-1.step-2",
+                    "Verify shutdown",
+                    second_text,
+                    2,
+                    parent_id,
+                    2,
+                ),
+            ],
+            "relationships": [
+                {
+                    "source_logical_id": second_id,
+                    "relationship_type": "sequence_after",
+                    "target_status": "resolved",
+                    "target_logical_id": first_id,
+                    "required": True,
+                    "derivation": {
+                        "method": "synthetic_agent_annotation",
+                        "review_status": "agent_reviewed",
+                    },
+                    "evidence_spans": [self._span(second_text, 2)],
+                }
+            ],
+            "unsupported_regions": [
+                {
+                    "region_id": "outside-reviewed-procedure",
+                    "reason_code": "outside_selected_scope",
+                    "description": "Only the reviewed two-step procedure is in scope.",
+                    "source_spans": [self._span("Governing note remains in force.", 2)],
+                    "derivation": {
+                        "method": "synthetic_agent_annotation",
+                        "review_status": "agent_reviewed",
+                    },
+                }
+            ],
+        }
+        semantic_statements = (
+            (annotations["nodes"][1], "equipment", "maintain", first_text, "when energized"),
+            (annotations["nodes"][2], "operator", "verify", second_text, "after the test"),
+        )
+        for node, subject, action, exact_text, condition in semantic_statements:
+            node["statement_role"] = "obligation"
+            node["semantics"] = {
+                "schema_version": "0.1.0",
+                "content_role": "requirement_candidate",
+                "normativity": "normative",
+                "statement": {
+                    "subject": subject,
+                    "action": action,
+                    "modality": "shall",
+                    "polarity": "affirmative",
+                    "exact_text": exact_text,
+                    "span_indices": [0],
+                },
+                "qualifiers": [
+                    {"kind": "condition", "exact_text": condition, "span_indices": [0]}
+                ],
+                "quantities": [],
+                "unresolved_issues": [],
+                "project_applicability": "not_decided",
+            }
+        annotations["nodes"][1]["semantics"]["quantities"] = [
+            {
+                "raw": "25°C",
+                "value": "25",
+                "unit": "°C",
+                "tolerance": None,
+                "span_indices": [0],
+            }
+        ]
+        return annotations
+
+    def test_compiles_and_retrieves_reviewed_procedure_order(self) -> None:
+        annotations = self._procedure_annotations()
+        schemas = contracts_gate.load_schemas()
+        registry = contracts_gate.check_schema_documents(schemas)
+        contracts_gate.validate_with_schema(
+            schemas, registry, "structure-annotations.schema.json", annotations
+        )
+        self.annotations_path.write_text(json.dumps(annotations), encoding="utf-8")
+
+        output = self.root / "reviewed-procedure"
+        compile_structured_pdf_section(
+            self.catalog_path,
+            self.document["document_id"],
+            self.sources,
+            self.annotations_path,
+            output,
+        )
+        pack = validate_pack_directory(output)
+        policy_path = self.root / "procedure-policy.json"
+        policy_path.write_text(
+            json.dumps(
+                {
+                    "policy_version": "0.1.0",
+                    "policy_id": "procedure-policy",
+                    "principal_id": "procedure-user",
+                    "allow_admin_install": True,
+                    "allow_serve": True,
+                    "allowed_pack_ids": [pack.manifest["pack_id"]],
+                    "allowed_content_classes": ["public_government_standard"],
+                }
+            ),
+            encoding="utf-8",
+        )
+        service = StandardsForgeService(
+            self.root / "procedure-memory.db", self.root / "procedure-objects"
+        )
+        digest = service.install_pack(output, policy_path)["package_digest"]
+        packet = service.get_clause(digest, "procedure-1.step-2", "procedure-user")
+        self.assertEqual(
+            ["procedure-1.step-2", "procedure-1.step-1"],
+            [record["clause_reference"] for record in packet["evidence"]],
+        )
+        relationship = packet["evidence"][0]["structure"]["relationships"][0]
+        self.assertEqual("sequence_after", relationship["relationship"])
+        self.assertEqual("test:procedure:1:step:1", relationship["target_logical_id"])
+        self.assertTrue(relationship["required"])
+        self.assertEqual(
+            "not_decided",
+            packet["evidence"][0]["structure"]["semantics"]["project_applicability"],
+        )
+        contracts_gate.validate_with_schema(
+            schemas, registry, "query-response.schema.json", packet
+        )
+
+        records_path = output / "records.json"
+        records = json.loads(records_path.read_text(encoding="utf-8"))
+        second = next(
+            record
+            for record in records["records"]
+            if record["clause_reference"] == "procedure-1.step-2"
+        )
+        second["structure"]["relationships"][0]["required"] = False
+        second["dependencies"] = []
+        records_bytes = json.dumps(records, ensure_ascii=False, indent=2).encode("utf-8")
+        records_path.write_bytes(records_bytes)
+        inventory_path = output / "inventory.json"
+        inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+        records_entry = next(
+            item for item in inventory["files"] if item["path"] == "records.json"
+        )
+        records_entry.update(
+            {"bytes": len(records_bytes), "sha256": hashlib.sha256(records_bytes).hexdigest()}
+        )
+        inventory_path.write_text(json.dumps(inventory, indent=2), encoding="utf-8")
+        with self.assertRaises(StandardsForgeError) as caught:
+            validate_pack_directory(output)
+        self.assertEqual("invalid_record", caught.exception.code)
+
+    def test_rejects_invalid_reviewed_procedure_order(self) -> None:
+        valid = self._procedure_annotations()
+        old_version = json.loads(json.dumps(valid))
+        old_version["schema_version"] = "0.2.0"
+        schemas = contracts_gate.load_schemas()
+        registry = contracts_gate.check_schema_documents(schemas)
+        with self.assertRaises(ValidationError):
+            contracts_gate.validate_with_schema(
+                schemas, registry, "structure-annotations.schema.json", old_version
+            )
+
+        cases: list[tuple[str, dict]] = [("old-version", old_version)]
+        optional = json.loads(json.dumps(valid))
+        optional["relationships"][0]["required"] = False
+        cases.append(("optional-predecessor", optional))
+
+        unresolved = json.loads(json.dumps(valid))
+        unresolved_relationship = unresolved["relationships"][0]
+        unresolved_relationship["target_status"] = "unresolved"
+        unresolved_relationship["target_reference"] = "unresolved predecessor"
+        unresolved_relationship.pop("target_logical_id")
+        unresolved_relationship["required"] = False
+        cases.append(("unresolved-predecessor", unresolved))
+
+        multiple = json.loads(json.dumps(valid))
+        multiple["relationships"].append(
+            json.loads(json.dumps(multiple["relationships"][0]))
+        )
+        cases.append(("multiple-predecessors", multiple))
+
+        non_list = json.loads(json.dumps(valid))
+        non_list["nodes"][1]["kind"] = "clause"
+        cases.append(("non-list-predecessor", non_list))
+
+        cross_parent = json.loads(json.dumps(valid))
+        other_parent = json.loads(json.dumps(cross_parent["nodes"][0]))
+        other_parent["logical_id"] = "test:procedure:other"
+        cross_parent["nodes"].append(other_parent)
+        cross_parent["nodes"][1]["parent_logical_id"] = other_parent["logical_id"]
+        cases.append(("cross-parent", cross_parent))
+
+        backward = json.loads(json.dumps(valid))
+        backward["nodes"][1]["ordinal"] = 3
+        backward["nodes"][2]["ordinal"] = 2
+        cases.append(("backward-predecessor", backward))
+
+        for name, annotations in cases:
+            with self.subTest(name=name):
+                self.annotations_path.write_text(json.dumps(annotations), encoding="utf-8")
+                with self.assertRaises(StandardsForgeError) as caught:
+                    compile_structured_pdf_section(
+                        self.catalog_path,
+                        self.document["document_id"],
+                        self.sources,
+                        self.annotations_path,
+                        self.root / name,
+                    )
+                self.assertEqual("invalid_structure_annotations", caught.exception.code)
 
     def test_compiles_installs_and_retrieves_source_spanned_tree(self) -> None:
         output = self.root / "structured"

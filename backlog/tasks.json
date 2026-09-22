@@ -695,6 +695,26 @@
         "Prove malformed schemas and representative generated packets fail validation, while retaining stricter runtime checks for files, canonical bytes, hashes, authorization, and cross-document invariants.",
         "Document an explicit schema version policy and append-only change log: changed accepted shape or meaning requires a new instance version, unknown versions fail closed, and migrations cannot invent semantic or approval state."
       ]
+    },
+    {
+      "task_id": "TASK-031",
+      "title": "Reviewed procedure-step ordering",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-010",
+        "SM-FR-016",
+        "SM-FR-019",
+        "SM-FR-052",
+        "SM-FR-061",
+        "SM-FR-071"
+      ],
+      "acceptance": [
+        "Add a versioned reviewed-structure annotation contract for an explicit sequence_after relationship without changing the accepted meaning of older annotation versions.",
+        "Accept one source-spanned resolved predecessor only between reviewed list-item siblings under the same explicit parent, with an earlier target ordinal and required retrieval context.",
+        "Compile, validate, install, and retrieve a two-step reviewed semantic procedure whose second step returns the first step and exact ordering relationship as required evidence.",
+        "Reject sequence ordering under older annotation versions, optional or unresolved predecessors, multiple immediate predecessors, non-list steps, cross-parent steps, and backward or cyclic ordinal claims.",
+        "Keep procedure ordering a reviewed source derivation rather than an applicability, compliance, test adequacy, or approval decision."
+      ]
     }
   ]
 }

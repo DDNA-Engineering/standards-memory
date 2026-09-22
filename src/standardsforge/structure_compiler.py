@@ -23,7 +23,7 @@ from .pdf_protocol import DEFAULT_LIMITS, LIMIT_POLICY_VERSION, PROTOCOL_VERSION
 from .source_catalog import load_source_catalog, verify_source_set
 
 
-STRUCTURE_COMPILER_VERSION = "0.3.0"
+STRUCTURE_COMPILER_VERSION = "0.4.0"
 MAX_NODE_SOURCE_SPANS = 64
 NODE_KINDS = {
     "document",
@@ -53,6 +53,7 @@ RELATIONSHIP_TYPES = {
     "header_for",
     "illustrates",
     "continues_on",
+    "sequence_after",
 }
 TARGET_STATUSES = {"resolved", "out_of_scope", "unresolved", "ambiguous"}
 
@@ -216,7 +217,7 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
         raise StandardsForgeError("invalid_structure_annotations", "The structure annotation file is invalid JSON.") from exc
     annotations = _strict_object(raw, _ANNOTATION_KEYS, "structure annotations")
     require(
-        annotations["schema_version"] in {"0.1.0", "0.2.0"},
+        annotations["schema_version"] in {"0.1.0", "0.2.0", "0.3.0"},
         "unsupported_schema_version",
         "Unsupported structure annotation schema.",
     )
@@ -233,7 +234,7 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
     )
     require(all(isinstance(review[key], str) and review[key] for key in _REVIEW_REQUIRED_KEYS), "invalid_structure_annotations", "Review provenance is required.")
     require(review["reviewer_type"] in {"agent", "human"}, "invalid_structure_annotations", "Reviewer type is invalid.")
-    if annotations["schema_version"] == "0.2.0":
+    if annotations["schema_version"] in {"0.2.0", "0.3.0"}:
         require(set(review) == _REVIEW_REQUIRED_KEYS | _REVIEW_OPTIONAL_KEYS, "invalid_structure_annotations", "Structure annotations 0.2.0 require complete review provenance.")
         require(isinstance(review["method"], str) and review["method"], "invalid_structure_annotations", "Review method is required.")
         require(review["attestation"] == "extraction_review_not_project_applicability_or_approval", "invalid_structure_annotations", "Review attestation cannot assert project applicability or approval.")
@@ -299,7 +300,7 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
         _validate_derivation(node["derivation"], "node derivation", review["reviewer_type"])
         semantics = node.get("semantics")
         if semantics is not None:
-            require(annotations["schema_version"] == "0.2.0", "invalid_structure_annotations", "Semantic annotations require structure annotation schema 0.2.0.")
+            require(annotations["schema_version"] in {"0.2.0", "0.3.0"}, "invalid_structure_annotations", "Semantic annotations require structure annotation schema 0.2.0 or newer.")
             _validate_semantics(semantics, len(source_spans), node["statement_role"])
     by_logical_id = {node["logical_id"]: node for node in nodes}
     for node in nodes:
@@ -313,6 +314,7 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
             cursor = by_logical_id[cursor].get("parent_logical_id")
     relationships = annotations["relationships"]
     require(isinstance(relationships, list), "invalid_structure_annotations", "relationships must be a list.")
+    sequence_sources: set[str] = set()
     for raw_relationship in relationships:
         relationship = _bounded_object(raw_relationship, _RELATIONSHIP_KEYS, _RELATIONSHIP_OPTIONAL_KEYS, "structural relationship")
         require(relationship["source_logical_id"] in by_logical_id, "invalid_structure_annotations", "A structural relationship source is unavailable.")
@@ -336,6 +338,19 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
             require(isinstance(candidates, list) and len(candidates) >= 2 and len(set(candidates)) == len(candidates) and all(candidate in by_logical_id for candidate in candidates), "invalid_structure_annotations", "Ambiguous relationships require in-scope candidate logical IDs.")
             require("target_logical_id" not in relationship and "target_reference" not in relationship, "invalid_structure_annotations", "Ambiguous relationships cannot assert one target.")
             require(not relationship["required"], "invalid_structure_annotations", "Ambiguous relationships cannot be required dependencies.")
+        if relationship["relationship_type"] == "sequence_after":
+            require(annotations["schema_version"] == "0.3.0", "invalid_structure_annotations", "Reviewed procedure ordering requires structure annotation schema 0.3.0.")
+            require(status == "resolved", "invalid_structure_annotations", "Procedure ordering requires one resolved predecessor.")
+            require(relationship["required"], "invalid_structure_annotations", "A procedure predecessor must be required retrieval context.")
+            source_id = relationship["source_logical_id"]
+            target_id = relationship["target_logical_id"]
+            source_node = by_logical_id[source_id]
+            target_node = by_logical_id[target_id]
+            require(source_id not in sequence_sources, "invalid_structure_annotations", "A procedure step cannot declare multiple immediate predecessors.")
+            sequence_sources.add(source_id)
+            require(source_node["kind"] == target_node["kind"] == "list_item", "invalid_structure_annotations", "Procedure ordering is limited to reviewed list-item steps.")
+            require(source_node.get("parent_logical_id") is not None and source_node.get("parent_logical_id") == target_node.get("parent_logical_id"), "invalid_structure_annotations", "Procedure steps must share one explicit parent.")
+            require(target_node["ordinal"] < source_node["ordinal"], "invalid_structure_annotations", "A procedure predecessor must have an earlier sibling ordinal.")
     unsupported = annotations["unsupported_regions"]
     require(isinstance(unsupported, list), "invalid_structure_annotations", "unsupported_regions must be a list.")
     for raw_region in unsupported:

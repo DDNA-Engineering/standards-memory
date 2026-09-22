@@ -690,6 +690,7 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
             require(dep["target_record_id"] in record_ids, "unresolved_dependency", "A record dependency is unresolved.", record_id=record["record_id"], target=dep["target_record_id"])
 
     structural_records = {record["structure"]["logical_id"]: record for record in records if record.get("structure")}
+    sequence_sources: set[str] = set()
     for logical_id, record in structural_records.items():
         structure = record["structure"]
         parent = structure["parent_logical_id"]
@@ -700,6 +701,16 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
                 require(relationship["target_logical_id"] in structural_records, "invalid_record", "A resolved structural relationship target is unavailable.", logical_id=logical_id, target_logical_id=relationship["target_logical_id"])
             elif relationship["target_status"] == "ambiguous":
                 require(all(candidate in structural_records for candidate in relationship["candidate_logical_ids"]), "invalid_record", "An ambiguous structural relationship candidate is unavailable.", logical_id=logical_id)
+            if relationship["relationship"] == "sequence_after":
+                require(relationship["target_status"] == "resolved", "invalid_record", "Procedure ordering requires one resolved predecessor.", logical_id=logical_id)
+                require(relationship["required"], "invalid_record", "A procedure predecessor must be required retrieval context.", logical_id=logical_id)
+                target_id = relationship["target_logical_id"]
+                target_structure = structural_records[target_id]["structure"]
+                require(logical_id not in sequence_sources, "invalid_record", "A procedure step cannot declare multiple immediate predecessors.", logical_id=logical_id)
+                sequence_sources.add(logical_id)
+                require(record["kind"] == structural_records[target_id]["kind"] == "list_item", "invalid_record", "Procedure ordering is limited to reviewed list-item steps.", logical_id=logical_id, target_logical_id=target_id)
+                require(structure["parent_logical_id"] is not None and structure["parent_logical_id"] == target_structure["parent_logical_id"], "invalid_record", "Procedure steps must share one explicit parent.", logical_id=logical_id, target_logical_id=target_id)
+                require(target_structure["ordinal"] < structure["ordinal"], "invalid_record", "A procedure predecessor must have an earlier sibling ordinal.", logical_id=logical_id, target_logical_id=target_id)
         expected_required_edges = sorted(
             (
                 relationship["relationship"],

@@ -19,6 +19,7 @@ StandardsForge machine contracts are closed interfaces, not examples. Every sche
 - Added `corpus-extraction-report.schema.json` for the multi-component DLA corpus report. The existing `extraction-report.schema.json` remains the single-PDF report contract; the two shapes are no longer conflated.
 - Added release evidence, CycloneDX SBOM, build statement, wheel provenance, starter bundle and receipt, engineering handoff, benchmark, doctor, parser protocol, and prepared-distribution contracts at their initial declared versions.
 - Added `structure-annotations` 0.2.0 with bounded ordered multi-span nodes and reviewed semantic provenance while retaining the one-span 0.1.0 contract.
+- Added `structure-annotations` 0.3.0 for explicit source-bound `sequence_after` procedure-step relationships while retaining 0.1.0 and 0.2.0 behavior.
 - Added offset-backed page records 0.2.0 while retaining records 0.1.0 for existing structural and curated packs.
 - Added query response 0.2.0 for explicit lexical modes and conservative edition-alignment evidence while retaining the established operation-specific 0.1.0 packets where applicable.
 
