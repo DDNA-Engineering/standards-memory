@@ -65,7 +65,7 @@ def _source_inventory() -> list[dict[str, object]]:
     ]
     inputs.extend(
         path
-        for path in sorted((ROOT / "src").rglob("*"))
+        for path in sorted((ROOT / "src" / "standardsforge").rglob("*"))
         if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
     )
     return [
@@ -105,11 +105,14 @@ def main() -> int:
         clean_env["SOURCE_DATE_EPOCH"] = SOURCE_DATE_EPOCH
         clean_env["PIP_NO_INDEX"] = "1"
         clean_env["PIP_DISABLE_PIP_VERSION_CHECK"] = "1"
+        source_files = _source_inventory()
+        wheel_source_paths = _wheel_source_paths(source_files)
         source = base / "source"
         source.mkdir()
-        shutil.copytree(ROOT / "src", source / "src")
-        for name in ("pyproject.toml", "README.md", "LICENSE"):
-            shutil.copy2(ROOT / name, source / name)
+        for relative in wheel_source_paths:
+            destination = source / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / relative, destination)
 
         builder_environment = base / "builder"
         venv.EnvBuilder(with_pip=True, clear=True).create(builder_environment)
@@ -268,7 +271,6 @@ def main() -> int:
             env=clean_env,
         )
 
-        source_files = _source_inventory()
         provenance = {
             "schema_version": "0.1.0",
             "project": "standardsforge",
@@ -281,7 +283,7 @@ def main() -> int:
                 "pip": builder_versions["pip"],
             },
             "source_files": source_files,
-            "wheel_source_paths": _wheel_source_paths(source_files),
+            "wheel_source_paths": wheel_source_paths,
             "release_metadata_paths": ["uv.lock"],
             "build_tool": {
                 "lock_path": BUILD_TOOL_LOCK.name,
