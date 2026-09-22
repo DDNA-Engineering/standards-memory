@@ -15,8 +15,8 @@ A Git clone is not required.
 
 ## Install
 
-1. Download [standardsforge-ready-0.1.0a1.zip](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a1/standardsforge-ready-0.1.0a1.zip).
-2. Optionally compare it with the [published SHA-256 file](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a1/standardsforge-ready-0.1.0a1.zip.sha256).
+1. Download [standardsforge-ready-0.1.0a2.zip](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a2/standardsforge-ready-0.1.0a2.zip).
+2. Optionally compare it with the [published SHA-256 file](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a2/standardsforge-ready-0.1.0a2.zip.sha256).
 3. Extract the ZIP to a durable local directory.
 4. Open PowerShell in the extracted directory.
 5. Run:

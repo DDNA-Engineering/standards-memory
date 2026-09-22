@@ -21,7 +21,7 @@ The prepared release provides `standardsforge-mcp.ps1`, which anchors Python, th
   "mcpServers": {
     "standardsforge": {
       "command": "powershell.exe",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a1\\standardsforge-mcp.ps1"]
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a2\\standardsforge-mcp.ps1"]
     }
   }
 }
@@ -30,7 +30,7 @@ The prepared release provides `standardsforge-mcp.ps1`, which anchors Python, th
 Claude Code can register the identical process:
 
 ```powershell
-claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-0.1.0a1\standardsforge-mcp.ps1"
+claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-0.1.0a2\standardsforge-mcp.ps1"
 claude mcp get standardsforge
 ```
 

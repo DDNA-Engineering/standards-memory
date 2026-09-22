@@ -26,7 +26,7 @@ Replace the example directory with the absolute path to this extracted release. 
   "mcpServers": {
     "standardsforge": {
       "command": "powershell.exe",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a1\\standardsforge-mcp.ps1"]
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a2\\standardsforge-mcp.ps1"]
     }
   }
 }
@@ -35,7 +35,7 @@ Replace the example directory with the absolute path to this extracted release. 
 Claude Code can register the same local stdio process:
 
 ```powershell
-claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-0.1.0a1\standardsforge-mcp.ps1"
+claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-0.1.0a2\standardsforge-mcp.ps1"
 claude mcp get standardsforge
 ```
 

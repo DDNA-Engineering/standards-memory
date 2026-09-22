@@ -94,11 +94,11 @@ Then bind the completed corpus, acquisition snapshot, qualified outline, wheel, 
   --corpus-index .standardsforge/corpus/mil-std-current/corpus.json `
   --acquisition-manifest .standardsforge/sources/dla/mil-std/manifest.json `
   --outline-pack .standardsforge/compiled/mil-std-810h-derived-outline `
-  --wheel build/prepared-wheel/standardsforge-0.1.0a1-py3-none-any.whl `
-  --wheel-provenance build/prepared-wheel/standardsforge-0.1.0a1-py3-none-any.whl.provenance.json `
+  --wheel build/prepared-wheel/standardsforge-0.1.0a2-py3-none-any.whl `
+  --wheel-provenance build/prepared-wheel/standardsforge-0.1.0a2-py3-none-any.whl.provenance.json `
   --mcp-wheelhouse build/prepared-mcp-wheelhouse `
-  --output build/standardsforge-ready-0.1.0a1.zip `
-  --version 0.1.0a1
+  --output build/standardsforge-ready-0.1.0a2.zip `
+  --version 0.1.0a2
 ```
 
 The builder must reject incomplete scope, mismatched acquisition identity, changed archives, duplicate packages, unauthorized policy scope, unqualified outline claims, wheel/source drift, a malformed or unpinned MCP wheelhouse, and an unclosed final archive.

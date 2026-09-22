@@ -18,7 +18,7 @@ Claude Desktop and Cursor use the same `mcpServers` shape (Cursor stores it in `
         "-ExecutionPolicy",
         "Bypass",
         "-File",
-        "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a1\\standardsforge-mcp.ps1"
+        "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a2\\standardsforge-mcp.ps1"
       ]
     }
   }
@@ -28,7 +28,7 @@ Claude Desktop and Cursor use the same `mcpServers` shape (Cursor stores it in `
 Claude Code can register that launcher directly:
 
 ```powershell
-claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-0.1.0a1\standardsforge-mcp.ps1"
+claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-0.1.0a2\standardsforge-mcp.ps1"
 ```
 
 The launcher fixes the principal to `local-user` and anchors the database and pack store to the extracted distribution. Do not add command-line state or principal overrides in a host configuration.
