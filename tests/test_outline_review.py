@@ -20,6 +20,7 @@ from standardsforge.errors import StandardsForgeError  # noqa: E402
 from standardsforge.outline_compiler import compile_derived_outline_pack  # noqa: E402
 from standardsforge.outline_review import export_outline_review_draft, promote_outline_review  # noqa: E402
 from standardsforge.pack import open_validated_pack, validate_pack_directory  # noqa: E402
+from standardsforge.review_shard import export_outline_review_shard  # noqa: E402
 from standardsforge.service import StandardsForgeService  # noqa: E402
 from standardsforge.structure_compiler import compile_structured_page_pack_section, load_structure_annotations  # noqa: E402
 
@@ -175,6 +176,92 @@ class OutlineReviewTests(unittest.TestCase):
         with self.assertRaisesRegex(StandardsForgeError, "exact outline proposal"):
             compile_structured_page_pack_section(self.base, self.outline, self.annotations_path, self.root / "rejected")
         self.assertFalse((self.root / "rejected").exists())
+
+    def test_parameterized_ambiguous_numbered_evidence_requires_explicit_kind_and_reference(self) -> None:
+        from tests.test_outline_compiler import OutlineCompilerTests
+
+        class ParameterizedFixture(OutlineCompilerTests):
+            def _write_base_page_pack(self) -> None:
+                self.page_text += "2.3.1  Maintain 15 kPa (2.2 psi) for 30 minutes at 25 C.\n"
+                super()._write_base_page_pack()
+
+        fixture = ParameterizedFixture(methodName="test_compiles_installs_resolves_and_retrieves_unreviewed_outline_offline")
+        fixture.setUp()
+        try:
+            outline = fixture.root / "parameterized-outline"
+            compile_derived_outline_pack(fixture.base_pack, outline)
+            with open_validated_pack(outline) as pack:
+                candidate = next(record for record in pack.records if "Maintain 15 kPa" in record["text"])
+                self.assertEqual("unsupported_region", candidate["kind"])
+                self.assertIn("ambiguous-numbered", candidate["clause_reference"])
+                unrelated_unsupported = next(record for record in pack.records if record["kind"] == "unsupported_region" and "ambiguous-numbered" not in record["clause_reference"])
+            with self.assertRaises(StandardsForgeError):
+                export_outline_review_draft(outline, fixture.base_pack, unrelated_unsupported["record_id"], fixture.root / "unrelated-draft.json")
+            selection = fixture.root / "selection.json"
+            selection.write_text(json.dumps({"schema_version": "0.1.0", "shard_id": "pending-rejected", "record_ids": [candidate["record_id"]]}), encoding="utf-8")
+            with self.assertRaises(StandardsForgeError):
+                export_outline_review_shard(outline, fixture.base_pack, selection, fixture.root / "pending-shard")
+            self.assertFalse((fixture.root / "pending-shard").exists())
+            draft_path = fixture.root / "pending-draft.json"
+            exported = export_outline_review_draft(outline, fixture.base_pack, candidate["record_id"], draft_path)
+            draft = json.loads(draft_path.read_text(encoding="utf-8"))
+            self.assertEqual("0.2.0", draft["schema_version"])
+            self.assertEqual("unsupported_region", draft["source_candidate_kind"])
+            self.assertEqual("pending_explicit_reviewer_kind", draft["classification_state"])
+            self.assertEqual("unsupported_region", draft["proposed_node"]["kind"])
+            schemas = {
+                path.name: json.loads(path.read_text(encoding="utf-8"))
+                for path in (ROOT / "contracts").glob("*.schema.json")
+            }
+            registry = Registry().with_resources(
+                (schema["$id"], Resource.from_contents(schema)) for schema in schemas.values()
+            )
+            schema = schemas["outline-review-draft.schema.json"]
+            validator_for(schema)(schema, registry=registry).validate(draft)
+            node = copy.deepcopy(draft["proposed_node"])
+            node["derivation"] = {"method": "synthetic_exact_parameter_review", "review_status": "human_reviewed"}
+            decision = {
+                "schema_version": "0.1.0", "draft_sha256": exported["draft_sha256"],
+                "review": {
+                    "reviewer_id": "synthetic-reviewer", "reviewer_type": "human",
+                    "reviewed_at": "2026-09-22T00:00:00Z",
+                    "method": "exact_numbered_clause_and_source_review", "tool": None,
+                    "unresolved_issues": [],
+                    "attestation": "extraction_review_not_project_applicability_or_approval",
+                },
+                "node": node,
+            }
+            decision_path = fixture.root / "decision.json"
+            annotations = fixture.root / "reviewed.json"
+            decision_path.write_text(json.dumps(decision), encoding="utf-8")
+            with self.assertRaisesRegex(StandardsForgeError, "reviewed structural kind"):
+                promote_outline_review(draft_path, decision_path, outline, fixture.base_pack, annotations)
+            node["kind"] = "clause"
+            decision_path.write_text(json.dumps(decision), encoding="utf-8")
+            with self.assertRaisesRegex(StandardsForgeError, "reviewed clause reference"):
+                promote_outline_review(draft_path, decision_path, outline, fixture.base_pack, annotations)
+            node["clause_reference"] = "2.3.1"
+            decision_path.write_text(json.dumps(decision), encoding="utf-8")
+            promote_outline_review(draft_path, decision_path, outline, fixture.base_pack, annotations)
+            validator_for(schemas["structure-annotations.schema.json"])(schemas["structure-annotations.schema.json"], registry=registry).validate(json.loads(annotations.read_text(encoding="utf-8")))
+            compiled = fixture.root / "reviewed-pack"
+            compile_structured_page_pack_section(fixture.base_pack, outline, annotations, compiled)
+            reviewed = validate_pack_directory(compiled)
+            self.assertEqual("clause", reviewed.records[0]["kind"])
+            self.assertEqual("2.3.1", reviewed.records[0]["clause_reference"])
+            self.assertEqual(draft["proposed_node"]["exact_text"], reviewed.records[0]["text"])
+            self.assertEqual("human_reviewed", reviewed.records[0]["derivation"]["review_status"])
+            decision["draft_sha256"] = "0" * 64
+            decision_path.write_text(json.dumps(decision), encoding="utf-8")
+            with self.assertRaises(StandardsForgeError):
+                promote_outline_review(draft_path, decision_path, outline, fixture.base_pack, fixture.root / "stale-reviewed.json")
+            decision["draft_sha256"] = exported["draft_sha256"]
+            decision["node"]["source_spans"][0]["start_byte"] += 1
+            decision_path.write_text(json.dumps(decision), encoding="utf-8")
+            with self.assertRaises(StandardsForgeError):
+                promote_outline_review(draft_path, decision_path, outline, fixture.base_pack, fixture.root / "wrong-span-reviewed.json")
+        finally:
+            fixture.tearDown()
 
 
 if __name__ == "__main__":

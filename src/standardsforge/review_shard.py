@@ -72,6 +72,7 @@ def export_outline_review_shard(
                     validated_base=base, validated_outline=outline,
                 )
                 draft = json.loads(draft_path.read_text(encoding="utf-8"))
+                require(draft["schema_version"] == "0.1.0", "invalid_review_shard", "Pending-classification candidates require an explicit single-candidate review before shard support.")
                 source_pdf_hashes.add(draft["source_pdf_sha256"])
                 source_pdf_paths.add(draft["source_pdf_path"])
                 candidates.append({

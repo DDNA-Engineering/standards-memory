@@ -855,6 +855,18 @@
         "Use stable distinct identity and preserve exact source text and global UTF-8 spans, with every derived record still automated, unclassified, and unreviewed.",
         "Version changed outline output identity, retain the old pack as separately addressable, and prove deterministic synthetic and real-corpus replay plus focused negative cases."
       ]
+    },
+    {
+      "task_id": "TASK-039",
+      "title": "Reviewer-mediated recovery of ambiguous numbered outline evidence",
+      "status": "complete",
+      "requirements": ["SM-FR-079"],
+      "acceptance": [
+        "Keep numeric table and plot rows unsupported by default; only exact ambiguous-numbered records may enter the new pending-classification draft path.",
+        "Bind each pending draft to exact outline and page-pack digests, source spans and candidate identity, and retain its unsupported origin; never present an unreviewed clause classification as fact.",
+        "Require an explicit reviewed structural kind and corrected clause reference in a content-bound decision before promotion; reject copied unsupported kind, unchanged synthetic reference, stale proposal, false provenance, and invalid spans.",
+        "Prove synthetic parameterized-clause review and a real 810H ambiguous-row rejection or explicitly unreviewed state; preserve 0.1 draft/decision behavior and report the remaining uncertainty."
+      ]
     }
   ]
 }

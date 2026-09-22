@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import tempfile
 from contextlib import nullcontext
 from pathlib import Path
@@ -21,6 +22,7 @@ _DRAFT_KEYS = {
     "source_text_sha256", "compiler", "extraction_mode", "text_encoding",
     "offset_convention", "proposed_node",
 }
+_PENDING_DRAFT_KEYS = _DRAFT_KEYS | {"source_candidate_kind", "classification_state"}
 _DECISION_KEYS = {"schema_version", "draft_sha256", "review", "node"}
 _REVIEW_NODE_KEYS = {
     "logical_id", "kind", "ordinal", "clause_reference", "heading", "statement_role",
@@ -34,7 +36,7 @@ def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def _read_closed_json(path: str | Path, keys: set[str], label: str) -> dict[str, Any]:
+def _read_closed_json(path: str | Path, keys: set[str] | tuple[set[str], ...], label: str) -> dict[str, Any]:
     try:
         with Path(path).open("rb") as source:
             data = source.read(MAX_REVIEW_JSON_BYTES + 1)
@@ -45,7 +47,8 @@ def _read_closed_json(path: str | Path, keys: set[str], label: str) -> dict[str,
         value = json.loads(data.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise StandardsForgeError("invalid_outline_review", f"{label} is not valid UTF-8 JSON.") from exc
-    require(isinstance(value, dict) and set(value) == keys, "invalid_outline_review", f"{label} fields are invalid.")
+    allowed = (keys,) if isinstance(keys, set) else keys
+    require(isinstance(value, dict) and any(set(value) == variant for variant in allowed), "invalid_outline_review", f"{label} fields are invalid.")
     return value
 
 
@@ -163,7 +166,18 @@ def _export_outline_review_draft(
         matches = [record for record in outline.records if record["record_id"] == record_id]
         require(len(matches) == 1, "outline_candidate_not_found", "Select exactly one existing outline record.")
         candidate = matches[0]
-        require(candidate["kind"] not in {"unsupported_region", "page"}, "outline_candidate_unsupported", "An unsupported region cannot become a reviewed node without an explicit separate annotation.")
+        pending_classification = (
+            candidate["kind"] == "unsupported_region"
+            and re.fullmatch(
+                rf"derived:[^:]+:[^:]+:page-{candidate['source']['page']:04d}-ambiguous-numbered-[1-9][0-9]*",
+                candidate["clause_reference"],
+            ) is not None
+        )
+        require(
+            candidate["kind"] != "page"
+            and (candidate["kind"] != "unsupported_region" or pending_classification),
+            "outline_candidate_unsupported", "Only exact ambiguous-numbered unsupported regions can enter pending classification review.",
+        )
         require(candidate["derivation"]["review_status"] == "automated_unreviewed", "outline_source_mismatch", "The source candidate is not an automated unreviewed outline.")
         raw_spans = candidate["structure"]["source_spans"]
         require(raw_spans and len(raw_spans) <= 64, "outline_source_mismatch", "The candidate source spans are outside the review limit.")
@@ -200,7 +214,7 @@ def _export_outline_review_draft(
             "derivation": {"method": candidate["derivation"]["method"], "review_status": "proposed"},
         }
         draft = {
-            "schema_version": "0.1.0",
+            "schema_version": "0.2.0" if pending_classification else "0.1.0",
             "state": "proposed_unreviewed",
             "outline_package_digest": outline.package_digest,
             "source_page_pack_digest": base.package_digest,
@@ -218,6 +232,9 @@ def _export_outline_review_draft(
             "offset_convention": "half_open_utf8_byte_offsets_per_physical_page",
             "proposed_node": proposed_node,
         }
+        if pending_classification:
+            draft["source_candidate_kind"] = "unsupported_region"
+            draft["classification_state"] = "pending_explicit_reviewer_kind"
         _write_new_json(output, draft)
         return {
             "operation": "export_outline_review_draft", "status": "proposed_unreviewed",
@@ -237,9 +254,22 @@ def promote_outline_review(
 
     output = Path(output_path).resolve()
     require(not output.exists(), "compiler_output_exists", "The reviewed annotation output already exists.", path=str(output))
-    draft = _read_closed_json(draft_path, _DRAFT_KEYS, "Outline review draft")
+    draft = _read_closed_json(draft_path, (_DRAFT_KEYS, _PENDING_DRAFT_KEYS), "Outline review draft")
     decision = _read_closed_json(decision_path, _DECISION_KEYS, "Outline review decision")
-    require(draft["schema_version"] == decision["schema_version"] == "0.1.0" and draft["state"] == "proposed_unreviewed", "invalid_outline_review", "Unsupported review draft or decision version/state.")
+    require(
+        decision["schema_version"] == "0.1.0"
+        and draft["state"] == "proposed_unreviewed"
+        and (
+            (draft["schema_version"] == "0.1.0" and set(draft) == _DRAFT_KEYS)
+            or (
+                draft["schema_version"] == "0.2.0"
+                and set(draft) == _PENDING_DRAFT_KEYS
+                and draft["source_candidate_kind"] == "unsupported_region"
+                and draft["classification_state"] == "pending_explicit_reviewer_kind"
+            )
+        ),
+        "invalid_outline_review", "Unsupported review draft or decision version/state.",
+    )
     draft_digest = _sha256(Path(draft_path).read_bytes())
     require(decision["draft_sha256"] == draft_digest, "outline_review_stale", "The reviewer decision does not bind these exact draft bytes.")
     with tempfile.TemporaryDirectory(prefix="standardsforge-review-verify-") as temporary:
@@ -250,6 +280,9 @@ def promote_outline_review(
     node = decision["node"]
     require(isinstance(proposed, dict) and isinstance(node, dict) and set(node) <= _REVIEW_NODE_KEYS, "invalid_outline_review", "The reviewed node fields are invalid.")
     require(node.get("logical_id") == proposed.get("logical_id"), "outline_review_stale", "The decision changed the candidate logical identity.")
+    if draft["schema_version"] == "0.2.0":
+        require(node.get("kind") != "unsupported_region" and node.get("kind") != proposed.get("kind"), "invalid_outline_review", "Pending numeric evidence requires an explicit reviewed structural kind.")
+        require(node.get("clause_reference") != proposed.get("clause_reference"), "invalid_outline_review", "Pending numeric evidence requires a reviewed clause reference, not its unsupported-region locator.")
     require(isinstance(decision["review"], dict), "invalid_outline_review", "Explicit review provenance is required.")
     with open_validated_pack(source_page_pack) as base:
         _validate_reviewed_node(base, draft, node)

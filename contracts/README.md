@@ -18,6 +18,8 @@ The JSON Schemas describe the public 0.1.0 pack manifest, inventory, records, ri
 
 `outline-review-selection.schema.json` and `outline-review-shard.schema.json` close a bounded exact candidate selection and its unreviewed partial-coverage manifest. `structure-annotations` 0.5.0 adds one proposal hash, decision hash, and complete review provenance per selected node; runtime replay checks every shard draft and decision byte-for-byte against the exact verified source packs and permits only explicit in-shard parents. It asserts no inferred semantic edges, source rights, or document-wide completeness.
 
+`outline-review-draft` 0.2.0 additionally permits one exact `ambiguous-numbered` unsupported source record as pending classification. Its proposed node retains `unsupported_region` rather than asserting a clause. The unchanged content-bound decision contract requires a reviewer to choose a valid structural kind and corrected reference before promotion; the 0.1.0 ordinary-candidate draft remains accepted.
+
 Pack manifests distinguish `page_text`, `derived_structure`, `reviewed_structure`, and `curated_records`. `derived_structure` is an automated, unreviewed representation: it may expose navigation candidates and unsupported regions but cannot imply semantic correctness, confirmed obligations, or human approval.
 
 `query-operations.json` identifies the seven read operations and their authority/pinning invariants. `mcp-tools.json` fixes the local stdio MCP surface, trusted startup-principal boundary, and exact caller-visible arguments. Returned packet details remain pre-release and are locked by the acceptance tests; no HTTP adapter is implemented.
