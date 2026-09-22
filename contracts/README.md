@@ -22,7 +22,7 @@ Pack manifests distinguish `page_text`, `derived_structure`, `reviewed_structure
 
 `distribution-scope.schema.json` defines the qualified source baseline shipped with a prepared distribution. It binds the release to the exact bundled acquisition manifest and records its selection, exclusions, build outcomes, extraction gaps, representation-specific review state, and limits without turning publisher currentness into project approval.
 
-`prepared-distribution.schema.json` defines the final bundle manifest, including its exact file inventory, fixed archive epoch, pinned wheel builder identity, wheel digest, corpus compiler version, installed package counts, and source-baseline identity.
+`prepared-distribution.schema.json` defines the final bundle manifest, including its exact file inventory, fixed archive epoch, pinned wheel builder identity, wheel digest, hash-bound offline MCP wheelhouse, corpus compiler version, installed package counts, and source-baseline identity.
 
 `wheel-build-provenance.schema.json` records the exact source-file inventory, separates files copied into the wheel build from release-only dependency metadata, binds the exact build-tool lock and backend artifact, fixes the source epoch, records observed builder Python and pip versions, denies authentication, and binds the two-build result to the wheel handed to distribution builders.
 

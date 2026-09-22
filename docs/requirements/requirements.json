@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1.0",
-  "scope": "TASK-001 through TASK-031 acceptance subset; the supplied PRD remains the broader proposed catalog",
+  "scope": "TASK-001 through TASK-032 acceptance subset; the supplied PRD remains the broader proposed catalog",
   "requirements": [
     {"id": "SM-FR-002", "text": "Preserve publisher-scoped document identity separately from editions and packages."},
     {"id": "SM-FR-003", "text": "Resolve identifiers conservatively and report ambiguity."},
@@ -46,6 +46,7 @@
     {"id": "SM-FR-068", "text": "Emit deterministic, offline-verifiable release evidence that binds the exact reproducible wheel and starter archive to their build provenance, source revision, dependency lock, standards-based software bill of materials, and CI attestation identity without presenting unsigned local evidence as a signed attestation."},
     {"id": "SM-FR-069", "text": "Run every untrusted PDF parser path in a disposable resource-limited worker with a closed digest-bound file protocol, deterministic output limits, fail-closed timeout and crash handling, and explicit incomplete-corpus outcomes for any extraction failure."},
     {"id": "SM-FR-070", "text": "Version generated-artifact contracts explicitly, validate each schema against its metaschema and each representative emitted artifact against the exact matching schema, keep single-PDF and corpus extraction reports distinct, and reject unknown versions without inventing migration semantics."},
-    {"id": "SM-FR-071", "text": "Represent reviewed procedure-step ordering as an exact source-bound relationship between list-item siblings, reject ambiguous, cross-procedure, backward, or optional predecessor claims, and retrieve the ordered predecessor as required evidence context."}
+    {"id": "SM-FR-071", "text": "Represent reviewed procedure-step ordering as an exact source-bound relationship between list-item siblings, reject ambiguous, cross-procedure, backward, or optional predecessor claims, and retrieve the ordered predecessor as required evidence context."},
+    {"id": "SM-FR-072", "text": "Make the prepared distribution model-ready offline by inventorying its pinned MCP dependency closure, installing with package-index access disabled, binding launchers to absolute distribution-local state and a fixed trusted principal, and proving the six-tool stdio surface plus an authorized query before readiness."}
   ]
 }

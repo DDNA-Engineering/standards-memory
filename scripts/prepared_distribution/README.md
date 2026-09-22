@@ -8,14 +8,38 @@ The exact acquisition snapshot is preserved at `provenance/acquisition-manifest.
 
 ## Start
 
-Install Python 3.11 or newer, open PowerShell in this directory, and run:
+Install 64-bit CPython 3.12 for Windows, open PowerShell in this directory, and run:
 
 ```powershell
 .\setup.ps1
 .\standardsforge.ps1 search "environmental testing" --principal local-user --limit 5
 ```
 
-`setup.ps1` creates an isolated Python environment, installs the bundled StandardsForge wheel without dependencies, validates and installs the precompiled packs, and proves the included corpus with a local smoke query. Subsequent queries use `standardsforge.ps1`.
+`setup.ps1` creates an isolated Python 3.12 environment, installs StandardsForge and its exact hash-locked Windows x64 MCP dependency closure only from the offline wheelhouse, validates and installs the precompiled packs, and proves both a local query and a real stdio MCP round trip. Subsequent queries use `standardsforge.ps1`; model hosts use `standardsforge-mcp.ps1`. Both launchers resolve state from this extracted directory, independent of the host working directory.
+
+## Connect Claude Desktop, Claude Code, or Cursor
+
+Replace the example directory with the absolute path to this extracted release. Claude Desktop and Cursor both accept an `mcpServers` entry; for Cursor place it in `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "standardsforge": {
+      "command": "powershell.exe",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a1\\standardsforge-mcp.ps1"]
+    }
+  }
+}
+```
+
+Claude Code can register the same local stdio process:
+
+```powershell
+claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-0.1.0a1\standardsforge-mcp.ps1"
+claude mcp get standardsforge
+```
+
+The launcher fixes the trusted principal to `local-user`, exposes only the six read tools, and writes no startup banner to protocol stdout.
 
 The bundle is offline and read-only during queries. Its database contains grants only for the generic local principal `local-user`.
 

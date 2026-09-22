@@ -53,6 +53,23 @@ jobs:
           python scripts/validate_installed_wheel.py
           --build-tool-dir build/toolchain-cache
           --output-dir build/ci-wheel
+      - name: Acquire pinned MCP wheelhouse
+        if: runner.os == 'Windows' && matrix.python-version == '3.12'
+        run: >-
+          python -m pip download
+          --disable-pip-version-check
+          --require-hashes
+          --no-deps
+          --only-binary=:all:
+          --dest build/mcp-wheelhouse
+          --requirement scripts/prepared_distribution/mcp-wheelhouse-win-amd64-cp312.txt
+      - name: Validate prepared MCP runtime offline
+        if: runner.os == 'Windows' && matrix.python-version == '3.12'
+        run: >-
+          python scripts/validate_prepared_mcp_runtime.py
+          --wheel-dir build/ci-wheel
+          --wheelhouse build/mcp-wheelhouse
+          --requirements scripts/prepared_distribution/mcp-wheelhouse-win-amd64-cp312.txt
       - name: Build deterministic synthetic starter bundle
         run: >-
           python scripts/build_starter_distribution.py

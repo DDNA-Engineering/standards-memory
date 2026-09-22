@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import email.parser
 import hashlib
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -129,6 +131,86 @@ def _validate_release_wheel(path: Path, version: str) -> str:
     if f"Version: {version}" not in package_metadata.splitlines():
         raise ValueError("The release wheel metadata version does not match the distribution.")
     return generator
+
+
+def _normalize_project(value: str) -> str:
+    return re.sub(r"[-_.]+", "-", value).casefold()
+
+
+def _load_mcp_requirements(path: Path) -> tuple[dict[str, tuple[str, str]], str]:
+    path = path.resolve()
+    if not path.is_file() or path.is_symlink():
+        raise ValueError("The MCP requirements lock must be one regular file.")
+    pattern = re.compile(
+        r"^(?P<name>[A-Za-z0-9_.-]+)==(?P<version>[^\s]+) --hash=sha256:(?P<digest>[0-9a-f]{64})$"
+    )
+    requirements: dict[str, tuple[str, str]] = {}
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError) as exc:
+        raise ValueError("The MCP requirements lock is unreadable.") from exc
+    if not lines:
+        raise ValueError("The MCP requirements lock is empty.")
+    for line in lines:
+        match = pattern.fullmatch(line)
+        if match is None:
+            raise ValueError("The MCP requirements lock contains a malformed entry.")
+        project = _normalize_project(match.group("name"))
+        if project in requirements:
+            raise ValueError("The MCP requirements lock contains a duplicate package.")
+        requirements[project] = (match.group("version"), match.group("digest"))
+    if requirements.get("mcp", (None, None))[0] != "2.2.0":
+        raise ValueError("The MCP requirements lock must pin mcp==2.2.0.")
+    return requirements, _sha256(path)
+
+
+def _wheelhouse_inventory_digest(inventory: list[dict[str, object]]) -> str:
+    rows = [
+        f'{item["sha256"]} {item["bytes"]} {item["path"]}\n'.encode("utf-8")
+        for item in sorted(inventory, key=lambda item: str(item["path"]))
+    ]
+    return hashlib.sha256(b"".join(rows)).hexdigest()
+
+
+def _validate_mcp_wheelhouse(
+    root: Path, requirements_path: Path
+) -> tuple[list[tuple[Path, str]], str, str]:
+    root = root.resolve()
+    if not root.is_dir() or root.is_symlink():
+        raise ValueError("The MCP wheelhouse must be one real directory.")
+    entries = sorted(root.iterdir(), key=lambda item: item.name)
+    if not entries or any(not item.is_file() or item.is_symlink() or item.suffix != ".whl" for item in entries):
+        raise ValueError("The MCP wheelhouse must contain only regular wheel files.")
+    requirements, requirements_sha256 = _load_mcp_requirements(requirements_path)
+    packages: dict[str, str] = {}
+    inventory: list[dict[str, object]] = []
+    payloads: list[tuple[Path, str]] = []
+    for wheel in entries:
+        try:
+            with zipfile.ZipFile(wheel, "r") as archive:
+                metadata_names = [name for name in archive.namelist() if name.endswith(".dist-info/METADATA")]
+                if len(metadata_names) != 1:
+                    raise ValueError("Each MCP wheel must contain one metadata record.")
+                metadata = email.parser.BytesParser().parsebytes(archive.read(metadata_names[0]))
+        except (OSError, zipfile.BadZipFile, KeyError) as exc:
+            raise ValueError(f"The MCP wheel is invalid: {wheel.name}") from exc
+        project = _normalize_project(metadata.get("Name", ""))
+        version = metadata.get("Version", "")
+        if not project or not version or project in packages:
+            raise ValueError("The MCP wheelhouse contains missing or duplicate package identities.")
+        if project == "standardsforge":
+            raise ValueError("The MCP wheelhouse cannot replace the separately verified StandardsForge wheel.")
+        digest = _sha256(wheel)
+        expected = requirements.get(project)
+        if expected is None or expected != (version, digest):
+            raise ValueError(f"The MCP wheel is not the exact locked artifact: {wheel.name}")
+        packages[project] = version
+        inventory.append({"path": wheel.name, "bytes": wheel.stat().st_size, "sha256": digest})
+        payloads.append((wheel, f"wheelhouse/{wheel.name}"))
+    if set(packages) != set(requirements):
+        missing = sorted(set(requirements) - set(packages))
+        raise ValueError(f"The MCP wheelhouse is missing locked packages: {', '.join(missing)}")
+    return payloads, _wheelhouse_inventory_digest(inventory), requirements_sha256
 
 
 def _load_wheel_provenance(path: Path, wheel: Path, version: str) -> tuple[dict, str]:
@@ -507,11 +589,29 @@ def _validate_built_distribution(archive_path: Path, prefix: str) -> None:
         wheel_items = [item for item in files if item["path"].startswith("wheel/")]
         if len(wheel_items) != 1 or wheel_items[0]["sha256"] != manifest["build"]["wheel_sha256"]:
             raise ValueError("The distribution wheel identity is inconsistent.")
+        mcp_items = [item for item in files if item["path"].startswith("wheelhouse/")]
+        mcp_inventory = [
+            {
+                "path": Path(item["path"]).name,
+                "bytes": item["bytes"],
+                "sha256": item["sha256"],
+            }
+            for item in mcp_items
+        ]
+        if (
+            len(mcp_items) != manifest["build"]["mcp_wheel_count"]
+            or _wheelhouse_inventory_digest(mcp_inventory)
+            != manifest["build"]["mcp_wheelhouse_sha256"]
+        ):
+            raise ValueError("The distribution MCP wheelhouse identity is inconsistent.")
 
         try:
             scope = json.loads(archive.read(prefix + "provenance/source-baseline.json"))
             acquisition_bytes = archive.read(prefix + "provenance/acquisition-manifest.json")
             wheel_provenance_bytes = archive.read(prefix + "provenance/wheel-build.json")
+            mcp_requirements_bytes = archive.read(
+                prefix + "provenance/mcp-wheelhouse-win-amd64-cp312.txt"
+            )
         except (KeyError, UnicodeDecodeError, json.JSONDecodeError) as exc:
             raise ValueError("The prepared distribution provenance is missing or invalid.") from exc
         schema = _load_json(REPOSITORY_ROOT / "contracts" / "distribution-scope.schema.json")
@@ -524,6 +624,8 @@ def _validate_built_distribution(archive_path: Path, prefix: str) -> None:
             raise ValueError("The bundled acquisition manifest does not match the source baseline.")
         if hashlib.sha256(wheel_provenance_bytes).hexdigest() != manifest["build"]["wheel_provenance_sha256"]:
             raise ValueError("The bundled wheel provenance does not match the distribution manifest.")
+        if hashlib.sha256(mcp_requirements_bytes).hexdigest() != manifest["build"]["mcp_requirements_sha256"]:
+            raise ValueError("The bundled MCP requirements do not match the distribution manifest.")
         try:
             wheel_provenance = json.loads(wheel_provenance_bytes)
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -542,6 +644,8 @@ def build_distribution(
     outline_pack: Path,
     wheel: Path,
     wheel_provenance: Path,
+    mcp_wheelhouse: Path,
+    mcp_requirements: Path,
     output: Path,
     version: str,
     compresslevel: int,
@@ -551,6 +655,8 @@ def build_distribution(
     outline_pack = outline_pack.resolve()
     wheel = wheel.resolve()
     wheel_provenance = wheel_provenance.resolve()
+    mcp_wheelhouse = mcp_wheelhouse.resolve()
+    mcp_requirements = mcp_requirements.resolve()
     output = output.resolve()
     checksum_path = output.with_suffix(output.suffix + ".sha256")
     if output.exists() or checksum_path.exists():
@@ -560,6 +666,9 @@ def build_distribution(
     wheel_generator = _validate_release_wheel(wheel, version)
     _, wheel_provenance_sha256 = _load_wheel_provenance(
         wheel_provenance, wheel, version
+    )
+    mcp_payloads, mcp_wheelhouse_sha256, mcp_requirements_sha256 = _validate_mcp_wheelhouse(
+        mcp_wheelhouse, mcp_requirements
     )
 
     index, corpus_payloads = _validate_corpus(corpus_index)
@@ -581,10 +690,14 @@ def build_distribution(
         (static_root / "README.md", "README.md"),
         (static_root / "setup.ps1", "setup.ps1"),
         (static_root / "standardsforge.ps1", "standardsforge.ps1"),
+        (static_root / "standardsforge-mcp.ps1", "standardsforge-mcp.ps1"),
+        (static_root / "smoke_mcp.py", "smoke_mcp.py"),
+        (static_root / "verify_mcp_environment.py", "verify_mcp_environment.py"),
         (static_root / "CONTENT-NOTICE.md", "CONTENT-NOTICE.md"),
         (REPOSITORY_ROOT / "LICENSE", "LICENSE"),
         (acquisition_manifest, "provenance/acquisition-manifest.json"),
         (wheel_provenance, "provenance/wheel-build.json"),
+        (mcp_requirements, "provenance/mcp-wheelhouse-win-amd64-cp312.txt"),
         (corpus_index, "corpus/corpus.json"),
         (corpus_policy, "policies/mil-std-corpus-local.json"),
         (outline_policy, "policies/mil-std-810h-derived-outline-local.json"),
@@ -605,6 +718,7 @@ def build_distribution(
         write_pack_archive(outline_pack, outline_archive, compresslevel=compresslevel)
         payload_files = [
             *static_files,
+            *mcp_payloads,
             (scope_path, "provenance/source-baseline.json"),
             *corpus_payloads,
             (outline_archive, "packs/mil-std-810h-derived-outline.zip"),
@@ -626,7 +740,7 @@ def build_distribution(
             "source_baseline_id": distribution_scope["baseline_id"],
         }
         manifest = {
-            "schema_version": "1.1",
+            "schema_version": "1.2",
             "product": "StandardsForge prepared distribution",
             "version": version,
             "build": {
@@ -636,6 +750,12 @@ def build_distribution(
                 "wheel_generator": wheel_generator,
                 "wheel_sha256": _sha256(wheel),
                 "wheel_provenance_sha256": wheel_provenance_sha256,
+                "mcp_requirement": "mcp==2.2.0",
+                "mcp_wheel_count": len(mcp_payloads),
+                "mcp_wheelhouse_sha256": mcp_wheelhouse_sha256,
+                "mcp_requirements_sha256": mcp_requirements_sha256,
+                "runtime_python": "CPython 3.12",
+                "runtime_platform": "win_amd64",
                 "corpus_compiler_version": index.get("compiler_version"),
             },
             "state": distribution_summary,
@@ -684,6 +804,8 @@ def main() -> int:
     parser.add_argument("--outline-pack", required=True, type=Path)
     parser.add_argument("--wheel", required=True, type=Path)
     parser.add_argument("--wheel-provenance", required=True, type=Path)
+    parser.add_argument("--mcp-wheelhouse", required=True, type=Path)
+    parser.add_argument("--mcp-requirements", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--version", required=True)
     parser.add_argument("--compresslevel", type=int, choices=range(1, 10), default=9)
@@ -694,6 +816,8 @@ def main() -> int:
         args.outline_pack,
         args.wheel,
         args.wheel_provenance,
+        args.mcp_wheelhouse,
+        args.mcp_requirements,
         args.output,
         args.version,
         args.compresslevel,

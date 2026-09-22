@@ -18,6 +18,7 @@ from jsonschema.validators import validator_for
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "scripts" / "prepared_distribution"))
 
 import build_prepared_distribution as distribution_module  # noqa: E402
 from build_prepared_distribution import (  # noqa: E402
@@ -26,8 +27,10 @@ from build_prepared_distribution import (  # noqa: E402
     _load_json,
     _load_wheel_provenance,
     _validate_built_distribution,
+    _validate_mcp_wheelhouse,
     build_distribution,
 )
+from verify_mcp_environment import verify_environment  # noqa: E402
 
 
 class DistributionScopeTests(unittest.TestCase):
@@ -183,6 +186,106 @@ class DistributionScopeTests(unittest.TestCase):
                     manifest, {"acquisition_manifest_sha256": "0" * 64}
                 )
 
+    def test_mcp_wheelhouse_is_closed_and_pinned(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="standardsforge-mcp-wheelhouse-test-") as temporary:
+            root = Path(temporary)
+            wheelhouse = root / "wheelhouse"
+            wheelhouse.mkdir()
+            requirements = root / "requirements.txt"
+
+            def write_wheel(path: Path, project: str, version: str) -> str:
+                with zipfile.ZipFile(path, "w") as archive:
+                    archive.writestr(
+                        f"{project}-{version}.dist-info/METADATA",
+                        f"Metadata-Version: 2.4\nName: {project}\nVersion: {version}\n",
+                    )
+                    archive.writestr(
+                        f"{project}-{version}.dist-info/WHEEL",
+                        "Wheel-Version: 1.0\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+                    )
+                return hashlib.sha256(path.read_bytes()).hexdigest()
+
+            mcp = wheelhouse / "mcp-2.2.0-py3-none-any.whl"
+            mcp_digest = write_wheel(mcp, "mcp", "2.2.0")
+            requirements.write_text(
+                f"mcp==2.2.0 --hash=sha256:{mcp_digest}\n", encoding="utf-8"
+            )
+            payloads, digest, requirements_digest = _validate_mcp_wheelhouse(
+                wheelhouse, requirements
+            )
+            self.assertEqual(["wheelhouse/mcp-2.2.0-py3-none-any.whl"], [item[1] for item in payloads])
+            self.assertEqual(64, len(digest))
+            self.assertEqual(hashlib.sha256(requirements.read_bytes()).hexdigest(), requirements_digest)
+
+            extra = wheelhouse / "mcp_types-2.2.0-py3-none-any.whl"
+            write_wheel(extra, "mcp_types", "2.2.0")
+            with self.assertRaisesRegex(ValueError, "exact locked artifact"):
+                _validate_mcp_wheelhouse(wheelhouse, requirements)
+            extra.unlink()
+
+            duplicate = wheelhouse / "duplicate-2.2.0-py3-none-any.whl"
+            write_wheel(duplicate, "mcp", "2.2.0")
+            with self.assertRaisesRegex(ValueError, "duplicate"):
+                _validate_mcp_wheelhouse(wheelhouse, requirements)
+            duplicate.unlink()
+
+            requirements.write_text(
+                f"mcp==2.2.0 --hash=sha256:{'0' * 64}\n", encoding="utf-8"
+            )
+            with self.assertRaisesRegex(ValueError, "exact locked artifact"):
+                _validate_mcp_wheelhouse(wheelhouse, requirements)
+
+            requirements.write_text(
+                f"mcp==2.2.0 --hash=sha256:{mcp_digest}\n"
+                f"mcp-types==2.2.0 --hash=sha256:{'1' * 64}\n",
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "missing locked packages"):
+                _validate_mcp_wheelhouse(wheelhouse, requirements)
+
+    def test_prepared_mcp_launcher_rejects_all_overrides(self) -> None:
+        launcher = (
+            ROOT / "scripts" / "prepared_distribution" / "standardsforge-mcp.ps1"
+        ).read_text(encoding="utf-8")
+        self.assertIn("$args.Count -ne 0", launcher)
+        self.assertNotIn("@args", launcher)
+        self.assertIn("$Python -I -m standardsforge.mcp_server", launcher)
+        self.assertIn("--principal local-user --result-mode structured_only", launcher)
+        self.assertNotIn("setup.ps1')", launcher)
+        cli_launcher = (
+            ROOT / "scripts" / "prepared_distribution" / "standardsforge.ps1"
+        ).read_text(encoding="utf-8")
+        self.assertIn("$Python -I -m standardsforge", cli_launcher)
+        setup = (
+            ROOT / "scripts" / "prepared_distribution" / "setup.ps1"
+        ).read_text(encoding="utf-8")
+        self.assertNotIn("$Python -m ", setup)
+
+    def test_prepared_environment_must_match_exact_lock(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="standardsforge-mcp-environment-test-") as temporary:
+            requirements = Path(temporary) / "requirements.txt"
+            requirements.write_text(
+                f"mcp==2.2.0 --hash=sha256:{'0' * 64}\n", encoding="utf-8"
+            )
+            expected = [
+                ("standardsforge", "0.1.0a1"),
+                ("mcp", "2.2.0"),
+                ("pip", "25.0"),
+            ]
+            verify_environment(requirements, "0.1.0a1", expected)
+            with self.assertRaisesRegex(RuntimeError, "differs from"):
+                verify_environment(
+                    requirements,
+                    "0.1.0a1",
+                    [*expected, ("injected-package", "1.0")],
+                )
+            with self.assertRaisesRegex(RuntimeError, "differs from"):
+                verify_environment(
+                    requirements,
+                    "0.1.0a1",
+                    [(name, "9.9" if name == "mcp" else version) for name, version in expected],
+                )
+
     def test_distribution_bundles_exact_acquisition_and_reopens_inventory(self) -> None:
         with tempfile.TemporaryDirectory(prefix="standardsforge-distribution-test-") as temporary:
             root = Path(temporary)
@@ -203,7 +306,15 @@ class DistributionScopeTests(unittest.TestCase):
                 )
             static_root = repository / "scripts" / "prepared_distribution"
             static_root.mkdir(parents=True)
-            for name in ("README.md", "setup.ps1", "standardsforge.ps1", "CONTENT-NOTICE.md"):
+            for name in (
+                "README.md",
+                "setup.ps1",
+                "standardsforge.ps1",
+                "standardsforge-mcp.ps1",
+                "smoke_mcp.py",
+                "verify_mcp_environment.py",
+                "CONTENT-NOTICE.md",
+            ):
                 (static_root / name).write_text(name + "\n", encoding="utf-8")
             for name, value in (
                 ("LICENSE", "test license\n"),
@@ -312,6 +423,27 @@ class DistributionScopeTests(unittest.TestCase):
                 ):
                     info = zipfile.ZipInfo(name, (2026, 1, 1, 0, 0, 0))
                     built_wheel.writestr(info, value)
+            mcp_wheelhouse = root / "mcp-wheelhouse"
+            mcp_wheelhouse.mkdir()
+            mcp_wheel = mcp_wheelhouse / "mcp-2.2.0-py3-none-any.whl"
+            with zipfile.ZipFile(mcp_wheel, "w") as built_wheel:
+                info = zipfile.ZipInfo(
+                    "mcp-2.2.0.dist-info/METADATA", (2026, 1, 1, 0, 0, 0)
+                )
+                built_wheel.writestr(
+                    info, "Metadata-Version: 2.4\nName: mcp\nVersion: 2.2.0\n"
+                )
+                built_wheel.writestr(
+                    "mcp-2.2.0.dist-info/WHEEL",
+                    "Wheel-Version: 1.0\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+                )
+            mcp_requirements = root / "mcp-requirements.txt"
+            mcp_requirements.write_text(
+                "mcp==2.2.0 --hash=sha256:"
+                + hashlib.sha256(mcp_wheel.read_bytes()).hexdigest()
+                + "\n",
+                encoding="utf-8",
+            )
             provenance_path = root / f"{wheel.name}.provenance.json"
             source_paths = [
                 repository / "build-toolchain.lock.json",
@@ -395,6 +527,8 @@ class DistributionScopeTests(unittest.TestCase):
                     outline_directory,
                     wheel,
                     provenance_path,
+                    mcp_wheelhouse,
+                    mcp_requirements,
                     output,
                     "test",
                     9,
@@ -413,6 +547,18 @@ class DistributionScopeTests(unittest.TestCase):
                     self.assertIn("provenance/source-baseline.json", paths)
                     self.assertIn("provenance/acquisition-manifest.json", paths)
                     self.assertIn("provenance/wheel-build.json", paths)
+                    self.assertIn("wheelhouse/mcp-2.2.0-py3-none-any.whl", paths)
+                    self.assertIn("standardsforge-mcp.ps1", paths)
+                    self.assertIn("smoke_mcp.py", paths)
+                    self.assertIn("verify_mcp_environment.py", paths)
+                    self.assertEqual("mcp==2.2.0", manifest["build"]["mcp_requirement"])
+                    self.assertEqual(1, manifest["build"]["mcp_wheel_count"])
+                    self.assertEqual("CPython 3.12", manifest["build"]["runtime_python"])
+                    self.assertEqual("win_amd64", manifest["build"]["runtime_platform"])
+                    self.assertEqual(
+                        hashlib.sha256(mcp_requirements.read_bytes()).hexdigest(),
+                        manifest["build"]["mcp_requirements_sha256"],
+                    )
 
                 second_output = root / "standardsforge-ready-test-second.zip"
                 build_distribution(
@@ -421,11 +567,29 @@ class DistributionScopeTests(unittest.TestCase):
                     outline_directory,
                     wheel,
                     provenance_path,
+                    mcp_wheelhouse,
+                    mcp_requirements,
                     second_output,
                     "test",
                     9,
                 )
                 self.assertEqual(output.read_bytes(), second_output.read_bytes())
+
+                tampered_output = root / "standardsforge-ready-test-tampered.zip"
+                with zipfile.ZipFile(second_output, "r") as source_archive, zipfile.ZipFile(
+                    tampered_output, "w"
+                ) as target_archive:
+                    for info in source_archive.infolist():
+                        payload = source_archive.read(info.filename)
+                        if info.filename == prefix + "bundle-manifest.json":
+                            changed_manifest = json.loads(payload)
+                            changed_manifest["build"]["mcp_wheelhouse_sha256"] = "0" * 64
+                            payload = (
+                                json.dumps(changed_manifest, indent=2, sort_keys=True) + "\n"
+                            ).encode("utf-8")
+                        target_archive.writestr(info, payload)
+                with self.assertRaisesRegex(ValueError, "wheelhouse identity"):
+                    _validate_built_distribution(tampered_output, prefix)
 
                 with zipfile.ZipFile(output, "a") as built:
                     built.writestr(prefix + "unlisted.txt", "not inventoried")

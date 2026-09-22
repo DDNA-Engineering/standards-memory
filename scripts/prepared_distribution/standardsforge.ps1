@@ -9,5 +9,5 @@ if (-not (Test-Path -LiteralPath $Python) -or -not (Test-Path -LiteralPath $Read
 
 $Database = Join-Path $DistributionRoot '.standardsforge\memory.db'
 $ObjectStore = Join-Path $DistributionRoot '.standardsforge\objects'
-& $Python -m standardsforge --db $Database --store $ObjectStore @args
+& $Python -I -m standardsforge --db $Database --store $ObjectStore @args
 exit $LASTEXITCODE

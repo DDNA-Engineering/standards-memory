@@ -2,6 +2,37 @@
 
 StandardsForge returns source-linked evidence. It does not decide whether a document applies to a project or whether a design complies. A model using the tools should follow this sequence.
 
+## Connect a prepared Windows distribution
+
+On 64-bit Windows with CPython 3.12, run `setup.ps1` once from the extracted distribution. The setup verifies the archive manifest, installs the bundled core and exact hash-locked MCP dependency wheelhouse without network access, installs every bundled pack, and performs a real MCP stdio smoke test. Then configure the model host with an absolute launcher path so startup does not depend on the host's working directory.
+
+Claude Desktop and Cursor use the same `mcpServers` shape (Cursor stores it in `.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "standardsforge": {
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a1\\standardsforge-mcp.ps1"
+      ]
+    }
+  }
+}
+```
+
+Claude Code can register that launcher directly:
+
+```powershell
+claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-0.1.0a1\standardsforge-mcp.ps1"
+```
+
+The launcher fixes the principal to `local-user` and anchors the database and pack store to the extracted distribution. Do not add command-line state or principal overrides in a host configuration.
+
 ## Required tool sequence
 
 1. Resolve the exact document identifier, edition, and representation. Keep the returned package digest as the immutable pin for the rest of the task.

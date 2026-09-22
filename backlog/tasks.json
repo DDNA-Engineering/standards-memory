@@ -715,6 +715,27 @@
         "Reject sequence ordering under older annotation versions, optional or unresolved predecessors, multiple immediate predecessors, non-list steps, cross-parent steps, and backward or cyclic ordinal claims.",
         "Keep procedure ordering a reviewed source derivation rather than an applicability, compliance, test adequacy, or approval decision."
       ]
+    },
+    {
+      "task_id": "TASK-032",
+      "title": "Offline model-ready prepared distribution",
+      "status": "in_progress",
+      "requirements": [
+        "SM-FR-022",
+        "SM-FR-025",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-048",
+        "SM-FR-057",
+        "SM-FR-072"
+      ],
+      "acceptance": [
+        "Bundle the exact hash-locked Windows x64 CPython 3.12 MCP dependency closure as regular wheel files in the prepared archive and independently revalidate every byte through the closed distribution inventory, requirements digest, and canonical wheelhouse digest.",
+        "Install the core MCP extra only from the local wheelhouse with package indexes disabled, run dependency consistency checks, and fail readiness on a missing, duplicate, malformed, incomplete, or incompatible wheel set.",
+        "Provide a distribution-rooted MCP launcher that accepts no overrides, emits no bootstrap output on protocol stdout, and always supplies absolute database and object-store paths plus the fixed trusted local principal regardless of host working directory.",
+        "Before writing the ready marker, start the installed server over stdio, require exactly the six read tools, and complete one authorized search against installed distribution state.",
+        "Document copy-paste Claude Desktop, Claude Code, and Cursor configuration using the absolute launcher path without expanding the read-only MCP surface or treating host configuration as authority."
+      ]
     }
   ]
 }
