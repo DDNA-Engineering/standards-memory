@@ -8,12 +8,12 @@
 
 Download one prepared archive, run one setup command, and search **438 compiled MIL-STD packs** locally. No Git clone, PDF acquisition, corpus compilation, network query, or model call is required to use the included snapshot.
 
-[![Prepared release: 0.1.0a2](https://img.shields.io/badge/prepared_release-0.1.0a2-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a2)
+[![Prepared release: 0.1.0a3](https://img.shields.io/badge/prepared_release-0.1.0a3-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a3)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
 [![Queries: offline](https://img.shields.io/badge/queries-offline-253247?style=flat-square)](docs/wiki/ARCHITECTURE_AND_TRUST.md)
 [![Library: 438 packs](https://img.shields.io/badge/library-438_packs-EA6A23?style=flat-square)](#complete-prepared-library-snapshot)
 
-[Download the prepared library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a2/standardsforge-ready-0.1.0a2.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a2/standardsforge-ready-0.1.0a2.zip.sha256) · [Wiki](docs/wiki/README.md) · [Contributing](CONTRIBUTING.md)
+[Download the prepared library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a3/standardsforge-ready-0.1.0a3.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a3/standardsforge-ready-0.1.0a3.zip.sha256) · [Wiki](docs/wiki/README.md) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -25,9 +25,9 @@ You need Windows PowerShell, Python 3.11 or newer, SQLite FTS5 support, and spac
 
 ### 1. Download and extract
 
-Download [`standardsforge-ready-0.1.0a2.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a2/standardsforge-ready-0.1.0a2.zip), extract it to a durable local directory, and open PowerShell in that extracted directory.
+Download [`standardsforge-ready-0.1.0a3.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a3/standardsforge-ready-0.1.0a3.zip), extract it to a durable local directory, and open PowerShell in that extracted directory.
 
-The [published checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a2/standardsforge-ready-0.1.0a2.zip.sha256) is available when you want to verify the downloaded archive before extraction.
+The [published checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a3/standardsforge-ready-0.1.0a3.zip.sha256) is available when you want to verify the downloaded archive before extraction.
 
 ### 2. Set up the included corpus
 
