@@ -16,6 +16,7 @@ from .outline_compiler import compile_derived_outline_pack
 from .outline_review import export_outline_review_draft, promote_outline_review
 from .pack import write_pack_archive
 from .policy import write_pack_policy
+from .review_shard import export_outline_review_shard, merge_outline_review_shard
 from .service import StandardsForgeService
 from .source_catalog import verify_source_set
 from .structure_compiler import compile_structured_page_pack_section, compile_structured_pdf_section
@@ -110,6 +111,8 @@ def _parser() -> argparse.ArgumentParser:
     compile_pack_structure.add_argument("outline_pack")
     compile_pack_structure.add_argument("annotations")
     compile_pack_structure.add_argument("output_directory")
+    compile_pack_structure.add_argument("--shard-directory")
+    compile_pack_structure.add_argument("--decisions-directory")
 
     outline_draft = commands.add_parser(
         "export-outline-draft",
@@ -119,6 +122,25 @@ def _parser() -> argparse.ArgumentParser:
     outline_draft.add_argument("source_page_pack")
     outline_draft.add_argument("record_id")
     outline_draft.add_argument("output_path")
+
+    outline_shard = commands.add_parser(
+        "export-outline-shard",
+        help="Administrative: export a bounded exact selection of unreviewed outline drafts",
+    )
+    outline_shard.add_argument("outline_pack")
+    outline_shard.add_argument("source_page_pack")
+    outline_shard.add_argument("selection_path")
+    outline_shard.add_argument("output_directory")
+
+    merge_shard = commands.add_parser(
+        "merge-review-shard",
+        help="Administrative: replay one exact shard and its per-node review decisions",
+    )
+    merge_shard.add_argument("shard_directory")
+    merge_shard.add_argument("decisions_directory")
+    merge_shard.add_argument("outline_pack")
+    merge_shard.add_argument("source_page_pack")
+    merge_shard.add_argument("output_path")
 
     promote_review = commands.add_parser(
         "promote-outline-review",
@@ -283,9 +305,16 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
             args.output_directory,
         )
     if args.command == "compile-structure-from-pack":
-        return compile_structured_page_pack_section(args.source_page_pack, args.outline_pack, args.annotations, args.output_directory)
+        return compile_structured_page_pack_section(
+            args.source_page_pack, args.outline_pack, args.annotations, args.output_directory,
+            shard_directory=args.shard_directory, decisions_directory=args.decisions_directory,
+        )
     if args.command == "export-outline-draft":
         return export_outline_review_draft(args.outline_pack, args.source_page_pack, args.record_id, args.output_path)
+    if args.command == "export-outline-shard":
+        return export_outline_review_shard(args.outline_pack, args.source_page_pack, args.selection_path, args.output_directory)
+    if args.command == "merge-review-shard":
+        return merge_outline_review_shard(args.shard_directory, args.decisions_directory, args.outline_pack, args.source_page_pack, args.output_path)
     if args.command == "promote-outline-review":
         return promote_outline_review(args.draft_path, args.decision_path, args.outline_pack, args.source_page_pack, args.output_path)
     if args.command == "compile-derived-outline":

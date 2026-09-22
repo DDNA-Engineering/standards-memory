@@ -17,13 +17,13 @@ from .compiler import (
     _write_json,
 )
 from .errors import StandardsForgeError, require
-from .pack import open_validated_pack, validate_pack_directory
+from .pack import MAX_FILES, MAX_JSON_BYTES, open_validated_pack, validate_pack_directory
 from .pdf_isolation import isolated_pdf_pages
 from .pdf_protocol import DEFAULT_LIMITS, LIMIT_POLICY_VERSION, PROTOCOL_VERSION
 from .source_catalog import load_source_catalog, verify_source_set
 
 
-STRUCTURE_COMPILER_VERSION = "0.4.0"
+STRUCTURE_COMPILER_VERSION = "0.5.0"
 MAX_NODE_SOURCE_SPANS = 64
 NODE_KINDS = {
     "document",
@@ -75,6 +75,11 @@ _PACK_ANNOTATION_KEYS = {
     "source_page_pack_digest", "outline_package_digest", "candidate_record_id",
     "candidate_content_sha256", "proposal_sha256",
 }
+_SHARD_ANNOTATION_KEYS = {
+    "source_page_pack_digest", "outline_package_digest", "shard_id",
+    "shard_manifest_sha256", "review_mode",
+}
+_SHARD_NODE_KEYS = {"candidate_record_id", "candidate_content_sha256", "proposal_sha256", "decision_sha256", "review"}
 _COMPILER_KEYS = {"name", "version"}
 _REVIEW_REQUIRED_KEYS = {"reviewer_id", "reviewer_type", "reviewed_at"}
 _REVIEW_OPTIONAL_KEYS = {"method", "tool", "unresolved_issues", "attestation"}
@@ -164,6 +169,25 @@ def _validate_derivation(value: Any, label: str, reviewer_type: str) -> dict[str
     return derivation
 
 
+def _validate_review(value: Any, *, complete: bool) -> dict[str, Any]:
+    review = _bounded_object(value, _REVIEW_REQUIRED_KEYS, _REVIEW_OPTIONAL_KEYS, "review")
+    require(all(isinstance(review[key], str) and review[key] for key in _REVIEW_REQUIRED_KEYS), "invalid_structure_annotations", "Review provenance is required.")
+    require(review["reviewer_type"] in {"agent", "human"}, "invalid_structure_annotations", "Reviewer type is invalid.")
+    if complete:
+        require(set(review) == _REVIEW_REQUIRED_KEYS | _REVIEW_OPTIONAL_KEYS, "invalid_structure_annotations", "Complete review provenance is required.")
+        require(isinstance(review["method"], str) and review["method"], "invalid_structure_annotations", "Review method is required.")
+        require(review["attestation"] == "extraction_review_not_project_applicability_or_approval", "invalid_structure_annotations", "Review attestation cannot assert project applicability or approval.")
+        require(isinstance(review["unresolved_issues"], list) and all(isinstance(item, str) and item for item in review["unresolved_issues"]), "invalid_structure_annotations", "Review unresolved issues must be non-empty strings.")
+        tool = review["tool"]
+        if review["reviewer_type"] == "agent":
+            require(isinstance(tool, dict), "invalid_structure_annotations", "Agent review requires tool provenance.")
+        if tool is not None:
+            tool = _strict_object(tool, {"name", "version", "configuration_sha256"}, "review tool")
+            require(all(isinstance(tool[key], str) and tool[key] for key in ("name", "version")), "invalid_structure_annotations", "Review tool name and version are required.")
+            require(tool["configuration_sha256"] is None or isinstance(tool["configuration_sha256"], str) and len(tool["configuration_sha256"]) == 64, "invalid_structure_annotations", "Review tool configuration digest is invalid.")
+    return review
+
+
 def _validate_span_indices(value: Any, span_count: int, label: str) -> list[int]:
     require(
         isinstance(value, list)
@@ -216,14 +240,23 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
     annotation_path = Path(path).resolve()
     require(annotation_path.is_file(), "structure_annotations_not_found", "The structure annotation file does not exist.")
     try:
-        raw = json.loads(annotation_path.read_text(encoding="utf-8"))
+        with annotation_path.open("rb") as source:
+            data = source.read(MAX_JSON_BYTES + 1)
+        require(len(data) <= MAX_JSON_BYTES, "invalid_structure_annotations", "The structure annotation file exceeds the JSON size limit.")
+        raw = json.loads(data.decode("utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise StandardsForgeError("invalid_structure_annotations", "The structure annotation file is invalid JSON.") from exc
     require(isinstance(raw, dict), "invalid_structure_annotations", "Structure annotations must be an object.")
     is_pack_annotation = raw.get("schema_version") == "0.4.0"
-    annotations = _strict_object(raw, _ANNOTATION_KEYS | (_PACK_ANNOTATION_KEYS if is_pack_annotation else set()), "structure annotations")
+    is_shard_annotation = raw.get("schema_version") == "0.5.0"
+    expected_keys = (
+        (_ANNOTATION_KEYS - {"review"} | _SHARD_ANNOTATION_KEYS)
+        if is_shard_annotation else
+        (_ANNOTATION_KEYS | (_PACK_ANNOTATION_KEYS if is_pack_annotation else set()))
+    )
+    annotations = _strict_object(raw, expected_keys, "structure annotations")
     require(
-        annotations["schema_version"] in {"0.1.0", "0.2.0", "0.3.0", "0.4.0"},
+        annotations["schema_version"] in {"0.1.0", "0.2.0", "0.3.0", "0.4.0", "0.5.0"},
         "unsupported_schema_version",
         "Unsupported structure annotation schema.",
     )
@@ -232,39 +265,42 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
     require(len(annotations["source_pdf_sha256"]) == 64, "invalid_structure_annotations", "The source PDF digest is invalid.")
     compiler = _strict_object(annotations["compiler"], _COMPILER_KEYS, "compiler")
     require(compiler == {"name": "pypdf", "version": PYPDF_VERSION}, "invalid_structure_annotations", "Structure annotations must bind the pinned PDF compiler.")
-    require(annotations["extraction_mode"] == ("layout_rotated_included" if is_pack_annotation else "simple"), "invalid_structure_annotations", "The structural extraction mode does not match its annotation version.")
+    require(annotations["extraction_mode"] == ("layout_rotated_included" if is_pack_annotation or is_shard_annotation else "simple"), "invalid_structure_annotations", "The structural extraction mode does not match its annotation version.")
     require(annotations["text_encoding"] == "UTF-8", "invalid_structure_annotations", "Structural annotations require UTF-8 page text.")
     require(annotations["offset_convention"] == "half_open_utf8_byte_offsets_per_physical_page", "invalid_structure_annotations", "Unsupported structural offset convention.")
     if is_pack_annotation:
         for key in _PACK_ANNOTATION_KEYS - {"candidate_record_id"}:
             require(isinstance(annotations[key], str) and len(annotations[key]) == 64 and all(char in "0123456789abcdef" for char in annotations[key]), "invalid_structure_annotations", f"{key} must be a SHA-256 digest.")
         require(isinstance(annotations["candidate_record_id"], str) and annotations["candidate_record_id"], "invalid_structure_annotations", "A pack-bound annotation requires its source candidate record ID.")
-    review = _bounded_object(
-        annotations["review"], _REVIEW_REQUIRED_KEYS, _REVIEW_OPTIONAL_KEYS, "review"
-    )
-    require(all(isinstance(review[key], str) and review[key] for key in _REVIEW_REQUIRED_KEYS), "invalid_structure_annotations", "Review provenance is required.")
-    require(review["reviewer_type"] in {"agent", "human"}, "invalid_structure_annotations", "Reviewer type is invalid.")
-    if annotations["schema_version"] in {"0.2.0", "0.3.0", "0.4.0"}:
-        require(set(review) == _REVIEW_REQUIRED_KEYS | _REVIEW_OPTIONAL_KEYS, "invalid_structure_annotations", "Structure annotations 0.2.0 require complete review provenance.")
-        require(isinstance(review["method"], str) and review["method"], "invalid_structure_annotations", "Review method is required.")
-        require(review["attestation"] == "extraction_review_not_project_applicability_or_approval", "invalid_structure_annotations", "Review attestation cannot assert project applicability or approval.")
-        require(isinstance(review["unresolved_issues"], list) and all(isinstance(item, str) and item for item in review["unresolved_issues"]), "invalid_structure_annotations", "Review unresolved issues must be non-empty strings.")
-        tool = review["tool"]
-        if review["reviewer_type"] == "agent":
-            require(isinstance(tool, dict), "invalid_structure_annotations", "Agent review requires tool provenance.")
-        if tool is not None:
-            tool = _strict_object(tool, {"name", "version", "configuration_sha256"}, "review tool")
-            require(all(isinstance(tool[key], str) and tool[key] for key in ("name", "version")), "invalid_structure_annotations", "Review tool name and version are required.")
-            require(tool["configuration_sha256"] is None or isinstance(tool["configuration_sha256"], str) and len(tool["configuration_sha256"]) == 64, "invalid_structure_annotations", "Review tool configuration digest is invalid.")
+    if is_shard_annotation:
+        require(annotations["review_mode"] == "per_node", "invalid_structure_annotations", "A review shard requires per-node review provenance.")
+        for key in ("source_page_pack_digest", "outline_package_digest", "shard_manifest_sha256"):
+            require(isinstance(annotations[key], str) and len(annotations[key]) == 64 and all(char in "0123456789abcdef" for char in annotations[key]), "invalid_structure_annotations", f"{key} must be a SHA-256 digest.")
+        require(isinstance(annotations["shard_id"], str) and annotations["shard_id"], "invalid_structure_annotations", "A review shard requires its identity.")
+    review = None if is_shard_annotation else _validate_review(annotations["review"], complete=annotations["schema_version"] != "0.1.0")
     nodes = annotations["nodes"]
     require(isinstance(nodes, list) and nodes, "invalid_structure_annotations", "At least one structural node is required.")
     if is_pack_annotation:
         require(len(nodes) == 1 and annotations["relationships"] == [] and annotations["unsupported_regions"] == [], "invalid_structure_annotations", "Pack-bound single-candidate review cannot assert additional nodes, relationships, or reviewed unsupported regions.")
+    if is_shard_annotation:
+        require(len(nodes) <= 256 and annotations["relationships"] == [] and annotations["unsupported_regions"] == [], "invalid_structure_annotations", "Review shards contain at most 256 explicitly selected nodes and no inferred relationships or unsupported regions.")
     require(len(nodes) <= 4096, "invalid_structure_annotations", "The structural annotation node limit was exceeded.")
     logical_ids: set[str] = set()
     clause_references: set[str] = set()
+    candidate_record_ids: set[str] = set()
     for value in nodes:
-        node = _bounded_object(value, _NODE_KEYS - {"parent_logical_id"}, _NODE_OPTIONAL_KEYS, "structural node")
+        node = _bounded_object(
+            value,
+            _NODE_KEYS - {"parent_logical_id"} | (_SHARD_NODE_KEYS if is_shard_annotation else set()),
+            _NODE_OPTIONAL_KEYS,
+            "structural node",
+        )
+        node_review = _validate_review(node["review"], complete=True) if is_shard_annotation else review
+        if is_shard_annotation:
+            require(isinstance(node["candidate_record_id"], str) and node["candidate_record_id"] and node["candidate_record_id"] not in candidate_record_ids, "invalid_structure_annotations", "Shard candidate record IDs must be unique.")
+            candidate_record_ids.add(node["candidate_record_id"])
+            for key in ("candidate_content_sha256", "proposal_sha256", "decision_sha256"):
+                require(isinstance(node[key], str) and len(node[key]) == 64 and all(char in "0123456789abcdef" for char in node[key]), "invalid_structure_annotations", f"Node {key} must be a SHA-256 digest.")
         for key in ("logical_id", "clause_reference", "heading", "exact_text", "content_sha256"):
             require(isinstance(node[key], str) and node[key], "invalid_structure_annotations", f"Structural node {key} is required.")
         require(node["logical_id"] not in logical_ids, "invalid_structure_annotations", "Structural logical IDs must be unique.", logical_id=node["logical_id"])
@@ -309,10 +345,10 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
             prior_span_key = span_key
         require(node["content_sha256"] == _sha256(node["exact_text"].encode("utf-8")), "invalid_structure_annotations", "Structural content digest does not match exact text.", logical_id=node["logical_id"])
         require(node["statement_role"] in STATEMENT_ROLES, "invalid_structure_annotations", "Unsupported structural statement role.")
-        _validate_derivation(node["derivation"], "node derivation", review["reviewer_type"])
+        _validate_derivation(node["derivation"], "node derivation", node_review["reviewer_type"])
         semantics = node.get("semantics")
         if semantics is not None:
-            require(annotations["schema_version"] in {"0.2.0", "0.3.0", "0.4.0"}, "invalid_structure_annotations", "Semantic annotations require structure annotation schema 0.2.0 or newer.")
+            require(annotations["schema_version"] in {"0.2.0", "0.3.0", "0.4.0", "0.5.0"}, "invalid_structure_annotations", "Semantic annotations require structure annotation schema 0.2.0 or newer.")
             _validate_semantics(semantics, len(source_spans), node["statement_role"])
     by_logical_id = {node["logical_id"]: node for node in nodes}
     for node in nodes:
@@ -393,8 +429,7 @@ def compile_structured_pdf_section(
     catalog = load_source_catalog(catalog_path)
     document = _source_document(catalog, document_id)
     annotations = load_structure_annotations(annotations_path)
-    require(annotations["schema_version"] != "0.4.0", "invalid_structure_annotations", "Pack-bound annotations require compile-structure-from-pack.")
-    review = annotations["review"]
+    require(annotations["schema_version"] in {"0.1.0", "0.2.0", "0.3.0"}, "invalid_structure_annotations", "Pack-bound annotations require compile-structure-from-pack.")
     require(annotations["document_id"] == document["document_id"], "structure_identity_mismatch", "Structure annotations belong to a different document.")
     require(annotations["edition_id"] == document["edition_id"], "structure_identity_mismatch", "Structure annotations belong to a different edition.")
     require(annotations["source_pdf_sha256"] == document["sha256"], "structure_identity_mismatch", "Structure annotations bind a different source PDF.")
@@ -408,23 +443,36 @@ def compile_structured_page_pack_section(
     outline_pack: str | Path,
     annotations_path: str | Path,
     output_directory: str | Path,
+    *,
+    shard_directory: str | Path | None = None,
+    decisions_directory: str | Path | None = None,
 ) -> dict[str, Any]:
     """Compile explicitly reviewed annotations against one verified page-text source pack."""
 
     annotations = load_structure_annotations(annotations_path)
-    require(annotations["schema_version"] == "0.4.0", "invalid_structure_annotations", "Pack compilation requires structure annotations 0.4.0.")
-    from .outline_review import export_outline_review_draft
+    require(annotations["schema_version"] in {"0.4.0", "0.5.0"}, "invalid_structure_annotations", "Pack compilation requires structure annotations 0.4.0 or 0.5.0.")
+    if annotations["schema_version"] == "0.4.0":
+        require(shard_directory is None and decisions_directory is None, "invalid_structure_annotations", "Single-candidate compilation does not accept shard inputs.")
+        from .outline_review import export_outline_review_draft
 
-    with tempfile.TemporaryDirectory(prefix="standardsforge-proposal-verify-") as temporary:
-        replay = Path(temporary) / "draft.json"
-        exported = export_outline_review_draft(outline_pack, source_page_pack, annotations["candidate_record_id"], replay)
-        draft = json.loads(replay.read_text(encoding="utf-8"))
-        require(
-            annotations["proposal_sha256"] == exported["draft_sha256"]
-            and annotations["outline_package_digest"] == draft["outline_package_digest"]
-            and annotations["candidate_content_sha256"] == draft["candidate_content_sha256"],
-            "structure_identity_mismatch", "The reviewed annotation does not bind the exact outline proposal.",
-        )
+        with tempfile.TemporaryDirectory(prefix="standardsforge-proposal-verify-") as temporary:
+            replay = Path(temporary) / "draft.json"
+            exported = export_outline_review_draft(outline_pack, source_page_pack, annotations["candidate_record_id"], replay)
+            draft = json.loads(replay.read_text(encoding="utf-8"))
+            require(
+                annotations["proposal_sha256"] == exported["draft_sha256"]
+                and annotations["outline_package_digest"] == draft["outline_package_digest"]
+                and annotations["candidate_content_sha256"] == draft["candidate_content_sha256"],
+                "structure_identity_mismatch", "The reviewed annotation does not bind the exact outline proposal.",
+            )
+    else:
+        require(shard_directory is not None and decisions_directory is not None, "invalid_structure_annotations", "Shard compilation requires the exact shard and decision directories.")
+        from .review_shard import merge_outline_review_shard
+
+        with tempfile.TemporaryDirectory(prefix="standardsforge-shard-verify-") as temporary:
+            replay = Path(temporary) / "annotations.json"
+            merge_outline_review_shard(shard_directory, decisions_directory, outline_pack, source_page_pack, replay)
+            require(replay.read_bytes() == Path(annotations_path).read_bytes(), "structure_identity_mismatch", "Shard annotations differ from the exact replayed review decisions.")
     with open_validated_pack(source_page_pack) as base:
         require(base.manifest["representation"] == "page_text", "structure_source_not_page_text", "A reviewed structure needs a page-text source pack.")
         require(annotations["source_page_pack_digest"] == base.package_digest, "structure_identity_mismatch", "The reviewed annotation binds a different page-text package.")
@@ -468,7 +516,7 @@ def _compile_structured_section(
     source_page_pack: Any = None,
     source_page_records: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    review = annotations["review"]
+    global_review = annotations.get("review")
     require(source_path.stat().st_size <= MAX_PDF_BYTES, "compiler_limit_exceeded", "The PDF exceeds the compiler size limit.")
     output = Path(output_directory).resolve()
     require(not output.exists(), "compiler_output_exists", "The compiler output directory already exists.", path=str(output))
@@ -569,6 +617,7 @@ def _compile_structured_section(
         records: list[dict[str, Any]] = []
         logical_sidecars: list[str] = []
         for node in sorted(annotations["nodes"], key=lambda item: (item["ordinal"], item["logical_id"])):
+            review = node.get("review", global_review)
             normalized_spans: list[dict[str, Any]] = []
             fragments: list[str] = []
             for node_span in node["source_spans"]:
@@ -743,7 +792,12 @@ def _compile_structured_section(
         manifest = {
             "schema_version": "0.1.0",
             "pack_id": (
-                f"structured.{source_page_pack.manifest['pack_id']}.{annotations['proposal_sha256'][:16]}"
+                f"structured.{source_page_pack.manifest['pack_id']}."
+                + (
+                    f"{annotations['shard_id']}.{annotations['shard_manifest_sha256'][:16]}"
+                    if annotations["schema_version"] == "0.5.0" else
+                    annotations["proposal_sha256"][:16]
+                )
                 if source_page_pack is not None else
                 f"structured.{document['document_family_id'].replace(':', '.')}.{document['document_date']}"
             ),
@@ -804,7 +858,9 @@ def _compile_structured_section(
             "candidate_content_sha256": annotations.get("candidate_content_sha256"),
             "proposal_sha256": annotations.get("proposal_sha256"),
             "annotation_sha256": _sha256(annotation_target.read_bytes()),
-            "review": annotations["review"],
+            "review": annotations.get("review", {"mode": "per_node", "node_count": len(records)}),
+            "shard_id": annotations.get("shard_id"),
+            "shard_manifest_sha256": annotations.get("shard_manifest_sha256"),
             "physical_pages": sorted(pages),
             "node_count": len(records),
             "multi_span_node_count": sum(
@@ -834,6 +890,8 @@ def _compile_structured_section(
             *(relative for relative, _, _ in pages.values()),
             *logical_sidecars,
         ]
+        require(len(inventoried) <= MAX_FILES, "pack_limit_exceeded", "The selected review shard exceeds the pack file limit; split it into smaller shards.")
+        require((staging / "records.json").stat().st_size <= MAX_JSON_BYTES, "pack_limit_exceeded", "The selected review shard exceeds the records size limit; split it into smaller shards.")
         _write_json(
             staging / "inventory.json",
             {

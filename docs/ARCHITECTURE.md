@@ -12,7 +12,7 @@ Source acquisition, ingestion, and query paths are separate:
 official publisher source -> local ignored source directory -> offline manifest verification
 verified PDF -> deterministic compiler -> preserved PDF + extracted text + fidelity report -> local pack
 verified page-text pack -> deterministic outline compiler -> exact-span automated candidates + unsupported regions -> separate derived-structure pack
-verified PDF + reviewed annotations -> structural compiler -> stable nodes + optional reviewed exact-span semantics + typed source-spanned relationships -> local pack
+verified PDF or exact page-text pack + reviewed annotations -> structural compiler -> stable nodes + optional reviewed exact-span semantics + typed source-spanned relationships -> local pack
 operator policy + local pack -> validation -> immutable object store -> atomic SQLite install
 principal + explicit selector -> authorization -> snapshot-pinned batched dependency closure -> request-local page/node/relationship span re-verification -> detailed, compact, or concise evidence packet
 caller-authored candidate + authorized detailed packet -> deterministic source-first static reader + neutral manifest-bound handoff
@@ -45,6 +45,7 @@ Rights statements inside a pack are provenance only. Operational authorization c
 - `corpus_compiler`: Distribution Statement A-gated DLA acquisition composition, deterministic record-scoped unclassified page packs, composition-and-provenance-validated restartable archives, exact local policy generation, and policy-bound batch installation with obsolete-grant reconciliation.
 - `outline_compiler`: deterministic exact-span method, clause, list, note, and caption candidates from verified page records, with ambiguous and unmatched content retained as unsupported regions and no automatic obligation or approval claim.
 - `outline_review`: one-candidate, exact-package-bound unreviewed draft export and separate content-bound reviewer decision; global outline sidecar offsets are rebased to the same verified page text without a new PDF rendering. It does not infer semantics, links, or document-wide coverage.
+- `review_shard`: deterministic 1–256-candidate partial selections, exact proposal replay, one-to-one decisions, and independent per-node review provenance. Only explicitly reviewed in-shard parents are accepted; source identity, relationships, roles, and rights are never inferred or widened.
 - `structure_compiler`: reviewed structural nodes, bounded optional semantic decompositions, content-bound review events, and typed relationships bound to exact verified PDF/page-text spans, including explicit same-procedure step ordering.
 - `query_cache`: bounded versioned in-process closure and search projections with checksum-verified envelopes; authorization decisions and source verification are never cached.
 - `benchmark`: content-bound offline synthetic qualification, raw cold/warm response capture, executable assertion and metric arithmetic, and explicit separation from real-document quality claims.

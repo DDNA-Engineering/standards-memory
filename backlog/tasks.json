@@ -817,7 +817,7 @@
     {
       "task_id": "TASK-036",
       "title": "Verified outline-to-reviewed-structure handoff",
-      "status": "active",
+      "status": "complete",
       "requirements": [
         "SM-FR-076"
       ],
@@ -827,6 +827,21 @@
         "Compile the reviewed annotation against the exact verified base page-text pack and its layout-mode sidecar without changing text rendering or silently falling back to a different catalog source.",
         "Reject changed packages, source identities, text digests, candidate hashes, invalid or ambiguous spans, missing review decisions, false review provenance, and draft annotations supplied as reviewed input.",
         "Prove one synthetic candidate-to-reviewed-pack roundtrip including exact retrieval, deterministic replay, offline behavior, and focused negative cases; report real-corpus validation separately."
+      ]
+    },
+    {
+      "task_id": "TASK-037",
+      "title": "Section-sized reviewed outline shards with per-node provenance",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-077"
+      ],
+      "acceptance": [
+        "Export a deterministic, bounded shard of explicitly selected outline record IDs with one exact base page-text pack, source component, edition, candidate hashes, and draft hashes; report excluded or unsupported content without a completeness claim.",
+        "Merge an exact one-to-one set of reviewer decisions into a section-sized reviewed annotation with independent per-node reviewer provenance, corrected exact spans, and explicitly reviewed in-shard parent identities; do not infer statement roles or relationships.",
+        "Compile and retrieve a reviewed shard without re-extracting the PDF, preserve per-node proposal identity and review events, and keep source rights claims and partial-coverage limits visible.",
+        "Reject missing, duplicate, stale, cross-pack, cross-component, unreviewed, false-parent, overlapping, UTF-8-splitting, or over-limit inputs before activation; preserve legacy annotation and query behavior.",
+        "Prove synthetic mixed-reviewer multi-node deterministic replay, negative cases, and one selected real 810H shard locally; keep protected CI and publication as separate evidence."
       ]
     }
   ]

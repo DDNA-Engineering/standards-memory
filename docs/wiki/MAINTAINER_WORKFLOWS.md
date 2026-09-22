@@ -94,6 +94,36 @@ The emitted file is a `proposed_unreviewed` draft, not a compileable reviewed an
 
 Promotion and compilation reverify the exact outline proposal, base package, page text, reviewer status, and edited source spans. The resulting pack is a reviewed representation of only that selected node. It is not a document-wide reviewed outline. The output includes the complete source PDF for offline evidence, preserves its input rights claims, and does not grant processing or redistribution permission; do not publish or share it without independently confirmed rights. The prior catalog-based `compile-structure` remains available for its separately pinned simple-extraction annotations; its catalog identity is not silently substituted for the corpus component.
 
+## Review a bounded outline section
+
+Select 1–256 exact candidate `record_id` values in a JSON file with `schema_version: "0.1.0"`, a short lowercase `shard_id`, and `record_ids` array. This is an explicit partial selection, not a claim that every clause in the section or document was found. Export against the outline's exact base pack:
+
+```powershell
+& $Python -m standardsforge export-outline-shard `
+  <derived-outline-pack> <exact-base-page-pack> `
+  .standardsforge/annotations/selection.json `
+  .standardsforge/annotations/selected-shard
+```
+
+The shard manifest binds the two package digests, source component, edition, and each candidate/draft hash. It reports the selected, unselected, and unsupported-region counts without claiming that the outline itself is complete. It contains one unreviewed draft under `drafts/<sha256-of-record-id>.json` per selected candidate. For every draft, prepare a separate decision under `decisions/<same-filename>.json` using the single-candidate decision shape described above. Deliberately review and, where necessary, correct each node. An explicit `parent_logical_id` may name only another reviewed node in this same shard; no parent, role, relationship, or semantic fact is inferred from the outline. Mixed human and agent reviews retain separate per-node provenance. Missing, extra, stale, unreviewed, or cross-source decisions fail closed.
+
+```powershell
+& $Python -m standardsforge merge-review-shard `
+  .standardsforge/annotations/selected-shard `
+  .standardsforge/annotations/decisions `
+  <derived-outline-pack> <exact-base-page-pack> `
+  .standardsforge/annotations/selected-reviewed.json
+
+& $Python -m standardsforge compile-structure-from-pack `
+  <exact-base-page-pack> <derived-outline-pack> `
+  .standardsforge/annotations/selected-reviewed.json `
+  .standardsforge/compiled/selected-reviewed `
+  --shard-directory .standardsforge/annotations/selected-shard `
+  --decisions-directory .standardsforge/annotations/decisions
+```
+
+Compilation replays every proposal and decision and rejects a changed annotation. The compiled pack includes only the selected reviewed nodes, exact page-text spans, the complete source PDF, inherited rights claims, and explicit partial-coverage markers. Shards should be kept smaller than the 256-candidate bound when the resulting pack's file or JSON limits require it. A shard is not document-wide semantic coverage, a redistribution grant, or an engineer's applicability/approval decision.
+
 ## Build the prepared distribution
 
 First build and retain the reproducible wheel:
