@@ -9,6 +9,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from jsonschema.validators import validator_for
 from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 
@@ -29,6 +30,14 @@ import standardsforge.corpus_compiler as corpus_compiler_module  # noqa: E402
 
 
 class CorpusCompilerTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.report_schema = json.loads(
+            (ROOT / "contracts" / "corpus-extraction-report.schema.json").read_text(encoding="utf-8")
+        )
+        validator_for(cls.report_schema).check_schema(cls.report_schema)
+        cls.report_validator = validator_for(cls.report_schema)(cls.report_schema)
+
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory(prefix="standardsforge-corpus-test-")
         self.root = Path(self.temp.name)
@@ -151,6 +160,8 @@ class CorpusCompilerTests(unittest.TestCase):
         with open_validated_pack(archive) as pack:
             self.assertTrue(pack.manifest["coverage"]["edition_composition"].startswith("partial_"))
             composition = json.loads((pack.root / "component-manifest.json").read_text(encoding="utf-8"))
+            report = json.loads((pack.root / "extraction-report.json").read_text(encoding="utf-8"))
+            self.report_validator.validate(report)
             self.assertFalse(composition["complete"])
             self.assertEqual(["1002.101", "1001.101"], [item["token"] for item in composition["components"]])
             self.assertEqual(1, len(pack.records))
@@ -213,6 +224,7 @@ class CorpusCompilerTests(unittest.TestCase):
         archive = next((output / "packs").glob("*.zip"))
         with open_validated_pack(archive) as pack:
             report = json.loads((pack.root / "extraction-report.json").read_text(encoding="utf-8"))
+            self.report_validator.validate(report)
             self.assertEqual("empty_password_decrypted_for_extraction", report["components"][0]["encryption_status"])
 
         archive.write_bytes(archive.read_bytes() + b"corrupt")

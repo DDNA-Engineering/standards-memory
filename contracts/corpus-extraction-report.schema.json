@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/corpus-extraction-report.schema.json",
+  "title": "StandardsForge DLA corpus PDF extraction report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "compiler",
+    "document_id",
+    "edition_id",
+    "composition_sha256",
+    "downloaded_component_count",
+    "unavailable_component_count",
+    "physical_pages",
+    "extracted_page_records",
+    "pages_without_text_records",
+    "fidelity",
+    "components"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "compiler": {"$ref": "#/$defs/compiler"},
+    "document_id": {"type": "string", "minLength": 1},
+    "edition_id": {"type": "string", "minLength": 1},
+    "composition_sha256": {"$ref": "#/$defs/sha256"},
+    "downloaded_component_count": {"type": "integer", "minimum": 1},
+    "unavailable_component_count": {"type": "integer", "minimum": 0},
+    "physical_pages": {"type": "integer", "minimum": 1},
+    "extracted_page_records": {"type": "integer", "minimum": 1},
+    "pages_without_text_records": {"type": "integer", "minimum": 0},
+    "fidelity": {"$ref": "#/$defs/fidelity"},
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/component"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_bytes",
+        "pages",
+        "page_content_bytes",
+        "page_text_bytes",
+        "aggregate_text_bytes",
+        "result_bytes",
+        "process_memory_bytes",
+        "cpu_seconds",
+        "wall_seconds"
+      ],
+      "properties": {
+        "source_bytes": {"const": 268435456},
+        "pages": {"const": 5000},
+        "page_content_bytes": {"const": 67108864},
+        "page_text_bytes": {"const": 67108864},
+        "aggregate_text_bytes": {"const": 268435456},
+        "result_bytes": {"const": 4194304},
+        "process_memory_bytes": {"const": 1073741824},
+        "cpu_seconds": {"const": 300},
+        "wall_seconds": {"const": 600}
+      }
+    },
+    "compiler": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "page_compiler_version",
+        "pypdf_version",
+        "fonttools_version",
+        "extraction_mode",
+        "rotated_text",
+        "parser_protocol",
+        "limit_policy",
+        "limits"
+      ],
+      "properties": {
+        "name": {"const": "standardsforge-dla-corpus-pdf-text-layer"},
+        "version": {"type": "string", "minLength": 1},
+        "page_compiler_version": {"type": "string", "minLength": 1},
+        "pypdf_version": {"type": "string", "minLength": 1},
+        "fonttools_version": {"type": "string", "minLength": 1},
+        "extraction_mode": {"const": "layout"},
+        "rotated_text": {"const": "included"},
+        "parser_protocol": {"const": "pdf-extraction-worker/0.1.0"},
+        "limit_policy": {"const": "pdf-limits/0.1.0"},
+        "limits": {"$ref": "#/$defs/limits"}
+      }
+    },
+    "source_pdf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "byte_length", "physical_pages"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^sources/.*\\.[Pp][Dd][Ff]$"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "byte_length": {"type": "integer", "minimum": 1},
+        "physical_pages": {"type": "integer", "minimum": 1}
+      }
+    },
+    "fidelity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text_layer", "ocr", "tables", "figures", "clause_boundaries", "obligations"],
+      "properties": {
+        "text_layer": {"const": "extracted_not_visually_verified"},
+        "ocr": {"const": "not_used"},
+        "tables": {"const": "not_interpreted"},
+        "figures": {"const": "not_interpreted"},
+        "clause_boundaries": {"const": "not_derived"},
+        "obligations": {"const": "not_classified"}
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "physical_page",
+        "content_stream_bytes",
+        "text_characters",
+        "text_sha256",
+        "text_layer_status",
+        "visual_fidelity",
+        "tables",
+        "figures",
+        "ocr"
+      ],
+      "properties": {
+        "physical_page": {"type": "integer", "minimum": 1},
+        "content_stream_bytes": {"type": "integer", "minimum": 0},
+        "text_characters": {"type": "integer", "minimum": 0},
+        "text_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "text_layer_status": {"enum": ["extracted", "no_text"]},
+        "visual_fidelity": {"const": "not_verified"},
+        "tables": {"const": "not_interpreted"},
+        "figures": {"const": "not_interpreted"},
+        "ocr": {"const": "not_used"}
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component_key",
+        "token",
+        "description",
+        "source_pdf",
+        "extracted_page_records",
+        "pages_without_text_records",
+        "encryption_status",
+        "pages"
+      ],
+      "properties": {
+        "component_key": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+        "token": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1},
+        "source_pdf": {"$ref": "#/$defs/source_pdf"},
+        "extracted_page_records": {"type": "integer", "minimum": 0},
+        "pages_without_text_records": {"type": "integer", "minimum": 0},
+        "encryption_status": {"enum": ["not_encrypted", "empty_password_decrypted_for_extraction"]},
+        "pages": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/page"}}
+      }
+    }
+  }
+}

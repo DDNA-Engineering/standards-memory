@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1.0",
-  "scope": "TASK-001 through TASK-029 acceptance subset; the supplied PRD remains the broader proposed catalog",
+  "scope": "TASK-001 through TASK-030 acceptance subset; the supplied PRD remains the broader proposed catalog",
   "requirements": [
     {"id": "SM-FR-002", "text": "Preserve publisher-scoped document identity separately from editions and packages."},
     {"id": "SM-FR-003", "text": "Resolve identifiers conservatively and report ambiguity."},
@@ -44,6 +44,7 @@
     {"id": "SM-FR-066", "text": "Ship a deterministic cross-platform synthetic starter bundle whose closed manifest binds an independently verified wheel and provenance, exact fictional packs, trusted policy, portable setup and launcher, installed-state receipt, and offline readiness and evidence smokes without representing synthetic examples as real standards coverage."},
     {"id": "SM-FR-067", "text": "Export one authorized package-pinned clause and its required governing context as a deterministic source-first reader and neutral engineering-handoff bundle that preserves exact evidence, locations, derivations, coverage, limitations, and host-owned undecided applicability and approval state without executing or trusting source content."},
     {"id": "SM-FR-068", "text": "Emit deterministic, offline-verifiable release evidence that binds the exact reproducible wheel and starter archive to their build provenance, source revision, dependency lock, standards-based software bill of materials, and CI attestation identity without presenting unsigned local evidence as a signed attestation."},
-    {"id": "SM-FR-069", "text": "Run every untrusted PDF parser path in a disposable resource-limited worker with a closed digest-bound file protocol, deterministic output limits, fail-closed timeout and crash handling, and explicit incomplete-corpus outcomes for any extraction failure."}
+    {"id": "SM-FR-069", "text": "Run every untrusted PDF parser path in a disposable resource-limited worker with a closed digest-bound file protocol, deterministic output limits, fail-closed timeout and crash handling, and explicit incomplete-corpus outcomes for any extraction failure."},
+    {"id": "SM-FR-070", "text": "Version generated-artifact contracts explicitly, validate each schema against its metaschema and each representative emitted artifact against the exact matching schema, keep single-PDF and corpus extraction reports distinct, and reject unknown versions without inventing migration semantics."}
   ]
 }

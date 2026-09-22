@@ -676,6 +676,25 @@
         "Make page extraction exceptions, timeout, resource termination, protocol failure, and output overrun fatal for the component and incomplete for the corpus; keep a genuinely empty text layer distinct and never count extraction failure as an ordinary page without text under a complete corpus status.",
         "Cover deterministic replay, source change, timeout, crash, missing result, malformed result, extra or linked output, page-order/count/digest/UTF-8 mismatch, output limits, parser exception, Windows Job assignment, POSIX limit setup, and unchanged page/corpus/structure retrieval behavior across the supported CI matrix."
       ]
+    },
+    {
+      "task_id": "TASK-030",
+      "title": "Executable generated-artifact contracts and schema lifecycle",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-019",
+        "SM-FR-048",
+        "SM-FR-049",
+        "SM-FR-057",
+        "SM-FR-070"
+      ],
+      "acceptance": [
+        "Keep every JSON Schema metaschema-valid and make schema validation an explicit non-core installation profile used by CI and contract tests.",
+        "Validate actual generated single-PDF and multi-component corpus extraction reports, structural annotations, records, distributions, response envelopes, diagnostics, benchmarks, release evidence, and handoffs against the exact matching schema rather than treating JSON parsing as contract validation.",
+        "Define a separate closed corpus extraction-report contract that matches the emitted composition, compiler, component, encryption, page, fidelity, and aggregate fields without weakening the single-PDF report contract.",
+        "Prove malformed schemas and representative generated packets fail validation, while retaining stricter runtime checks for files, canonical bytes, hashes, authorization, and cross-document invariants.",
+        "Document an explicit schema version policy and append-only change log: changed accepted shape or meaning requires a new instance version, unknown versions fail closed, and migrations cannot invent semantic or approval state."
+      ]
     }
   ]
 }

@@ -1,8 +1,12 @@
 # Machine contracts
 
+Contract lifecycle rules and the schema change log are in [SCHEMA_VERSIONING.md](SCHEMA_VERSIONING.md). Every generated artifact family must have an exact schema-validation test in addition to runtime validation of file, digest, authorization, and cross-document invariants.
+
 The JSON Schemas describe the public 0.1.0 pack manifest, inventory, records, rights claims, and trusted local policy shapes. Runtime validation is deliberately stricter where filesystem evidence is required: it verifies inventory closure, byte counts, SHA-256 values, source quote presence, edition consistency, dependency targets, and data-only paths.
 
 `source-catalog.schema.json` describes tracked metadata for locally acquired official sources. Runtime validation additionally enforces stable DLA Quick Search URLs, safe PDF filenames, directory closure, PDF signatures, exact byte counts, and SHA-256 digests. The catalog is not a download script and its rights metadata does not authorize repository redistribution.
+
+`corpus-extraction-report.schema.json` separately closes the DLA corpus compiler's multi-component report, including composition identity, aggregate counts, exact compiler and parser-limit policy, component source identities, encryption status, and every physical-page extraction outcome. It is intentionally not accepted by the single-PDF report schema.
 
 `extraction-report.schema.json` describes deterministic PDF text-layer compilation results and records the exact isolated-worker protocol and fixed limit policy. Compiled PDF records cite the original inventoried PDF and an exact half-open UTF-8 range in a separate inventoried text sidecar. `records-v0.2.schema.json` removes the duplicate page-text field from portable page records; validation reconstructs the exact in-memory text from that verified byte range. The 0.1 records contract remains supported for existing and structural packs. The report keeps text extraction, OCR, visual fidelity, tables, figures, clause boundaries, and obligation classification as independent dimensions.
 
