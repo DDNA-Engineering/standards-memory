@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
+        os: [ubuntu-latest, windows-latest]
         python-version: ["3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     env:
@@ -105,9 +105,54 @@ jobs:
             build/release-evidence
           if-no-files-found: error
 
+  portable-core:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, macos-15-intel]
+        python-version: ["3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install portable-core test dependencies
+        run: python -m pip install --disable-pip-version-check -e ".[mcp,contract]"
+      - name: Check dependency consistency
+        run: python -m pip check
+      - name: Validate contracts
+        run: python scripts/validate_contracts.py
+      - name: Run portable query and distribution tests
+        run: |
+          python -m unittest discover -s tests -p "test_prepared_runtime.py" -v
+          python -m unittest discover -s tests -p "test_doctor.py" -v
+          python -m unittest discover -s tests -p "test_document_discovery.py" -v
+          python -m unittest discover -s tests -p "test_query_cache.py" -v
+          python -m unittest discover -s tests -p "test_vertical_slice.py" -v
+      - name: Acquire locked build backend
+        run: >-
+          python -m pip download
+          --disable-pip-version-check
+          --no-deps
+          --only-binary=:all:
+          --dest build/toolchain-cache
+          setuptools==84.0.0
+      - name: Validate installed core wheel
+        run: >-
+          python scripts/validate_installed_wheel.py
+          --build-tool-dir build/toolchain-cache
+          --output-dir build/ci-wheel
+      - name: Build and validate portable synthetic starter
+        run: |
+          python scripts/build_starter_distribution.py --wheel-dir build/ci-wheel --output build/standardsforge-starter.zip
+          python scripts/validate_starter_distribution.py build/standardsforge-starter.zip
+
   release-attestation:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: contracts-and-tests
+    needs: [contracts-and-tests, portable-core]
     runs-on: ubuntu-latest
     permissions:
       contents: read
