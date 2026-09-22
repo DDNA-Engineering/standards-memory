@@ -7,6 +7,7 @@ $Database = Join-Path $DistributionRoot '.standardsforge\memory.db'
 $ObjectStore = Join-Path $DistributionRoot '.standardsforge\objects'
 $ReadyMarker = Join-Path $DistributionRoot '.standardsforge\prepared-distribution.json'
 $BundleManifest = Join-Path $DistributionRoot 'bundle-manifest.json'
+$McpRequirementsPath = Join-Path $DistributionRoot 'provenance\mcp-wheelhouse-win-amd64-cp312.txt'
 
 function Test-PreparedDistribution {
     if (-not (Test-Path -LiteralPath $BundleManifest -PathType Leaf)) {
@@ -82,7 +83,6 @@ function Test-PreparedDistribution {
     if ($InventoryDigest -ne [string]$Manifest.build.mcp_wheelhouse_sha256) {
         throw 'The prepared-distribution MCP wheelhouse digest is inconsistent.'
     }
-    $McpRequirementsPath = Join-Path $DistributionRoot 'provenance\mcp-wheelhouse-win-amd64-cp312.txt'
     $McpRequirementsDigest = (Get-FileHash -LiteralPath $McpRequirementsPath -Algorithm SHA256).Hash.ToLowerInvariant()
     if ($McpRequirementsDigest -ne [string]$Manifest.build.mcp_requirements_sha256) {
         throw 'The prepared-distribution MCP requirements digest is inconsistent.'

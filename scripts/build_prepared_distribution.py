@@ -376,7 +376,7 @@ def _build_distribution_scope(
     if (
         not isinstance(outline_manifest, dict)
         or outline_manifest.get("representation") != "derived_structure"
-        or not isinstance(outline_records, list)
+        or not isinstance(outline_records, (list, tuple))
         or not outline_records
         or not isinstance(outline_digest, str)
     ):

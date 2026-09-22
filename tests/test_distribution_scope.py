@@ -260,6 +260,7 @@ class DistributionScopeTests(unittest.TestCase):
             ROOT / "scripts" / "prepared_distribution" / "setup.ps1"
         ).read_text(encoding="utf-8")
         self.assertNotIn("$Python -m ", setup)
+        self.assertIn("$McpRequirementsPath = Join-Path", setup.split("function", 1)[0])
 
     def test_prepared_environment_must_match_exact_lock(self) -> None:
         with tempfile.TemporaryDirectory(prefix="standardsforge-mcp-environment-test-") as temporary:
@@ -510,7 +511,7 @@ class DistributionScopeTests(unittest.TestCase):
                     "representation": "derived_structure",
                     "coverage": {"parsed_source_coverage": "synthetic qualified scope"},
                 },
-                records=copy.deepcopy(self.outline.records),
+                records=tuple(copy.deepcopy(self.outline.records)),
                 package_digest="d" * 64,
             )
 
