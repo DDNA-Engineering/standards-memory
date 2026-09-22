@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "standardsforge"
-version = "0.1.0a4"
+version = "0.1.0a5"
 description = "Offline-first standards pack compiler and evidence engine"
 readme = "README.md"
 license = "Apache-2.0"

@@ -112,6 +112,19 @@ def _require_no_links_tree(root: Path, label: str) -> None:
             _require(not _is_link_like(current_path / name), f"{label} contains a symbolic link or junction.")
 
 
+def _remove_posix_venv_lib64_alias(root: Path) -> None:
+    if not sys.platform.startswith("linux"):
+        return
+    _require(root.is_dir() and not _is_link_like(root), "Prepared .venv is missing or unsafe.")
+    alias = root / "lib64"
+    if not alias.is_symlink():
+        return
+    _require(os.readlink(alias) == "lib", "Prepared .venv contains an unexpected symbolic link or junction.")
+    library = root / "lib"
+    _require(library.is_dir() and not _is_link_like(library), "Prepared .venv library is missing or unsafe.")
+    alias.unlink()
+
+
 def _runtime_profile() -> str:
     machine = platform.machine().casefold()
     if sys.platform == "win32" and machine in {"amd64", "x86_64"}:
@@ -369,13 +382,19 @@ def setup_prepared(root: Path, *, quiet: bool = False) -> dict[str, Any]:
         else:
             marker = _load_json(marker_path, "prepared virtual-environment marker")
             _require(marker == {"bundle_manifest_sha256": manifest_sha256}, "Existing .venv is not owned by this prepared bundle.")
+            _remove_posix_venv_lib64_alias(venv_root)
             _require_no_links_tree(venv_root, "Prepared .venv")
+            if recovering_partial:
+                shutil.rmtree(venv_root)
     if not venv_root.exists():
         if not existing_ready:
             state.mkdir()
             _write_json_atomic(partial_path, {"bundle_manifest_sha256": manifest_sha256})
-        venv.EnvBuilder(with_pip=True, symlinks=False).create(venv_root)
+        venv_root.mkdir()
         _write_json_atomic(marker_path, {"bundle_manifest_sha256": manifest_sha256})
+        venv.EnvBuilder(with_pip=True, symlinks=False).create(venv_root)
+        _remove_posix_venv_lib64_alias(venv_root)
+        _require_no_links_tree(venv_root, "Prepared .venv")
     python = _venv_python(venv_root)
     _require(python.is_file() and not _is_link_like(python), "Prepared Python environment is incomplete or unsafe.")
     wheel = next(root.joinpath(*PurePosixPath(item["path"]).parts) for item in manifest["files"] if item["path"].startswith("wheel/"))

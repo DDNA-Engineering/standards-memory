@@ -35,15 +35,15 @@ The launcher fixes the principal to `local-user` and anchors the database and pa
 
 ## Connect a prepared Linux or macOS distribution
 
-Run `sh ./setup.sh` once in the extracted distribution to install the bundled core and corpus offline. POSIX MCP is a separate, explicit networked code channel: create an environment outside the prepared directory, then install `standardsforge[mcp]==0.1.0a4` from PyPI. PyPI does not contain or fetch the prepared corpus.
+Run `sh ./setup.sh` once in the extracted distribution to install the bundled core and corpus offline. POSIX MCP is a separate, explicit networked code channel: create an environment outside the prepared directory, then install `standardsforge[mcp]==0.1.0a5` from PyPI. PyPI does not contain or fetch the prepared corpus.
 
 Start the installed module with absolute paths to the distribution-local state:
 
 ```sh
 MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
-PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a4
+PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a5
 python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a4"
+"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a5"
 "$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
   --db "$PREPARED_ROOT/.standardsforge/memory.db" \
   --store "$PREPARED_ROOT/.standardsforge/objects" \

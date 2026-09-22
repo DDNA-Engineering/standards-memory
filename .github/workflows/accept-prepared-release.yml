@@ -81,7 +81,7 @@ jobs:
           $extract = Join-Path $env:RUNNER_TEMP 'StandardsForge acceptance ü'
           New-Item -ItemType Directory -Path $extract -Force | Out-Null
           @'
-          import os, stat, sys, zipfile
+          import stat, sys, zipfile
           from pathlib import Path, PurePosixPath
           archive, destination, github_env = map(Path, sys.argv[1:])
           with zipfile.ZipFile(archive) as bundle:
@@ -102,8 +102,8 @@ jobs:
           root = destination / roots.pop()
           if not (root / "bundle-manifest.json").is_file() or " " not in str(root) or str(root).isascii():
               raise SystemExit("acceptance extraction path or manifest is invalid")
-          with github_env.open("a", encoding="utf-8") as output:
-              output.write(f"PREPARED_ROOT={root}{os.linesep}")
+          with github_env.open("ab") as output:
+              output.write(f"PREPARED_ROOT={root}\n".encode("utf-8"))
           '@ | python - "$env:ARCHIVE_PATH" "$extract" "$env:GITHUB_ENV"
           if ($LASTEXITCODE -ne 0) { throw 'Safe extraction failed.' }
       - name: Run first and repeat portable core setup outside the distribution
@@ -128,7 +128,7 @@ jobs:
               }
             }
           } finally { Pop-Location }
-      - name: Prove full doctor and natural-language search
+      - name: Prove full doctor, exact resolve, search, and source evidence retrieval
         shell: pwsh
         env:
           NATIVE_OS: ${{ runner.os }}
@@ -139,6 +139,8 @@ jobs:
           $policy = Join-Path $env:PREPARED_ROOT 'policies/prepared-local.json'
           $doctor = Join-Path $env:RUNNER_TEMP 'doctor.json'
           $search = Join-Path $env:RUNNER_TEMP 'search.json'
+          $resolve = Join-Path $env:RUNNER_TEMP 'resolve.json'
+          $clause = Join-Path $env:RUNNER_TEMP 'clause.json'
           Push-Location $env:RUNNER_TEMP
           try {
             if ($env:NATIVE_OS -eq 'Windows') {
@@ -146,12 +148,25 @@ jobs:
               if ($LASTEXITCODE -ne 0) { throw 'Doctor command failed.' }
               & python (Join-Path $env:PREPARED_ROOT 'run.py') search 'environmental testing' --principal local-user --query-mode natural_language --limit 3 > $search
               if ($LASTEXITCODE -ne 0) { throw 'Search command failed.' }
+              & python (Join-Path $env:PREPARED_ROOT 'run.py') resolve 'MIL-STD-810H(1)' --representation derived_structure --principal local-user > $resolve
+              if ($LASTEXITCODE -ne 0) { throw 'Exact resolve command failed.' }
             } else {
               & sh (Join-Path $env:PREPARED_ROOT 'standardsforge.sh') doctor --policy $policy --principal local-user --full-integrity > $doctor
               if ($LASTEXITCODE -ne 0) { throw 'Doctor command failed.' }
               & sh (Join-Path $env:PREPARED_ROOT 'standardsforge.sh') search 'environmental testing' --principal local-user --query-mode natural_language --limit 3 > $search
               if ($LASTEXITCODE -ne 0) { throw 'Search command failed.' }
+              & sh (Join-Path $env:PREPARED_ROOT 'standardsforge.sh') resolve 'MIL-STD-810H(1)' --representation derived_structure --principal local-user > $resolve
+              if ($LASTEXITCODE -ne 0) { throw 'Exact resolve command failed.' }
             }
+            $searchPacket = Get-Content -LiteralPath $search -Raw | ConvertFrom-Json
+            $selector = $searchPacket.result.results[0].evidence_selector
+            if ($null -eq $selector -or $selector.operation -ne 'get_clause') { throw 'Search did not return a replayable evidence selector.' }
+            if ($env:NATIVE_OS -eq 'Windows') {
+              & python (Join-Path $env:PREPARED_ROOT 'run.py') get-clause $selector.package_digest $selector.clause_reference --record-id $selector.record_id --principal local-user > $clause
+            } else {
+              & sh (Join-Path $env:PREPARED_ROOT 'standardsforge.sh') get-clause $selector.package_digest $selector.clause_reference --record-id $selector.record_id --principal local-user > $clause
+            }
+            if ($LASTEXITCODE -ne 0) { throw 'Source evidence retrieval failed.' }
           } finally { Pop-Location }
           @'
           import json, os, platform, sys
@@ -159,30 +174,51 @@ jobs:
           root = Path(sys.argv[1])
           doctor_envelope = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8-sig"))
           search_envelope = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8-sig"))
+          resolve_envelope = json.loads(Path(sys.argv[4]).read_text(encoding="utf-8-sig"))
+          clause_envelope = json.loads(Path(sys.argv[5]).read_text(encoding="utf-8-sig"))
           receipt = json.loads((root / ".standardsforge/prepared-distribution.json").read_text(encoding="utf-8-sig"))
           manifest = json.loads((root / "bundle-manifest.json").read_text(encoding="utf-8"))
-          if (not isinstance(doctor_envelope, dict) or not isinstance(search_envelope, dict)
-                  or doctor_envelope.get("ok") is not True or search_envelope.get("ok") is not True):
-              raise SystemExit("doctor or search returned a failure envelope")
+          if any(not isinstance(packet, dict) or packet.get("ok") is not True
+                 for packet in (doctor_envelope, search_envelope, resolve_envelope, clause_envelope)):
+              raise SystemExit("doctor, search, resolve, or retrieval returned a failure envelope")
           doctor = doctor_envelope.get("result")
           search = search_envelope.get("result")
-          if not isinstance(doctor, dict) or not isinstance(search, dict):
-              raise SystemExit("doctor or search did not return an object result")
+          resolved = resolve_envelope.get("result")
+          clause = clause_envelope.get("result")
+          if any(not isinstance(result, dict) for result in (doctor, search, resolved, clause)):
+              raise SystemExit("doctor, search, resolve, or retrieval did not return an object result")
           if doctor.get("ready") is not True or doctor.get("integrity", {}).get("complete") is not True:
               raise SystemExit("doctor did not prove complete readiness")
           if not isinstance(search.get("results"), list) or not search["results"]:
               raise SystemExit("natural-language search returned no evidence")
+          selector = search["results"][0].get("evidence_selector")
+          if not isinstance(selector, dict) or selector.get("operation") != "get_clause":
+              raise SystemExit("search did not return a replayable evidence selector")
+          if (resolved.get("operation") != "resolve_document" or resolved.get("identifier") != "MIL-STD-810H(1)"
+                  or resolved.get("representation") != "derived_structure"
+                  or resolved.get("package_digest") != manifest["state"]["mil_std_810h_derived_package_digest"]):
+              raise SystemExit("exact resolve did not select the qualified derived package")
+          evidence = clause.get("evidence")
+          if (clause.get("operation") != "get_clause" or clause.get("package", {}).get("package_digest") != selector.get("package_digest")
+                  or not isinstance(evidence, list) or not any(
+                      item.get("record_id") == selector.get("record_id")
+                      and item.get("clause_reference") == selector.get("clause_reference")
+                      and all(item.get("source_checks", {}).get(check) is True for check in (
+                          "exact_quote_present", "extracted_text_digest_verified", "quote_digest_verified", "source_digest_verified"))
+                      for item in evidence)):
+              raise SystemExit("replayed evidence retrieval did not verify the selected source")
           if receipt.get("status") != "ready" or receipt.get("bundle_manifest_sha256") is None:
               raise SystemExit("prepared receipt is not ready and manifest-bound")
-          evidence = {
+          acceptance = {
               "release_tag": os.environ["RELEASE_TAG"], "asset_name": os.environ["ASSET_NAME"],
               "archive_bytes": int(os.environ["EXPECTED_BYTES"]), "archive_sha256": os.environ["EXPECTED_SHA256"],
               "distribution_version": manifest["version"], "runner_os": os.environ["NATIVE_OS"],
               "machine": platform.machine(), "python": platform.python_version(), "repeat_setup": "already_ready",
               "doctor_ready": True, "full_integrity_complete": True, "search_result_count": len(search["results"]),
+              "resolved_package_digest": resolved["package_digest"], "source_evidence_verified": True,
           }
-          print(json.dumps(evidence, indent=2, sort_keys=True))
+          print(json.dumps(acceptance, indent=2, sort_keys=True))
           with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as output:
-              output.write("## Prepared distribution acceptance\n\n```json\n" + json.dumps(evidence, indent=2, sort_keys=True) + "\n```\n")
-          '@ | python - "$env:PREPARED_ROOT" "$doctor" "$search"
+              output.write("## Prepared distribution acceptance\n\n```json\n" + json.dumps(acceptance, indent=2, sort_keys=True) + "\n```\n")
+          '@ | python - "$env:PREPARED_ROOT" "$doctor" "$search" "$resolve" "$clause"
           if ($LASTEXITCODE -ne 0) { throw 'Acceptance-result validation failed.' }

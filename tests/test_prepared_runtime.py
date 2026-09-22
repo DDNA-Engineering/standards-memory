@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import venv
 from pathlib import Path
 
 
@@ -16,6 +17,9 @@ sys.path.insert(0, str(ROOT / "scripts" / "prepared_distribution"))
 from prepared_runtime import (  # noqa: E402
     PreparedSetupError,
     _parse_cli_success,
+    _remove_posix_venv_lib64_alias,
+    _require_no_links_tree,
+    setup_prepared,
     validate_bundle,
     validate_receipt,
 )
@@ -26,6 +30,36 @@ def _sha256(value: bytes) -> str:
 
 
 class PreparedRuntimeTests(unittest.TestCase):
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Linux venv alias behavior")
+    def test_standard_linux_venv_alias_is_removed_but_external_link_is_rejected(self) -> None:
+        venv_root = self.root / ".venv"
+        venv.EnvBuilder(with_pip=False, symlinks=False).create(venv_root)
+        alias = venv_root / "lib64"
+        self.assertTrue(alias.is_symlink())
+        self.assertEqual("lib", os.readlink(alias))
+
+        _remove_posix_venv_lib64_alias(venv_root)
+        self.assertFalse(alias.exists())
+        _require_no_links_tree(venv_root, "Prepared .venv")
+
+        outside = self.root / "outside"
+        outside.mkdir()
+        alias.symlink_to(outside, target_is_directory=True)
+        with self.assertRaisesRegex(PreparedSetupError, "unexpected symbolic link"):
+            _remove_posix_venv_lib64_alias(venv_root)
+        with self.assertRaisesRegex(PreparedSetupError, "symbolic link or junction"):
+            _require_no_links_tree(venv_root, "Prepared .venv")
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Linux venv alias behavior")
+    def test_unowned_venv_alias_is_not_modified(self) -> None:
+        venv_root = self.root / ".venv"
+        venv.EnvBuilder(with_pip=False, symlinks=False).create(venv_root)
+        alias = venv_root / "lib64"
+        self.assertTrue(alias.is_symlink())
+        with self.assertRaises(PreparedSetupError):
+            setup_prepared(self.root)
+        self.assertTrue(alias.is_symlink())
+
     def test_cli_success_envelope_is_unwrapped(self) -> None:
         result = subprocess.CompletedProcess([], 0, stdout='{"ok": true, "result": {"ready": true}}')
 
@@ -44,7 +78,7 @@ class PreparedRuntimeTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory(prefix="standardsforge-prepared-runtime-")
         self.root = Path(self.temporary.name)
-        wheel_name = "standardsforge-0.1.0a4-py3-none-any.whl"
+        wheel_name = "standardsforge-0.1.0a5-py3-none-any.whl"
         wheel_bytes = b"qualified universal wheel"
         wheel_digest = _sha256(wheel_bytes)
         acquisition_bytes = b'{"qualified":true}\n'
@@ -55,7 +89,7 @@ class PreparedRuntimeTests(unittest.TestCase):
             }
         }
         wheel_provenance = {
-            "version": "0.1.0a4",
+            "version": "0.1.0a5",
             "wheel": {"filename": wheel_name, "sha256": wheel_digest},
         }
         mcp_name = "mcp-2.2.0-py3-none-any.whl"
@@ -80,7 +114,7 @@ class PreparedRuntimeTests(unittest.TestCase):
         self.manifest = {
             "schema_version": "1.3",
             "product": "StandardsForge prepared distribution",
-            "version": "0.1.0a4",
+            "version": "0.1.0a5",
             "build": {
                 "archive_source_date_epoch": 1767225600,
                 "archive_timestamp": "2026-01-01T00:00:00Z",
@@ -121,7 +155,7 @@ class PreparedRuntimeTests(unittest.TestCase):
             "mcp_status": "not_installed",
             "principal_id": "local-user",
             "status": "ready",
-            "version": "0.1.0a4",
+            "version": "0.1.0a5",
             "wheel_sha256": manifest["build"]["wheel_sha256"],
         }
         state = self.root / ".standardsforge"
@@ -174,7 +208,7 @@ class PreparedRuntimeTests(unittest.TestCase):
             "mcp_status": "not_installed",
             "principal_id": "local-user",
             "status": "ready",
-            "version": "0.1.0a4",
+            "version": "0.1.0a5",
             "wheel_sha256": manifest["build"]["wheel_sha256"],
         }
         (external / "prepared-distribution.json").write_text(json.dumps(receipt), encoding="utf-8")

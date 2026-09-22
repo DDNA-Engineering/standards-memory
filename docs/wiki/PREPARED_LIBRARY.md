@@ -9,7 +9,7 @@ Return to the [three-minute root quickstart](../../README.md#start-the-offline-l
 ## Requirements
 
 - 64-bit Windows or Linux, or Intel or Apple silicon macOS.
-- CPython 3.11 or newer.
+- CPython 3.11 or newer with `venv`/`ensurepip`; Debian/Ubuntu system Python may require its matching `python3-venv` package.
 - Windows PowerShell for the Windows examples, or a POSIX shell for the Linux and macOS wrappers.
 - A Python build whose SQLite includes FTS5.
 - Enough local space for the approximately 1 GB archive plus its extracted packs, virtual environment, object store, and index.
@@ -108,7 +108,7 @@ On Linux or macOS, complete the offline core setup first. Then create a separate
 ```sh
 MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
 python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a4"
+"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a5"
 ```
 
 The pip command is an explicit networked code/dependency installation. It does not download the prepared corpus or any standards content. Start the installed module with absolute paths to the prepared distribution's `.standardsforge/memory.db` and `.standardsforge/objects`; the [model integration guide](MODEL_INTEGRATION.md) gives the full command and host boundary.

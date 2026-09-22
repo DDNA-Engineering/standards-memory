@@ -83,14 +83,16 @@ Acquire the pinned Windows MCP dependency closure into a dedicated wheelhouse. T
 & $Python -m pip download `
   --disable-pip-version-check `
   --only-binary=:all: `
+  --require-hashes `
+  --no-deps `
   --dest build/prepared-mcp-wheelhouse `
-  mcp==2.2.0
+  -r scripts/prepared_distribution/mcp-wheelhouse-win-amd64-cp312.txt
 ```
 
 Then bind the completed corpus, acquisition snapshot, qualified outline, wheel, policy, and provenance:
 
 ```powershell
-$PreparedVersion = '0.1.0a4'
+$PreparedVersion = '0.1.0a5'
 & $Python scripts/build_prepared_distribution.py `
   --corpus-index .standardsforge/corpus/mil-std-current/corpus.json `
   --acquisition-manifest .standardsforge/sources/dla/mil-std/manifest.json `
@@ -98,6 +100,7 @@ $PreparedVersion = '0.1.0a4'
   --wheel "build/prepared-wheel/standardsforge-$PreparedVersion-py3-none-any.whl" `
   --wheel-provenance "build/prepared-wheel/standardsforge-$PreparedVersion-py3-none-any.whl.provenance.json" `
   --mcp-wheelhouse build/prepared-mcp-wheelhouse `
+  --mcp-requirements scripts/prepared_distribution/mcp-wheelhouse-win-amd64-cp312.txt `
   --output "build/standardsforge-ready-$PreparedVersion.zip" `
   --version $PreparedVersion
 ```

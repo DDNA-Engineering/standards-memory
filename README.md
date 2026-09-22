@@ -8,12 +8,12 @@
 
 Download one prepared archive, run one setup command, and search **438 compiled MIL-STD packs** locally. No Git clone, PDF acquisition, corpus compilation, network query, or model call is required to use the included snapshot.
 
-[![Prepared release: 0.1.0a4](https://img.shields.io/badge/prepared_release-0.1.0a4-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a4)
+[![Prepared release: 0.1.0a5](https://img.shields.io/badge/prepared_release-0.1.0a5-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a5)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
 [![Queries: offline](https://img.shields.io/badge/queries-offline-253247?style=flat-square)](docs/wiki/ARCHITECTURE_AND_TRUST.md)
 [![Library: 438 packs](https://img.shields.io/badge/library-438_packs-EA6A23?style=flat-square)](#complete-prepared-library-snapshot)
 
-[Download the prepared library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a4/standardsforge-ready-0.1.0a4.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a4/standardsforge-ready-0.1.0a4.zip.sha256) · [Wiki](docs/wiki/README.md) · [Contributing](CONTRIBUTING.md)
+[Download the prepared library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip.sha256) · [Wiki](docs/wiki/README.md) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -25,9 +25,9 @@ The prepared core supports 64-bit Windows and Linux plus Intel and Apple silicon
 
 ### 1. Download and extract
 
-Download [`standardsforge-ready-0.1.0a4.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a4/standardsforge-ready-0.1.0a4.zip), extract it to a durable local directory, and open PowerShell or a POSIX shell in that extracted directory.
+Download [`standardsforge-ready-0.1.0a5.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip), extract it to a durable local directory, and open PowerShell or a POSIX shell in that extracted directory.
 
-The [published checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a4/standardsforge-ready-0.1.0a4.zip.sha256) is available when you want to verify the downloaded archive before extraction.
+The [published checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip.sha256) is available when you want to verify the downloaded archive before extraction.
 
 ### 2. Set up the included corpus
 
@@ -116,9 +116,9 @@ On Linux or macOS, first complete the offline core setup above. Then create an e
 
 ```sh
 MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
-PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a4
+PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a5
 python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a4"
+"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a5"
 "$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
   --db "$PREPARED_ROOT/.standardsforge/memory.db" \
   --store "$PREPARED_ROOT/.standardsforge/objects" \
