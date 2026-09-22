@@ -35,9 +35,9 @@ Rights statements inside a pack are provenance only. Operational authorization c
 - `pack`: strict data-only inventory, content, citation, and dependency validation.
 - `policy`: trusted operator policy parsing and install authorization.
 - `store`: SQLite snapshot metadata, grants, records, and FTS5 projection.
-- `service`: all six read operations, signed policy-bound continuations, and separate install/revoke administration.
+- `service`: all seven read operations, signed policy-bound continuations, and separate install/revoke administration.
 - `cli`: separate administrative and read-only query commands.
-- `mcp_server`: local stdio adapter exposing exactly the six read operations under a startup-bound principal, with no administration, listener, or telemetry middleware.
+- `mcp_server`: local stdio adapter exposing exactly the seven declared read operations under a startup-bound principal, with no administration, listener, or telemetry middleware.
 - `source_catalog`: strict metadata validation and offline integrity verification for a closed local PDF source set.
 - `compiler`: strict PDF text-layer extraction into page records, with raw PDF preservation, extracted-text sidecars, and explicit fidelity dimensions.
 - `corpus_compiler`: Distribution Statement A-gated DLA acquisition composition, deterministic record-scoped unclassified page packs, composition-and-provenance-validated restartable archives, exact local policy generation, and policy-bound batch installation with obsolete-grant reconciliation.

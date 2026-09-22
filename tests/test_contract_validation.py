@@ -51,11 +51,11 @@ class ContractValidationTests(unittest.TestCase):
         )
         self.assertEqual(
             {
-                "detailed_results": 9,
+                "detailed_results": 11,
                 "profile_results": 4,
                 "doctor_results": 1,
                 "handoff_results": 1,
-                "typed_errors": 3,
+                "typed_errors": 4,
                 "negative_cases": 12,
             },
             counts,
@@ -79,6 +79,7 @@ class ContractValidationTests(unittest.TestCase):
         first_page = self.service.enumerate_obligations(
             self.first_digest, "local-user", limit=1
         )
+        document_page = self.service.list_documents("local-user", limit=1)
 
         mutations = []
         missing_operation = copy.deepcopy(search)
@@ -100,6 +101,14 @@ class ContractValidationTests(unittest.TestCase):
         inconsistent_cursor = copy.deepcopy(first_page)
         inconsistent_cursor["page"]["next_cursor"] = None
         mutations.append(inconsistent_cursor)
+
+        extra_document_field = copy.deepcopy(document_page)
+        extra_document_field["documents"][0]["undeclared"] = True
+        mutations.append(extra_document_field)
+
+        inconsistent_document_cursor = copy.deepcopy(document_page)
+        inconsistent_document_cursor["page"]["next_cursor"] = None
+        mutations.append(inconsistent_document_cursor)
 
         for mutation in mutations:
             with self.subTest(operation=mutation.get("operation")):

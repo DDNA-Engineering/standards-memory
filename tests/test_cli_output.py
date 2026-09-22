@@ -47,6 +47,29 @@ class CLIOutputTests(unittest.TestCase):
                     query_mode=expected,
                 )
 
+    def test_list_documents_forwards_prefix_pagination_and_bound_principal(self) -> None:
+        args = _parser().parse_args(
+            [
+                "list-documents",
+                "--identifier-prefix",
+                "MIL-STD-810",
+                "--limit",
+                "25",
+                "--cursor",
+                "signed-cursor",
+                "--principal",
+                "local-user",
+            ]
+        )
+        with patch(
+            "standardsforge.cli.StandardsForgeService.list_documents",
+            return_value={"operation": "list_documents"},
+        ) as list_documents:
+            self.assertEqual({"operation": "list_documents"}, _run(args))
+        list_documents.assert_called_once_with(
+            "local-user", "MIL-STD-810", 25, "signed-cursor"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

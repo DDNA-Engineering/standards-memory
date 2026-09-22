@@ -70,7 +70,7 @@
         "SM-FR-046"
       ],
       "acceptance": [
-        "Expose exactly the six read operations over local stdio MCP with no administrative tools.",
+        "Expose only the query contract's declared read operations over local stdio MCP with no administrative tools.",
         "Bind the principal from trusted server startup configuration and omit it from every tool schema.",
         "Preserve successful result envelopes and typed domain-error envelopes across the MCP boundary.",
         "Disable SDK telemetry even when a host process configures an exporter.",
@@ -365,7 +365,7 @@
         "Create an exact one-pack local policy only through an explicit administrative command that requires the operator to name the principal and expected content class; never infer authority from pack rights alone.",
         "Deliver a concise MIL-STD reading workflow to MCP clients during initialization, covering exact edition and representation selection, immutable package pins, discovery versus evidence, governing context, tailoring and applicability boundaries, notices, and honest completeness.",
         "Make every MCP tool description state its operation-specific interpretation boundary, including that derived structure is unreviewed and zero classified obligations is not proof of zero requirements.",
-        "Keep the MCP surface read-only, offline, principal-bound, and limited to the existing six query operations.",
+        "Keep the MCP surface read-only, offline, principal-bound, and limited to the query contract's declared operations.",
         "Verify policy-writer negative cases, actual client-visible instructions and descriptions, contract parity, copy-paste command syntax, and the complete local test suite."
       ]
     },
@@ -406,7 +406,7 @@
       "acceptance": [
         "Install the MCP, compiler, and contract-validation profiles in every supported CI matrix job and fail on inconsistent installed dependencies.",
         "Check every declared JSON Schema against its selected metaschema and validate the repository's concrete contract documents against their schemas.",
-        "Validate actual success packets for all six read operations, first and final continuation pages, compact and concise evidence profiles, and typed error envelopes against operation-specific contracts.",
+        "Validate actual success packets for all declared read operations, first and final continuation pages, compact and concise evidence profiles, and typed error envelopes against operation-specific contracts.",
         "Prove malformed packets fail validation rather than relying only on positive fixtures.",
         "Build the wheel in a clean temporary directory, install it outside the checkout, and run a dependency-free core read smoke test without PYTHONPATH source leakage.",
         "Keep schema validation and compiler dependencies outside the dependency-free core runtime."
@@ -733,8 +733,34 @@
         "Bundle the exact hash-locked Windows x64 CPython 3.12 MCP dependency closure as regular wheel files in the prepared archive and independently revalidate every byte through the closed distribution inventory, requirements digest, and canonical wheelhouse digest.",
         "Install the core MCP extra only from the local wheelhouse with package indexes disabled, run dependency consistency checks, and fail readiness on a missing, duplicate, malformed, incomplete, or incompatible wheel set.",
         "Provide a distribution-rooted MCP launcher that accepts no overrides, emits no bootstrap output on protocol stdout, and always supplies absolute database and object-store paths plus the fixed trusted local principal regardless of host working directory.",
-        "Before writing the ready marker, start the installed server over stdio, require exactly the six read tools, and complete one authorized search against installed distribution state.",
+        "Before writing the ready marker, start the installed server over stdio, require the complete declared read-tool surface, and complete authorized document discovery and search against installed distribution state.",
         "Document copy-paste Claude Desktop, Claude Code, and Cursor configuration using the absolute launcher path without expanding the read-only MCP surface or treating host configuration as authority."
+      ]
+    },
+    {
+      "task_id": "TASK-033",
+      "title": "Authorization-safe installed-document discovery",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-002",
+        "SM-FR-003",
+        "SM-FR-022",
+        "SM-FR-025",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-039",
+        "SM-FR-057",
+        "SM-FR-073"
+      ],
+      "acceptance": [
+        "Expose a seventh read-only list_documents operation through service, CLI, and principal-bound stdio MCP without exposing administrative or authorization selectors.",
+        "Return exact authorized installed-package identity, representation, immutable digest, record count, and declared coverage in deterministic keyset order with an exact matching count.",
+        "Normalize optional identifier prefixes without wildcard interpretation and bind signed continuations to operation, prefix, principal, authorization visibility, position, cumulative count, and expiry.",
+        "Return at most twenty deterministic replayable near-match candidates for exact alternate selectors, identifier prefixes, and matched document families; never use fuzzy, title, network, or model fallback.",
+        "Reauthorize returned packages and recheck authorization visibility immediately before returning inventory, exact resolution, ambiguity, or near-match results so absent and unauthorized resources remain indistinguishable.",
+        "Version the expanded seven-operation response and MCP contracts, retain query response 0.2 for historical consumers, and validate actual first and final inventory pages plus the closed near-match error envelope.",
+        "Prove empty-principal and revocation non-disclosure, stable prefix pagination, replayable hints, invalid limits, tampered cursors, prefix mismatch, and authorization-snapshot invalidation with networking disabled."
       ]
     }
   ]

@@ -409,6 +409,27 @@ class LocalStore:
         with self._connection() as connection:
             return list(connection.execute(sql, params))
 
+    def authorized_document_packages(self, principal_id: str) -> list[sqlite3.Row]:
+        """Return package metadata only for grants currently visible to one principal."""
+
+        with self._connection() as connection:
+            return list(
+                connection.execute(
+                    """
+                    SELECT p.*, g.policy_fingerprint AS grant_policy_fingerprint,
+                           (
+                               SELECT COUNT(*) FROM records r
+                               WHERE r.package_digest = p.package_digest
+                           ) AS record_count
+                    FROM packages p
+                    JOIN grants g ON g.package_digest = p.package_digest
+                    WHERE g.principal_id = ? AND g.can_serve = 1 AND g.revoked_at IS NULL
+                    ORDER BY p.normalized_identifier, p.edition_id, p.package_digest
+                    """,
+                    (principal_id,),
+                )
+            )
+
     def authorized_package(self, principal_id: str, package_digest: str) -> sqlite3.Row:
         with self._connection() as connection:
             row = connection.execute(

@@ -10,6 +10,7 @@ from mcp.client.stdio import StdioServerParameters
 
 EXPECTED_TOOLS = [
     "search",
+    "list_documents",
     "resolve_document",
     "get_clause",
     "build_context",
@@ -39,9 +40,17 @@ async def _smoke(db: str, store: str, principal: str, query: str) -> None:
         tools = await client.list_tools()
         if [tool.name for tool in tools.tools] != EXPECTED_TOOLS:
             raise RuntimeError("The prepared MCP server exposed an unexpected tool surface.")
+        inventory = await client.call_tool("list_documents", {"limit": 1})
+        if inventory.is_error or inventory.structured_content is None:
+            raise RuntimeError("The prepared MCP server document-inventory smoke failed.")
+        inventory_result = inventory.structured_content.get("result", {})
+        if not inventory_result.get("documents") or inventory_result.get("page", {}).get("matching_authorized_package_count", 0) < 1:
+            raise RuntimeError("The prepared MCP server has no authorized installed documents.")
         result = await client.call_tool("search", {"query": query, "limit": 1})
         if result.is_error or result.structured_content is None:
             raise RuntimeError("The prepared MCP server search smoke failed.")
+        if not result.structured_content.get("result", {}).get("results"):
+            raise RuntimeError("The prepared MCP server search returned no authorized evidence.")
 
 
 def main() -> int:

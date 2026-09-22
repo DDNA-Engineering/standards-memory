@@ -1,12 +1,13 @@
 # Query guide
 
-StandardsForge exposes six read operations. Administration, acquisition, compilation, installation, revocation, and handoff export remain separate.
+StandardsForge exposes seven read operations. Administration, acquisition, compilation, installation, revocation, and handoff export remain separate.
 
 ## Operations
 
 | Command | Use it for |
 |---|---|
 | `search` | Discover authorized records through lexical search and source-linked snippets. |
+| `list-documents` | Inventory authorized installed packages, optionally by normalized identifier prefix. |
 | `resolve` | Resolve an exact document, edition, and optional representation to a package pin. |
 | `get-clause` | Retrieve one exact record plus its required governing context. |
 | `build-context` | Assemble several records without duplicating shared evidence. |
@@ -16,6 +17,17 @@ StandardsForge exposes six read operations. Administration, acquisition, compila
 All examples below assume a prepared distribution PowerShell opened in its extracted root and the principal `local-user`.
 
 ## Discover
+
+When the exact installed identifier is unknown, inventory the caller's authorized packages first:
+
+```powershell
+.\standardsforge.ps1 list-documents `
+  --identifier-prefix 'MIL-STD-810' `
+  --principal local-user `
+  --limit 50
+```
+
+The result includes exact edition and representation identities, immutable package digests, record counts, declared coverage, and a signed continuation when another page exists. Prefix matching is normalized and literal, not fuzzy or wildcard search. The inventory is authorization-filtered and publisher currentness does not select a project baseline.
 
 ```powershell
 .\standardsforge.ps1 search "steady axial load" `
@@ -80,7 +92,7 @@ Exact record IDs are the only authoritative cross-package identity. Unmatched re
 
 ## Export a source-first handoff
 
-`export-handoff` is an administrative write, not a seventh query:
+`export-handoff` is an administrative write, not a query operation:
 
 ```powershell
 standardsforge export-handoff <package-digest> `

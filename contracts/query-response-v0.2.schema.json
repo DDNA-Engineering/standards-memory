@@ -1,11 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://standardsforge.dev/contracts/query-response-0.3.0.schema.json",
+  "$id": "https://standardsforge.dev/contracts/query-response-0.2.0.schema.json",
   "title": "StandardsForge read-operation result packets",
-  "description": "Concrete result contracts for the seven read operations. Compact and concise evidence packets use their dedicated profile schemas.",
+  "description": "Concrete result contracts for the six read operations. Compact and concise evidence packets use their dedicated profile schemas.",
   "oneOf": [
     {"$ref": "#/$defs/search"},
-    {"$ref": "#/$defs/listDocuments"},
     {"$ref": "#/$defs/resolveDocument"},
     {"$ref": "#/$defs/getClause"},
     {"$ref": "#/$defs/buildContext"},
@@ -205,67 +204,6 @@
         },
         "coverage_by_package": {"type": "object", "additionalProperties": {"type": "object", "required": ["declared_pack_coverage", "dimensions"], "properties": {"declared_pack_coverage": {"$ref": "#/$defs/declaredCoverage"}, "dimensions": {"$ref": "#/$defs/coverageDimensions"}}}},
         "completeness": {"type": "object", "additionalProperties": false, "required": ["database_traversal", "response_fit"], "properties": {"database_traversal": {"type": "object", "required": ["complete", "status", "returned", "limit"]}, "response_fit": {"type": "object", "required": ["complete", "status", "unit"]}}},
-        "limitations": {"type": "array", "items": {"type": "string"}}
-      }
-    },
-    "listDocuments": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["schema_version", "operation", "retrieval_mode", "filters", "snapshot_sha256", "documents", "page", "limitations"],
-      "properties": {
-        "schema_version": {"const": "0.1.0"},
-        "operation": {"const": "list_documents"},
-        "retrieval_mode": {"const": "authorized_installed_package_catalog"},
-        "filters": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["identifier_prefix", "normalized_identifier_prefix"],
-          "properties": {
-            "identifier_prefix": {"type": ["string", "null"]},
-            "normalized_identifier_prefix": {"type": ["string", "null"]}
-          }
-        },
-        "snapshot_sha256": {"$ref": "#/$defs/digest"},
-        "documents": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["pack_id", "document_family_id", "identifier", "normalized_identifier", "title", "edition_id", "revision", "publication_date", "representation", "package_digest", "record_count", "declared_coverage"],
-            "properties": {
-              "pack_id": {"$ref": "#/$defs/nonEmptyString"},
-              "document_family_id": {"$ref": "#/$defs/nonEmptyString"},
-              "identifier": {"$ref": "#/$defs/nonEmptyString"},
-              "normalized_identifier": {"$ref": "#/$defs/nonEmptyString"},
-              "title": {"$ref": "#/$defs/nonEmptyString"},
-              "edition_id": {"$ref": "#/$defs/nonEmptyString"},
-              "revision": {"type": "string"},
-              "publication_date": {"type": "string"},
-              "representation": {"enum": ["page_text", "derived_structure", "reviewed_structure", "curated_records"]},
-              "package_digest": {"$ref": "#/$defs/digest"},
-              "record_count": {"type": "integer", "minimum": 0},
-              "declared_coverage": {"$ref": "#/$defs/declaredCoverage"}
-            }
-          }
-        },
-        "page": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["returned", "previously_returned", "cumulative_returned", "matching_authorized_package_count", "has_more", "next_cursor", "cursor_ttl_seconds"],
-          "properties": {
-            "returned": {"type": "integer", "minimum": 0},
-            "previously_returned": {"type": "integer", "minimum": 0},
-            "cumulative_returned": {"type": "integer", "minimum": 0},
-            "matching_authorized_package_count": {"type": "integer", "minimum": 0},
-            "has_more": {"type": "boolean"},
-            "next_cursor": {"type": ["string", "null"], "minLength": 1},
-            "cursor_ttl_seconds": {"type": ["integer", "null"], "minimum": 1}
-          },
-          "allOf": [
-            {"if": {"properties": {"has_more": {"const": true}}, "required": ["has_more"]}, "then": {"properties": {"next_cursor": {"type": "string", "minLength": 1}, "cursor_ttl_seconds": {"type": "integer", "minimum": 1}}}},
-            {"if": {"properties": {"has_more": {"const": false}}, "required": ["has_more"]}, "then": {"properties": {"next_cursor": {"type": "null"}, "cursor_ttl_seconds": {"type": "null"}}}}
-          ]
-        },
         "limitations": {"type": "array", "items": {"type": "string"}}
       }
     },

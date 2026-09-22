@@ -35,11 +35,12 @@ The launcher fixes the principal to `local-user` and anchors the database and pa
 
 ## Required tool sequence
 
-1. Resolve the exact document identifier, edition, and representation. Keep the returned package digest as the immutable pin for the rest of the task.
-2. Use `search` only to discover candidate records. Search rank is not applicability, normative status, or complete coverage.
-3. Replay a selected result's evidence selector through `get_clause`, or use `build_context` for multiple selected records. Base answers on exact retrieved text and returned required context, not the search snippet.
-4. Read coverage, derivation status, relationships, citations, and limitations before answering. Preserve unresolved dependencies and unsupported regions.
-5. Use `enumerate_obligations` only for packs that explicitly classify obligations. Zero returned rows does not mean zero requirements when classification or source interpretation is incomplete.
+1. If the exact installed identifier is unknown, call `list_documents`; treat its authorized inventory and declared coverage as discovery, not applicability or baseline approval.
+2. Resolve the exact document identifier, edition, and representation. Keep the returned package digest as the immutable pin for the rest of the task.
+3. Use `search` only to discover candidate records. Each hit carries its identifier, edition ID, and package digest, but search rank is not applicability, normative status, or complete coverage.
+4. Replay a selected result's evidence selector through `get_clause`, or use `build_context` for multiple selected records. Base answers on exact retrieved text and returned required context, not the search snippet.
+5. Read coverage, derivation status, relationships, citations, and limitations before answering. Preserve unresolved dependencies and unsupported regions.
+6. Use `enumerate_obligations` only for packs that explicitly classify obligations. Zero returned rows does not mean zero requirements when classification or source interpretation is incomplete.
 
 ## Representation meaning
 

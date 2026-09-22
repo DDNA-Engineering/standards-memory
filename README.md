@@ -48,7 +48,16 @@ Setup validates the bundle, creates its isolated Python environment, installs th
 
 A ready report exits `0`. The check opens the installed state read-only, validates every included package, reconciles the selected local policy, and proves one exact source-verifying query through the real evidence path.
 
-### 4. Run the first search
+### 4. Inventory and search the installed library
+
+```powershell
+.\standardsforge.ps1 list-documents `
+  --identifier-prefix 'MIL-STD-810' `
+  --principal local-user `
+  --limit 20
+```
+
+This authorization-filtered inventory returns exact identifiers, editions, representations, immutable package digests, record counts, and declared coverage. Use it before resolution when an exact installed identifier or suffix is unknown.
 
 ```powershell
 .\standardsforge.ps1 search "environmental testing" `

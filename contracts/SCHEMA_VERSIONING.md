@@ -23,5 +23,6 @@ StandardsForge machine contracts are closed interfaces, not examples. Every sche
 - Added prepared-distribution 1.2 with a pinned MCP runtime requirement and hash-bound offline wheelhouse identity; 1.1 artifacts remain identifiable but are not accepted by the current setup path.
 - Added offset-backed page records 0.2.0 while retaining records 0.1.0 for existing structural and curated packs.
 - Added query response 0.2.0 for explicit lexical modes and conservative edition-alignment evidence while retaining the established operation-specific 0.1.0 packets where applicable.
+- Added query response 0.3.0 for authorization-safe installed-document inventory and retained the complete six-operation 0.2.0 schema under `query-response-v0.2.schema.json`.
 
 Future changes append a dated entry here in the same commit as the schema, generator, validation, migration or compatibility behavior, and negative tests.

@@ -19,6 +19,7 @@ from .service import StandardsForgeService
 
 MCP_TOOL_NAMES = (
     "search",
+    "list_documents",
     "resolve_document",
     "get_clause",
     "build_context",
@@ -26,7 +27,8 @@ MCP_TOOL_NAMES = (
     "diff_editions",
 )
 MCP_SERVER_INSTRUCTIONS = (
-    "Read MIL-STDs as edition-pinned evidence, not as free-floating prose. First resolve the exact "
+    "Read MIL-STDs as edition-pinned evidence, not as free-floating prose. If the exact identifier is unknown, "
+    "list the authorized installed documents first. Then resolve the exact "
     "identifier, edition, and representation; never combine editions or silently choose among representations. "
     "Use reviewed_structure or curated_records only for their declared reviewed scope, derived_structure only "
     "as automated unreviewed navigation, and page_text as physical extracted text. Search is discovery, not "
@@ -44,9 +46,14 @@ MCP_TOOL_DESCRIPTIONS = {
     "search": (
         "Discover authorized records by explicit local lexical mode: exact_phrase preserves token order and "
         "adjacency, all_terms requires every parsed term, and any_terms accepts at least one. Results are "
-        "candidates, not applicability, "
+        "candidates and include identifier, edition_id, and package_digest for replay; they do not establish applicability, "
         "obligation completeness, or exact document identity; use resolve_document for an identifier and replay "
         "a selected evidence_selector through get_clause."
+    ),
+    "list_documents": (
+        "List authorized installed document packages with exact identity, representation, immutable package digest, "
+        "record count, and declared coverage. Optional normalized identifier-prefix filtering and signed pagination "
+        "remain bound to the startup principal; current publisher status does not establish a project baseline."
     ),
     "resolve_document": (
         "Resolve an exact authorized identifier, optional edition, and representation to an immutable package "
@@ -143,6 +150,56 @@ class _EnumerateObligationsResult(TypedDict):
 
 class _ClosedTypedDict(TypedDict):
     __pydantic_config__ = ConfigDict(extra="forbid")
+
+
+class _DocumentCoverage(_ClosedTypedDict):
+    corpus_scope: str
+    edition_composition: str
+    parsed_source_coverage: str
+    dependency_closure: str
+    enumeration_traversal: str
+    output_budget_coverage: str
+
+
+class _DocumentInventoryEntry(_ClosedTypedDict):
+    pack_id: str
+    document_family_id: str
+    identifier: str
+    normalized_identifier: str
+    title: str
+    edition_id: str
+    revision: str
+    publication_date: str
+    representation: Literal["page_text", "derived_structure", "reviewed_structure", "curated_records"]
+    package_digest: str
+    record_count: int
+    declared_coverage: _DocumentCoverage
+
+
+class _DocumentInventoryFilters(_ClosedTypedDict):
+    identifier_prefix: str | None
+    normalized_identifier_prefix: str | None
+
+
+class _DocumentInventoryPage(_ClosedTypedDict):
+    returned: int
+    previously_returned: int
+    cumulative_returned: int
+    matching_authorized_package_count: int
+    has_more: bool
+    next_cursor: str | None
+    cursor_ttl_seconds: int | None
+
+
+class _ListDocumentsResult(_ClosedTypedDict):
+    schema_version: Literal["0.1.0"]
+    operation: Literal["list_documents"]
+    retrieval_mode: Literal["authorized_installed_package_catalog"]
+    filters: _DocumentInventoryFilters
+    snapshot_sha256: str
+    documents: list[_DocumentInventoryEntry]
+    page: _DocumentInventoryPage
+    limitations: list[str]
 
 
 class _DiffPackage(_ClosedTypedDict):
@@ -452,6 +509,11 @@ class _SearchSuccess(TypedDict):
     result: _SearchResult
 
 
+class _ListDocumentsSuccess(_ClosedTypedDict):
+    ok: Literal[True]
+    result: _ListDocumentsResult
+
+
 class _ResolveDocumentSuccess(TypedDict):
     ok: Literal[True]
     result: _ResolveDocumentResult
@@ -478,6 +540,7 @@ class _DiffEditionsSuccess(_ClosedTypedDict):
 
 
 SearchToolResult = Annotated[CallToolResult, _SearchSuccess]
+ListDocumentsToolResult = Annotated[CallToolResult, _ListDocumentsSuccess]
 ResolveDocumentToolResult = Annotated[CallToolResult, _ResolveDocumentSuccess]
 GetClauseToolResult = Annotated[CallToolResult, _GetClauseSuccess]
 BuildContextToolResult = Annotated[CallToolResult, _BuildContextSuccess]
@@ -579,6 +642,17 @@ def create_mcp_server(
                 scope_prefix=scope_prefix,
                 query_mode=query_mode,
             ),
+            result_mode=result_mode,
+        )
+
+    @server.tool(description=MCP_TOOL_DESCRIPTIONS["list_documents"], annotations=read_only)
+    def list_documents(
+        identifier_prefix: str | None = None,
+        limit: int = 50,
+        cursor: str | None = None,
+    ) -> ListDocumentsToolResult:
+        return _invoke(
+            lambda: service.list_documents(bound_principal, identifier_prefix, limit, cursor),
             result_mode=result_mode,
         )
 

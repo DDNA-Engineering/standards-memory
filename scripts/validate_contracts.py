@@ -239,9 +239,18 @@ def validate_actual_query_contracts(
         final_page = service.enumerate_obligations(
             first_digest, "local-user", limit=1, cursor=next_cursor
         )
+        first_document_page = service.list_documents("local-user", "EXAMPLE-SPEC", limit=1)
+        document_cursor = first_document_page["page"]["next_cursor"]
+        if not isinstance(document_cursor, str):
+            raise AssertionError("The document inventory fixture did not produce a cursor.")
+        final_document_page = service.list_documents(
+            "local-user", "EXAMPLE-SPEC", limit=1, cursor=document_cursor
+        )
 
         detailed_results = [
             service.search("axial load", "local-user"),
+            first_document_page,
+            final_document_page,
             service.resolve_document(
                 "EXAMPLE-SPEC-100",
                 "local-user",
@@ -358,6 +367,14 @@ def validate_actual_query_contracts(
             validate_with_schema(
                 schemas, registry, "error-response.schema.json", error
             )
+        resolve_not_found = _error_envelope(
+            lambda: service.resolve_document("EXAMPLE-SPEC", "local-user")
+        )
+        validate_with_schema(schemas, registry, "error-response.schema.json", resolve_not_found)
+        validate_with_schema(
+            schemas, registry, "resolve-document-not-found-error.schema.json", resolve_not_found
+        )
+        errors.append(resolve_not_found)
 
         malformed = {"ok": True, "result": dict(detailed_results[0])}
         del malformed["result"]["operation"]
@@ -386,7 +403,13 @@ def validate_actual_query_contracts(
         else:
             raise AssertionError("A malformed error packet passed contract validation.")
 
-        malformed_semantics = json.loads(json.dumps(detailed_results[3]))
+        detailed_context = next(
+            result for result in detailed_results if result["operation"] == "build_context"
+        )
+        diff_result = next(
+            result for result in detailed_results if result["operation"] == "diff_editions"
+        )
+        malformed_semantics = json.loads(json.dumps(detailed_context))
         semantic_record = next(
             item for item in malformed_semantics["evidence"] if item.get("structure", {}).get("semantics")
         )
@@ -419,7 +442,7 @@ def validate_actual_query_contracts(
         else:
             raise AssertionError("A false human review claim passed response validation.")
 
-        missing_review = json.loads(json.dumps(detailed_results[3]))
+        missing_review = json.loads(json.dumps(detailed_context))
         semantic_record = next(
             item for item in missing_review["evidence"] if item.get("structure", {}).get("semantics")
         )
@@ -448,7 +471,7 @@ def validate_actual_query_contracts(
             raise AssertionError("An undeclared search query mode passed response validation.")
 
         malformed_diff_packets: list[tuple[dict[str, Any], str]] = []
-        moved_without_after = json.loads(json.dumps(detailed_results[6]))
+        moved_without_after = json.loads(json.dumps(diff_result))
         moved_change = next(
             item for item in moved_without_after["changes"] if item["status"] == "modified"
         )
@@ -459,7 +482,7 @@ def validate_actual_query_contracts(
             (moved_without_after, "A moved change without after evidence passed response validation.")
         )
 
-        changed_target_without_status = json.loads(json.dumps(detailed_results[6]))
+        changed_target_without_status = json.loads(json.dumps(diff_result))
         target_cause = next(
             item["cause"]
             for item in changed_target_without_status["dependency_impact_paths"]
@@ -473,7 +496,7 @@ def validate_actual_query_contracts(
             )
         )
 
-        edge_cause_with_status = json.loads(json.dumps(detailed_results[6]))
+        edge_cause_with_status = json.loads(json.dumps(diff_result))
         edge_cause = next(
             item["cause"]
             for item in edge_cause_with_status["dependency_impact_paths"]
@@ -484,7 +507,7 @@ def validate_actual_query_contracts(
             (edge_cause_with_status, "An edge-delta cause with status passed response validation.")
         )
 
-        short_dependency_edge = json.loads(json.dumps(detailed_results[6]))
+        short_dependency_edge = json.loads(json.dumps(diff_result))
         short_dependency_edge["dependency_edges_added"] = [["a", "b", "c"]]
         malformed_diff_packets.append(
             (short_dependency_edge, "A short dependency-edge tuple passed response validation.")

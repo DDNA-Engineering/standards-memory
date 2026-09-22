@@ -354,7 +354,7 @@ class MCPAdapterTests(unittest.TestCase):
 
         _run_with_socket_creation_denied(scenario())
 
-    def test_all_six_operations_match_core_results_with_networking_denied(self) -> None:
+    def test_all_seven_operations_match_core_results_with_networking_denied(self) -> None:
         server = create_mcp_server(self.service, "local-user")
         cases = [
             (
@@ -372,6 +372,11 @@ class MCPAdapterTests(unittest.TestCase):
                     scope_prefix="4.2",
                     query_mode="any_terms",
                 ),
+            ),
+            (
+                "list_documents",
+                {"identifier_prefix": "EXAMPLE-SPEC", "limit": 50},
+                self.service.list_documents("local-user", "EXAMPLE-SPEC", 50),
             ),
             (
                 "resolve_document",
