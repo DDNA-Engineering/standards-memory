@@ -9,7 +9,7 @@
 StandardsForge helps teams building physical products gather the military standards that may shape their design, retrieve the exact source evidence, and use it to develop requirements, test plans, and a standards-aware product roadmap.<br>
 It is an offline-first compiler and evidence engine: every result stays tied to the source, edition, governing conditions, and known evidence limits.
 
-[![Version: 0.1.0a1](https://img.shields.io/badge/version-0.1.0a1-253247?style=flat-square)](pyproject.toml)
+[![Version: 0.1.0a2](https://img.shields.io/badge/version-0.1.0a2-253247?style=flat-square)](pyproject.toml)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-253247?style=flat-square)](LICENSE)
 [![Status: pre-alpha](https://img.shields.io/badge/status-pre--alpha-EA6A23?style=flat-square)](docs/PRD.md)
@@ -21,7 +21,7 @@ It is an offline-first compiler and evidence engine: every result stays tied to 
 
 **Topics:** [defense-engineering](https://github.com/topics/defense-engineering) · [military-standards](https://github.com/topics/military-standards) · [mil-std](https://github.com/topics/mil-std) · [systems-engineering](https://github.com/topics/systems-engineering) · [requirements-engineering](https://github.com/topics/requirements-engineering) · [mcp](https://github.com/topics/mcp) · [offline-first](https://github.com/topics/offline-first)
 
-[Quickstart](#query-the-prebuilt-corpus) · [Commands](#six-ways-to-read) · [Architecture](#under-the-hood) · [Roadmap](#where-this-is-going) · [Contributing](CONTRIBUTING.md)
+[Quickstart](#query-the-prebuilt-corpus) · [Commands](#seven-ways-to-read) · [Architecture](#under-the-hood) · [Roadmap](#where-this-is-going) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -53,7 +53,7 @@ The current prepared baseline contains:
 - About **1.0 GB** of deterministic compressed packs.
 - A one-command local setup that validates and indexes the included packs for offline queries.
 
-Download and extract [standardsforge-ready-0.1.0a1.zip](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a1/standardsforge-ready-0.1.0a1.zip), and optionally verify its [published SHA-256 checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a1/standardsforge-ready-0.1.0a1.zip.sha256). You need **Python 3.11+** with SQLite FTS5 support. Open **PowerShell** in the extracted directory and run:
+Download and extract [standardsforge-ready-0.1.0a2.zip](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a2/standardsforge-ready-0.1.0a2.zip), and optionally verify its [published SHA-256 checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a2/standardsforge-ready-0.1.0a2.zip.sha256). You need **Python 3.11+** with SQLite FTS5 support. Open **PowerShell** in the extracted directory and run:
 
 ```powershell
 # Create the isolated local environment and index the included compiled packs.
@@ -234,18 +234,19 @@ $Mcp = Join-Path $PWD '.venv\Scripts\standardsforge-mcp.exe'
 
 `write-pack-policy` does not silently trust a rights claim. The operator must name the expected content class, the validated pack must match it, and the resulting policy authorizes only that pack ID for the named principal.
 
-## Six ways to read
+## Seven ways to read
 
 | Command | The job |
 | --- | --- |
 | `search` | Discover relevant records through authorized lexical search, source-linked snippets, and available heading ancestry. |
+| `list-documents` | Inventory authorized installed packages by optional normalized identifier prefix, with signed pagination. |
 | `resolve` | Turn an exact document identifier, edition, and optional representation into a package pin. |
 | `get-clause` | Retrieve a uniquely referenced clause, note, or compiled page and its required dependency context. |
 | `build-context` | Assemble multiple clauses without duplicating shared evidence. |
 | `enumerate-obligations` | Traverse every explicitly classified obligation in a selected scope, with pagination. |
 | `diff-editions` | Compare records by exact identity and surface changes in their dependency context. |
 
-Pack validation (`verify-pack`) and administration (`install`, `revoke`) are separate from those six read operations. Source-set verification is also administrative; it does not install, parse, or authorize a document.
+Pack validation (`verify-pack`) and administration (`install`, `revoke`) are separate from those seven read operations. Source-set verification is also administrative; it does not install, parse, or authorize a document.
 
 ## Connect a local MCP host
 
@@ -261,7 +262,7 @@ Configure the MCP host to launch this stdio process against the database and obj
 standardsforge-mcp --db .standardsforge/memory.db --store .standardsforge/objects --principal local-user
 ```
 
-The host owns the process and talks over stdin/stdout, so the command intentionally blocks when run directly. It exposes exactly `search`, `resolve_document`, `get_clause`, `build_context`, `enumerate_obligations`, and `diff_editions`. It has no install, pack-verification, revocation, HTTP, or caller-selected-principal surface. The trusted startup principal is bound to every call, core authorization is rechecked, and the SDK telemetry middleware is removed before serving.
+The host owns the process and talks over stdin/stdout, so the command intentionally blocks when run directly. It exposes exactly `search`, `list_documents`, `resolve_document`, `get_clause`, `build_context`, `enumerate_obligations`, and `diff_editions`. It has no install, pack-verification, revocation, HTTP, or caller-selected-principal surface. The trusted startup principal is bound to every call, core authorization is rechecked, and the SDK telemetry middleware is removed before serving.
 
 Successful calls carry the CLI's `{ok,result}` envelope as structured content. Anticipated domain failures are MCP error results whose text is a typed `{ok:false,error}` JSON envelope.
 
@@ -302,9 +303,9 @@ The core is a small Python library backed by SQLite and FTS5. Packs contain data
 | `pack` | Validate inventories, content, citations, and dependencies. |
 | `policy` | Parse trusted operator policy and authorize installation. |
 | `store` | Maintain snapshots, grants, records, and lexical indexes. |
-| `service` | Provide the six read operations and signed, policy-bound continuations. |
+| `service` | Provide the seven read operations and signed, policy-bound continuations. |
 | `cli` | Expose read operations and separate administrative commands. |
-| `mcp_server` | Expose only the six reads over local stdio under a startup-bound principal. |
+| `mcp_server` | Expose only the seven reads over local stdio under a startup-bound principal. |
 | `source_catalog` | Validate official-source metadata and verify a closed local PDF set offline. |
 | `compiler` | Compile a verified text-layer PDF into a raw-source-preserving, page-indexed pack. |
 | `corpus_compiler` | Compile a verified acquisition manifest into restartable record-scoped archives and install them under exact local policy. |
@@ -323,7 +324,7 @@ The larger goal is a **standards compiler and evidence engine**: turn authorized
 | Stage | Scope | Status |
 | --- | --- | --- |
 | M0 · Foundations | Contracts, identities, and rights boundaries | Local pack subset implemented; broader decisions remain proposed |
-| M1 · Local evidence engine | Pack installation, pinned retrieval, all six read operations | Implemented and locally qualified |
+| M1 · Local evidence engine | Pack installation, pinned retrieval, all seven read operations | Implemented and locally qualified |
 | M1.5 · Official source boundary | Tracked official metadata and offline local PDF integrity verification | Implemented for public-source local acquisition |
 | M2 · Compilation | Raw-PDF preservation, page text, automated outlines, and reviewed source-spanned structure | Implemented; document-wide review remains incomplete |
 | M3 · Identification and reading | Honest coverage, concise evidence, batched retrieval, caches, and source-linked scoped search | Implemented; derived nodes remain unreviewed candidates |
@@ -351,9 +352,9 @@ python -m pip wheel . --no-deps --wheel-dir build/prepared-wheel
 python scripts/build_prepared_distribution.py `
   --corpus-index .standardsforge/corpus/mil-std-current/corpus.json `
   --outline-pack .standardsforge/compiled/mil-std-810h-derived-outline `
-  --wheel build/prepared-wheel/standardsforge-0.1.0a1-py3-none-any.whl `
-  --output build/standardsforge-ready-0.1.0a1.zip `
-  --version 0.1.0a1
+  --wheel build/prepared-wheel/standardsforge-0.1.0a2-py3-none-any.whl `
+  --output build/standardsforge-ready-0.1.0a2.zip `
+  --version 0.1.0a2
 ```
 
 The builder rejects incomplete corpora, missing or changed archives, duplicate pack identities, and policies that do not exactly authorize the public compiled pack set. It emits the release ZIP plus a SHA-256 checksum file.

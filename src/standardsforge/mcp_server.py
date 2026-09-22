@@ -17,6 +17,7 @@ from .service import StandardsForgeService
 
 MCP_TOOL_NAMES = (
     "search",
+    "list_documents",
     "resolve_document",
     "get_clause",
     "build_context",
@@ -24,7 +25,8 @@ MCP_TOOL_NAMES = (
     "diff_editions",
 )
 MCP_SERVER_INSTRUCTIONS = (
-    "Read MIL-STDs as edition-pinned evidence, not as free-floating prose. First resolve the exact "
+    "Read MIL-STDs as edition-pinned evidence, not as free-floating prose. If the exact identifier is unknown, "
+    "list the authorized installed documents first. Then resolve the exact "
     "identifier, edition, and representation; never combine editions or silently choose among representations. "
     "Use reviewed_structure or curated_records only for their declared reviewed scope, derived_structure only "
     "as automated unreviewed navigation, and page_text as physical extracted text. Search is discovery, not "
@@ -40,9 +42,15 @@ MCP_SERVER_INSTRUCTIONS = (
 )
 MCP_TOOL_DESCRIPTIONS = {
     "search": (
-        "Discover authorized records by local lexical search. Results are candidates, not applicability, "
+        "Discover authorized records by local lexical search. Results include identifier, edition_id, and package_digest "
+        "for replay; they are candidates, not applicability, "
         "obligation completeness, or exact document identity; use resolve_document for an identifier and replay "
         "a selected evidence_selector through get_clause."
+    ),
+    "list_documents": (
+        "List authorized installed document packages with exact identity, representation, immutable package digest, "
+        "record count, and declared coverage. Optional normalized identifier-prefix filtering and signed pagination "
+        "remain bound to the startup principal; current publisher status does not establish a project baseline."
     ),
     "resolve_document": (
         "Resolve an exact authorized identifier, optional edition, and representation to an immutable package "
@@ -162,6 +170,17 @@ def create_mcp_server(
                 package_digest=package_digest,
                 scope_prefix=scope_prefix,
             ),
+            result_mode=result_mode,
+        )
+
+    @server.tool(description=MCP_TOOL_DESCRIPTIONS["list_documents"], annotations=read_only)
+    def list_documents(
+        identifier_prefix: str | None = None,
+        limit: int = 50,
+        cursor: str | None = None,
+    ) -> StructuredToolResult:
+        return _invoke(
+            lambda: service.list_documents(bound_principal, identifier_prefix, limit, cursor),
             result_mode=result_mode,
         )
 

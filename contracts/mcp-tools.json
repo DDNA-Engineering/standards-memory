@@ -1,11 +1,11 @@
 {
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "sdk_requirement": "mcp==2.2.0",
   "transport": "stdio",
   "principal_binding": "trusted_server_startup_configuration",
   "telemetry": "disabled",
   "model_reading_guidance": [
-    "resolve the exact identifier, edition, and representation before relying on evidence",
+    "list authorized installed documents when the exact identifier is unknown, then resolve the exact identifier, edition, and representation before relying on evidence",
     "treat derived_structure as automated unreviewed navigation and page_text as physical extracted text",
     "use search only for discovery, then retrieve exact evidence under an immutable package digest",
     "preserve governing conditions, exceptions, notes, referenced tables or figures, citations, review status, and coverage",
@@ -14,7 +14,8 @@
     "zero explicitly classified obligations is not proof of zero requirements when classification is incomplete"
   ],
   "tools": [
-    {"name": "search", "description": "Discover authorized records by local lexical search. Results are candidates, not applicability, obligation completeness, or exact document identity; use resolve_document for an identifier and replay a selected evidence_selector through get_clause.", "arguments": ["query", "limit", "package_digest", "scope_prefix"], "optional_arguments": ["limit", "package_digest", "scope_prefix"]},
+    {"name": "search", "description": "Discover authorized records by local lexical search. Results include identifier, edition_id, and package_digest for replay; they are candidates, not applicability, obligation completeness, or exact document identity; use resolve_document for an identifier and replay a selected evidence_selector through get_clause.", "arguments": ["query", "limit", "package_digest", "scope_prefix"], "optional_arguments": ["limit", "package_digest", "scope_prefix"]},
+    {"name": "list_documents", "description": "List authorized installed document packages with exact identity, representation, immutable package digest, record count, and declared coverage. Optional normalized identifier-prefix filtering and signed pagination remain bound to the startup principal; current publisher status does not establish a project baseline.", "arguments": ["identifier_prefix", "limit", "cursor"], "optional_arguments": ["identifier_prefix", "limit", "cursor"]},
     {"name": "resolve_document", "description": "Resolve an exact authorized identifier, optional edition, and representation to an immutable package digest. Specify representation when ambiguous: derived_structure is automated and unreviewed, while page_text is physical extracted text.", "arguments": ["identifier", "edition_id", "representation"], "optional_arguments": ["edition_id", "representation"], "argument_schemas": {"representation": {"enum": ["page_text", "derived_structure", "reviewed_structure", "curated_records"]}}},
     {"name": "get_clause", "description": "Retrieve one exact package-pinned record and its required evidence context. Interpret exact text with citations, relationships, derivation review status, and coverage; this does not decide applicability or compliance.", "arguments": ["package_digest", "clause_reference", "record_id", "max_bytes", "response_profile"], "optional_arguments": ["clause_reference", "record_id", "max_bytes", "response_profile"], "selector": {"at_least_one": ["clause_reference", "record_id"], "when_both": "must_resolve_to_same_record"}, "argument_schemas": {"response_profile": {"enum": ["compact_evidence_v1", "concise_evidence_v1"]}}},
     {"name": "build_context", "description": "Retrieve multiple exact package-pinned records with their deduplicated required context. Preserve conditions, exceptions, notes, and unresolved relationships; the packet is evidence, not an approval decision.", "arguments": ["package_digest", "clause_references", "max_bytes", "response_profile"], "optional_arguments": ["max_bytes", "response_profile"], "argument_schemas": {"response_profile": {"enum": ["compact_evidence_v1", "concise_evidence_v1"]}}},
@@ -23,6 +24,7 @@
   ],
   "invariants": [
     "no principal or authorization selector is accepted from a tool caller",
+    "list_documents and resolve_document candidates expose only actively authorized packages",
     "no administrative operation is exposed",
     "every tool is marked read-only and closed-world",
     "successful calls use the same typed envelope as the CLI",

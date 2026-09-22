@@ -1,8 +1,8 @@
 # Validation report
 
-Date: 2026-09-21
+Date: 2026-09-22
 
-Scope: `TASK-001` through `TASK-016` deterministic local evidence engine, stdio MCP adapter with model-facing MIL-STD reading guidance, official-source integrity boundary, PDF/derived-outline/reviewed-structure/corpus compilers, honest coverage, concise responses, exact page/structure spans, source-linked scoped discovery, lossless storage/wire compression, policy-bound installation of the downloaded local MIL-STD corpus, prepared end-user distribution, and post-build documentation/code-comment cleanup
+Scope: `TASK-001` through `TASK-016` plus `TASK-033` maintenance acceptance: deterministic local evidence engine, authorization-safe installed-document discovery, stdio MCP adapter with model-facing MIL-STD reading guidance, official-source integrity boundary, PDF/derived-outline/reviewed-structure/corpus compilers, honest coverage, concise responses, exact page/structure spans, source-linked scoped discovery, lossless storage/wire compression, policy-bound installation of the downloaded local MIL-STD corpus, prepared end-user distribution, and post-build documentation/code-comment cleanup
 
 Repository state at validation: local uncommitted development working tree
 
@@ -16,7 +16,9 @@ Historical input names, build results, schema IDs, and pack provenance below ret
 
 ## Requirements addressed
 
-Thirty bounded requirements are represented in `docs/requirements/requirements.json`, including identity/pinning, exact evidence, dependency context, pack contracts, all six read operations, exhaustive scoped traversal, edition comparison, rights-policy separation, offline operation, continuation binding, rebuildable indexes, completeness dimensions, official-source integrity, deterministic PDF compilation, extraction-fidelity separation, coverage propagation, source-spanned structure, concise responses, batching, versioned authorization-safe caches, and exact scoped discovery. `TASK-007` adds a reviewed structural compiler slice, `TASK-008` adds the opt-in compact projection, `TASK-009` adds batched graph/source retrieval and scoped caches, `TASK-010` completes integrity verification and replayable exact-record selectors, `TASK-011` adds accurate concise surfacing, `TASK-012` removes duplicate portable page text and FTS content, preserves ambiguous relationship identity, reduces response finalization to one serialization, `TASK-013` adds manifest-driven, restartable compilation and policy-bound installation of the complete downloaded local MIL-STD corpus, `TASK-014` adds a separate deterministic unreviewed derived-outline representation with explicit unsupported regions, `TASK-015` adds exact one-pack policy onboarding plus client-visible MIL-STD reading instructions and tool boundaries, and `TASK-016` removes superseded documentation and redundant comments while preserving active evidence and security guidance.
+Thirty-one bounded requirements are represented in `docs/requirements/requirements.json`, including identity/pinning, exact evidence, dependency context, pack contracts, all seven read operations, exhaustive scoped traversal, edition comparison, rights-policy separation, offline operation, continuation binding, rebuildable indexes, completeness dimensions, official-source integrity, deterministic PDF compilation, extraction-fidelity separation, coverage propagation, source-spanned structure, concise responses, batching, versioned authorization-safe caches, exact scoped discovery, and authorization-safe installed-document inventory. `TASK-033` adds the maintenance release inventory and bounded near-match slice without changing the sealed compiler-0.3 corpus boundary.
+
+The `v0.1.0a2` maintenance slice is based on immutable `v0.1.0a1` source commit `6f112ab` so the shipped compiler-0.3 corpus remains accepted without broadening current main's compiler boundary. It adds only query-side store, service, CLI, MCP, contract, test, documentation, and version metadata. `list_documents` returns current principal-authorized packages in a stable signed traversal with exact identity, representation, digest, record count, and declared coverage. Exact resolution returns only bounded authorized exact-selector, prefix, or family candidates and reauthorizes them immediately before the typed failure. The maintenance suite passed 79 tests in 10.126 seconds; contract parsing reported 13 documents, 31 requirements, and tasks `TASK-001` through `TASK-016` plus `TASK-033`; compilation and `git diff --check` passed. Prepared-archive, reproducible-wheel, clean-extraction, public-download, and remote-CI evidence is recorded only after those separate release steps complete.
 
 ## Official-source seed corpus
 
@@ -180,6 +182,6 @@ The local database is schema version 4. Tested v1/v2/v3-to-v4 migrations add exp
 ## Limitations
 
 - Real PDF text layers are compiled and source-linked. One reviewed structural section is qualified, but document-wide visual reading order, tables, figures, OCR, semantic clauses, dependencies, and obligation classification are not qualified.
-- The six read operations are implemented in the local library, CLI, and stdio MCP adapter; no HTTP transport is implemented, and a hosted multi-tenant service is not a product target.
+- The seven read operations are implemented in the local library, CLI, and stdio MCP adapter; no HTTP transport is implemented, and a hosted multi-tenant service is not a product target.
 - No reader UI, background compilation worker, model adapter, broad performance benchmark, configured tokenizer, SBOM, or signed release artifact.
 - Exact quote presence is not proof of PDF fidelity, and returned evidence is not an applicability, compliance, or human approval decision.

@@ -70,7 +70,7 @@
         "SM-FR-046"
       ],
       "acceptance": [
-        "Expose exactly the six read operations over local stdio MCP with no administrative tools.",
+        "Expose only the query contract's declared read operations over local stdio MCP with no administrative tools.",
         "Bind the principal from trusted server startup configuration and omit it from every tool schema.",
         "Preserve successful result envelopes and typed domain-error envelopes across the MCP boundary.",
         "Disable SDK telemetry even when a host process configures an exporter.",
@@ -365,7 +365,7 @@
         "Create an exact one-pack local policy only through an explicit administrative command that requires the operator to name the principal and expected content class; never infer authority from pack rights alone.",
         "Deliver a concise MIL-STD reading workflow to MCP clients during initialization, covering exact edition and representation selection, immutable package pins, discovery versus evidence, governing context, tailoring and applicability boundaries, notices, and honest completeness.",
         "Make every MCP tool description state its operation-specific interpretation boundary, including that derived structure is unreviewed and zero classified obligations is not proof of zero requirements.",
-        "Keep the MCP surface read-only, offline, principal-bound, and limited to the existing six query operations.",
+        "Keep the MCP surface read-only, offline, principal-bound, and limited to the query contract's declared operations.",
         "Verify policy-writer negative cases, actual client-visible instructions and descriptions, contract parity, copy-paste command syntax, and the complete local test suite."
       ]
     },
@@ -388,6 +388,30 @@
         "Update stale decision and security wording to the observed TASK-015 implementation without converting proposals into approval claims.",
         "Remove redundant implementation comments and duplicate MCP function docstrings while retaining comments that explain security, integrity, compatibility, transactional, or algorithmic invariants.",
         "Verify retained Markdown links, stale documentation references, contract parsing, compilation, and the complete local test suite."
+      ]
+    },
+    {
+      "task_id": "TASK-033",
+      "title": "Authorization-safe installed-document discovery maintenance release",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-002",
+        "SM-FR-003",
+        "SM-FR-022",
+        "SM-FR-025",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-039",
+        "SM-FR-073"
+      ],
+      "acceptance": [
+        "Expose a seventh read-only list_documents operation through service, CLI, and principal-bound stdio MCP without exposing administrative or authorization selectors.",
+        "Return exact authorized installed-package identity, representation, immutable digest, record count, and declared coverage in deterministic keyset order with an exact matching count.",
+        "Bind signed continuations to operation, normalized literal prefix, principal, authorization visibility, position, count, and expiry.",
+        "Return at most twenty deterministic replayable near-match candidates drawn only from current grants without fuzzy, title, network, model, or authorization fallback.",
+        "Reauthorize inventory, exact resolution, ambiguity, and near-match results immediately before return, including concurrent-revocation rejection.",
+        "Prove pagination, replayable hints, invalid limits, cursor tampering and mismatch, revoked or absent non-disclosure, and the exact seven-tool MCP surface with networking disabled."
       ]
     }
   ]

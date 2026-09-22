@@ -719,6 +719,153 @@ class StandardsForgeService:
             result = self.store.install(pack, policy)
         return {"operation": "install", "status": "installed", **result}
 
+    @staticmethod
+    def _document_sort_key(row: Any) -> tuple[str, str, str, str, str]:
+        return (
+            row["normalized_identifier"],
+            row["document_family_id"],
+            row["edition_id"],
+            StandardsForgeService._package_representation(row),
+            row["package_digest"],
+        )
+
+    def _authorized_document_snapshot(self, principal_id: str) -> tuple[list[Any], str]:
+        before = self.store.cache_state(principal_id)["visibility_fingerprint"]
+        rows = self.store.authorized_document_packages(principal_id)
+        after = self.store.cache_state(principal_id)["visibility_fingerprint"]
+        require(
+            before == after,
+            "authorization_changed",
+            "Document visibility changed while the inventory was being assembled; retry the query.",
+        )
+        return sorted(rows, key=self._document_sort_key), after
+
+    def list_documents(
+        self,
+        principal_id: str,
+        identifier_prefix: str | None = None,
+        limit: int = 50,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """List only document packages currently authorized for one bound principal."""
+
+        require(type(limit) is int and 1 <= limit <= 100, "invalid_limit", "Document limit must be from 1 to 100.")
+        normalized_prefix = None if identifier_prefix is None else normalize_identifier(identifier_prefix)
+        rows, visibility_fingerprint = self._authorized_document_snapshot(principal_id)
+        if normalized_prefix is not None:
+            rows = [row for row in rows if row["normalized_identifier"].startswith(normalized_prefix)]
+
+        principal_fingerprint = hashlib.sha256(principal_id.encode("utf-8")).hexdigest()
+        after_key: tuple[str, str, str, str, str] | None = None
+        previously_returned = 0
+        if cursor is not None:
+            payload = self._decode_document_cursor(cursor)
+            require(payload["principal_fingerprint"] == principal_fingerprint, "cursor_scope_mismatch", "The cursor belongs to a different principal.")
+            require(payload["normalized_identifier_prefix"] == normalized_prefix, "cursor_scope_mismatch", "The cursor belongs to a different identifier prefix.")
+            require(payload["visibility_fingerprint"] == visibility_fingerprint, "cursor_inventory_changed", "The authorized document inventory changed after the cursor was issued.")
+            after_key = tuple(payload["last_key"])
+            previously_returned = payload["returned_count"]
+            rows = [row for row in rows if self._document_sort_key(row) > after_key]
+
+        matching_total = previously_returned + len(rows)
+        page_rows = rows[:limit]
+        has_more = len(rows) > limit
+        cumulative_returned = previously_returned + len(page_rows)
+        next_cursor = None
+        if has_more and page_rows:
+            next_cursor = self._encode_cursor(
+                {
+                    "version": 1,
+                    "operation": "list_documents",
+                    "principal_fingerprint": principal_fingerprint,
+                    "normalized_identifier_prefix": normalized_prefix,
+                    "visibility_fingerprint": visibility_fingerprint,
+                    "last_key": list(self._document_sort_key(page_rows[-1])),
+                    "returned_count": cumulative_returned,
+                    "expires_at": int(time.time()) + 900,
+                }
+            )
+
+        documents = [
+            {
+                "pack_id": row["pack_id"],
+                "document_family_id": row["document_family_id"],
+                "identifier": row["identifier"],
+                "normalized_identifier": row["normalized_identifier"],
+                "title": row["title"],
+                "edition_id": row["edition_id"],
+                "revision": row["revision"],
+                "publication_date": row["publication_date"],
+                "representation": self._package_representation(row),
+                "package_digest": row["package_digest"],
+                "record_count": row["record_count"],
+                "declared_coverage": self._declared_coverage(row),
+            }
+            for row in page_rows
+        ]
+        for row in page_rows:
+            self.store.authorized_package(principal_id, row["package_digest"])
+        require(
+            self.store.cache_state(principal_id)["visibility_fingerprint"] == visibility_fingerprint,
+            "authorization_changed",
+            "Document visibility changed while the inventory was being assembled; retry the query.",
+        )
+        return {
+            "schema_version": "0.1.0",
+            "operation": "list_documents",
+            "retrieval_mode": "authorized_installed_package_catalog",
+            "filters": {"identifier_prefix": identifier_prefix, "normalized_identifier_prefix": normalized_prefix},
+            "snapshot_sha256": visibility_fingerprint,
+            "documents": documents,
+            "page": {
+                "returned": len(documents),
+                "previously_returned": previously_returned,
+                "cumulative_returned": cumulative_returned,
+                "matching_authorized_package_count": matching_total,
+                "has_more": has_more,
+                "next_cursor": next_cursor,
+                "cursor_ttl_seconds": 900 if next_cursor is not None else None,
+            },
+            "limitations": [
+                "The inventory contains only packages currently authorized for the bound principal.",
+                "Publisher currentness does not establish a project-approved baseline.",
+            ],
+        }
+
+    def _resolve_candidates(self, rows: list[Any], normalized_identifier: str) -> tuple[list[dict[str, Any]], bool]:
+        exact_rows = [row for row in rows if row["normalized_identifier"] == normalized_identifier]
+        prefix_rows = [row for row in rows if row["normalized_identifier"].startswith(normalized_identifier)]
+        seed_rows = exact_rows or prefix_rows
+        family_ids = {row["document_family_id"] for row in seed_rows}
+        related_rows = [row for row in rows if row["document_family_id"] in family_ids]
+        candidates: list[dict[str, Any]] = []
+        for row in related_rows:
+            match_basis = (
+                "exact_identifier_alternate_selector"
+                if row in exact_rows
+                else "identifier_prefix" if row in prefix_rows else "document_family"
+            )
+            candidates.append(
+                {
+                    "match_basis": match_basis,
+                    "document_family_id": row["document_family_id"],
+                    "identifier": row["identifier"],
+                    "normalized_identifier": row["normalized_identifier"],
+                    "title": row["title"],
+                    "edition_id": row["edition_id"],
+                    "revision": row["revision"],
+                    "representation": self._package_representation(row),
+                    "package_digest": row["package_digest"],
+                    "resolve_selector": {
+                        "identifier": row["identifier"],
+                        "edition_id": row["edition_id"],
+                        "representation": self._package_representation(row),
+                    },
+                }
+            )
+        candidates.sort(key=lambda candidate: (candidate["normalized_identifier"], candidate["edition_id"], candidate["representation"], candidate["package_digest"]))
+        return candidates[:20], len(candidates) > 20
+
     def resolve_document(
         self,
         identifier: str,
@@ -727,6 +874,7 @@ class StandardsForgeService:
         representation: str | None = None,
     ) -> dict[str, Any]:
         normalized = normalize_identifier(identifier)
+        before_visibility = self.store.cache_state(principal_id)["visibility_fingerprint"]
         rows = self.store.authorized_packages(principal_id, normalized, edition_id)
         if representation is not None:
             require(
@@ -736,8 +884,32 @@ class StandardsForgeService:
             )
             rows = [row for row in rows if self._package_representation(row) == representation]
         if not rows:
-            raise StandardsForgeError("not_found", "No authorized resource matches the request.")
+            authorized_rows, candidate_visibility = self._authorized_document_snapshot(principal_id)
+            require(before_visibility == candidate_visibility, "authorization_changed", "Document visibility changed while the resolution result was being assembled; retry the query.")
+            candidates, candidates_truncated = self._resolve_candidates(authorized_rows, normalized)
+            try:
+                for candidate in candidates:
+                    self.store.authorized_package(principal_id, candidate["package_digest"])
+            except StandardsForgeError as exc:
+                if exc.code != "not_found":
+                    raise
+                raise StandardsForgeError("authorization_changed", "Document visibility changed while the resolution result was being assembled; retry the query.") from exc
+            require(self.store.cache_state(principal_id)["visibility_fingerprint"] == candidate_visibility, "authorization_changed", "Document visibility changed while the resolution result was being assembled; retry the query.")
+            raise StandardsForgeError(
+                "not_found",
+                "No authorized resource matches the request.",
+                {
+                    "operation": "resolve_document",
+                    "requested": {"identifier": identifier, "normalized_identifier": normalized, "edition_id": edition_id, "representation": representation},
+                    "candidates": candidates,
+                    "candidates_truncated": candidates_truncated,
+                    "discovery_operation": "list_documents",
+                },
+            )
         if len(rows) != 1:
+            for candidate_row in rows:
+                self.store.authorized_package(principal_id, candidate_row["package_digest"])
+            require(self.store.cache_state(principal_id)["visibility_fingerprint"] == before_visibility, "authorization_changed", "Document visibility changed while the resolution result was being assembled; retry the query.")
             raise StandardsForgeError(
                 "ambiguous_document",
                 "The identifier does not resolve to exactly one authorized package; provide an edition and representation, or use an exact package pin.",
@@ -753,7 +925,7 @@ class StandardsForgeService:
                 },
             )
         row = rows[0]
-        return {
+        result = {
             "operation": "resolve_document",
             "retrieval_mode": "exact_identifier",
             "document_family_id": row["document_family_id"],
@@ -765,6 +937,9 @@ class StandardsForgeService:
             "representation": self._package_representation(row),
             "package_digest": row["package_digest"],
         }
+        current = self.store.authorized_package(principal_id, row["package_digest"])
+        require(current["grant_policy_fingerprint"] == row["grant_policy_fingerprint"] and self.store.cache_state(principal_id)["visibility_fingerprint"] == before_visibility, "authorization_changed", "Document visibility changed while the resolution result was being assembled; retry the query.")
+        return result
 
     @staticmethod
     def _record_payload(
@@ -1159,7 +1334,7 @@ class StandardsForgeService:
         tag = base64.urlsafe_b64encode(signature).decode("ascii").rstrip("=")
         return body + "." + tag
 
-    def _decode_cursor(self, token: str) -> dict[str, Any]:
+    def _decode_signed_cursor(self, token: str) -> dict[str, Any]:
         require(isinstance(token, str) and 1 <= len(token) <= 4096, "invalid_cursor", "The continuation cursor is invalid.")
         try:
             body, tag = token.split(".", 1)
@@ -1181,6 +1356,12 @@ class StandardsForgeService:
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
             raise StandardsForgeError("invalid_cursor", "The continuation cursor payload is invalid.") from exc
         require(isinstance(payload, dict), "invalid_cursor", "The continuation cursor payload is invalid.")
+        require(type(payload.get("expires_at")) in {int, float}, "invalid_cursor", "The continuation cursor expiry is invalid.")
+        require(payload["expires_at"] >= time.time(), "expired_cursor", "The continuation cursor has expired.")
+        return payload
+
+    def _decode_cursor(self, token: str) -> dict[str, Any]:
+        payload = self._decode_signed_cursor(token)
         required_keys = {
             "version", "package_digest", "principal_fingerprint", "policy_fingerprint",
             "scope_prefix", "last_ordinal", "returned_count", "expires_at",
@@ -1193,8 +1374,19 @@ class StandardsForgeService:
             "invalid_cursor",
             "The continuation cursor count is invalid.",
         )
-        require(type(payload["expires_at"]) in {int, float}, "invalid_cursor", "The continuation cursor expiry is invalid.")
-        require(payload["expires_at"] >= time.time(), "expired_cursor", "The continuation cursor has expired.")
+        return payload
+
+    def _decode_document_cursor(self, token: str) -> dict[str, Any]:
+        payload = self._decode_signed_cursor(token)
+        required_keys = {
+            "version", "operation", "principal_fingerprint", "normalized_identifier_prefix",
+            "visibility_fingerprint", "last_key", "returned_count", "expires_at",
+        }
+        require(set(payload) == required_keys, "invalid_cursor", "The continuation cursor fields are invalid.")
+        require(payload["version"] == 1 and payload["operation"] == "list_documents", "invalid_cursor", "The continuation cursor version or operation is unsupported.")
+        require(isinstance(payload["last_key"], list) and len(payload["last_key"]) == 5 and all(isinstance(value, str) for value in payload["last_key"]), "invalid_cursor", "The continuation cursor document key is invalid.")
+        require(type(payload["returned_count"]) is int and payload["returned_count"] >= 0, "invalid_cursor", "The continuation cursor count is invalid.")
+        require(payload["normalized_identifier_prefix"] is None or isinstance(payload["normalized_identifier_prefix"], str), "invalid_cursor", "The continuation cursor prefix is invalid.")
         return payload
 
     def enumerate_obligations(

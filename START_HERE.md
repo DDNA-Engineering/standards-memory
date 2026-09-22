@@ -4,7 +4,7 @@ StandardsForge is a standalone, source-first standards compiler and evidence eng
 
 ## Current baseline
 
-- Six query operations are implemented in the library, CLI, and principal-bound stdio MCP adapter.
+- Seven query operations are implemented in the library, CLI, and principal-bound stdio MCP adapter, including authorization-safe installed-document discovery.
 - Official-source verification, deterministic PDF page compilation, restartable DLA corpus compilation, automated derived outlines, and reviewed structural annotations are separate administrative stages.
 - Installed evidence is immutable and package-pinned. Authorization comes from trusted local policy, not imported rights claims.
 - Search is discovery only. Retrieval reauthorizes, rechecks exact source hashes and spans, and reports coverage and unresolved context.

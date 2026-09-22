@@ -10,9 +10,9 @@ The JSON Schemas describe the public 0.1.0 pack manifest, inventory, records, ri
 
 Pack manifests distinguish `page_text`, `derived_structure`, `reviewed_structure`, and `curated_records`. `derived_structure` is an automated, unreviewed representation: it may expose navigation candidates and unsupported regions but cannot imply semantic correctness, confirmed obligations, or human approval.
 
-`query-operations.json` identifies the six read operations and their authority/pinning invariants. `mcp-tools.json` fixes the local stdio MCP surface, trusted startup-principal boundary, and exact caller-visible arguments. Returned packet details remain pre-release and are locked by the acceptance tests; no HTTP adapter is implemented.
+`query-operations.json` identifies the seven read operations and their authority/pinning invariants. `mcp-tools.json` fixes the local stdio MCP surface, trusted startup-principal boundary, and exact caller-visible arguments. Returned packet details remain pre-release and are locked by the acceptance tests; no HTTP adapter is implemented.
 
-The MCP contract also records the client-visible MIL-STD reading guidance and exact per-tool descriptions. Initialization guidance covers edition/representation selection, immutable package pins, discovery versus evidence, governing context, tailoring and applicability, and honest classification coverage. This guidance does not expand the six-tool read-only surface or grant authority.
+The MCP contract also records the client-visible MIL-STD reading guidance and exact per-tool descriptions. Initialization guidance covers edition/representation selection, immutable package pins, discovery versus evidence, governing context, tailoring and applicability, and honest classification coverage. This guidance does not expand the seven-tool read-only surface or grant authority.
 
 `compact-evidence-response.schema.json` describes the opt-in `compact_evidence_v1` response profile for `get_clause` and `build_context`. Omitting `response_profile` retains the established detailed JSON response. Compact records keep exact text and canonical record IDs while packet-local references navigate deduplicated source and derivation dictionaries; byte budgets cover the complete compact JSON packet.
 

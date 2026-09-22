@@ -130,6 +130,12 @@ def _parser() -> argparse.ArgumentParser:
     )
     resolve.add_argument("--principal", required=True)
 
+    list_documents = commands.add_parser("list-documents", help="Read-only: list authorized installed document packages")
+    list_documents.add_argument("--identifier-prefix")
+    list_documents.add_argument("--limit", type=int, default=50)
+    list_documents.add_argument("--cursor")
+    list_documents.add_argument("--principal", required=True)
+
     get_clause = commands.add_parser("get-clause", help="Read-only: retrieve a pinned clause and required context")
     get_clause.add_argument("package_digest")
     get_clause.add_argument("clause_reference", nargs="?")
@@ -247,6 +253,8 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
         return service.install_pack(args.source, args.policy)
     if args.command == "resolve":
         return service.resolve_document(args.identifier, args.principal, args.edition, args.representation)
+    if args.command == "list-documents":
+        return service.list_documents(args.principal, args.identifier_prefix, args.limit, args.cursor)
     if args.command == "get-clause":
         return service.get_clause(
             args.package_digest,
