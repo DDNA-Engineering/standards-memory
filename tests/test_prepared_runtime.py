@@ -13,7 +13,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts" / "prepared_distribution"))
 
-from prepared_runtime import PreparedSetupError, validate_bundle, validate_receipt  # noqa: E402
+from prepared_runtime import (  # noqa: E402
+    PreparedSetupError,
+    _parse_cli_success,
+    validate_bundle,
+    validate_receipt,
+)
 
 
 def _sha256(value: bytes) -> str:
@@ -21,6 +26,21 @@ def _sha256(value: bytes) -> str:
 
 
 class PreparedRuntimeTests(unittest.TestCase):
+    def test_cli_success_envelope_is_unwrapped(self) -> None:
+        result = subprocess.CompletedProcess([], 0, stdout='{"ok": true, "result": {"ready": true}}')
+
+        self.assertEqual(_parse_cli_success(result, "doctor"), {"ready": True})
+
+    def test_cli_error_envelope_is_rejected(self) -> None:
+        result = subprocess.CompletedProcess(
+            [],
+            0,
+            stdout='{"ok": false, "error": {"code": "not_ready"}}',
+        )
+
+        with self.assertRaisesRegex(PreparedSetupError, "successful result envelope"):
+            _parse_cli_success(result, "doctor")
+
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory(prefix="standardsforge-prepared-runtime-")
         self.root = Path(self.temporary.name)

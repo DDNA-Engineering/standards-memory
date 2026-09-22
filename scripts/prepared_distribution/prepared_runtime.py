@@ -283,6 +283,20 @@ def _cli(python: Path, root: Path, arguments: list[str], *, capture: bool = Fals
     )
 
 
+def _parse_cli_success(result: subprocess.CompletedProcess[str], operation: str) -> dict[str, Any]:
+    try:
+        envelope = json.loads(result.stdout)
+    except (json.JSONDecodeError, TypeError) as exc:
+        raise PreparedSetupError(f"Prepared {operation} did not return JSON.") from exc
+    _require(
+        isinstance(envelope, dict)
+        and envelope.get("ok") is True
+        and isinstance(envelope.get("result"), dict),
+        f"Prepared {operation} did not return a successful result envelope.",
+    )
+    return envelope["result"]
+
+
 def validate_receipt(root: Path, manifest: dict[str, Any], manifest_sha256: str) -> dict[str, Any]:
     state = root / ".standardsforge"
     receipt_path = root / RECEIPT_RELATIVE
@@ -377,16 +391,10 @@ def setup_prepared(root: Path, *, quiet: bool = False) -> dict[str, Any]:
 
     policy = root / "policies/prepared-local.json"
     doctor = _cli(python, root, ["doctor", "--policy", str(policy), "--principal", "local-user", "--full-integrity"], capture=True)
-    try:
-        doctor_result = json.loads(doctor.stdout)
-    except json.JSONDecodeError as exc:
-        raise PreparedSetupError("Prepared doctor did not return JSON.") from exc
+    doctor_result = _parse_cli_success(doctor, "doctor")
     _require(doctor_result.get("ready") is True and doctor_result.get("integrity", {}).get("complete") is True, "Prepared full-integrity doctor did not establish readiness.")
     search = _cli(python, root, ["search", "environmental testing", "--principal", "local-user", "--query-mode", "natural_language", "--limit", "1"], capture=True)
-    try:
-        search_result = json.loads(search.stdout)
-    except json.JSONDecodeError as exc:
-        raise PreparedSetupError("Prepared search did not return JSON.") from exc
+    search_result = _parse_cli_success(search, "search")
     _require(isinstance(search_result.get("results"), list) and search_result["results"], "Prepared search returned no evidence.")
 
     receipt = {
