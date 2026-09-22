@@ -14,7 +14,7 @@ StandardsForge exposes seven read operations. Administration, acquisition, compi
 | `enumerate-obligations` | Traverse explicitly classified obligations in a selected scope. |
 | `diff-editions` | Compare exact record identities and report review-required alignment candidates separately. |
 
-The examples below use the prepared core's PowerShell form, `python .\run.py`, and principal `local-user`. On Linux or macOS, replace that launcher with `sh ./standardsforge.sh`; both launchers anchor state to the extracted distribution and validate the bundle and receipt before use.
+The examples below use the prepared core's PowerShell form, `python .\run.py`, and principal `local-user`. On Linux or macOS, replace that launcher with `sh ./standardsforge.sh`. Both launchers anchor state to the extracted distribution and validate its manifest-bound receipt and owned runtime before use. Rerun setup for a full closed-bundle revalidation.
 
 ## Discover
 
