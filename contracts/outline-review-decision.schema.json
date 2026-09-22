@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/outline-review-decision.schema.json",
+  "title": "StandardsForge explicit single-candidate structure review decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "draft_sha256", "review", "node"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "draft_sha256": {"$ref": "structure-annotations.schema.json#/$defs/sha256"},
+    "review": {
+      "allOf": [
+        {"$ref": "structure-annotations.schema.json#/$defs/review"},
+        {"required": ["reviewer_id", "reviewer_type", "reviewed_at", "method", "tool", "unresolved_issues", "attestation"]}
+      ]
+    },
+    "node": {"$ref": "structure-annotations.schema.json#/$defs/node"}
+  }
+}

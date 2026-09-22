@@ -20,13 +20,18 @@
     "unsupported_regions"
   ],
   "properties": {
-    "schema_version": {"enum": ["0.1.0", "0.2.0", "0.3.0"]},
+    "schema_version": {"enum": ["0.1.0", "0.2.0", "0.3.0", "0.4.0"]},
     "document_id": {"type": "string", "minLength": 1},
     "edition_id": {"type": "string", "minLength": 1},
     "source_pdf_sha256": {"$ref": "#/$defs/sha256"},
+    "source_page_pack_digest": {"$ref": "#/$defs/sha256"},
+    "outline_package_digest": {"$ref": "#/$defs/sha256"},
+    "candidate_record_id": {"type": "string", "minLength": 1},
+    "candidate_content_sha256": {"$ref": "#/$defs/sha256"},
+    "proposal_sha256": {"$ref": "#/$defs/sha256"},
     "compiler": {"$ref": "#/$defs/compiler"},
     "extraction_mode": {
-      "enum": ["layout", "simple", "ocr", "manual", "mixed"],
+      "enum": ["layout_rotated_included", "simple"],
       "description": "Mode used to produce the page text against which source-span byte offsets are measured."
     },
     "text_encoding": {"const": "UTF-8"},
@@ -49,6 +54,22 @@
   },
   "allOf": [
     {
+      "if": {"properties": {"schema_version": {"const": "0.4.0"}}, "required": ["schema_version"]},
+      "then": {
+        "required": ["source_page_pack_digest", "outline_package_digest", "candidate_record_id", "candidate_content_sha256", "proposal_sha256"],
+        "properties": {
+          "extraction_mode": {"const": "layout_rotated_included"},
+          "nodes": {"maxItems": 1},
+          "relationships": {"maxItems": 0},
+          "unsupported_regions": {"maxItems": 0}
+        }
+      },
+      "else": {
+        "properties": {"extraction_mode": {"const": "simple"}},
+        "not": {"anyOf": [{"required": ["source_page_pack_digest"]}, {"required": ["outline_package_digest"]}, {"required": ["candidate_record_id"]}, {"required": ["candidate_content_sha256"]}, {"required": ["proposal_sha256"]}]}
+      }
+    },
+    {
       "if": {"properties": {"schema_version": {"const": "0.1.0"}}, "required": ["schema_version"]},
       "then": {
         "properties": {
@@ -62,7 +83,7 @@
       }
     },
     {
-      "if": {"properties": {"schema_version": {"enum": ["0.2.0", "0.3.0"]}}, "required": ["schema_version"]},
+      "if": {"properties": {"schema_version": {"enum": ["0.2.0", "0.3.0", "0.4.0"]}}, "required": ["schema_version"]},
       "then": {
         "properties": {
           "review": {

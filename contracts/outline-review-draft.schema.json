@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/outline-review-draft.schema.json",
+  "title": "StandardsForge exact-source unreviewed outline review draft",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "state", "outline_package_digest", "source_page_pack_digest",
+    "candidate_record_id", "candidate_content_sha256", "candidate_parent_logical_id",
+    "document_id", "edition_id", "source_pdf_sha256", "source_pdf_path",
+    "source_text_sha256", "compiler", "extraction_mode", "text_encoding",
+    "offset_convention", "proposed_node"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "state": {"const": "proposed_unreviewed"},
+    "outline_package_digest": {"$ref": "structure-annotations.schema.json#/$defs/sha256"},
+    "source_page_pack_digest": {"$ref": "structure-annotations.schema.json#/$defs/sha256"},
+    "candidate_record_id": {"type": "string", "minLength": 1},
+    "candidate_content_sha256": {"$ref": "structure-annotations.schema.json#/$defs/sha256"},
+    "candidate_parent_logical_id": {"type": ["string", "null"], "minLength": 1},
+    "document_id": {"type": "string", "minLength": 1},
+    "edition_id": {"type": "string", "minLength": 1},
+    "source_pdf_sha256": {"$ref": "structure-annotations.schema.json#/$defs/sha256"},
+    "source_pdf_path": {"type": "string", "minLength": 1},
+    "source_text_sha256": {"$ref": "structure-annotations.schema.json#/$defs/sha256"},
+    "compiler": {"$ref": "structure-annotations.schema.json#/$defs/compiler"},
+    "extraction_mode": {"const": "layout_rotated_included"},
+    "text_encoding": {"const": "UTF-8"},
+    "offset_convention": {"const": "half_open_utf8_byte_offsets_per_physical_page"},
+    "proposed_node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["logical_id", "kind", "ordinal", "clause_reference", "heading", "statement_role", "exact_text", "source_spans", "content_sha256", "derivation"],
+      "properties": {
+        "logical_id": {"$ref": "structure-annotations.schema.json#/$defs/logical_id"},
+        "kind": {"$ref": "structure-annotations.schema.json#/$defs/node_kind"},
+        "ordinal": {"type": "integer", "minimum": 1},
+        "clause_reference": {"type": "string", "minLength": 1},
+        "heading": {"type": "string", "minLength": 1},
+        "statement_role": {"const": "unclassified"},
+        "exact_text": {"type": "string", "minLength": 1},
+        "source_spans": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "structure-annotations.schema.json#/$defs/source_span"}},
+        "content_sha256": {"$ref": "structure-annotations.schema.json#/$defs/sha256"},
+        "derivation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "review_status"],
+          "properties": {
+            "method": {"type": "string", "minLength": 1},
+            "review_status": {"const": "proposed"}
+          }
+        }
+      }
+    }
+  }
+}

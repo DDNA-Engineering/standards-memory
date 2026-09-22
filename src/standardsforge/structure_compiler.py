@@ -17,7 +17,7 @@ from .compiler import (
     _write_json,
 )
 from .errors import StandardsForgeError, require
-from .pack import validate_pack_directory
+from .pack import open_validated_pack, validate_pack_directory
 from .pdf_isolation import isolated_pdf_pages
 from .pdf_protocol import DEFAULT_LIMITS, LIMIT_POLICY_VERSION, PROTOCOL_VERSION
 from .source_catalog import load_source_catalog, verify_source_set
@@ -70,6 +70,10 @@ _ANNOTATION_KEYS = {
     "nodes",
     "relationships",
     "unsupported_regions",
+}
+_PACK_ANNOTATION_KEYS = {
+    "source_page_pack_digest", "outline_package_digest", "candidate_record_id",
+    "candidate_content_sha256", "proposal_sha256",
 }
 _COMPILER_KEYS = {"name", "version"}
 _REVIEW_REQUIRED_KEYS = {"reviewer_id", "reviewer_type", "reviewed_at"}
@@ -215,9 +219,11 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
         raw = json.loads(annotation_path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise StandardsForgeError("invalid_structure_annotations", "The structure annotation file is invalid JSON.") from exc
-    annotations = _strict_object(raw, _ANNOTATION_KEYS, "structure annotations")
+    require(isinstance(raw, dict), "invalid_structure_annotations", "Structure annotations must be an object.")
+    is_pack_annotation = raw.get("schema_version") == "0.4.0"
+    annotations = _strict_object(raw, _ANNOTATION_KEYS | (_PACK_ANNOTATION_KEYS if is_pack_annotation else set()), "structure annotations")
     require(
-        annotations["schema_version"] in {"0.1.0", "0.2.0", "0.3.0"},
+        annotations["schema_version"] in {"0.1.0", "0.2.0", "0.3.0", "0.4.0"},
         "unsupported_schema_version",
         "Unsupported structure annotation schema.",
     )
@@ -226,15 +232,19 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
     require(len(annotations["source_pdf_sha256"]) == 64, "invalid_structure_annotations", "The source PDF digest is invalid.")
     compiler = _strict_object(annotations["compiler"], _COMPILER_KEYS, "compiler")
     require(compiler == {"name": "pypdf", "version": PYPDF_VERSION}, "invalid_structure_annotations", "Structure annotations must bind the pinned PDF compiler.")
-    require(annotations["extraction_mode"] == "simple", "invalid_structure_annotations", "The structural compiler currently supports only simple text extraction.")
+    require(annotations["extraction_mode"] == ("layout_rotated_included" if is_pack_annotation else "simple"), "invalid_structure_annotations", "The structural extraction mode does not match its annotation version.")
     require(annotations["text_encoding"] == "UTF-8", "invalid_structure_annotations", "Structural annotations require UTF-8 page text.")
     require(annotations["offset_convention"] == "half_open_utf8_byte_offsets_per_physical_page", "invalid_structure_annotations", "Unsupported structural offset convention.")
+    if is_pack_annotation:
+        for key in _PACK_ANNOTATION_KEYS - {"candidate_record_id"}:
+            require(isinstance(annotations[key], str) and len(annotations[key]) == 64 and all(char in "0123456789abcdef" for char in annotations[key]), "invalid_structure_annotations", f"{key} must be a SHA-256 digest.")
+        require(isinstance(annotations["candidate_record_id"], str) and annotations["candidate_record_id"], "invalid_structure_annotations", "A pack-bound annotation requires its source candidate record ID.")
     review = _bounded_object(
         annotations["review"], _REVIEW_REQUIRED_KEYS, _REVIEW_OPTIONAL_KEYS, "review"
     )
     require(all(isinstance(review[key], str) and review[key] for key in _REVIEW_REQUIRED_KEYS), "invalid_structure_annotations", "Review provenance is required.")
     require(review["reviewer_type"] in {"agent", "human"}, "invalid_structure_annotations", "Reviewer type is invalid.")
-    if annotations["schema_version"] in {"0.2.0", "0.3.0"}:
+    if annotations["schema_version"] in {"0.2.0", "0.3.0", "0.4.0"}:
         require(set(review) == _REVIEW_REQUIRED_KEYS | _REVIEW_OPTIONAL_KEYS, "invalid_structure_annotations", "Structure annotations 0.2.0 require complete review provenance.")
         require(isinstance(review["method"], str) and review["method"], "invalid_structure_annotations", "Review method is required.")
         require(review["attestation"] == "extraction_review_not_project_applicability_or_approval", "invalid_structure_annotations", "Review attestation cannot assert project applicability or approval.")
@@ -248,6 +258,8 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
             require(tool["configuration_sha256"] is None or isinstance(tool["configuration_sha256"], str) and len(tool["configuration_sha256"]) == 64, "invalid_structure_annotations", "Review tool configuration digest is invalid.")
     nodes = annotations["nodes"]
     require(isinstance(nodes, list) and nodes, "invalid_structure_annotations", "At least one structural node is required.")
+    if is_pack_annotation:
+        require(len(nodes) == 1 and annotations["relationships"] == [] and annotations["unsupported_regions"] == [], "invalid_structure_annotations", "Pack-bound single-candidate review cannot assert additional nodes, relationships, or reviewed unsupported regions.")
     require(len(nodes) <= 4096, "invalid_structure_annotations", "The structural annotation node limit was exceeded.")
     logical_ids: set[str] = set()
     clause_references: set[str] = set()
@@ -300,7 +312,7 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
         _validate_derivation(node["derivation"], "node derivation", review["reviewer_type"])
         semantics = node.get("semantics")
         if semantics is not None:
-            require(annotations["schema_version"] in {"0.2.0", "0.3.0"}, "invalid_structure_annotations", "Semantic annotations require structure annotation schema 0.2.0 or newer.")
+            require(annotations["schema_version"] in {"0.2.0", "0.3.0", "0.4.0"}, "invalid_structure_annotations", "Semantic annotations require structure annotation schema 0.2.0 or newer.")
             _validate_semantics(semantics, len(source_spans), node["statement_role"])
     by_logical_id = {node["logical_id"]: node for node in nodes}
     for node in nodes:
@@ -339,7 +351,7 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
             require("target_logical_id" not in relationship and "target_reference" not in relationship, "invalid_structure_annotations", "Ambiguous relationships cannot assert one target.")
             require(not relationship["required"], "invalid_structure_annotations", "Ambiguous relationships cannot be required dependencies.")
         if relationship["relationship_type"] == "sequence_after":
-            require(annotations["schema_version"] == "0.3.0", "invalid_structure_annotations", "Reviewed procedure ordering requires structure annotation schema 0.3.0.")
+            require(annotations["schema_version"] in {"0.3.0", "0.4.0"}, "invalid_structure_annotations", "Reviewed procedure ordering requires structure annotation schema 0.3.0 or newer.")
             require(status == "resolved", "invalid_structure_annotations", "Procedure ordering requires one resolved predecessor.")
             require(relationship["required"], "invalid_structure_annotations", "A procedure predecessor must be required retrieval context.")
             source_id = relationship["source_logical_id"]
@@ -381,12 +393,82 @@ def compile_structured_pdf_section(
     catalog = load_source_catalog(catalog_path)
     document = _source_document(catalog, document_id)
     annotations = load_structure_annotations(annotations_path)
+    require(annotations["schema_version"] != "0.4.0", "invalid_structure_annotations", "Pack-bound annotations require compile-structure-from-pack.")
     review = annotations["review"]
     require(annotations["document_id"] == document["document_id"], "structure_identity_mismatch", "Structure annotations belong to a different document.")
     require(annotations["edition_id"] == document["edition_id"], "structure_identity_mismatch", "Structure annotations belong to a different edition.")
     require(annotations["source_pdf_sha256"] == document["sha256"], "structure_identity_mismatch", "Structure annotations bind a different source PDF.")
 
     source_path = Path(source_root).resolve() / document["local_filename"]
+    return _compile_structured_section(document, source_path, annotations, output_directory)
+
+
+def compile_structured_page_pack_section(
+    source_page_pack: str | Path,
+    outline_pack: str | Path,
+    annotations_path: str | Path,
+    output_directory: str | Path,
+) -> dict[str, Any]:
+    """Compile explicitly reviewed annotations against one verified page-text source pack."""
+
+    annotations = load_structure_annotations(annotations_path)
+    require(annotations["schema_version"] == "0.4.0", "invalid_structure_annotations", "Pack compilation requires structure annotations 0.4.0.")
+    from .outline_review import export_outline_review_draft
+
+    with tempfile.TemporaryDirectory(prefix="standardsforge-proposal-verify-") as temporary:
+        replay = Path(temporary) / "draft.json"
+        exported = export_outline_review_draft(outline_pack, source_page_pack, annotations["candidate_record_id"], replay)
+        draft = json.loads(replay.read_text(encoding="utf-8"))
+        require(
+            annotations["proposal_sha256"] == exported["draft_sha256"]
+            and annotations["outline_package_digest"] == draft["outline_package_digest"]
+            and annotations["candidate_content_sha256"] == draft["candidate_content_sha256"],
+            "structure_identity_mismatch", "The reviewed annotation does not bind the exact outline proposal.",
+        )
+    with open_validated_pack(source_page_pack) as base:
+        require(base.manifest["representation"] == "page_text", "structure_source_not_page_text", "A reviewed structure needs a page-text source pack.")
+        require(annotations["source_page_pack_digest"] == base.package_digest, "structure_identity_mismatch", "The reviewed annotation binds a different page-text package.")
+        require(annotations["document_id"] == base.manifest["identifier"], "structure_identity_mismatch", "Structure annotations belong to a different document.")
+        require(annotations["edition_id"] == base.manifest["edition_id"], "structure_identity_mismatch", "Structure annotations belong to a different edition.")
+        page_records = [record for record in base.records if record["kind"] == "page"]
+        require(page_records and len(page_records) == len(base.records), "structure_source_not_page_text", "Source pack contains non-page records.")
+        source_paths = {record["source"]["path"] for record in page_records}
+        source_hashes = {record["source"]["sha256"] for record in page_records}
+        require(len(source_paths) == len(source_hashes) == 1, "structure_source_ambiguous", "Select a one-component page-text pack for structural review.")
+        source_relative = next(iter(source_paths))
+        source_sha256 = next(iter(source_hashes))
+        require(annotations["source_pdf_sha256"] == source_sha256, "structure_identity_mismatch", "Annotations bind a different source component.")
+        source_path = base.root.joinpath(*PurePosixPath(source_relative).parts)
+        document = {
+            "document_id": base.manifest["identifier"],
+            "document_family_id": base.manifest["document_family_id"],
+            "edition_id": base.manifest["edition_id"],
+            "title": base.manifest["title"],
+            "publisher": base.manifest["publisher"],
+            "revision": base.manifest["revision"],
+            "change": 0,
+            "document_date": base.manifest["publication_date"],
+            "local_filename": PurePosixPath(source_relative).name,
+            "sha256": source_sha256,
+            "byte_length": source_path.stat().st_size,
+        }
+        return _compile_structured_section(
+            document, source_path, annotations, output_directory,
+            source_page_pack=base,
+            source_page_records=page_records,
+        )
+
+
+def _compile_structured_section(
+    document: dict[str, Any],
+    source_path: Path,
+    annotations: dict[str, Any],
+    output_directory: str | Path,
+    *,
+    source_page_pack: Any = None,
+    source_page_records: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    review = annotations["review"]
     require(source_path.stat().st_size <= MAX_PDF_BYTES, "compiler_limit_exceeded", "The PDF exceeds the compiler size limit.")
     output = Path(output_directory).resolve()
     require(not output.exists(), "compiler_output_exists", "The compiler output directory already exists.", path=str(output))
@@ -398,6 +480,7 @@ def compile_structured_pdf_section(
         page_sources.mkdir(parents=True)
         pdf_relative = f"sources/{document['local_filename']}"
         shutil.copyfile(source_path, sources / document["local_filename"])
+        require(_sha256((sources / document["local_filename"]).read_bytes()) == document["sha256"], "source_hash_mismatch", "The copied structural source PDF changed.")
 
         all_annotation_spans = [span for node in annotations["nodes"] for span in node["source_spans"]]
         all_annotation_spans.extend(
@@ -407,24 +490,40 @@ def compile_structured_pdf_section(
             span for region in annotations["unsupported_regions"] for span in region["source_spans"]
         )
         pages: dict[int, tuple[str, str, bytes]] = {}
-        with isolated_pdf_pages(
-            source_path,
-            source_sha256=document["sha256"],
-            source_bytes=document["byte_length"],
-            expected_pages=document["page_count"],
-            extraction_mode="simple",
-            encryption_policy="reject",
-        ) as parsed:
-            page_count = parsed.page_count
-            parsed_by_page = {page.physical_page: page for page in parsed.pages}
-            for physical_page in sorted({span["physical_page"] for span in all_annotation_spans}):
-                require(physical_page <= page_count, "invalid_structure_annotations", "A structural node references a page outside the source PDF.", physical_page=physical_page)
-                parsed_page = parsed_by_page[physical_page]
-                require(parsed_page.text_layer_status == "extracted", "pdf_text_layer_empty", "A structural source page has no extractable text layer.", page=physical_page)
-                page_bytes = parsed_page.path.read_bytes()
+        selected_pages = sorted({span["physical_page"] for span in all_annotation_spans})
+        if source_page_pack is not None:
+            assert source_page_records is not None
+            by_page: dict[int, dict[str, Any]] = {}
+            for record in source_page_records:
+                physical_page = record["source"]["page"]
+                require(physical_page not in by_page, "structure_source_ambiguous", "The source pack has duplicate physical-page identities.", physical_page=physical_page)
+                by_page[physical_page] = record
+            for physical_page in selected_pages:
+                record = by_page.get(physical_page)
+                require(record is not None, "invalid_structure_annotations", "A structural node references a page absent from the verified source pack.", physical_page=physical_page)
+                page_bytes = record["text"].encode("utf-8")
                 relative = f"sources/pages/physical-{physical_page:04d}.txt"
                 staging.joinpath(*PurePosixPath(relative).parts).write_bytes(page_bytes)
-                pages[physical_page] = (relative, parsed_page.sha256, page_bytes)
+                pages[physical_page] = (relative, _sha256(page_bytes), page_bytes)
+        else:
+            with isolated_pdf_pages(
+                source_path,
+                source_sha256=document["sha256"],
+                source_bytes=document["byte_length"],
+                expected_pages=document["page_count"],
+                extraction_mode="simple",
+                encryption_policy="reject",
+            ) as parsed:
+                page_count = parsed.page_count
+                parsed_by_page = {page.physical_page: page for page in parsed.pages}
+                for physical_page in selected_pages:
+                    require(physical_page <= page_count, "invalid_structure_annotations", "A structural node references a page outside the source PDF.", physical_page=physical_page)
+                    parsed_page = parsed_by_page[physical_page]
+                    require(parsed_page.text_layer_status == "extracted", "pdf_text_layer_empty", "A structural source page has no extractable text layer.", page=physical_page)
+                    page_bytes = parsed_page.path.read_bytes()
+                    relative = f"sources/pages/physical-{physical_page:04d}.txt"
+                    staging.joinpath(*PurePosixPath(relative).parts).write_bytes(page_bytes)
+                    pages[physical_page] = (relative, parsed_page.sha256, page_bytes)
         for span in all_annotation_spans:
             _, actual_page_hash, page_bytes = pages[span["physical_page"]]
             require(span["page_text_sha256"] == actual_page_hash, "structure_span_mismatch", "A structural page-text digest changed.", physical_page=span["physical_page"])
@@ -643,7 +742,11 @@ def compile_structured_pdf_section(
         revision_label = f"{revision} Change {document['change']}" if document["change"] else revision
         manifest = {
             "schema_version": "0.1.0",
-            "pack_id": f"structured.{document['document_family_id'].replace(':', '.')}.{document['document_date']}",
+            "pack_id": (
+                f"structured.{source_page_pack.manifest['pack_id']}.{annotations['proposal_sha256'][:16]}"
+                if source_page_pack is not None else
+                f"structured.{document['document_family_id'].replace(':', '.')}.{document['document_date']}"
+            ),
             "document_family_id": document["document_family_id"],
             "edition_id": document["edition_id"],
             "publisher": document["publisher"],
@@ -658,7 +761,10 @@ def compile_structured_pdf_section(
             "records_path": "records.json",
             "coverage": {
                 "corpus_scope": f"reviewed_structural_annotations_for_{len(pages)}_physical_pages",
-                "edition_composition": "exact_catalog_edition",
+                "edition_composition": (
+                    source_page_pack.manifest["coverage"]["edition_composition"]
+                    if source_page_pack is not None else "exact_catalog_edition"
+                ),
                 "parsed_source_coverage": "partial_reviewed_structural_section_only",
                 "dependency_closure": "partial_out_of_scope_references_explicit",
                 "enumeration_traversal": "classified_structural_records_only_not_document_complete",
@@ -667,11 +773,15 @@ def compile_structured_pdf_section(
         }
         rights = {
             "rights_schema_version": "0.1.0",
-            "content_class": "public_government_standard",
-            "redistribution": "not_asserted_for_generated_pack",
-            "processing": ["local_text_layer_extraction", "reviewed_structural_annotation", "local_retrieval"],
-            "model_use": "not_used",
-            "statement": "The reviewed structure is a derivation over a locally verified source; it does not grant access or assert source redistribution rights.",
+            "content_class": source_page_pack.rights["content_class"] if source_page_pack is not None else "public_government_standard",
+            "redistribution": source_page_pack.rights["redistribution"] if source_page_pack is not None else "not_asserted_for_generated_pack",
+            "processing": list(source_page_pack.rights["processing"]) if source_page_pack is not None else ["local_text_layer_extraction", "reviewed_structural_annotation", "local_retrieval"],
+            "model_use": source_page_pack.rights["model_use"] if source_page_pack is not None else "not_used",
+            "statement": (
+                "The complete source PDF is included for exact offline evidence. Its imported rights claims are preserved, not granted; structural review gives no new processing, access, model-use, or redistribution permission."
+                if source_page_pack is not None else
+                "The reviewed structure is a derivation over a locally verified source; it does not grant access or assert source redistribution rights."
+            ),
         }
         report = {
             "schema_version": "0.1.0",
@@ -688,6 +798,11 @@ def compile_structured_pdf_section(
             "document_id": document["document_id"],
             "edition_id": document["edition_id"],
             "source_pdf_sha256": document["sha256"],
+            "source_page_pack_digest": source_page_pack.package_digest if source_page_pack is not None else None,
+            "outline_package_digest": annotations.get("outline_package_digest"),
+            "candidate_record_id": annotations.get("candidate_record_id"),
+            "candidate_content_sha256": annotations.get("candidate_content_sha256"),
+            "proposal_sha256": annotations.get("proposal_sha256"),
             "annotation_sha256": _sha256(annotation_target.read_bytes()),
             "review": annotations["review"],
             "physical_pages": sorted(pages),
@@ -730,7 +845,7 @@ def compile_structured_pdf_section(
         validated = validate_pack_directory(staging)
         os.replace(staging, output)
         return {
-            "operation": "compile_structured_pdf_section",
+            "operation": "compile_structured_page_pack_section" if source_page_pack is not None else "compile_structured_pdf_section",
             "status": "compiled",
             "document_id": document["document_id"],
             "edition_id": document["edition_id"],

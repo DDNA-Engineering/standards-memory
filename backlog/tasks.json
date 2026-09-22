@@ -813,6 +813,21 @@
         "Build the universal wheel and source distribution from the tagged revision, verify version identity and clean installs on Windows, Linux, and macOS, and publish only through a tag-gated GitHub environment using OIDC trusted publishing.",
         "Prove portable setup and repeated-use behavior on native Windows, Linux, and macOS runners, including spaces and non-ASCII paths plus tampered, missing, extra, duplicate, unsafe-link, wrong-version, and unowned-state failures."
       ]
+    },
+    {
+      "task_id": "TASK-036",
+      "title": "Verified outline-to-reviewed-structure handoff",
+      "status": "active",
+      "requirements": [
+        "SM-FR-076"
+      ],
+      "acceptance": [
+        "Export a selected automated outline candidate into a closed, unreviewed draft bound to the exact derived and base page-text package digests, edition, source PDF, sidecar, logical identity, content hash, and exact UTF-8 span.",
+        "Require an explicit content-bound reviewer decision for each promoted node; never infer obligation role, governing edges, applicability, or human approval from an outline candidate.",
+        "Compile the reviewed annotation against the exact verified base page-text pack and its layout-mode sidecar without changing text rendering or silently falling back to a different catalog source.",
+        "Reject changed packages, source identities, text digests, candidate hashes, invalid or ambiguous spans, missing review decisions, false review provenance, and draft annotations supplied as reviewed input.",
+        "Prove one synthetic candidate-to-reviewed-pack roundtrip including exact retrieval, deterministic replay, offline behavior, and focused negative cases; report real-corpus validation separately."
+      ]
     }
   ]
 }

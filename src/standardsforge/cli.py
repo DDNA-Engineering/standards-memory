@@ -13,11 +13,12 @@ from .doctor import run_doctor
 from .errors import StandardsForgeError, require
 from .handoff import export_engineering_handoff
 from .outline_compiler import compile_derived_outline_pack
+from .outline_review import export_outline_review_draft, promote_outline_review
 from .pack import write_pack_archive
 from .policy import write_pack_policy
 from .service import StandardsForgeService
 from .source_catalog import verify_source_set
-from .structure_compiler import compile_structured_pdf_section
+from .structure_compiler import compile_structured_page_pack_section, compile_structured_pdf_section
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -100,6 +101,34 @@ def _parser() -> argparse.ArgumentParser:
     compile_structure.add_argument("annotations")
     compile_structure.add_argument("output_directory")
     compile_structure.add_argument("--source-root", required=True)
+
+    compile_pack_structure = commands.add_parser(
+        "compile-structure-from-pack",
+        help="Administrative: compile reviewed annotations against their exact verified page-text pack",
+    )
+    compile_pack_structure.add_argument("source_page_pack")
+    compile_pack_structure.add_argument("outline_pack")
+    compile_pack_structure.add_argument("annotations")
+    compile_pack_structure.add_argument("output_directory")
+
+    outline_draft = commands.add_parser(
+        "export-outline-draft",
+        help="Administrative: export one exact unreviewed outline candidate for explicit review",
+    )
+    outline_draft.add_argument("outline_pack")
+    outline_draft.add_argument("source_page_pack")
+    outline_draft.add_argument("record_id")
+    outline_draft.add_argument("output_path")
+
+    promote_review = commands.add_parser(
+        "promote-outline-review",
+        help="Administrative: validate an explicit reviewer decision and write pack-bound annotations",
+    )
+    promote_review.add_argument("draft_path")
+    promote_review.add_argument("decision_path")
+    promote_review.add_argument("outline_pack")
+    promote_review.add_argument("source_page_pack")
+    promote_review.add_argument("output_path")
 
     compile_outline = commands.add_parser(
         "compile-derived-outline",
@@ -253,6 +282,12 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
             args.annotations,
             args.output_directory,
         )
+    if args.command == "compile-structure-from-pack":
+        return compile_structured_page_pack_section(args.source_page_pack, args.outline_pack, args.annotations, args.output_directory)
+    if args.command == "export-outline-draft":
+        return export_outline_review_draft(args.outline_pack, args.source_page_pack, args.record_id, args.output_path)
+    if args.command == "promote-outline-review":
+        return promote_outline_review(args.draft_path, args.decision_path, args.outline_pack, args.source_page_pack, args.output_path)
     if args.command == "compile-derived-outline":
         return compile_derived_outline_pack(args.source_pack, args.output_directory)
     if args.command == "acquire-mil-std":
