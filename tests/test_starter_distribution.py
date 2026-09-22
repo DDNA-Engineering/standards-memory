@@ -381,7 +381,7 @@ class StarterDistributionTests(unittest.TestCase):
 
     def test_wheel_directory_discovery_requires_one_exact_pair(self) -> None:
         self.assertEqual(
-            (self.wheel, self.provenance),
+            (self.wheel.resolve(), self.provenance.resolve()),
             discover_wheel_inputs(self.base),
         )
         extra = self.base / "standardsforge-extra.whl"

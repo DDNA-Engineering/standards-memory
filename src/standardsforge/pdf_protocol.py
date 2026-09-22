@@ -12,6 +12,7 @@ PROTOCOL_VERSION = "pdf-extraction-worker/0.1.0"
 LIMIT_POLICY_VERSION = "pdf-limits/0.1.0"
 PYPDF_VERSION = "6.19.0"
 FONTTOOLS_VERSION = "4.65.0"
+WORKER_ERROR_BYTES = 64 * 1024
 
 
 @dataclass(frozen=True)

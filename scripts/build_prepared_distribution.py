@@ -76,7 +76,8 @@ def _validate_corpus(corpus_index: Path) -> tuple[dict, list[tuple[Path, str]]]:
             raise ValueError("Corpus package digests and pack IDs must be unique.")
         digests.add(package_digest)
         pack_ids.add(pack_id)
-        payloads.append((archive, f"corpus/{archive_relative.replace('\\', '/')}"))
+        archive_member = archive_relative.replace("\\", "/")
+        payloads.append((archive, f"corpus/{archive_member}"))
 
     if len(entries) != summary.get("compiled_record_count"):
         raise ValueError("Corpus summary count does not match its entries.")

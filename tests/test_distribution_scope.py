@@ -400,7 +400,7 @@ class DistributionScopeTests(unittest.TestCase):
                     9,
                 )
 
-                self.assertEqual(output, Path(result["output"]))
+                self.assertEqual(output.resolve(), Path(result["output"]))
                 prefix = "standardsforge-ready-test/"
                 _validate_built_distribution(output, prefix)
                 with zipfile.ZipFile(output) as built:

@@ -18,6 +18,9 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from standardsforge.errors import StandardsForgeError  # noqa: E402
 from standardsforge.cli import _parser as cli_parser, _run as cli_run  # noqa: E402
 from standardsforge.handoff import (  # noqa: E402
+    HANDOFF_NAME,
+    MANIFEST_NAME,
+    READER_NAME,
     decode_evidence_locator,
     export_engineering_handoff,
     render_reader_html,
@@ -250,14 +253,13 @@ class EngineeringHandoffTests(unittest.TestCase):
     def test_manifest_last_activation_failure_cleans_owned_partial_output(self) -> None:
         output = self.base / "activation-failure"
         original_replace = os.replace
-        activation_calls = 0
+        activation_names = []
 
         def fail_during_activation(source, destination):
-            nonlocal activation_calls
-            if Path(destination).parent == output:
-                activation_calls += 1
-                if activation_calls == 2:
-                    raise OSError("synthetic activation failure")
+            if Path(destination).name in {HANDOFF_NAME, READER_NAME, MANIFEST_NAME}:
+                activation_names.append(Path(destination).name)
+            if Path(destination).name == MANIFEST_NAME:
+                raise OSError("synthetic activation failure")
             return original_replace(source, destination)
 
         with patch("standardsforge.handoff.os.replace", side_effect=fail_during_activation):
@@ -271,6 +273,7 @@ class EngineeringHandoffTests(unittest.TestCase):
                     output,
                     record_id="clause-4.2.1",
                 )
+        self.assertEqual([HANDOFF_NAME, READER_NAME, MANIFEST_NAME], activation_names)
         self.assertFalse(output.exists())
         self.assertEqual([], list(self.base.glob(f".{output.name}.*.partial")))
 

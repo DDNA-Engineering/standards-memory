@@ -103,7 +103,7 @@ class PDFIsolationTests(unittest.TestCase):
                 pass
         self.assertEqual("parser_source_changed", changed.exception.code)
 
-        limits = replace(DEFAULT_LIMITS, page_text_bytes=8, aggregate_text_bytes=16)
+        limits = replace(DEFAULT_LIMITS, page_text_bytes=8, aggregate_text_bytes=16, result_bytes=8)
         with self.assertRaises(StandardsForgeError) as oversized:
             self._extract(limits)
         self.assertEqual("parser_output_limit_exceeded", oversized.exception.code)

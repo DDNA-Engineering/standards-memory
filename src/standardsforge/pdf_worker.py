@@ -17,6 +17,7 @@ from .pdf_protocol import (
     PROTOCOL_VERSION,
     PYPDF_VERSION,
     ParserLimits,
+    WORKER_ERROR_BYTES,
     canonical_json_bytes,
     normalize_page_text,
     sha256_bytes,
@@ -42,7 +43,8 @@ def _apply_posix_limits(limits: ParserLimits) -> None:
             raise RuntimeError("required limit missing")
         resource.setrlimit(resource.RLIMIT_AS, (limits.process_memory_bytes, limits.process_memory_bytes))
         resource.setrlimit(resource.RLIMIT_CPU, (limits.cpu_seconds, limits.cpu_seconds + 5))
-        resource.setrlimit(resource.RLIMIT_FSIZE, (limits.page_text_bytes, limits.page_text_bytes))
+        file_bytes = max(limits.page_text_bytes, limits.result_bytes, WORKER_ERROR_BYTES)
+        resource.setrlimit(resource.RLIMIT_FSIZE, (file_bytes, file_bytes))
         resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     except Exception as exc:
         raise WorkerFailure("parser_limits_unavailable", "startup") from exc

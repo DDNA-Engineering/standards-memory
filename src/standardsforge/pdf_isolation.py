@@ -21,6 +21,7 @@ from .pdf_protocol import (
     LIMIT_POLICY_VERSION,
     PROTOCOL_VERSION,
     ParserLimits,
+    WORKER_ERROR_BYTES,
     build_request,
     canonical_json_bytes,
     sha256_bytes,
@@ -167,7 +168,7 @@ def _start_worker(
 
 def _load_error(output: Path) -> StandardsForgeError | None:
     error_path = output / "error.json"
-    if not _is_regular_unlinked(error_path) or error_path.stat().st_size > 64 * 1024:
+    if not _is_regular_unlinked(error_path) or error_path.stat().st_size > WORKER_ERROR_BYTES:
         return None
     try:
         value = json.loads(error_path.read_text(encoding="utf-8"))
