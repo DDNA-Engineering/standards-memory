@@ -297,6 +297,22 @@ def _require_no_links_tree(root: Path) -> None:
             _require(not _is_link_like(directory_path / name), "Setup-owned partial state contains a symbolic link or junction.")
 
 
+def _require_owned_venv_tree(root: Path) -> None:
+    root_resolved = root.resolve(strict=True)
+    for directory, names, files in os.walk(root, topdown=True, followlinks=False):
+        directory_path = Path(directory)
+        for name in [*names, *files]:
+            path = directory_path / name
+            if not _is_link_like(path):
+                continue
+            try:
+                path.resolve(strict=True).relative_to(root_resolved)
+            except (OSError, ValueError) as exc:
+                raise StarterSetupError(
+                    "Starter environment contains an external or broken symbolic link or junction."
+                ) from exc
+
+
 def validate_bundle(root: Path) -> tuple[dict[str, Any], str]:
     _require(sys.version_info >= MINIMUM_PYTHON, "Python 3.11 or newer is required.")
     root = root.resolve(strict=True)
@@ -419,7 +435,7 @@ def _prepare_venv(root: Path, manifest: dict[str, Any], manifest_sha256: str) ->
     _require(not _is_link_like(venv_root), "Starter environment cannot be a symbolic link or junction.")
     marker = venv_root / VENV_MARKER
     if venv_root.exists():
-        _require_no_links_tree(venv_root)
+        _require_owned_venv_tree(venv_root)
         _require(marker.is_file() and not _is_link_like(marker) and _load_json(marker, "starter environment marker") == {"bundle_manifest_sha256": manifest_sha256}, "Existing .venv is not owned by this starter bundle.")
     else:
         venv_root.mkdir()
@@ -427,6 +443,7 @@ def _prepare_venv(root: Path, manifest: dict[str, Any], manifest_sha256: str) ->
     python = _venv_python(venv_root)
     if not python.is_file():
         venv.EnvBuilder(with_pip=True, clear=False, symlinks=False).create(venv_root)
+    _require_owned_venv_tree(venv_root)
     _require(python.is_file() and not _is_link_like(python), "Starter Python environment is incomplete or unsafe.")
     wheel = _safe_disk_path(root, manifest["build"]["wheel_path"])
     _run(

@@ -32,13 +32,13 @@ jobs:
       - name: Run tests
         run: python -m unittest discover -s tests -v
       - name: Run offline synthetic benchmark
-        run: python scripts/run_benchmark.py benchmarks/synthetic-contract-v1.json --output benchmark-run.json
+        run: python scripts/run_benchmark.py benchmarks/synthetic-contract-v1.json --output build/benchmark-run.json
       - name: Retain synthetic benchmark evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: synthetic-benchmark-${{ matrix.os }}-py${{ matrix.python-version }}
-          path: benchmark-run.json
+          path: build/benchmark-run.json
           if-no-files-found: warn
       - name: Acquire locked build backend
         run: >-
