@@ -42,7 +42,6 @@ jobs:
       ASSET_NAME: ${{ inputs.asset_name }}
       EXPECTED_SHA256: ${{ inputs.expected_sha256 }}
       EXPECTED_BYTES: ${{ inputs.expected_bytes }}
-      NATIVE_OS: ${{ runner.os }}
     steps:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
@@ -109,6 +108,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Safe extraction failed.' }
       - name: Run first and repeat portable core setup outside the distribution
         shell: pwsh
+        env:
+          NATIVE_OS: ${{ runner.os }}
         run: |
           $env:PYTHONPATH = $null
           $env:PYTHONHOME = $null
@@ -129,6 +130,8 @@ jobs:
           } finally { Pop-Location }
       - name: Prove full doctor and natural-language search
         shell: pwsh
+        env:
+          NATIVE_OS: ${{ runner.os }}
         run: |
           $env:PYTHONPATH = $null
           $env:PYTHONHOME = $null
