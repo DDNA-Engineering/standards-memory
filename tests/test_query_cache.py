@@ -151,6 +151,69 @@ class QueryCacheAndBatchTests(unittest.TestCase):
         self.assertEqual({"max_terms": 32, "actual_terms": 33}, caught.exception.details)
         lexical_search.assert_not_called()
 
+    def test_search_modes_are_explicit_distinct_and_cache_separated(self) -> None:
+        self.service.install_pack(PACK_V1, POLICY)
+
+        default_all = self.service.search("axial ingress", "local-user")
+        explicit_all = self.service.search(
+            "axial ingress", "local-user", query_mode="all_terms"
+        )
+        any_terms = self.service.search(
+            "axial ingress", "local-user", query_mode="any_terms"
+        )
+        exact_phrase = self.service.search(
+            "steady axial load", "local-user", query_mode="exact_phrase"
+        )
+        reversed_phrase = self.service.search(
+            "axial steady load", "local-user", query_mode="exact_phrase"
+        )
+
+        self.assertEqual(default_all, explicit_all)
+        self.assertEqual([], default_all["results"])
+        self.assertEqual(
+            {"clause-4.2.1", "clause-4.2.2"},
+            {item["record_id"] for item in any_terms["results"]},
+        )
+        self.assertEqual(
+            ["clause-4.2.1"],
+            [item["record_id"] for item in exact_phrase["results"]],
+        )
+        self.assertEqual([], reversed_phrase["results"])
+        self.assertEqual(
+            {
+                "mode": "any_terms",
+                "normalized_query": "axial ingress",
+                "parsed_terms": ["axial", "ingress"],
+            },
+            any_terms["query_interpretation"],
+        )
+
+        identifier_chunks = self.service.search(
+            "4.2.1 water", "local-user", query_mode="any_terms"
+        )
+        self.assertEqual(
+            {"clause-4.2.1", "note-4.2.1-1", "clause-4.2.2"},
+            {item["record_id"] for item in identifier_chunks["results"]},
+        )
+
+        with patch.object(
+            self.service.store, "search", wraps=self.service.store.search
+        ) as lexical_search:
+            for mode in ("exact_phrase", "all_terms", "any_terms"):
+                packet = self.service.search("adapter", "local-user", query_mode=mode)
+                self.assertEqual(mode, packet["query_interpretation"]["mode"])
+            self.assertEqual(3, lexical_search.call_count)
+            self.service.search("adapter", "local-user", query_mode="all_terms")
+            self.assertEqual(3, lexical_search.call_count)
+
+        for invalid_mode in ("", "implicit", "ALL_TERMS", " all_terms ", None, [], {}):
+            with self.subTest(query_mode=invalid_mode):
+                with self.assertRaises(StandardsForgeError) as caught:
+                    self.service.search(
+                        "axial load", "local-user", query_mode=invalid_mode  # type: ignore[arg-type]
+                    )
+                self.assertEqual("invalid_query_mode", caught.exception.code)
+
     def test_search_returns_source_linked_snippets_and_structural_heading_ancestry(self) -> None:
         digest = self.service.install_pack(PACK_V1, POLICY)["package_digest"]
         structures = {

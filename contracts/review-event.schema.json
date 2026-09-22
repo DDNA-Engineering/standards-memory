@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/review-event.schema.json",
+  "title": "StandardsForge evidence review event",
+  "description": "Review of extracted structure or semantics. It is not a project applicability, compliance, or approval decision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "reviewed_content_sha256", "scope", "reviewer", "reviewed_at", "method", "tool", "unresolved_issues", "attestation"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "status": {"enum": ["agent_reviewed", "human_verified", "human_verified_with_uncertainty", "rejected"]},
+    "reviewed_content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "scope": {"enum": ["structure_only", "structure_and_semantics"]},
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {"enum": ["agent", "human"]}
+      }
+    },
+    "reviewed_at": {"type": "string", "format": "date-time"},
+    "method": {"type": "string", "minLength": 1},
+    "tool": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version", "configuration_sha256"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "version": {"type": "string", "minLength": 1},
+            "configuration_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      ]
+    },
+    "unresolved_issues": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "attestation": {"const": "extraction_review_not_project_applicability_or_approval"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "reviewer": {
+            "properties": {"type": {"const": "agent"}},
+            "required": ["type"]
+          }
+        },
+        "required": ["reviewer"]
+      },
+      "then": {
+        "properties": {
+          "status": {"enum": ["agent_reviewed", "rejected"]},
+          "tool": {"type": "object"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reviewer": {
+            "properties": {"type": {"const": "human"}},
+            "required": ["type"]
+          }
+        },
+        "required": ["reviewer"]
+      },
+      "then": {
+        "properties": {
+          "status": {"enum": ["human_verified", "human_verified_with_uncertainty", "rejected"]}
+        }
+      }
+    }
+  ]
+}

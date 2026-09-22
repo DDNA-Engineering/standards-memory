@@ -9,7 +9,9 @@ from typing import Any, Sequence
 from .acquisition import acquire_active_mil_stds, verify_mil_std_acquisition
 from .compiler import compile_pdf_to_pack
 from .corpus_compiler import compile_mil_std_corpus, install_compiled_corpus, write_corpus_policy
+from .doctor import run_doctor
 from .errors import StandardsForgeError, require
+from .handoff import export_engineering_handoff
 from .outline_compiler import compile_derived_outline_pack
 from .pack import write_pack_archive
 from .policy import write_pack_policy
@@ -23,6 +25,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--db", default=".standardsforge/memory.db", help="SQLite metadata database")
     parser.add_argument("--store", default=".standardsforge/objects", help="Immutable object directory")
     commands = parser.add_subparsers(dest="command", required=True)
+
+    doctor = commands.add_parser("doctor", help="Read-only: diagnose local runtime and installed-state readiness")
+    doctor.add_argument("--policy", help="Trusted local operator policy to compare with installed grants")
+    doctor.add_argument("--principal", help="Principal whose active grants must be ready")
+    doctor.add_argument("--full-integrity", action="store_true", help="Validate every installed package instead of one deterministic package")
+    doctor.add_argument("--require-mcp", action="store_true", help="Treat the optional MCP dependency as required")
 
     verify = commands.add_parser("verify-pack", help="Validate a data-only pack without installing it")
     verify.add_argument("source")
@@ -121,6 +129,17 @@ def _parser() -> argparse.ArgumentParser:
     install.add_argument("source")
     install.add_argument("--policy", required=True, help="Trusted local operator policy JSON")
 
+    export_handoff = commands.add_parser(
+        "export-handoff",
+        help="Administrative: write a source-first reader and neutral engineering handoff",
+    )
+    export_handoff.add_argument("package_digest")
+    export_handoff.add_argument("clause_reference", nargs="?")
+    export_handoff.add_argument("--record-id")
+    export_handoff.add_argument("--principal", required=True)
+    export_handoff.add_argument("--candidate", required=True, help="Closed caller-authored candidate JSON")
+    export_handoff.add_argument("--output", required=True, help="New output directory")
+
     resolve = commands.add_parser("resolve", help="Read-only: resolve an exact document identity")
     resolve.add_argument("identifier")
     resolve.add_argument("--edition")
@@ -170,6 +189,11 @@ def _parser() -> argparse.ArgumentParser:
     search.add_argument("--limit", type=int, default=20)
     search.add_argument("--package-digest")
     search.add_argument("--scope-prefix")
+    search.add_argument(
+        "--query-mode",
+        choices=("exact_phrase", "all_terms", "any_terms"),
+        default="all_terms",
+    )
 
     revoke = commands.add_parser("revoke", help="Administrative: immediately revoke a principal's package grant")
     revoke.add_argument("package_digest")
@@ -178,6 +202,15 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def _run(args: argparse.Namespace) -> dict[str, Any]:
+    if args.command == "doctor":
+        return run_doctor(
+            args.db,
+            args.store,
+            policy_path=args.policy,
+            principal_id=args.principal,
+            full_integrity=args.full_integrity,
+            require_mcp=args.require_mcp,
+        )
     if args.command == "verify-source-set":
         return verify_source_set(args.catalog, args.source_root)
     if args.command == "archive-pack":
@@ -225,7 +258,7 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
         )
     if args.command == "verify-mil-std-acquisition":
         return verify_mil_std_acquisition(args.manifest, args.output_root)
-    if args.command == "get-clause":
+    if args.command in {"get-clause", "export-handoff"}:
         for name, value in (
             ("clause_reference", args.clause_reference),
             ("record_id", args.record_id),
@@ -238,7 +271,18 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
         require(
             args.clause_reference is not None or args.record_id is not None,
             "invalid_selector",
-            "get-clause requires clause_reference, record_id, or both.",
+            f"{args.command} requires clause_reference, record_id, or both.",
+        )
+    if args.command == "export-handoff":
+        return export_engineering_handoff(
+            args.db,
+            args.store,
+            args.package_digest,
+            args.principal,
+            args.candidate,
+            args.output,
+            clause_reference=args.clause_reference,
+            record_id=args.record_id,
         )
     service = StandardsForgeService(Path(args.db), Path(args.store))
     if args.command == "verify-pack":
@@ -279,6 +323,7 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
             args.limit,
             package_digest=args.package_digest,
             scope_prefix=args.scope_prefix,
+            query_mode=args.query_mode,
         )
     if args.command == "revoke":
         return service.revoke(args.package_digest, args.principal)
@@ -317,6 +362,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         return 1
     _emit_json(sys.stdout, {"ok": True, "result": result})
+    if args.command == "doctor" and result["ready"] is False:
+        return 3
     return 0
 
 

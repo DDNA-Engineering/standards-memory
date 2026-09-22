@@ -1,0 +1,242 @@
+{
+  "schema_version": "0.1.0",
+  "suite": {
+    "suite_id": "standardsforge.synthetic-contract",
+    "suite_version": "1.0.0",
+    "qualification_class": "synthetic_contract_qualification",
+    "claim_boundary": "qualifies_benchmark_harness_and_synthetic_contract_behavior_only",
+    "principal_id": "local-user",
+    "source_bindings": [
+      {
+        "binding_id": "adapter-v1",
+        "pack_path": "examples/packs/fictional-adapter-v1",
+        "package_digest": "3c27ee682401e154425f806614a800d744f472f1be41e9e412f9214460f12117",
+        "pack_id": "example.vehicle-adapter.1.0",
+        "edition_id": "example:spec-100:2025-a",
+        "representation": "curated_records",
+        "content_class": "synthetic"
+      },
+      {
+        "binding_id": "adapter-v2",
+        "pack_path": "examples/packs/fictional-adapter-v2",
+        "package_digest": "ad93262351fbf1138f841e7f964fca95ffe7c5139778996ec851bdd91df33ad3",
+        "pack_id": "example.vehicle-adapter.2.0",
+        "edition_id": "example:spec-100:2026-b",
+        "representation": "curated_records",
+        "content_class": "synthetic"
+      }
+    ],
+    "cases": [
+      {
+        "case_id": "resolve-v1-exact",
+        "dimension": "discovery",
+        "operation": "resolve_document",
+        "question": "Resolve the exact synthetic A edition and curated representation.",
+        "request": {
+          "identifier": "EXAMPLE-SPEC-100",
+          "edition_id": "example:spec-100:2025-a",
+          "representation": "curated_records"
+        },
+        "expectations": {
+          "answerability": "answerable",
+          "expected_binding": "adapter-v1",
+          "relevant_record_ids": [],
+          "required_record_ids": [],
+          "forbidden_record_ids": [],
+          "critical_facts": [],
+          "forbidden_facts": [],
+          "expected_change_statuses": {},
+          "expected_result_count": 1,
+          "required_json_values": [
+            {"pointer": "/edition_id", "value": "example:spec-100:2025-a"},
+            {"pointer": "/representation", "value": "curated_records"}
+          ],
+          "forbidden_claims": ["wrong_edition", "fabricated_citation", "false_complete", "applicability", "compliance", "approval"]
+        }
+      },
+      {
+        "case_id": "search-v1-exact-phrase",
+        "dimension": "discovery",
+        "operation": "search",
+        "question": "Find the exact steady axial load phrase in edition A.",
+        "request": {"query": "steady axial load", "query_mode": "exact_phrase", "limit": 10, "package_binding": "adapter-v1"},
+        "expectations": {
+          "answerability": "answerable",
+          "expected_binding": "adapter-v1",
+          "relevant_record_ids": ["clause-4.2.1"],
+          "required_record_ids": [],
+          "forbidden_record_ids": ["clause-4.2.2"],
+          "critical_facts": [],
+          "forbidden_facts": [],
+          "expected_change_statuses": {},
+          "expected_result_count": 1,
+          "required_json_values": [{"pointer": "/query_interpretation/mode", "value": "exact_phrase"}],
+          "forbidden_claims": ["wrong_edition", "fabricated_citation", "false_complete", "applicability", "compliance", "approval"]
+        }
+      },
+      {
+        "case_id": "search-v1-all-terms",
+        "dimension": "discovery",
+        "operation": "search",
+        "question": "Find the record containing both axial and load in edition A.",
+        "request": {"query": "axial load", "query_mode": "all_terms", "limit": 10, "package_binding": "adapter-v1"},
+        "expectations": {
+          "answerability": "answerable",
+          "expected_binding": "adapter-v1",
+          "relevant_record_ids": ["clause-4.2.1"],
+          "required_record_ids": [],
+          "forbidden_record_ids": ["clause-4.2.2"],
+          "critical_facts": [],
+          "forbidden_facts": [],
+          "expected_change_statuses": {},
+          "expected_result_count": 1,
+          "required_json_values": [{"pointer": "/query_interpretation/mode", "value": "all_terms"}],
+          "forbidden_claims": ["wrong_edition", "fabricated_citation", "false_complete", "applicability", "compliance", "approval"]
+        }
+      },
+      {
+        "case_id": "search-v1-any-terms",
+        "dimension": "discovery",
+        "operation": "search",
+        "question": "Find records containing axial or ingress in edition A.",
+        "request": {"query": "axial ingress", "query_mode": "any_terms", "limit": 10, "package_binding": "adapter-v1"},
+        "expectations": {
+          "answerability": "answerable",
+          "expected_binding": "adapter-v1",
+          "relevant_record_ids": ["clause-4.2.1", "clause-4.2.2"],
+          "required_record_ids": [],
+          "forbidden_record_ids": [],
+          "critical_facts": [],
+          "forbidden_facts": [],
+          "expected_change_statuses": {},
+          "expected_result_count": 2,
+          "required_json_values": [{"pointer": "/query_interpretation/mode", "value": "any_terms"}],
+          "forbidden_claims": ["wrong_edition", "fabricated_citation", "false_complete", "applicability", "compliance", "approval"]
+        }
+      },
+      {
+        "case_id": "context-v1-required-note",
+        "dimension": "context",
+        "operation": "get_clause",
+        "question": "Return edition A clause 4.2.1 with its required governing note.",
+        "request": {"package_binding": "adapter-v1", "record_id": "clause-4.2.1"},
+        "expectations": {
+          "answerability": "answerable",
+          "expected_binding": "adapter-v1",
+          "relevant_record_ids": ["clause-4.2.1"],
+          "required_record_ids": ["note-4.2.1-1"],
+          "forbidden_record_ids": [],
+          "critical_facts": [
+            {"record_id": "clause-4.2.1", "exact_text": "80 N for 60 seconds"},
+            {"record_id": "note-4.2.1-1", "exact_text": "23 °C ± 2 °C for at least two hours"}
+          ],
+          "forbidden_facts": [
+            {"record_id": "clause-4.2.1", "exact_text": "100 N"},
+            {"record_id": "note-4.2.1-1", "exact_text": "-20 °C"}
+          ],
+          "expected_change_statuses": {},
+          "expected_result_count": 2,
+          "required_json_values": [{"pointer": "/package/edition_id", "value": "example:spec-100:2025-a"}],
+          "forbidden_claims": ["wrong_edition", "fabricated_citation", "false_complete", "applicability", "compliance", "approval"]
+        }
+      },
+      {
+        "case_id": "context-v2-required-note",
+        "dimension": "fidelity",
+        "operation": "get_clause",
+        "question": "Return edition B clause 4.2.1 with its changed requirement and governing note.",
+        "request": {"package_binding": "adapter-v2", "record_id": "clause-4.2.1"},
+        "expectations": {
+          "answerability": "answerable",
+          "expected_binding": "adapter-v2",
+          "relevant_record_ids": ["clause-4.2.1"],
+          "required_record_ids": ["note-4.2.1-1"],
+          "forbidden_record_ids": [],
+          "critical_facts": [
+            {"record_id": "clause-4.2.1", "exact_text": "100 N for 60 seconds"},
+            {"record_id": "note-4.2.1-1", "exact_text": "-20 °C ± 2 °C for at least four hours"}
+          ],
+          "forbidden_facts": [
+            {"record_id": "clause-4.2.1", "exact_text": "80 N"},
+            {"record_id": "note-4.2.1-1", "exact_text": "23 °C"}
+          ],
+          "expected_change_statuses": {},
+          "expected_result_count": 2,
+          "required_json_values": [{"pointer": "/package/edition_id", "value": "example:spec-100:2026-b"}],
+          "forbidden_claims": ["wrong_edition", "fabricated_citation", "false_complete", "applicability", "compliance", "approval"]
+        }
+      },
+      {
+        "case_id": "search-outside-baseline",
+        "dimension": "honesty",
+        "operation": "search",
+        "question": "Report no result for a topic absent from the exact synthetic baseline.",
+        "request": {"query": "orbital radiation hardness", "query_mode": "all_terms", "limit": 10, "package_binding": "adapter-v1"},
+        "expectations": {
+          "answerability": "outside_baseline",
+          "expected_binding": "adapter-v1",
+          "relevant_record_ids": [],
+          "required_record_ids": [],
+          "forbidden_record_ids": [],
+          "critical_facts": [],
+          "forbidden_facts": [],
+          "expected_change_statuses": {},
+          "expected_result_count": 0,
+          "required_json_values": [{"pointer": "/completeness/database_traversal/complete", "value": false}],
+          "forbidden_claims": ["wrong_edition", "fabricated_citation", "false_complete", "applicability", "compliance", "approval"]
+        }
+      },
+      {
+        "case_id": "diff-v1-v2-exact-ids",
+        "dimension": "revision",
+        "operation": "diff_editions",
+        "question": "Compare the exact A and B package pins without treating heuristic candidates as authoritative.",
+        "request": {"from_binding": "adapter-v1", "to_binding": "adapter-v2"},
+        "expectations": {
+          "answerability": "answerable",
+          "expected_binding": null,
+          "relevant_record_ids": ["clause-4.2.1", "note-4.2.1-1", "clause-4.2.2"],
+          "required_record_ids": [],
+          "forbidden_record_ids": [],
+          "critical_facts": [],
+          "forbidden_facts": [],
+          "expected_change_statuses": {"clause-4.2.1": "modified", "note-4.2.1-1": "modified", "clause-4.2.2": "unchanged"},
+          "expected_result_count": 3,
+          "required_json_values": [{"pointer": "/alignment_mode", "value": "exact_record_id_only_with_non_authoritative_candidates_v1"}],
+          "forbidden_claims": ["wrong_edition", "fabricated_citation", "false_complete", "applicability", "compliance", "approval"]
+        }
+      }
+    ],
+    "release_blocking_max": {
+      "failed_cases": 0,
+      "wrong_edition_results": 0,
+      "citation_mismatches": 0,
+      "lost_critical_facts": 0,
+      "missing_required_context": 0,
+      "false_complete_results": 0
+    },
+    "unmeasured_dimensions": [
+      "real_document_discovery_accuracy",
+      "real_document_semantic_fidelity",
+      "tokenizer_normalized_efficiency",
+      "peak_process_resources",
+      "engineer_time_saved"
+    ],
+    "exclusions": [
+      "Synthetic fixture results do not establish real-document discovery accuracy.",
+      "Synthetic fixture results do not establish semantic fidelity on third-party standards.",
+      "This suite does not measure tokenizer efficiency, peak process resources, or engineer time saved."
+    ]
+  },
+  "review": {
+    "status": "synthetic_fixture_reviewed",
+    "reviewed_content_sha256": "e1ec146ea1184b14b4ef3ac05e176e304411b7181e1ee269bf0643e690f28f52",
+    "scope": "benchmark_suite",
+    "reviewer": {"id": "standardsforge-maintainers", "type": "synthetic_author"},
+    "reviewed_at": "2026-09-22T00:00:00Z",
+    "method": "Manual review of synthetic questions, expected records, exact facts, exclusions, and release-blocking thresholds against the content-bound fixture packs.",
+    "tool": null,
+    "unresolved_issues": [],
+    "attestation": "benchmark_review_not_project_applicability_or_approval"
+  }
+}

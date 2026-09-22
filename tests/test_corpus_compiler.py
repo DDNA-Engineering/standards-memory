@@ -245,6 +245,24 @@ class CorpusCompilerTests(unittest.TestCase):
             caught.exception.details["errors"][0]["error"],
         )
 
+    def test_parser_failure_forces_incomplete_corpus_instead_of_no_text(self) -> None:
+        output = self.root / "parser-failure-corpus"
+        failure = StandardsForgeError(
+            "parser_worker_terminated",
+            "The parser worker terminated without a valid result.",
+            {"termination_reason": "resource_limit_or_crash"},
+        )
+        with patch.object(corpus_compiler_module, "isolated_pdf_pages", side_effect=failure):
+            with self.assertRaises(StandardsForgeError) as caught:
+                compile_mil_std_corpus(self.manifest_path, self.sources, output)
+        self.assertEqual("corpus_compile_incomplete", caught.exception.code)
+        index = json.loads((output / "corpus.json").read_text(encoding="utf-8"))
+        self.assertEqual("incomplete", index["summary"]["status"])
+        self.assertEqual(1, index["summary"]["failed_record_count"])
+        self.assertEqual(0, index["summary"]["compiled_record_count"])
+        self.assertEqual("parser_worker_terminated", index["failures"][0]["code"])
+        self.assertEqual(0, index["summary"]["pages_without_text_records"])
+
     def test_rejects_stale_valid_archive_during_uncheckpointed_resume(self) -> None:
         output = self.root / "stale-corpus"
         compile_mil_std_corpus(self.manifest_path, self.sources, output)

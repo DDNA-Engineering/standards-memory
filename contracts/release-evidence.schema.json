@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/release-evidence.schema.json",
+  "title": "StandardsForge closed release evidence index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "source", "subjects", "evidence_files", "verification_policy", "authentication"],
+  "$defs": {
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "artifact_type": {"const": "standardsforge_release_evidence"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inventory_sha256", "dependency_lock", "build_tool_lock", "vcs"],
+      "properties": {
+        "inventory_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "dependency_lock": {"$ref": "#/$defs/file"},
+        "build_tool_lock": {"$ref": "#/$defs/file"},
+        "vcs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "worktreeState", "binding"],
+          "properties": {
+            "kind": {"enum": ["git", "unavailable"]},
+            "repositoryUri": {"type": "string", "pattern": "^https://[^@/]+/[^/]+/[^/]+$"},
+            "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "ref": {"type": "string", "pattern": "^refs/heads/[A-Za-z0-9._/-]+$"},
+            "worktreeState": {"enum": ["clean", "dirty", "unavailable"]},
+            "binding": {"enum": ["exact_commit", "context_only", "inventory_only"]}
+          }
+        }
+      }
+    },
+    "subjects": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/file"}},
+    "evidence_files": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/file"}},
+    "verification_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "workflow", "branch", "predicate_type", "issuer"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "workflow": {"const": ".github/workflows/ci.yml"},
+        "branch": {"const": "refs/heads/main"},
+        "predicate_type": {"const": "https://cyclonedx.org/bom"},
+        "issuer": {"const": "https://token.actions.githubusercontent.com"}
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["local_evidence", "signature_status", "authenticity_verified"],
+      "properties": {
+        "local_evidence": {"const": "unsigned"},
+        "signature_status": {"const": "not_present"},
+        "authenticity_verified": {"const": false}
+      }
+    }
+  }
+}

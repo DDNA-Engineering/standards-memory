@@ -7,7 +7,7 @@ import stat
 import tempfile
 import zipfile
 from contextlib import contextmanager
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterator
 
@@ -65,7 +65,7 @@ _SOURCE_OFFSET_KEYS = {"text_start_byte", "text_end_byte"}
 _SOURCE_KEYS = _SOURCE_REQUIRED_KEYS | _SOURCE_TEXT_KEYS | _SOURCE_OFFSET_KEYS
 _DEPENDENCY_KEYS = {"relationship", "target_record_id", "required"}
 _DERIVATION_KEYS = {"statement_role", "method", "review_status"}
-_STRUCTURE_KEYS = {
+_STRUCTURE_REQUIRED_KEYS = {
     "logical_id",
     "content_sha256",
     "parent_logical_id",
@@ -73,6 +73,8 @@ _STRUCTURE_KEYS = {
     "source_spans",
     "relationships",
 }
+_STRUCTURE_OPTIONAL_KEYS = {"semantics", "review"}
+_STRUCTURE_KEYS = _STRUCTURE_REQUIRED_KEYS | _STRUCTURE_OPTIONAL_KEYS
 _STRUCTURE_SPAN_KEYS = {
     "path",
     "sha256",
@@ -93,6 +95,28 @@ _STRUCTURE_RELATIONSHIP_KEYS = {
     "method",
     "review_status",
     "evidence_spans",
+}
+_SEMANTIC_KEYS = {
+    "schema_version",
+    "content_role",
+    "normativity",
+    "statement",
+    "qualifiers",
+    "quantities",
+    "unresolved_issues",
+    "project_applicability",
+}
+_REVIEW_EVENT_KEYS = {
+    "schema_version",
+    "status",
+    "reviewed_content_sha256",
+    "scope",
+    "reviewer",
+    "reviewed_at",
+    "method",
+    "tool",
+    "unresolved_issues",
+    "attestation",
 }
 _STRUCTURAL_KINDS = {
     "document",
@@ -176,6 +200,114 @@ def _strict_object(value: Any, allowed: set[str], code: str, label: str) -> dict
     unknown = sorted(set(value) - allowed)
     require(not unknown, code, f"{label} has unknown fields.", fields=unknown)
     return value
+
+
+def _span_indices(value: Any, span_count: int, label: str) -> list[int]:
+    require(
+        isinstance(value, list)
+        and value
+        and len(value) == len(set(value))
+        and all(type(index) is int and 0 <= index < span_count for index in value)
+        and value == sorted(value),
+        "invalid_record",
+        f"{label} span indices are invalid.",
+    )
+    return value
+
+
+def _validate_semantic_record(
+    value: Any,
+    *,
+    record_text: str,
+    statement_role: str,
+    kind: str,
+    span_fragments: list[str],
+) -> dict[str, Any]:
+    semantics = _strict_object(value, _SEMANTIC_KEYS, "invalid_record", "record semantics")
+    require(set(semantics) == _SEMANTIC_KEYS, "invalid_record", "Every semantic field is required.")
+    require(semantics["schema_version"] == "0.1.0", "invalid_record", "Unsupported semantic schema.")
+    content_roles = {
+        "requirement_candidate", "governing_condition", "exception", "applicability_statement",
+        "definition", "table_header", "table_row", "table_footnote", "note", "prose",
+    }
+    require(semantics["content_role"] in content_roles, "invalid_record", "Unsupported semantic content role.")
+    require(semantics["normativity"] in {"normative", "informative", "mixed", "unclassified"}, "invalid_record", "Unsupported semantic normativity.")
+    require(semantics["project_applicability"] == "not_decided", "invalid_record", "Semantic evidence cannot decide project applicability.")
+    issues = semantics["unresolved_issues"]
+    require(isinstance(issues, list) and len(issues) == len(set(issues)) and all(isinstance(item, str) and item for item in issues), "invalid_record", "Semantic unresolved issues are invalid.")
+
+    def selected_text(indices: list[int]) -> str:
+        return "\n".join(span_fragments[index] for index in indices)
+
+    statement = semantics["statement"]
+    if semantics["content_role"] == "requirement_candidate":
+        require(statement_role == "obligation" and isinstance(statement, dict), "invalid_record", "Requirement candidates require an explicit obligation classification and statement decomposition.")
+    if statement is not None:
+        statement = _strict_object(statement, {"subject", "action", "modality", "polarity", "exact_text", "span_indices"}, "invalid_record", "semantic statement")
+        require(set(statement) == {"subject", "action", "modality", "polarity", "exact_text", "span_indices"}, "invalid_record", "Every semantic statement field is required.")
+        require(all(isinstance(statement[key], str) and statement[key] for key in ("subject", "action", "exact_text")), "invalid_record", "Semantic statement text fields are invalid.")
+        require(statement["modality"] in {"shall", "must", "should", "may", "will", "other"} and statement["polarity"] in {"affirmative", "negative"}, "invalid_record", "Semantic statement modality or polarity is invalid.")
+        indices = _span_indices(statement["span_indices"], len(span_fragments), "Semantic statement")
+        require(statement["exact_text"] in selected_text(indices), "invalid_record", "Semantic statement exact text is absent from its cited spans.")
+        statement_lower = statement["exact_text"].casefold()
+        require(statement["subject"].casefold() in statement_lower and statement["action"].casefold() in statement_lower, "invalid_record", "Semantic statement subject or action is absent from exact text.")
+        if statement["modality"] != "other":
+            require(statement["modality"] in statement_lower.split(), "invalid_record", "Semantic statement modality is absent from exact text.")
+    for qualifier in semantics["qualifiers"]:
+        qualifier = _strict_object(qualifier, {"kind", "exact_text", "span_indices"}, "invalid_record", "semantic qualifier")
+        require(set(qualifier) == {"kind", "exact_text", "span_indices"}, "invalid_record", "Every semantic qualifier field is required.")
+        require(qualifier["kind"] in {"condition", "exception", "source_applicability", "test_condition", "acceptance_criterion", "tailoring_instruction"}, "invalid_record", "Semantic qualifier kind is invalid.")
+        indices = _span_indices(qualifier["span_indices"], len(span_fragments), "Semantic qualifier")
+        require(isinstance(qualifier["exact_text"], str) and qualifier["exact_text"] in selected_text(indices), "invalid_record", "Semantic qualifier exact text is absent from its cited spans.")
+    for quantity in semantics["quantities"]:
+        quantity = _strict_object(quantity, {"raw", "value", "unit", "tolerance", "span_indices"}, "invalid_record", "semantic quantity")
+        require(set(quantity) == {"raw", "value", "unit", "tolerance", "span_indices"}, "invalid_record", "Every semantic quantity field is required.")
+        indices = _span_indices(quantity["span_indices"], len(span_fragments), "Semantic quantity")
+        require(isinstance(quantity["raw"], str) and quantity["raw"] in selected_text(indices), "invalid_record", "Semantic quantity raw text is absent from its cited spans.")
+        require(all(quantity[key] is None or isinstance(quantity[key], str) for key in ("value", "unit", "tolerance")), "invalid_record", "Semantic quantity fields must be text or null.")
+    require(record_text == "\n".join(span_fragments), "invalid_record", "Semantic record text is not the exact ordered span assembly.")
+    if semantics["content_role"] == "definition":
+        require(kind == "definition", "invalid_record", "Definition semantics require a definition node.")
+    if semantics["content_role"].startswith("table_"):
+        expected_kind = {"table_header": "table_cell", "table_row": "table_row", "table_footnote": "note"}[semantics["content_role"]]
+        require(kind == expected_kind, "invalid_record", "Table semantics disagree with the record kind.")
+    return semantics
+
+
+def _validate_review_event(
+    value: Any,
+    *,
+    content_sha256: str,
+    has_semantics: bool,
+) -> dict[str, Any]:
+    review = _strict_object(value, _REVIEW_EVENT_KEYS, "invalid_record", "review event")
+    require(set(review) == _REVIEW_EVENT_KEYS, "invalid_record", "Every review-event field is required.")
+    require(review["schema_version"] == "0.1.0", "invalid_record", "Unsupported review-event schema.")
+    require(review["status"] in {"agent_reviewed", "human_verified", "human_verified_with_uncertainty"}, "invalid_record", "Rejected or unknown review status cannot be installed as reviewed evidence.")
+    require(review["reviewed_content_sha256"] == content_sha256, "invalid_record", "Review event binds different content.")
+    expected_scope = "structure_and_semantics" if has_semantics else "structure_only"
+    require(review["scope"] == expected_scope, "invalid_record", "Review-event scope disagrees with the record.")
+    reviewer = _strict_object(review["reviewer"], {"id", "type"}, "invalid_record", "reviewer")
+    require(set(reviewer) == {"id", "type"} and isinstance(reviewer["id"], str) and reviewer["id"] and reviewer["type"] in {"agent", "human"}, "invalid_record", "Review identity is invalid.")
+    require(not (reviewer["type"] == "agent" and review["status"].startswith("human_")), "invalid_record", "Agent review cannot claim human verification.")
+    require(isinstance(review["reviewed_at"], str) and review["reviewed_at"], "invalid_record", "Review timestamp is required.")
+    try:
+        datetime.fromisoformat(review["reviewed_at"].replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise StandardsForgeError("invalid_record", "Review timestamp is invalid.") from exc
+    require(isinstance(review["method"], str) and review["method"], "invalid_record", "Review method is required.")
+    tool = review["tool"]
+    if reviewer["type"] == "agent":
+        require(isinstance(tool, dict), "invalid_record", "Agent review requires tool provenance.")
+    if tool is not None:
+        tool = _strict_object(tool, {"name", "version", "configuration_sha256"}, "invalid_record", "review tool")
+        require(set(tool) == {"name", "version", "configuration_sha256"} and all(isinstance(tool[key], str) and tool[key] for key in ("name", "version")), "invalid_record", "Review tool identity is invalid.")
+        configuration_sha256 = tool["configuration_sha256"]
+        require(configuration_sha256 is None or isinstance(configuration_sha256, str) and len(configuration_sha256) == 64 and all(character in "0123456789abcdef" for character in configuration_sha256), "invalid_record", "Review tool configuration digest is invalid.")
+    issues = review["unresolved_issues"]
+    require(isinstance(issues, list) and len(issues) == len(set(issues)) and all(isinstance(item, str) and item for item in issues), "invalid_record", "Review unresolved issues are invalid.")
+    require(review["attestation"] == "extraction_review_not_project_applicability_or_approval", "invalid_record", "Review event cannot assert project applicability or approval.")
+    return review
 
 
 def _validate_inventory(root: Path) -> tuple[tuple[InventoryEntry, ...], str]:
@@ -381,7 +513,7 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
         structure = record.get("structure")
         if structure is not None:
             structure = _strict_object(structure, _STRUCTURE_KEYS, "invalid_record", "record structure")
-            require(set(structure) == _STRUCTURE_KEYS, "invalid_record", "Every structure field is required.")
+            require(_STRUCTURE_REQUIRED_KEYS <= set(structure), "invalid_record", "Every required structure field is required.")
             logical_id = structure["logical_id"]
             require(isinstance(logical_id, str) and logical_id, "invalid_record", "A structural logical ID is required.")
             require(logical_id not in logical_ids, "invalid_record", "Structural logical IDs must be unique within an edition.", logical_id=logical_id)
@@ -402,33 +534,91 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
             )
             require(type(structure["ordinal"]) is int and structure["ordinal"] >= 0, "invalid_record", "A structural ordinal must be a non-negative integer.")
             spans = structure["source_spans"]
-            require(isinstance(spans, list) and len(spans) == 1, "invalid_record", "Structural records currently require exactly one source span.")
-            span = _strict_object(spans[0], _STRUCTURE_SPAN_KEYS, "invalid_record", "structural source span")
-            require(set(span) == _STRUCTURE_SPAN_KEYS, "invalid_record", "Every structural source span field is required.")
-            span_source_rel = _safe_relative_path(span["path"]).as_posix()
-            span_text_rel = _safe_relative_path(span["text_path"]).as_posix()
-            require(span_source_rel in inventory_by_path and span_text_rel in inventory_by_path, "invalid_record", "Structural span files must be inventoried.")
-            require(span["sha256"] == inventory_by_path[span_source_rel].sha256, "invalid_record", "Structural span source digest does not match the inventory.")
-            require(span["text_sha256"] == inventory_by_path[span_text_rel].sha256, "invalid_record", "Structural span text digest does not match the inventory.")
-            require(type(span["physical_page"]) is int and span["physical_page"] >= 1, "invalid_record", "Structural span page must be positive.")
-            require(type(span["start_byte"]) is int and type(span["end_byte"]) is int and 0 <= span["start_byte"] < span["end_byte"], "invalid_record", "Structural span byte offsets are invalid.")
-            span_bytes = pack_root.joinpath(*PurePosixPath(span_text_rel).parts).read_bytes()
-            require(span["end_byte"] <= len(span_bytes), "invalid_record", "Structural span exceeds its text sidecar.")
-            quote_bytes = span_bytes[span["start_byte"]:span["end_byte"]]
-            try:
-                quote_text = quote_bytes.decode("utf-8")
-            except UnicodeDecodeError as exc:
-                raise StandardsForgeError("invalid_record", "Structural span offsets split UTF-8 text.", {"logical_id": logical_id}) from exc
-            require(quote_text == record["text"], "source_quote_missing", "Structural span does not reproduce the exact record text.", logical_id=logical_id)
-            require(span["quote_sha256"] == _sha256(quote_bytes), "invalid_record", "Structural span quote digest is invalid.", logical_id=logical_id)
             require(
-                span_source_rel == rel
-                and span_text_rel == evidence_rel
-                and span["physical_page"] == source["page"]
-                and span["quote_sha256"] == source["quote_sha256"],
+                isinstance(spans, list) and 1 <= len(spans) <= 64,
                 "invalid_record",
-                "The primary source locator must agree with the structural source span.",
+                "Structural records require between one and 64 ordered source spans.",
+            )
+            span_fragments: list[str] = []
+            prior_span_key: tuple[int, int, int] | None = None
+            normalized_span_locations: list[tuple[str, str, int, str]] = []
+            for raw_span in spans:
+                span = _strict_object(raw_span, _STRUCTURE_SPAN_KEYS, "invalid_record", "structural source span")
+                require(set(span) == _STRUCTURE_SPAN_KEYS, "invalid_record", "Every structural source span field is required.")
+                span_source_rel = _safe_relative_path(span["path"]).as_posix()
+                span_text_rel = _safe_relative_path(span["text_path"]).as_posix()
+                require(span_source_rel in inventory_by_path and span_text_rel in inventory_by_path, "invalid_record", "Structural span files must be inventoried.")
+                require(span["sha256"] == inventory_by_path[span_source_rel].sha256, "invalid_record", "Structural span source digest does not match the inventory.")
+                require(span["text_sha256"] == inventory_by_path[span_text_rel].sha256, "invalid_record", "Structural span text digest does not match the inventory.")
+                require(type(span["physical_page"]) is int and span["physical_page"] >= 1, "invalid_record", "Structural span page must be positive.")
+                require(type(span["start_byte"]) is int and type(span["end_byte"]) is int and 0 <= span["start_byte"] < span["end_byte"], "invalid_record", "Structural span byte offsets are invalid.")
+                span_key = (span["physical_page"], span["start_byte"], span["end_byte"])
+                require(prior_span_key is None or span_key > prior_span_key, "invalid_record", "Structural source spans must be unique and ordered.")
+                if prior_span_key is not None and span_key[0] == prior_span_key[0]:
+                    require(span_key[1] >= prior_span_key[2], "invalid_record", "Structural source spans cannot overlap.")
+                prior_span_key = span_key
+                span_bytes = pack_root.joinpath(*PurePosixPath(span_text_rel).parts).read_bytes()
+                require(span["end_byte"] <= len(span_bytes), "invalid_record", "Structural span exceeds its text sidecar.")
+                quote_bytes = span_bytes[span["start_byte"]:span["end_byte"]]
+                try:
+                    quote_text = quote_bytes.decode("utf-8")
+                except UnicodeDecodeError as exc:
+                    raise StandardsForgeError("invalid_record", "Structural span offsets split UTF-8 text.", {"logical_id": logical_id}) from exc
+                require(span["quote_sha256"] == _sha256(quote_bytes), "invalid_record", "Structural span quote digest is invalid.", logical_id=logical_id)
+                span_fragments.append(quote_text)
+                normalized_span_locations.append(
+                    (span_source_rel, span_text_rel, span["physical_page"], span["quote_sha256"])
+                )
+            require(
+                "\n".join(span_fragments) == record["text"],
+                "source_quote_missing",
+                "Ordered structural spans do not reproduce the exact record text.",
                 logical_id=logical_id,
+            )
+            first_source_rel, first_text_rel, first_page, first_quote_sha256 = normalized_span_locations[0]
+            require(
+                all(span_source_rel == rel for span_source_rel, _, _, _ in normalized_span_locations)
+                and first_source_rel == rel
+                and first_page == source["page"],
+                "invalid_record",
+                "The primary source locator must agree with the ordered structural spans.",
+                logical_id=logical_id,
+            )
+            if len(spans) == 1:
+                require(
+                    first_text_rel == evidence_rel
+                    and first_quote_sha256 == source["quote_sha256"],
+                    "invalid_record",
+                    "The primary source locator must agree with the structural source span.",
+                    logical_id=logical_id,
+                )
+            else:
+                require(
+                    source_text == record["text"] and evidence_rel not in {location[1] for location in normalized_span_locations},
+                    "invalid_record",
+                    "A multi-span structural record requires an exact assembled evidence sidecar.",
+                    logical_id=logical_id,
+                )
+            semantics = structure.get("semantics")
+            if semantics is not None:
+                _validate_semantic_record(
+                    semantics,
+                    record_text=record["text"],
+                    statement_role=record["derivation"]["statement_role"],
+                    kind=record["kind"],
+                    span_fragments=span_fragments,
+                )
+            review_event = structure.get("review")
+            if review_event is not None:
+                _validate_review_event(
+                    review_event,
+                    content_sha256=structure["content_sha256"],
+                    has_semantics=semantics is not None,
+                )
+            require(
+                semantics is None or review_event is not None,
+                "invalid_record",
+                "Reviewed semantics require a query-visible review event.",
             )
             relationships = structure["relationships"]
             require(isinstance(relationships, list), "invalid_record", "Structural relationships must be a list.")

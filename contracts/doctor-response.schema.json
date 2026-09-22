@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/doctor-response-0.1.0.schema.json",
+  "title": "StandardsForge doctor report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "operation", "status", "ready", "mode", "mutation_mode", "network_mode", "request", "runtime", "state", "integrity", "query_smoke", "checks", "summary", "limitations"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "operation": {"const": "doctor"},
+    "status": {"enum": ["ready", "not_ready"]},
+    "ready": {"type": "boolean"},
+    "mode": {"enum": ["quick", "full_integrity"]},
+    "mutation_mode": {"const": "read_only"},
+    "network_mode": {"const": "not_used"},
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principal_id", "policy_supplied", "require_mcp"],
+      "properties": {
+        "principal_id": {"type": ["string", "null"], "minLength": 1},
+        "policy_supplied": {"type": "boolean"},
+        "require_mcp": {"type": "boolean"}
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python", "sqlite", "platform", "standardsforge_version"],
+      "properties": {
+        "python": {"type": "string", "minLength": 1},
+        "sqlite": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "minLength": 1},
+        "standardsforge_version": {"type": "string", "minLength": 1}
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["database_path", "object_store_path", "database_exists", "object_store_exists", "database_schema_version", "installed_package_count", "active_grant_count", "selected_principal_active_grant_count"],
+      "properties": {
+        "database_path": {"type": "string", "minLength": 1},
+        "object_store_path": {"type": "string", "minLength": 1},
+        "database_exists": {"type": "boolean"},
+        "object_store_exists": {"type": "boolean"},
+        "database_schema_version": {"type": ["integer", "null"], "minimum": 1},
+        "installed_package_count": {"type": ["integer", "null"], "minimum": 0},
+        "active_grant_count": {"type": ["integer", "null"], "minimum": 0},
+        "selected_principal_active_grant_count": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requested_mode", "complete", "total_packages", "validated_packages", "failed_package_digests"],
+      "properties": {
+        "requested_mode": {"enum": ["quick", "full_integrity"]},
+        "complete": {"type": "boolean"},
+        "total_packages": {"type": ["integer", "null"], "minimum": 0},
+        "validated_packages": {"type": "integer", "minimum": 0},
+        "failed_package_digests": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/digest"}}
+      }
+    },
+    "query_smoke": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "package_digest", "record_id", "clause_reference", "evidence_count", "required_relationship_count", "source_verification", "final_authorization", "error_code"],
+      "properties": {
+        "status": {"enum": ["pass", "fail", "not_checked"]},
+        "package_digest": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
+        "record_id": {"type": ["string", "null"], "minLength": 1},
+        "clause_reference": {"type": ["string", "null"], "minLength": 1},
+        "evidence_count": {"type": ["integer", "null"], "minimum": 1},
+        "required_relationship_count": {"type": ["integer", "null"], "minimum": 0},
+        "source_verification": {"enum": ["performed", "not_performed"]},
+        "final_authorization": {"enum": ["performed", "not_performed"]},
+        "error_code": {"type": ["string", "null"], "pattern": "^[a-z][a-z0-9_]*$"}
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/check"}
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "failed", "not_checked", "required_failed_or_not_checked"],
+      "properties": {
+        "passed": {"type": "integer", "minimum": 0},
+        "failed": {"type": "integer", "minimum": 0},
+        "not_checked": {"type": "integer", "minimum": 0},
+        "required_failed_or_not_checked": {"type": "integer", "minimum": 0}
+      }
+    },
+    "limitations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"ready": {"const": true}}, "required": ["ready"]},
+      "then": {
+        "properties": {
+          "status": {"const": "ready"},
+          "query_smoke": {"properties": {"status": {"const": "pass"}}},
+          "summary": {"properties": {"required_failed_or_not_checked": {"const": 0}}},
+          "checks": {
+            "not": {
+              "contains": {
+                "type": "object",
+                "properties": {"severity": {"const": "required"}, "status": {"enum": ["fail", "not_checked"]}},
+                "required": ["severity", "status"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"ready": {"const": false}}, "required": ["ready"]},
+      "then": {
+        "properties": {
+          "status": {"const": "not_ready"},
+          "summary": {"properties": {"required_failed_or_not_checked": {"minimum": 1}}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"mode": {"const": "quick"}}, "required": ["mode"]},
+      "then": {"properties": {"integrity": {"properties": {"requested_mode": {"const": "quick"}, "complete": {"const": false}}}}}
+    },
+    {
+      "if": {"properties": {"mode": {"const": "full_integrity"}, "ready": {"const": true}}, "required": ["mode", "ready"]},
+      "then": {"properties": {"integrity": {"properties": {"requested_mode": {"const": "full_integrity"}, "complete": {"const": true}}}}}
+    },
+    {
+      "if": {"properties": {"query_smoke": {"properties": {"status": {"const": "pass"}}, "required": ["status"]}}, "required": ["query_smoke"]},
+      "then": {
+        "properties": {
+          "query_smoke": {
+            "properties": {
+              "package_digest": {"$ref": "#/$defs/digest"},
+              "record_id": {"type": "string", "minLength": 1},
+              "clause_reference": {"type": "string", "minLength": 1},
+              "evidence_count": {"type": "integer", "minimum": 1},
+              "required_relationship_count": {"type": "integer", "minimum": 0},
+              "source_verification": {"const": "performed"},
+              "final_authorization": {"const": "performed"},
+              "error_code": {"type": "null"}
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "query_smoke": {
+            "properties": {
+              "source_verification": {"const": "not_performed"},
+              "final_authorization": {"const": "not_performed"}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "detailValue": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "integer"},
+        {"type": "boolean"},
+        {"type": "null"},
+        {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      ]
+    },
+    "detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value"],
+      "properties": {
+        "name": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "value": {"$ref": "#/$defs/detailValue"}
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["check_id", "severity", "status", "code", "message", "details"],
+      "properties": {
+        "check_id": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]*$"},
+        "severity": {"enum": ["required", "advisory"]},
+        "status": {"enum": ["pass", "fail", "not_checked"]},
+        "code": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "message": {"type": "string", "minLength": 1},
+        "details": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/detail"}}
+      }
+    }
+  }
+}

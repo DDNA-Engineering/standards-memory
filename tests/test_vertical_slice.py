@@ -748,8 +748,247 @@ class VerticalSliceTests(unittest.TestCase):
         self.assertEqual("modified", statuses["note-4.2.1-1"])
         self.assertEqual("unchanged", statuses["clause-4.2.2"])
         self.assertIn("clause-4.2.1", packet["dependency_context_impacts"])
+        impact = next(
+            item
+            for item in packet["dependency_impact_paths"]
+            if item["record_id"] == "clause-4.2.1"
+        )
+        self.assertEqual(
+            ["note-4.2.1-1"],
+            [edge["target_record_id"] for edge in impact["path"]],
+        )
+        self.assertEqual("target_record_changed", impact["cause"]["type"])
         self.assertEqual([], packet["dependency_edges_added"])
         self.assertEqual([], packet["dependency_edges_removed"])
+
+    def test_diff_editions_reports_transitive_dependency_impact_path(self) -> None:
+        candidates = []
+        for name, source in (("before", PACK_V1), ("after", PACK_V2)):
+            candidate = Path(self.temp.name) / f"transitive-{name}"
+            shutil.copytree(source, candidate)
+            records = json.loads((candidate / "records.json").read_text(encoding="utf-8"))
+            sealing = next(
+                record for record in records["records"] if record["record_id"] == "clause-4.2.2"
+            )
+            sealing["dependencies"] = [
+                {
+                    "relationship": "governed_by",
+                    "target_record_id": "note-4.2.1-1",
+                    "required": True,
+                }
+            ]
+            downstream = json.loads(json.dumps(sealing))
+            downstream.update(
+                {
+                    "record_id": "clause-4.2.3",
+                    "clause_reference": "4.2.3",
+                    "heading": "Downstream system requirement",
+                    "dependencies": [
+                        {
+                            "relationship": "governed_by",
+                            "target_record_id": "clause-4.2.2",
+                            "required": True,
+                        }
+                    ],
+                }
+            )
+            records["records"].append(downstream)
+            self._rewrite_inventoried_json(candidate, "records.json", records)
+            candidates.append(candidate)
+
+        before_digest = self.service.install_pack(candidates[0], POLICY)["package_digest"]
+        after_digest = self.service.install_pack(candidates[1], POLICY)["package_digest"]
+        packet = self.service.diff_editions(before_digest, after_digest, "local-user")
+        impacts = [
+            item
+            for item in packet["dependency_impact_paths"]
+            if item["record_id"] == "clause-4.2.3"
+        ]
+        self.assertEqual({"before", "after"}, {item["side"] for item in impacts})
+        self.assertEqual(2, len(impacts))
+        for impact in impacts:
+            self.assertEqual(
+                [
+                    ("clause-4.2.3", "clause-4.2.2"),
+                    ("clause-4.2.2", "note-4.2.1-1"),
+                ],
+                [
+                    (edge["source_record_id"], edge["target_record_id"])
+                    for edge in impact["path"]
+                ],
+            )
+            self.assertEqual(
+                {
+                    "type": "target_record_changed",
+                    "record_id": "note-4.2.1-1",
+                    "status": "modified",
+                },
+                impact["cause"],
+            )
+
+    def test_diff_editions_reports_source_only_move_without_content_change(self) -> None:
+        candidate = Path(self.temp.name) / "moved-v1"
+        shutil.copytree(PACK_V1, candidate)
+        records = json.loads((candidate / "records.json").read_text(encoding="utf-8"))
+        moved = next(
+            record for record in records["records"] if record["record_id"] == "clause-4.2.2"
+        )
+        moved["source"]["page"] = 2
+        moved["source"]["locator"] = "page 2 / 4.2.2"
+        self._rewrite_inventoried_json(candidate, "records.json", records)
+
+        before_digest = self._install_v1()
+        after_digest = self.service.install_pack(candidate, POLICY)["package_digest"]
+        packet = self.service.diff_editions(before_digest, after_digest, "local-user")
+        change = next(
+            item for item in packet["changes"] if item["record_id"] == "clause-4.2.2"
+        )
+        self.assertEqual("moved", change["status"])
+        self.assertTrue(change["source_location_changed"])
+        self.assertEqual(
+            {"added": 0, "removed": 0, "modified": 0, "moved": 1, "unchanged": 2},
+            packet["change_counts"],
+        )
+
+        moved["heading"] = "Relocated and substantively revised interface sealing"
+        moved["derivation"]["review_status"] = "synthetic_fixture_revised"
+        self._rewrite_inventoried_json(candidate, "records.json", records)
+        revised_digest = self.service.install_pack(candidate, POLICY)["package_digest"]
+        revised_packet = self.service.diff_editions(
+            before_digest, revised_digest, "local-user"
+        )
+        revised_change = next(
+            item
+            for item in revised_packet["changes"]
+            if item["record_id"] == "clause-4.2.2"
+        )
+        self.assertEqual("modified", revised_change["status"])
+        self.assertTrue(revised_change["source_location_changed"])
+
+    def test_diff_editions_reports_added_required_edge_on_after_graph(self) -> None:
+        candidate = Path(self.temp.name) / "added-edge-v1"
+        shutil.copytree(PACK_V1, candidate)
+        records = json.loads((candidate / "records.json").read_text(encoding="utf-8"))
+        sealing = next(
+            record for record in records["records"] if record["record_id"] == "clause-4.2.2"
+        )
+        sealing["dependencies"] = [
+            {
+                "relationship": "governed_by",
+                "target_record_id": "note-4.2.1-1",
+                "required": True,
+            },
+            {
+                "relationship": "references",
+                "target_record_id": "note-4.2.1-1",
+                "required": True,
+            }
+        ]
+        self._rewrite_inventoried_json(candidate, "records.json", records)
+
+        before_digest = self._install_v1()
+        after_digest = self.service.install_pack(candidate, POLICY)["package_digest"]
+        packet = self.service.diff_editions(before_digest, after_digest, "local-user")
+        impacts = [
+            item
+            for item in packet["dependency_impact_paths"]
+            if item["record_id"] == "clause-4.2.2"
+        ]
+        self.assertEqual(2, len(impacts))
+        self.assertEqual({"after"}, {impact["side"] for impact in impacts})
+        self.assertEqual(
+            {"governed_by", "references"},
+            {impact["path"][-1]["relationship"] for impact in impacts},
+        )
+        self.assertTrue(
+            all(
+                impact["cause"]
+                == {"type": "dependency_edge_added", "record_id": "note-4.2.1-1"}
+                for impact in impacts
+            )
+        )
+        self.assertEqual(
+            [
+                ["clause-4.2.2", "governed_by", "note-4.2.1-1", True],
+                ["clause-4.2.2", "references", "note-4.2.1-1", True],
+            ],
+            packet["dependency_edges_added"],
+        )
+
+    def test_diff_editions_never_traverses_a_mixed_edition_graph(self) -> None:
+        before = Path(self.temp.name) / "split-graph-before"
+        after = Path(self.temp.name) / "split-graph-after"
+        shutil.copytree(PACK_V1, before)
+        shutil.copytree(PACK_V2, after)
+
+        before_records = json.loads((before / "records.json").read_text(encoding="utf-8"))
+        before_by_id = {record["record_id"]: record for record in before_records["records"]}
+        before_by_id["clause-4.2.2"]["dependencies"] = [
+            {
+                "relationship": "governed_by",
+                "target_record_id": "clause-4.2.1",
+                "required": True,
+            }
+        ]
+        before_by_id["clause-4.2.1"]["dependencies"] = []
+        self._rewrite_inventoried_json(before, "records.json", before_records)
+
+        before_digest = self.service.install_pack(before, POLICY)["package_digest"]
+        after_digest = self.service.install_pack(after, POLICY)["package_digest"]
+        packet = self.service.diff_editions(before_digest, after_digest, "local-user")
+
+        fabricated = [
+            item
+            for item in packet["dependency_impact_paths"]
+            if item["record_id"] == "clause-4.2.2"
+            and item["cause"]["record_id"] == "note-4.2.1-1"
+        ]
+        self.assertEqual([], fabricated)
+        direct = [
+            item
+            for item in packet["dependency_impact_paths"]
+            if item["record_id"] == "clause-4.2.2"
+        ]
+        self.assertEqual(1, len(direct))
+        self.assertEqual("before", direct[0]["side"])
+        self.assertEqual("dependency_edge_removed", direct[0]["cause"]["type"])
+        self.assertEqual(1, len(direct[0]["path"]))
+
+    def test_diff_alignment_candidates_do_not_change_authoritative_identity(self) -> None:
+        candidate = Path(self.temp.name) / "content-addressed-v2"
+        shutil.copytree(PACK_V2, candidate)
+        records = json.loads((candidate / "records.json").read_text(encoding="utf-8"))
+        id_map = {
+            record["record_id"]: f"content-2026-{index}"
+            for index, record in enumerate(records["records"], start=1)
+        }
+        for record in records["records"]:
+            record["record_id"] = id_map[record["record_id"]]
+            for dependency in record["dependencies"]:
+                dependency["target_record_id"] = id_map[dependency["target_record_id"]]
+        self._rewrite_inventoried_json(candidate, "records.json", records)
+
+        first_digest = self._install_v1()
+        second_digest = self.service.install_pack(candidate, POLICY)["package_digest"]
+        packet = self.service.diff_editions(first_digest, second_digest, "local-user")
+
+        self.assertEqual(
+            "exact_record_id_only_with_non_authoritative_candidates_v1",
+            packet["alignment_mode"],
+        )
+        self.assertEqual(
+            {"added": 3, "removed": 3, "modified": 0, "moved": 0, "unchanged": 0},
+            packet["change_counts"],
+        )
+        self.assertEqual(3, len(packet["alignment_candidates"]))
+        self.assertTrue(
+            all(
+                item["review_status"] == "review_required"
+                for item in packet["alignment_candidates"]
+            )
+        )
+        self.assertTrue(packet["dependency_edges_added"])
+        self.assertTrue(packet["dependency_edges_removed"])
 
     def test_schema_version_one_migrates_without_reclassifying_legacy_records(self) -> None:
         migration_root = Path(self.temp.name) / "migration"

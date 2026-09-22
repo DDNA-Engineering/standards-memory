@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/distribution-scope.schema.json",
+  "title": "StandardsForge prepared-distribution source baseline",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "baseline_id", "publisher", "acquisition", "selection", "outcomes", "representations", "limitations"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "baseline_id": {"type": "string", "minLength": 1},
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["organization", "system", "source_url"],
+      "properties": {
+        "organization": {"const": "United States Department of Defense, Defense Logistics Agency"},
+        "system": {"const": "DLA ASSIST Quick Search"},
+        "source_url": {"type": "string", "pattern": "^https://quicksearch\\.dla\\.mil/"}
+      }
+    },
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["catalog_id", "manifest_path", "manifest_sha256", "generated_at", "completed_at", "source_data_updated"],
+      "properties": {
+        "catalog_id": {"const": "dla-active-mil-std-current"},
+        "manifest_path": {"const": "provenance/acquisition-manifest.json"},
+        "manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "generated_at": {"type": "string", "format": "date-time"},
+        "completed_at": {"type": "string", "format": "date-time"},
+        "source_data_updated": {"type": ["string", "null"], "format": "date"}
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_classes", "record_statuses", "components", "distribution_statements", "exclusions"],
+      "properties": {
+        "document_classes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["included", "excluded"],
+          "properties": {
+            "included": {"const": ["MIL-STD"]},
+            "excluded": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+          }
+        },
+        "record_statuses": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["included", "excluded"],
+          "properties": {
+            "included": {"const": ["active"]},
+            "excluded": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+          }
+        },
+        "components": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["current_only", "selection_rule", "historical_editions_included"],
+          "properties": {
+            "current_only": {"const": true},
+            "selection_rule": {"type": "string", "minLength": 1},
+            "historical_editions_included": {"const": false}
+          }
+        },
+        "distribution_statements": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["included_content", "unavailable_metadata_retained", "rights_effect"],
+          "properties": {
+            "included_content": {"const": ["A"]},
+            "unavailable_metadata_retained": {"const": true},
+            "rights_effect": {"const": "provenance_only_not_operational_authorization"}
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "minItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["category", "reason", "observed_count"],
+            "properties": {
+              "category": {"type": "string", "minLength": 1},
+              "reason": {"type": "string", "minLength": 1},
+              "observed_count": {"type": ["integer", "null"], "minimum": 0}
+            }
+          }
+        }
+      }
+    },
+    "outcomes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_record_count", "current_component_count", "downloaded_component_count", "restricted_component_count", "not_publicly_exposed_component_count", "failed_acquisition_component_count", "compiled_record_count", "compilation_failure_count", "source_pdf_count", "physical_page_count", "page_record_count", "pages_without_text_records"],
+      "properties": {
+        "manifest_record_count": {"type": "integer", "minimum": 1},
+        "current_component_count": {"type": "integer", "minimum": 1},
+        "downloaded_component_count": {"type": "integer", "minimum": 0},
+        "restricted_component_count": {"type": "integer", "minimum": 0},
+        "not_publicly_exposed_component_count": {"type": "integer", "minimum": 0},
+        "failed_acquisition_component_count": {"type": "integer", "minimum": 0},
+        "compiled_record_count": {"type": "integer", "minimum": 0},
+        "compilation_failure_count": {"type": "integer", "minimum": 0},
+        "source_pdf_count": {"type": "integer", "minimum": 0},
+        "physical_page_count": {"type": "integer", "minimum": 0},
+        "page_record_count": {"type": "integer", "minimum": 0},
+        "pages_without_text_records": {"type": "integer", "minimum": 0}
+      }
+    },
+    "representations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page_text", "derived_outline", "reviewed_structure", "semantic_review"],
+      "properties": {
+        "page_text": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["included", "package_count", "review_status", "statement_role", "extraction_gap_pages"],
+          "properties": {
+            "included": {"const": true},
+            "package_count": {"type": "integer", "minimum": 1},
+            "review_status": {"const": "unreviewed"},
+            "statement_role": {"const": "unclassified"},
+            "extraction_gap_pages": {"type": "integer", "minimum": 0}
+          }
+        },
+        "derived_outline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["included", "package_digest", "record_count", "review_status", "statement_role", "qualified_scope"],
+          "properties": {
+            "included": {"const": true},
+            "package_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "record_count": {"type": "integer", "minimum": 1},
+            "review_status": {"const": "automated_unreviewed"},
+            "statement_role": {"const": "unclassified"},
+            "qualified_scope": {"type": "string", "minLength": 1}
+          }
+        },
+        "reviewed_structure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["included", "review_status"],
+          "properties": {
+            "included": {"const": false},
+            "review_status": {"const": "not_included"}
+          }
+        },
+        "semantic_review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["document_wide_structure_interpreted", "obligations_classified", "governing_dependencies_resolved", "human_verified", "applicability_approved"],
+          "properties": {
+            "document_wide_structure_interpreted": {"const": false},
+            "obligations_classified": {"const": false},
+            "governing_dependencies_resolved": {"const": false},
+            "human_verified": {"const": false},
+            "applicability_approved": {"const": false}
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publisher_currentness_is_project_baseline", "ordinary_queries_refresh_sources", "completeness_claim"],
+      "properties": {
+        "publisher_currentness_is_project_baseline": {"const": false},
+        "ordinary_queries_refresh_sources": {"const": false},
+        "completeness_claim": {"const": "complete_only_for_the_recorded_selection_and_included_representations"}
+      }
+    }
+  }
+}

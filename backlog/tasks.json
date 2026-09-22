@@ -389,6 +389,293 @@
         "Remove redundant implementation comments and duplicate MCP function docstrings while retaining comments that explain security, integrity, compatibility, transactional, or algorithmic invariants.",
         "Verify retained Markdown links, stale documentation references, contract parsing, compilation, and the complete local test suite."
       ]
+    },
+    {
+      "task_id": "TASK-017",
+      "title": "Dependency-complete CI and executable response contracts",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-019",
+        "SM-FR-022",
+        "SM-FR-023",
+        "SM-FR-030",
+        "SM-FR-039",
+        "SM-FR-046",
+        "SM-FR-057"
+      ],
+      "acceptance": [
+        "Install the MCP, compiler, and contract-validation profiles in every supported CI matrix job and fail on inconsistent installed dependencies.",
+        "Check every declared JSON Schema against its selected metaschema and validate the repository's concrete contract documents against their schemas.",
+        "Validate actual success packets for all six read operations, first and final continuation pages, compact and concise evidence profiles, and typed error envelopes against operation-specific contracts.",
+        "Prove malformed packets fail validation rather than relying only on positive fixtures.",
+        "Build the wheel in a clean temporary directory, install it outside the checkout, and run a dependency-free core read smoke test without PYTHONPATH source leakage.",
+        "Keep schema validation and compiler dependencies outside the dependency-free core runtime."
+      ]
+    },
+    {
+      "task_id": "TASK-018",
+      "title": "Explicit prepared-distribution source baseline",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-019",
+        "SM-FR-025",
+        "SM-FR-047",
+        "SM-FR-049",
+        "SM-FR-050",
+        "SM-FR-058"
+      ],
+      "acceptance": [
+        "Replace broad corpus-completeness language with the exact active, current-component, Distribution Statement A baseline and identify excluded document classes, historical editions, restricted bytes, and unsupported semantic coverage.",
+        "Require the prepared-distribution builder to receive the verified acquisition manifest whose digest is pinned by the completed corpus index.",
+        "Emit and schema-validate a machine-readable scope statement containing publisher and acquisition dates, document-class and status filters, component-selection and distribution rules, exclusions, acquisition and compilation failures, extraction gaps, and representation-specific review coverage.",
+        "Inventory the scope statement inside the deterministic release bundle and point the human content notice to the actual bundled provenance paths.",
+        "Reject mismatched acquisition snapshots, missing required scope fields, inconsistent counts, and any scope statement that upgrades automated or absent semantic review."
+      ]
+    },
+    {
+      "task_id": "TASK-019",
+      "title": "Reproducible wheel-to-bundle build provenance",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-019",
+        "SM-FR-022",
+        "SM-FR-025",
+        "SM-FR-057",
+        "SM-FR-059"
+      ],
+      "acceptance": [
+        "Build the core wheel twice from copied packaging inputs with a fixed SOURCE_DATE_EPOCH and pinned backend, and reject any byte difference, timestamp drift, or unexpected generator.",
+        "Install the verified wheel without extras in a fresh environment outside the checkout and complete a dependency-free core read smoke with source-path leakage disabled.",
+        "Optionally retain that exact verified wheel plus schema-validated provenance containing its source-file inventory, tool identity, digest, size, version, epoch, and two-build result without overwriting existing outputs.",
+        "Require the prepared-distribution builder to validate the wheel, its provenance, and every inventoried source hash, then preserve and bind the provenance in the final bundle manifest.",
+        "Prove identical prepared inputs produce byte-identical final ZIPs and reject changed source inputs, malformed provenance, or an unlisted final archive member."
+      ]
+    },
+    {
+      "task_id": "TASK-020",
+      "title": "Lossless multi-span reviewed logical clauses",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-006",
+        "SM-FR-019",
+        "SM-FR-040",
+        "SM-FR-052",
+        "SM-FR-060"
+      ],
+      "acceptance": [
+        "Accept versioned reviewed structural annotations containing up to 64 ordered, non-overlapping source spans while preserving the one-span 0.1 contract.",
+        "Assemble a logical node only by joining its exact ordered UTF-8 source fragments with one declared newline and reject any digest, ordering, overlap, or reconstruction mismatch.",
+        "Preserve every physical-page span plus an inventoried exact assembled sidecar without presenting that sidecar as a replacement for source evidence.",
+        "Return the whole multi-page logical clause in one get_clause record together with its required governing context and reverify every fragment on each read.",
+        "Reject retrieval after tampering with any contributing page sidecar and retain existing single-span behavior."
+      ]
+    },
+    {
+      "task_id": "TASK-021",
+      "title": "Bounded reviewed semantic requirement packet",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-010",
+        "SM-FR-016",
+        "SM-FR-019",
+        "SM-FR-025",
+        "SM-FR-052",
+        "SM-FR-061"
+      ],
+      "acceptance": [
+        "Accept only versioned reviewed semantic decompositions bound to the node's exact source spans, with closed roles for normativity, subject, action, modality, polarity, conditions, exceptions, source qualifiers, raw quantities, and unresolved issues.",
+        "Emit a query-visible content-bound review event containing reviewer identity and type, timestamp, method, tool provenance, unresolved issues, and an attestation that extraction review is not project applicability or approval.",
+        "Reject invented semantic text, invalid span references, missing agent tool provenance, semantic or structural kind mismatches, changed reviewed-content digests, and any semantic claim that decides project applicability.",
+        "Retrieve one synthetic reviewed multi-page obligation with its required governing note and definition plus a transitive table-footnote, table-row, and table-header chain.",
+        "Keep this acceptance bounded to the synthetic reviewed packet; do not claim document-wide semantic segmentation, obligation classification, applicability, compliance, or human approval."
+      ]
+    },
+    {
+      "task_id": "TASK-022",
+      "title": "Explicit lexical discovery modes",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-022",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-040",
+        "SM-FR-050",
+        "SM-FR-054",
+        "SM-FR-055",
+        "SM-FR-057",
+        "SM-FR-062"
+      ],
+      "acceptance": [
+        "Expose exact_phrase, all_terms, and any_terms through the core, CLI, MCP, and versioned machine contracts while preserving all_terms when the option is omitted.",
+        "Parse at most 32 bounded lexical chunks, quote every chunk, and compile only the selected mode so caller quotes, operators, wildcards, and parentheses never become raw FTS syntax.",
+        "Return the selected mode, normalized query, and parsed chunks with the existing source citation, snippet, ancestry, coverage, authorization, package, scope, and exact evidence-selector fields.",
+        "Separate cache entries by mode even when a one-chunk query compiles to the same FTS expression; retain authorization generations and reauthorization behavior.",
+        "Reject unknown or non-text modes with a typed core error, schema-reject an undeclared returned mode, and validate actual packets for all three modes.",
+        "Keep document-level grouping, controlled vocabulary expansion, and optional semantic discovery outside this bounded slice."
+      ]
+    },
+    {
+      "task_id": "TASK-023",
+      "title": "Conservative revision candidates and side-qualified transitive impacts",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-016",
+        "SM-FR-022",
+        "SM-FR-025",
+        "SM-FR-026",
+        "SM-FR-055",
+        "SM-FR-057",
+        "SM-FR-063"
+      ],
+      "acceptance": [
+        "Keep exact record IDs as the sole authority for added, removed, modified, moved, and unchanged classifications and for raw dependency-edge deltas.",
+        "Report a unique unmatched kind and clause-reference pair only as a review-required candidate with before and after record IDs and text digests; never use it to rewrite authoritative changes, dependency edges, or impact paths.",
+        "Classify a source-only location change as moved while treating substantive record, derivation, or structural meaning changes as modified, and expose both before and after evidence for either case.",
+        "Traverse required dependencies independently in the before and after package graphs and return deterministic side-qualified paths to each distinct changed-record or edge-delta cause.",
+        "Reject the mixed-graph failure mode where an edge from one edition and an edge from the other could fabricate a transitive path that existed in neither package.",
+        "Version the changed detailed response and MCP output contract while leaving reviewed alignment artifacts, split and merge mappings, fuzzy equivalence, and semantic change classification outside this bounded slice."
+      ]
+    },
+    {
+      "task_id": "TASK-024",
+      "title": "Synthetic benchmark contracts and deterministic qualification runner",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-006",
+        "SM-FR-010",
+        "SM-FR-016",
+        "SM-FR-025",
+        "SM-FR-046",
+        "SM-FR-050",
+        "SM-FR-057",
+        "SM-FR-064"
+      ],
+      "acceptance": [
+        "Validate a versioned benchmark-suite contract whose reviewed content is bound by digest to exact local package identities, editions, representations, cases, critical facts, completeness expectations, and forbidden claims.",
+        "Run the tracked fictional packs offline through exact resolution, all three lexical modes, package-pinned context retrieval, outside-baseline discovery, and edition comparison while preserving raw per-case results and failures.",
+        "Emit a schema-valid benchmark-run artifact with suite digest, runner and environment identity, service-cache-cold and immediate-warm samples, exact metric numerators and denominators, response bytes, and content digest.",
+        "Require zero wrong-edition results, citation mismatches, lost critical facts or required context, and false-completeness outcomes for the synthetic suite; any failed case must make the gate fail without being omitted from the run artifact.",
+        "Reject suite digest mismatch, synthetic suites labeled as real-quality evidence, missing source pins or review provenance, malformed metric denominators, omitted case results, and mixed synthetic and real-quality aggregation.",
+        "Label this result synthetic_contract_qualification only; keep real-document discovery accuracy, semantic fidelity, tokenizer-normalized efficiency, resource limits, and engineer time saved explicitly not measured until a separately authorized human-reviewed suite exists."
+      ]
+    },
+    {
+      "task_id": "TASK-025",
+      "title": "Non-mutating portable readiness doctor",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-018",
+        "SM-FR-027",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-057",
+        "SM-FR-065"
+      ],
+      "acceptance": [
+        "Expose a cross-platform doctor command and closed versioned response contract covering supported Python, SQLite FTS5, database schema, object-store paths, installed packages, active grants, trusted-policy alignment, integrity coverage, and optional MCP availability.",
+        "Open existing state read-only and never create directories, initialize or migrate a database, change grants, install packs, fetch network resources, or invoke a model; an uninitialized path must remain byte-for-byte absent after diagnosis.",
+        "Return every check with required or advisory severity, pass, fail, or not_checked status, stable code, bounded details, and an overall ready or not_ready result instead of stopping at the first failure.",
+        "Keep quick structural inspection distinct from full package-integrity validation and report exact validated and total package counts so partial integrity coverage cannot be mistaken for complete validation.",
+        "When a trusted policy is supplied, validate it independently, bind the selected principal explicitly, and detect missing grants, revoked grants, policy-fingerprint drift, missing object packages, path escape, symlinks, and package-digest mismatch.",
+        "Return exit zero only for ready state and a distinct documented nonzero exit for completed not-ready diagnosis; retain existing typed domain and internal failure behavior.",
+        "Cover initialized and uninitialized stores, healthy quick and full checks, tampered or missing objects, unsupported schema, policy drift, optional versus required MCP, no-network execution, and schema validation of actual reports."
+      ]
+    },
+    {
+      "task_id": "TASK-026",
+      "title": "Deterministic cross-platform synthetic starter bundle",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-018",
+        "SM-FR-027",
+        "SM-FR-030",
+        "SM-FR-057",
+        "SM-FR-059",
+        "SM-FR-065",
+        "SM-FR-066"
+      ],
+      "acceptance": [
+        "Build a deterministic synthetic-only starter ZIP containing the two exact fictional packs, their exact trusted policy, a twice-built verified core wheel and its source provenance, a closed bundle manifest, and stdlib-only setup and launcher scripts that work on Windows and POSIX.",
+        "Validate the wheel and provenance against the current inventoried source, validate and archive both packs, require an exact policy allowlist and synthetic content class, inventory every bundled byte, reject unsafe or duplicate paths and symbolic links, reopen nested packs, and require two independent builds to be byte-identical.",
+        "Before any setup write, revalidate the complete extracted bundle; create an isolated environment without network dependency resolution, install only the bundled wheel and exact packs, and run full doctor plus lexical-discovery and exact-context smokes against the installed state.",
+        "Write a closed receipt bound to the manifest, wheel, policy, and package digests; on later setup runs always revalidate the bundle, receipt, full doctor, and evidence smokes, and never skip work solely because a marker file exists.",
+        "Fail closed on tampered or extra files, traversal, symlinks, duplicate archive members, wrong wheel or policy identity, stale receipts, unowned existing state, and malformed or interrupted setup state; recover only an explicitly marked setup-owned partial state.",
+        "Exercise the actual extracted bundle in the existing Windows and Linux, Python 3.11 and 3.12 CI matrix without checkout PYTHONPATH, and keep the dependency-free core-wheel smoke separate.",
+        "Document the starter as fictional contract behavior for learning and integration only, not real-document discovery, semantic quality, applicability, compliance, approval, or a replacement for the prepared public corpus."
+      ]
+    },
+    {
+      "task_id": "TASK-027",
+      "title": "Source-first evidence reader and neutral engineering handoff",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-006",
+        "SM-FR-010",
+        "SM-FR-025",
+        "SM-FR-027",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-031",
+        "SM-FR-052",
+        "SM-FR-057",
+        "SM-FR-067"
+      ],
+      "acceptance": [
+        "Add one explicit administrative export command that calls the existing package-pinned detailed get-clause path with an exact clause or record selector and trusted principal; do not add a seventh query or MCP operation.",
+        "Define closed candidate-draft and neutral handoff contracts containing caller-authored candidate provenance, the exact detailed evidence packet, a replayable immutable selector and durable local locator, packet digest, export-time authorization evidence that transfers no authority, and fixed host-owned not-decided applicability, compliance, tailoring, baseline, and approval states.",
+        "Write a deterministic closed directory containing the handoff JSON, a no-script source-first HTML reader, and a manifest that binds both files; construct and validate it in a sibling temporary directory, reserve the target without overwrite, activate the manifest last after final reauthorization, and clean owned partial output on failure.",
+        "Render the selected source language separately from governing context, exact citations and spans, relationships, derivation and review status, coverage dimensions, interpretation limits, and unresolved evidence issues; escape all source-controlled text and block scripts, forms, frames, plugins, navigation, and network access with a restrictive content policy.",
+        "Validate the complete bundle by exact file set, safe canonical paths, regular-file and no-link checks, bytes and digests, handoff shape and packet digest, selector and package identities, fixed host-owned decision states, and byte-for-byte deterministic HTML rerendering.",
+        "Reject unauthorized or revoked access, selector mismatch, malformed or unprovenanced candidate drafts, caller-selected evidence references or decision states, compact or truncated evidence, existing output, path or link hazards, extra or changed files, changed packet digests, false applicability or approval states, and source text attempting HTML or instruction injection without leaving a published partial artifact.",
+        "Prove with the fictional pack that one export carries the selected clause and required governing note, validates against both machine contracts, is byte-identical across repeated exports, opens without a model or network, and remains an evidence candidate rather than a requirement, test plan, applicability decision, or approval."
+      ]
+    },
+    {
+      "task_id": "TASK-028",
+      "title": "Deterministic release SBOM and attestable evidence",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-030",
+        "SM-FR-057",
+        "SM-FR-059",
+        "SM-FR-066",
+        "SM-FR-068"
+      ],
+      "acceptance": [
+        "Generate a deterministic closed release-evidence directory for the exact twice-built core wheel and actual synthetic starter archive, containing a standards-based SBOM, a subject manifest, and a release-evidence statement bound to the wheel provenance, source revision, dependency lock, and starter manifest.",
+        "Distinguish deterministic unsigned local evidence from CI-issued signed attestations; record the expected repository, workflow, protected branch, predicate type, and signer only as verification policy, never as a claim that a local artifact is signed.",
+        "Validate every subject by bytes and SHA-256, revalidate the wheel provenance and extracted starter bundle, recompute the source inventory and lock digest, require a clean source revision for release attestation, and reject mismatched, missing, extra, linked, or mutated evidence files.",
+        "Produce byte-identical local evidence from identical inputs under a fixed source epoch, use canonical serialization and stable component identities, and validate the SBOM and release statement against closed machine contracts without network access.",
+        "On protected main-branch CI only, rebuild and exercise the actual release artifacts, retain the local evidence, and issue a GitHub artifact attestation pinned to an immutable action revision with least-privilege identity permissions; pull requests must perform all local validation without requesting an identity token.",
+        "Document online and pre-fetched offline verification as separate procedures, require both subject digest and trusted repository/workflow identity, and do not describe a retained attestation bundle as verified until the verification command succeeds.",
+        "Cover tampered wheel, provenance, starter, starter manifest, source inventory, lock, subject manifest, SBOM, release statement, dirty or absent source revision, false signed status, wrong verification identity, noncanonical paths, and partial output without publishing a valid-looking evidence set."
+      ]
+    },
+    {
+      "task_id": "TASK-029",
+      "title": "Resource-limited PDF parser process isolation",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-018",
+        "SM-FR-030",
+        "SM-FR-048",
+        "SM-FR-049",
+        "SM-FR-057",
+        "SM-FR-069"
+      ],
+      "acceptance": [
+        "Route every production pypdf path used by page-pack, corpus, and reviewed-structure compilation through one disposable child process per source PDF; the parent must not import or execute pypdf parsing code.",
+        "Use a closed versioned request/result protocol bound to the verified source bytes, parser versions, extraction mode, encryption policy, and fixed limit policy; return normalized page text as digest-inventoried regular files with the result activated last.",
+        "Enforce positive fixed source, page-count, decompressed-page, normalized-page, aggregate-output, result-metadata, process-memory, CPU, and wall-time bounds; never truncate parser output and never expose a disable or unlimited mode.",
+        "On POSIX, install address-space, CPU, file-size, and core limits before source parsing and kill the process group on timeout. On Windows, assign the blocked worker to a Job Object with memory, CPU, active-process, and kill-on-close limits before allowing it to parse; fail closed if required controls cannot be installed.",
+        "Accept only the exact regular-file result set with no links, safe canonical names, consecutive page ordinals, request/source/page digest equality, exact byte counts, valid UTF-8, declared normalization, and bounded metadata; treat any mismatch, crash, or missing activation result as a typed parser failure.",
+        "Stream accepted page files into existing sidecars while preserving established markers, offsets, quote digests, layout/simple extraction semantics, and deterministic final pack bytes; no complete pack or record may activate from partial worker output.",
+        "Make page extraction exceptions, timeout, resource termination, protocol failure, and output overrun fatal for the component and incomplete for the corpus; keep a genuinely empty text layer distinct and never count extraction failure as an ordinary page without text under a complete corpus status.",
+        "Cover deterministic replay, source change, timeout, crash, missing result, malformed result, extra or linked output, page-order/count/digest/UTF-8 mismatch, output limits, parser exception, Windows Job assignment, POSIX limit setup, and unchanged page/corpus/structure retrieval behavior across the supported CI matrix."
+      ]
     }
   ]
 }

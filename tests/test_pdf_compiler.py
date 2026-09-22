@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
+from jsonschema.validators import validator_for
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -103,6 +104,11 @@ class PDFCompilerTests(unittest.TestCase):
         output = self.root / "compiled"
         with patch.object(socket, "socket", side_effect=AssertionError("network access attempted")):
             result = compile_pdf_to_pack(self.catalog_path, "MIL-STD-TEST", self.sources, output)
+            report = json.loads((output / "extraction-report.json").read_text(encoding="utf-8"))
+            report_schema = json.loads(
+                (ROOT / "contracts" / "extraction-report.schema.json").read_text(encoding="utf-8")
+            )
+            validator_for(report_schema)(report_schema).validate(report)
             pack = validate_pack_directory(output)
             policy_path = self.root / "policy.json"
             policy_path.write_text(

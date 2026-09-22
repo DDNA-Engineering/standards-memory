@@ -203,7 +203,7 @@
         "quote_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "source_checks": {"$ref": "#/$defs/sourceChecks"},
         "derivation_ref": {"type": "string", "pattern": "^d[1-9][0-9]*$"},
-        "structure": {"type": "object"}
+        "structure": {"$ref": "https://standards-memory.invalid/contracts/records-0.1.0.schema.json#/properties/records/items/properties/structure"}
       }
     },
     "budget": {

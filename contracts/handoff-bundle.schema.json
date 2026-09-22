@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/handoff-bundle-0.1.0.schema.json",
+  "title": "StandardsForge source-first handoff bundle manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "status", "package_digest", "root_record_id", "handoff_sha256", "files"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "artifact_type": {"const": "standardsforge_source_first_handoff_bundle"},
+    "status": {"const": "candidate_unapproved"},
+    "package_digest": {"$ref": "#/$defs/digest"},
+    "root_record_id": {"type": "string", "minLength": 1},
+    "handoff_sha256": {"$ref": "#/$defs/digest"},
+    "files": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {"allOf": [{"$ref": "#/$defs/file"}, {"properties": {"path": {"const": "evidence-handoff.json"}}}]},
+        {"allOf": [{"$ref": "#/$defs/file"}, {"properties": {"path": {"const": "reader.html"}}}]}
+      ],
+      "items": false
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"enum": ["evidence-handoff.json", "reader.html"]},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

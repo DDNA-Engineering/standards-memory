@@ -11,20 +11,20 @@ from typing import Any
 from .compiler import (
     COMPILER_VERSION,
     MAX_PDF_BYTES,
-    MAX_PDF_PAGES,
     PYPDF_VERSION,
     _inventory_entry,
-    _load_pypdf,
-    _normalize_page_text,
     _source_document,
     _write_json,
 )
 from .errors import StandardsForgeError, require
 from .pack import validate_pack_directory
+from .pdf_isolation import isolated_pdf_pages
+from .pdf_protocol import DEFAULT_LIMITS, LIMIT_POLICY_VERSION, PROTOCOL_VERSION
 from .source_catalog import load_source_catalog, verify_source_set
 
 
-STRUCTURE_COMPILER_VERSION = "0.1.0"
+STRUCTURE_COMPILER_VERSION = "0.3.0"
+MAX_NODE_SOURCE_SPANS = 64
 NODE_KINDS = {
     "document",
     "section",
@@ -49,6 +49,7 @@ RELATIONSHIP_TYPES = {
     "references",
     "caption_of",
     "footnote_for",
+    "table_footnote_for",
     "header_for",
     "illustrates",
     "continues_on",
@@ -70,7 +71,8 @@ _ANNOTATION_KEYS = {
     "unsupported_regions",
 }
 _COMPILER_KEYS = {"name", "version"}
-_REVIEW_KEYS = {"reviewer_id", "reviewer_type", "reviewed_at"}
+_REVIEW_REQUIRED_KEYS = {"reviewer_id", "reviewer_type", "reviewed_at"}
+_REVIEW_OPTIONAL_KEYS = {"method", "tool", "unresolved_issues", "attestation"}
 _DERIVATION_KEYS = {"method", "review_status"}
 _NODE_KEYS = {
     "logical_id",
@@ -84,6 +86,29 @@ _NODE_KEYS = {
     "source_spans",
     "content_sha256",
     "derivation",
+}
+_NODE_OPTIONAL_KEYS = {"parent_logical_id", "semantics"}
+_SEMANTIC_KEYS = {
+    "schema_version",
+    "content_role",
+    "normativity",
+    "statement",
+    "qualifiers",
+    "quantities",
+    "unresolved_issues",
+    "project_applicability",
+}
+_SEMANTIC_CONTENT_ROLES = {
+    "requirement_candidate",
+    "governing_condition",
+    "exception",
+    "applicability_statement",
+    "definition",
+    "table_header",
+    "table_row",
+    "table_footnote",
+    "note",
+    "prose",
 }
 _RELATIONSHIP_KEYS = {
     "source_logical_id",
@@ -134,6 +159,54 @@ def _validate_derivation(value: Any, label: str, reviewer_type: str) -> dict[str
     return derivation
 
 
+def _validate_span_indices(value: Any, span_count: int, label: str) -> list[int]:
+    require(
+        isinstance(value, list)
+        and value
+        and len(value) == len(set(value))
+        and all(type(index) is int and 0 <= index < span_count for index in value)
+        and value == sorted(value),
+        "invalid_structure_annotations",
+        f"{label} span indices are invalid.",
+    )
+    return value
+
+
+def _validate_semantics(value: Any, span_count: int, statement_role: str) -> dict[str, Any]:
+    semantics = _strict_object(value, _SEMANTIC_KEYS, "node semantics")
+    require(semantics["schema_version"] == "0.1.0", "invalid_structure_annotations", "Unsupported node semantic schema.")
+    require(semantics["content_role"] in _SEMANTIC_CONTENT_ROLES, "invalid_structure_annotations", "Unsupported semantic content role.")
+    require(semantics["normativity"] in {"normative", "informative", "mixed", "unclassified"}, "invalid_structure_annotations", "Unsupported semantic normativity.")
+    require(semantics["project_applicability"] == "not_decided", "invalid_structure_annotations", "Semantic extraction cannot decide project applicability.")
+    require(isinstance(semantics["unresolved_issues"], list) and all(isinstance(item, str) and item for item in semantics["unresolved_issues"]), "invalid_structure_annotations", "Semantic unresolved issues must be non-empty strings.")
+    statement = semantics["statement"]
+    if semantics["content_role"] == "requirement_candidate":
+        require(statement_role == "obligation", "invalid_structure_annotations", "Requirement candidates must be explicitly classified as obligations.")
+        require(isinstance(statement, dict), "invalid_structure_annotations", "Requirement candidates require a reviewed statement decomposition.")
+    if statement is not None:
+        statement = _strict_object(statement, {"subject", "action", "modality", "polarity", "exact_text", "span_indices"}, "semantic statement")
+        require(all(isinstance(statement[key], str) and statement[key] for key in ("subject", "action", "exact_text")), "invalid_structure_annotations", "Semantic statement text fields are required.")
+        require(statement["modality"] in {"shall", "must", "should", "may", "will", "other"}, "invalid_structure_annotations", "Semantic statement modality is invalid.")
+        require(statement["polarity"] in {"affirmative", "negative"}, "invalid_structure_annotations", "Semantic statement polarity is invalid.")
+        _validate_span_indices(statement["span_indices"], span_count, "Semantic statement")
+    for collection_name, allowed_keys in (
+        ("qualifiers", {"kind", "exact_text", "span_indices"}),
+        ("quantities", {"raw", "value", "unit", "tolerance", "span_indices"}),
+    ):
+        collection = semantics[collection_name]
+        require(isinstance(collection, list), "invalid_structure_annotations", f"Semantic {collection_name} must be a list.")
+        for item in collection:
+            item = _strict_object(item, allowed_keys, f"semantic {collection_name} item")
+            _validate_span_indices(item["span_indices"], span_count, f"Semantic {collection_name} item")
+            if collection_name == "qualifiers":
+                require(item["kind"] in {"condition", "exception", "source_applicability", "test_condition", "acceptance_criterion", "tailoring_instruction"}, "invalid_structure_annotations", "Semantic qualifier kind is invalid.")
+                require(isinstance(item["exact_text"], str) and item["exact_text"], "invalid_structure_annotations", "Semantic qualifier exact text is required.")
+            else:
+                require(isinstance(item["raw"], str) and item["raw"], "invalid_structure_annotations", "Semantic quantity raw text is required.")
+                require(all(item[key] is None or isinstance(item[key], str) for key in ("value", "unit", "tolerance")), "invalid_structure_annotations", "Semantic quantity fields must be text or null.")
+    return semantics
+
+
 def load_structure_annotations(path: str | Path) -> dict[str, Any]:
     annotation_path = Path(path).resolve()
     require(annotation_path.is_file(), "structure_annotations_not_found", "The structure annotation file does not exist.")
@@ -142,7 +215,11 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise StandardsForgeError("invalid_structure_annotations", "The structure annotation file is invalid JSON.") from exc
     annotations = _strict_object(raw, _ANNOTATION_KEYS, "structure annotations")
-    require(annotations["schema_version"] == "0.1.0", "unsupported_schema_version", "Unsupported structure annotation schema.")
+    require(
+        annotations["schema_version"] in {"0.1.0", "0.2.0"},
+        "unsupported_schema_version",
+        "Unsupported structure annotation schema.",
+    )
     for key in ("document_id", "edition_id", "source_pdf_sha256"):
         require(isinstance(annotations[key], str) and annotations[key], "invalid_structure_annotations", f"{key} is required.")
     require(len(annotations["source_pdf_sha256"]) == 64, "invalid_structure_annotations", "The source PDF digest is invalid.")
@@ -151,16 +228,30 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
     require(annotations["extraction_mode"] == "simple", "invalid_structure_annotations", "The structural compiler currently supports only simple text extraction.")
     require(annotations["text_encoding"] == "UTF-8", "invalid_structure_annotations", "Structural annotations require UTF-8 page text.")
     require(annotations["offset_convention"] == "half_open_utf8_byte_offsets_per_physical_page", "invalid_structure_annotations", "Unsupported structural offset convention.")
-    review = _strict_object(annotations["review"], _REVIEW_KEYS, "review")
-    require(all(isinstance(review[key], str) and review[key] for key in _REVIEW_KEYS), "invalid_structure_annotations", "Review provenance is required.")
+    review = _bounded_object(
+        annotations["review"], _REVIEW_REQUIRED_KEYS, _REVIEW_OPTIONAL_KEYS, "review"
+    )
+    require(all(isinstance(review[key], str) and review[key] for key in _REVIEW_REQUIRED_KEYS), "invalid_structure_annotations", "Review provenance is required.")
     require(review["reviewer_type"] in {"agent", "human"}, "invalid_structure_annotations", "Reviewer type is invalid.")
+    if annotations["schema_version"] == "0.2.0":
+        require(set(review) == _REVIEW_REQUIRED_KEYS | _REVIEW_OPTIONAL_KEYS, "invalid_structure_annotations", "Structure annotations 0.2.0 require complete review provenance.")
+        require(isinstance(review["method"], str) and review["method"], "invalid_structure_annotations", "Review method is required.")
+        require(review["attestation"] == "extraction_review_not_project_applicability_or_approval", "invalid_structure_annotations", "Review attestation cannot assert project applicability or approval.")
+        require(isinstance(review["unresolved_issues"], list) and all(isinstance(item, str) and item for item in review["unresolved_issues"]), "invalid_structure_annotations", "Review unresolved issues must be non-empty strings.")
+        tool = review["tool"]
+        if review["reviewer_type"] == "agent":
+            require(isinstance(tool, dict), "invalid_structure_annotations", "Agent review requires tool provenance.")
+        if tool is not None:
+            tool = _strict_object(tool, {"name", "version", "configuration_sha256"}, "review tool")
+            require(all(isinstance(tool[key], str) and tool[key] for key in ("name", "version")), "invalid_structure_annotations", "Review tool name and version are required.")
+            require(tool["configuration_sha256"] is None or isinstance(tool["configuration_sha256"], str) and len(tool["configuration_sha256"]) == 64, "invalid_structure_annotations", "Review tool configuration digest is invalid.")
     nodes = annotations["nodes"]
     require(isinstance(nodes, list) and nodes, "invalid_structure_annotations", "At least one structural node is required.")
     require(len(nodes) <= 4096, "invalid_structure_annotations", "The structural annotation node limit was exceeded.")
     logical_ids: set[str] = set()
     clause_references: set[str] = set()
     for value in nodes:
-        node = _bounded_object(value, _NODE_KEYS - {"parent_logical_id"}, {"parent_logical_id"}, "structural node")
+        node = _bounded_object(value, _NODE_KEYS - {"parent_logical_id"}, _NODE_OPTIONAL_KEYS, "structural node")
         for key in ("logical_id", "clause_reference", "heading", "exact_text", "content_sha256"):
             require(isinstance(node[key], str) and node[key], "invalid_structure_annotations", f"Structural node {key} is required.")
         require(node["logical_id"] not in logical_ids, "invalid_structure_annotations", "Structural logical IDs must be unique.", logical_id=node["logical_id"])
@@ -171,11 +262,45 @@ def load_structure_annotations(path: str | Path) -> dict[str, Any]:
         parent = node.get("parent_logical_id")
         require(parent is None or isinstance(parent, str) and parent, "invalid_structure_annotations", "A parent logical ID must be absent or non-empty text.")
         require(type(node["ordinal"]) is int and node["ordinal"] >= 1, "invalid_structure_annotations", "A structural ordinal must be one-based.")
-        require(isinstance(node["source_spans"], list) and len(node["source_spans"]) == 1, "invalid_structure_annotations", "Structural compiler v0.1 requires exactly one source span per node.")
-        _validate_span(node["source_spans"][0], "node source span")
+        source_spans = node["source_spans"]
+        require(
+            isinstance(source_spans, list)
+            and source_spans
+            and len(source_spans) <= MAX_NODE_SOURCE_SPANS,
+            "invalid_structure_annotations",
+            "Structural nodes require between one and 64 ordered source spans.",
+        )
+        if annotations["schema_version"] == "0.1.0":
+            require(
+                len(source_spans) == 1,
+                "invalid_structure_annotations",
+                "Structure annotations 0.1.0 require exactly one source span per node.",
+            )
+        prior_span_key: tuple[int, int, int] | None = None
+        for span in source_spans:
+            _validate_span(span, "node source span")
+            span_key = (span["physical_page"], span["start_byte"], span["end_byte"])
+            require(
+                prior_span_key is None or span_key > prior_span_key,
+                "invalid_structure_annotations",
+                "Structural node source spans must be unique and ordered by page and byte offset.",
+                logical_id=node["logical_id"],
+            )
+            if prior_span_key is not None and span_key[0] == prior_span_key[0]:
+                require(
+                    span_key[1] >= prior_span_key[2],
+                    "invalid_structure_annotations",
+                    "Structural node source spans on one page cannot overlap.",
+                    logical_id=node["logical_id"],
+                )
+            prior_span_key = span_key
         require(node["content_sha256"] == _sha256(node["exact_text"].encode("utf-8")), "invalid_structure_annotations", "Structural content digest does not match exact text.", logical_id=node["logical_id"])
         require(node["statement_role"] in STATEMENT_ROLES, "invalid_structure_annotations", "Unsupported structural statement role.")
         _validate_derivation(node["derivation"], "node derivation", review["reviewer_type"])
+        semantics = node.get("semantics")
+        if semantics is not None:
+            require(annotations["schema_version"] == "0.2.0", "invalid_structure_annotations", "Semantic annotations require structure annotation schema 0.2.0.")
+            _validate_semantics(semantics, len(source_spans), node["statement_role"])
     by_logical_id = {node["logical_id"]: node for node in nodes}
     for node in nodes:
         parent = node.get("parent_logical_id")
@@ -241,11 +366,11 @@ def compile_structured_pdf_section(
     catalog = load_source_catalog(catalog_path)
     document = _source_document(catalog, document_id)
     annotations = load_structure_annotations(annotations_path)
+    review = annotations["review"]
     require(annotations["document_id"] == document["document_id"], "structure_identity_mismatch", "Structure annotations belong to a different document.")
     require(annotations["edition_id"] == document["edition_id"], "structure_identity_mismatch", "Structure annotations belong to a different edition.")
     require(annotations["source_pdf_sha256"] == document["sha256"], "structure_identity_mismatch", "Structure annotations bind a different source PDF.")
 
-    pypdf = _load_pypdf()
     source_path = Path(source_root).resolve() / document["local_filename"]
     require(source_path.stat().st_size <= MAX_PDF_BYTES, "compiler_limit_exceeded", "The PDF exceeds the compiler size limit.")
     output = Path(output_directory).resolve()
@@ -253,15 +378,6 @@ def compile_structured_pdf_section(
     output.parent.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix=".standardsforge-structure-", dir=output.parent))
     try:
-        try:
-            reader = pypdf.PdfReader(source_path, strict=True)
-        except Exception as exc:
-            raise StandardsForgeError("invalid_pdf", "The verified source could not be parsed as a strict PDF.") from exc
-        require(not reader.is_encrypted, "encrypted_pdf", "Encrypted PDFs are not supported by the structural compiler.")
-        page_count = len(reader.pages)
-        require(1 <= page_count <= MAX_PDF_PAGES, "compiler_limit_exceeded", "The PDF page count is outside the compiler limit.")
-        require(page_count == document["page_count"], "pdf_page_count_mismatch", "The PDF page count does not match catalog metadata.")
-
         sources = staging / "sources"
         page_sources = sources / "pages"
         page_sources.mkdir(parents=True)
@@ -276,17 +392,24 @@ def compile_structured_pdf_section(
             span for region in annotations["unsupported_regions"] for span in region["source_spans"]
         )
         pages: dict[int, tuple[str, str, bytes]] = {}
-        for physical_page in sorted({span["physical_page"] for span in all_annotation_spans}):
-            require(physical_page <= page_count, "invalid_structure_annotations", "A structural node references a page outside the source PDF.", physical_page=physical_page)
-            try:
-                text = _normalize_page_text(reader.pages[physical_page - 1].extract_text() or "")
-            except Exception as exc:
-                raise StandardsForgeError("pdf_page_extraction_failed", "A structural source page could not be extracted.", {"page": physical_page}) from exc
-            require(text, "pdf_text_layer_empty", "A structural source page has no extractable text layer.", page=physical_page)
-            page_bytes = text.encode("utf-8")
-            relative = f"sources/pages/physical-{physical_page:04d}.txt"
-            staging.joinpath(*PurePosixPath(relative).parts).write_bytes(page_bytes)
-            pages[physical_page] = (relative, _sha256(page_bytes), page_bytes)
+        with isolated_pdf_pages(
+            source_path,
+            source_sha256=document["sha256"],
+            source_bytes=document["byte_length"],
+            expected_pages=document["page_count"],
+            extraction_mode="simple",
+            encryption_policy="reject",
+        ) as parsed:
+            page_count = parsed.page_count
+            parsed_by_page = {page.physical_page: page for page in parsed.pages}
+            for physical_page in sorted({span["physical_page"] for span in all_annotation_spans}):
+                require(physical_page <= page_count, "invalid_structure_annotations", "A structural node references a page outside the source PDF.", physical_page=physical_page)
+                parsed_page = parsed_by_page[physical_page]
+                require(parsed_page.text_layer_status == "extracted", "pdf_text_layer_empty", "A structural source page has no extractable text layer.", page=physical_page)
+                page_bytes = parsed_page.path.read_bytes()
+                relative = f"sources/pages/physical-{physical_page:04d}.txt"
+                staging.joinpath(*PurePosixPath(relative).parts).write_bytes(page_bytes)
+                pages[physical_page] = (relative, parsed_page.sha256, page_bytes)
         for span in all_annotation_spans:
             _, actual_page_hash, page_bytes = pages[span["physical_page"]]
             require(span["page_text_sha256"] == actual_page_hash, "structure_span_mismatch", "A structural page-text digest changed.", physical_page=span["physical_page"])
@@ -330,20 +453,76 @@ def compile_structured_pdf_section(
                 )
             relationships_by_source.setdefault(relationship["source_logical_id"], []).append(normalized_relationship)
         records: list[dict[str, Any]] = []
+        logical_sidecars: list[str] = []
         for node in sorted(annotations["nodes"], key=lambda item: (item["ordinal"], item["logical_id"])):
-            node_span = node["source_spans"][0]
-            physical_page = node_span["physical_page"]
-            start_byte = node_span["start_byte"]
-            end_byte = node_span["end_byte"]
-            text_relative, text_sha256, page_bytes = pages[physical_page]
-            quote_bytes = page_bytes[start_byte:end_byte]
-            try:
-                quote = quote_bytes.decode("utf-8")
-            except UnicodeDecodeError as exc:
-                raise StandardsForgeError("invalid_structure_annotations", "A structural span splits UTF-8 text.", {"logical_id": node["logical_id"]}) from exc
-            require(quote == node["exact_text"], "structure_span_mismatch", "A structural span does not match the reviewed exact text.", logical_id=node["logical_id"])
-            quote_sha256 = _sha256(quote_bytes)
-            require(quote_sha256 == node["content_sha256"], "structure_span_mismatch", "A structural span digest changed.", logical_id=node["logical_id"])
+            normalized_spans: list[dict[str, Any]] = []
+            fragments: list[str] = []
+            for node_span in node["source_spans"]:
+                physical_page = node_span["physical_page"]
+                start_byte = node_span["start_byte"]
+                end_byte = node_span["end_byte"]
+                text_relative, text_sha256, page_bytes = pages[physical_page]
+                quote_bytes = page_bytes[start_byte:end_byte]
+                try:
+                    fragment = quote_bytes.decode("utf-8")
+                except UnicodeDecodeError as exc:
+                    raise StandardsForgeError(
+                        "invalid_structure_annotations",
+                        "A structural span splits UTF-8 text.",
+                        {"logical_id": node["logical_id"]},
+                    ) from exc
+                fragments.append(fragment)
+                normalized_spans.append(
+                    {
+                        "path": pdf_relative,
+                        "sha256": document["sha256"],
+                        "text_path": text_relative,
+                        "text_sha256": text_sha256,
+                        "physical_page": physical_page,
+                        "start_byte": start_byte,
+                        "end_byte": end_byte,
+                        "quote_sha256": _sha256(quote_bytes),
+                    }
+                )
+            assembled_text = "\n".join(fragments)
+            require(
+                assembled_text == node["exact_text"],
+                "structure_span_mismatch",
+                "Ordered structural spans do not reproduce the reviewed exact text.",
+                logical_id=node["logical_id"],
+            )
+            quote_sha256 = _sha256(assembled_text.encode("utf-8"))
+            require(
+                quote_sha256 == node["content_sha256"],
+                "structure_span_mismatch",
+                "The assembled structural span digest changed.",
+                logical_id=node["logical_id"],
+            )
+            semantics = node.get("semantics")
+            if semantics is not None:
+                selected_text = lambda indices: "\n".join(fragments[index] for index in indices)
+                statement = semantics["statement"]
+                if statement is not None:
+                    statement_evidence = selected_text(statement["span_indices"])
+                    require(statement["exact_text"] in statement_evidence, "structure_span_mismatch", "Semantic statement evidence is absent from its cited spans.", logical_id=node["logical_id"])
+                    statement_lower = statement["exact_text"].casefold()
+                    require(statement["subject"].casefold() in statement_lower, "invalid_structure_annotations", "Semantic statement subject is absent from its exact text.", logical_id=node["logical_id"])
+                    require(statement["action"].casefold() in statement_lower, "invalid_structure_annotations", "Semantic statement action is absent from its exact text.", logical_id=node["logical_id"])
+                    if statement["modality"] != "other":
+                        require(statement["modality"] in statement_lower.split(), "invalid_structure_annotations", "Semantic statement modality is absent from its exact text.", logical_id=node["logical_id"])
+                for qualifier in semantics["qualifiers"]:
+                    require(qualifier["exact_text"] in selected_text(qualifier["span_indices"]), "structure_span_mismatch", "Semantic qualifier evidence is absent from its cited spans.", logical_id=node["logical_id"])
+                for quantity in semantics["quantities"]:
+                    require(quantity["raw"] in selected_text(quantity["span_indices"]), "structure_span_mismatch", "Semantic quantity evidence is absent from its cited spans.", logical_id=node["logical_id"])
+                if semantics["content_role"] == "definition":
+                    require(node["kind"] == "definition", "invalid_structure_annotations", "Definition semantics require a definition node.")
+                if semantics["content_role"].startswith("table_"):
+                    required_kind = {
+                        "table_header": "table_cell",
+                        "table_row": "table_row",
+                        "table_footnote": "note",
+                    }[semantics["content_role"]]
+                    require(node["kind"] == required_kind, "invalid_structure_annotations", "Table semantics disagree with the structural node kind.")
             relationships = relationships_by_source.get(node["logical_id"], [])
             dependencies = [
                 {
@@ -354,16 +533,57 @@ def compile_structured_pdf_section(
                 for relationship in relationships
                 if relationship["target_status"] == "resolved" and relationship["required"]
             ]
-            span = {
-                "path": pdf_relative,
-                "sha256": document["sha256"],
-                "text_path": text_relative,
-                "text_sha256": text_sha256,
-                "physical_page": physical_page,
-                "start_byte": start_byte,
-                "end_byte": end_byte,
-                "quote_sha256": quote_sha256,
+            first_span = normalized_spans[0]
+            evidence_relative = first_span["text_path"]
+            evidence_sha256 = first_span["text_sha256"]
+            if len(normalized_spans) > 1:
+                evidence_relative = f"sources/logical/{record_id_by_logical_id[node['logical_id']]}.txt"
+                evidence_path = staging.joinpath(*PurePosixPath(evidence_relative).parts)
+                evidence_path.parent.mkdir(parents=True, exist_ok=True)
+                evidence_path.write_text(assembled_text, encoding="utf-8", newline="\n")
+                evidence_sha256 = _sha256(evidence_path.read_bytes())
+                logical_sidecars.append(evidence_relative)
+            review_status = {
+                "agent_reviewed": "agent_reviewed",
+                "human_reviewed": "human_verified",
+                "human_reviewed_with_uncertainty": "human_verified_with_uncertainty",
+            }[node["derivation"]["review_status"]]
+            review_tool = review.get("tool")
+            review_issues = list(review.get("unresolved_issues", []))
+            if annotations["schema_version"] == "0.1.0":
+                if review["reviewer_type"] == "agent":
+                    review_tool = {
+                        "name": "unrecorded_legacy_annotation_tool",
+                        "version": "not_recorded",
+                        "configuration_sha256": None,
+                    }
+                review_issues.append(
+                    "Legacy structure annotation 0.1.0 did not record complete review method and tool provenance."
+                )
+            review_event = {
+                "schema_version": "0.1.0",
+                "status": review_status,
+                "reviewed_content_sha256": node["content_sha256"],
+                "scope": "structure_and_semantics" if semantics is not None else "structure_only",
+                "reviewer": {
+                    "id": review["reviewer_id"],
+                    "type": review["reviewer_type"],
+                },
+                "reviewed_at": review["reviewed_at"],
+                "method": review.get("method", node["derivation"]["method"]),
+                "tool": review_tool,
+                "unresolved_issues": review_issues,
+                "attestation": "extraction_review_not_project_applicability_or_approval",
             }
+            locator = (
+                f"physical PDF page {first_span['physical_page']}; UTF-8 bytes "
+                f"{first_span['start_byte']}:{first_span['end_byte']}"
+            )
+            if len(normalized_spans) > 1:
+                locator = "ordered reviewed source spans: " + "; ".join(
+                    f"page {span['physical_page']} UTF-8 bytes {span['start_byte']}:{span['end_byte']}"
+                    for span in normalized_spans
+                )
             records.append(
                 {
                     "record_id": record_id_by_logical_id[node["logical_id"]],
@@ -375,10 +595,10 @@ def compile_structured_pdf_section(
                     "source": {
                         "path": pdf_relative,
                         "sha256": document["sha256"],
-                        "text_path": text_relative,
-                        "text_sha256": text_sha256,
-                        "page": physical_page,
-                        "locator": f"physical PDF page {physical_page}; UTF-8 bytes {start_byte}:{end_byte}",
+                        "text_path": evidence_relative,
+                        "text_sha256": evidence_sha256,
+                        "page": first_span["physical_page"],
+                        "locator": locator,
                         "quote_sha256": quote_sha256,
                     },
                     "derivation": {
@@ -392,8 +612,10 @@ def compile_structured_pdf_section(
                         "content_sha256": node["content_sha256"],
                         "parent_logical_id": node.get("parent_logical_id"),
                         "ordinal": node["ordinal"],
-                        "source_spans": [span],
+                        "source_spans": normalized_spans,
                         "relationships": relationships,
+                        "semantics": semantics,
+                        "review": review_event,
                     },
                 }
             )
@@ -444,6 +666,9 @@ def compile_structured_pdf_section(
                 "base_pdf_compiler_version": COMPILER_VERSION,
                 "pypdf_version": PYPDF_VERSION,
                 "extraction_mode": annotations["extraction_mode"],
+                "parser_protocol": PROTOCOL_VERSION,
+                "limit_policy": LIMIT_POLICY_VERSION,
+                "limits": DEFAULT_LIMITS.to_dict(),
             },
             "document_id": document["document_id"],
             "edition_id": document["edition_id"],
@@ -452,6 +677,10 @@ def compile_structured_pdf_section(
             "review": annotations["review"],
             "physical_pages": sorted(pages),
             "node_count": len(records),
+            "multi_span_node_count": sum(
+                len(node["source_spans"]) > 1 for node in annotations["nodes"]
+            ),
+            "logical_text_assembly": "ordered_source_fragments_joined_with_one_lf",
             "unsupported_regions": annotations["unsupported_regions"],
             "limitations": {
                 "scope": "only_explicitly_reviewed_nodes_are_structured",
@@ -473,6 +702,7 @@ def compile_structured_pdf_section(
             "structure-report.json",
             pdf_relative,
             *(relative for relative, _, _ in pages.values()),
+            *logical_sidecars,
         ]
         _write_json(
             staging / "inventory.json",

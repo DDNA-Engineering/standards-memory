@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/starter-bundle-0.1.0.schema.json",
+  "title": "StandardsForge synthetic starter bundle manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "product", "version", "profile", "qualification", "build", "install", "packages", "claims", "files"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "product": {"const": "StandardsForge synthetic starter"},
+    "version": {"type": "string", "minLength": 1},
+    "profile": {"const": "synthetic_contract_starter"},
+    "qualification": {"const": "fictional_examples_for_onboarding_and_integration_only"},
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["archive_source_date_epoch", "fixed_zip_datetime", "archive_method", "wheel_path", "wheel_bytes", "wheel_sha256", "wheel_provenance_path", "wheel_provenance_sha256", "reproducible_clean_wheel_builds"],
+      "properties": {
+        "archive_source_date_epoch": {"const": 1767225600},
+        "fixed_zip_datetime": {"const": "2026-01-01T00:00:00Z"},
+        "archive_method": {"const": "zip_stored"},
+        "wheel_path": {"type": "string", "pattern": "^wheel/standardsforge-[^/]+\\.whl$"},
+        "wheel_bytes": {"type": "integer", "minimum": 1},
+        "wheel_sha256": {"$ref": "#/$defs/digest"},
+        "wheel_provenance_path": {"const": "provenance/wheel-build.json"},
+        "wheel_provenance_sha256": {"$ref": "#/$defs/digest"},
+        "reproducible_clean_wheel_builds": {"const": 2}
+      }
+    },
+    "install": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimum_python", "principal_id", "policy_path", "policy_sha256", "state_directory", "venv_directory", "receipt_path", "setup_path", "launcher_path", "network_dependency_resolution", "smokes"],
+      "properties": {
+        "minimum_python": {"const": "3.11"},
+        "principal_id": {"const": "local-user"},
+        "policy_path": {"const": "policies/local-synthetic.json"},
+        "policy_sha256": {"$ref": "#/$defs/digest"},
+        "state_directory": {"const": ".standardsforge"},
+        "venv_directory": {"const": ".venv"},
+        "receipt_path": {"const": ".standardsforge/starter-receipt.json"},
+        "setup_path": {"const": "setup.py"},
+        "launcher_path": {"const": "run.py"},
+        "network_dependency_resolution": {"const": "disabled"},
+        "smokes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["doctor", "discovery", "exact_context"],
+          "properties": {
+            "doctor": {"const": "full_integrity"},
+            "discovery": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["query", "query_mode", "package_digest", "expected_record_ids"],
+              "properties": {
+                "query": {"const": "axial load"},
+                "query_mode": {"const": "all_terms"},
+                "package_digest": {"$ref": "#/$defs/digest"},
+                "expected_record_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {"type": "string", "minLength": 1}
+                }
+              }
+            },
+            "exact_context": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["record_id", "required_context_record_ids"],
+              "properties": {
+                "record_id": {"type": "string", "minLength": 1},
+                "required_context_record_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {"type": "string", "minLength": 1}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "packages": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"$ref": "#/$defs/package"}
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["real_document_quality", "project_applicability", "compliance", "approval", "prepared_public_corpus_replacement"],
+      "properties": {
+        "real_document_quality": {"const": false},
+        "project_applicability": {"const": false},
+        "compliance": {"const": false},
+        "approval": {"const": false},
+        "prepared_public_corpus_replacement": {"const": false}
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 10,
+      "items": {"$ref": "#/$defs/file"}
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "safePath": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)[A-Za-z0-9._/-]+$"},
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "pack_id", "package_digest", "document_family_id", "edition_id", "representation", "content_class"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^packs/[A-Za-z0-9._-]+$"},
+        "pack_id": {"type": "string", "minLength": 1},
+        "package_digest": {"$ref": "#/$defs/digest"},
+        "document_family_id": {"type": "string", "minLength": 1},
+        "edition_id": {"type": "string", "minLength": 1},
+        "representation": {"const": "curated_records"},
+        "content_class": {"const": "synthetic"}
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/safePath"},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

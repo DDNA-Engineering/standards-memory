@@ -107,7 +107,15 @@ class QuerySelectorAdapterTests(unittest.TestCase):
 
     def test_mcp_record_selector_preserves_structured_and_text_envelopes(self) -> None:
         service = Mock()
-        expected = {"operation": "get_clause", "selected_record_id": "record-421"}
+        expected = {
+            "schema_version": "0.1.0",
+            "operation": "get_clause",
+            "retrieval_mode": "exact_pinned_clause",
+            "package": {},
+            "evidence": [],
+            "limitations": [],
+            "budget": {},
+        }
         service.get_clause.return_value = expected
         server = create_mcp_server(service, "local-user")
 
@@ -173,6 +181,15 @@ class MCPAdapterTests(unittest.TestCase):
                 self.assertNotIn("principal", tool.input_schema["properties"])
                 self.assertNotIn("principal_id", tool.input_schema["properties"])
                 self.assertNotIn("result_mode", tool.input_schema["properties"])
+                self.assertEqual({"ok", "result"}, set(tool.output_schema["required"]))
+                self.assertNotEqual(True, tool.output_schema.get("additionalProperties"))
+                result_reference = tool.output_schema["properties"]["result"]["$ref"]
+                result_schema = tool.output_schema["$defs"][result_reference.rsplit("/", 1)[-1]]
+                self.assertIn("operation", result_schema["required"])
+                self.assertEqual(
+                    tool.name,
+                    result_schema["properties"]["operation"]["const"],
+                )
                 if tool.name in {"get_clause", "build_context"}:
                     profile_schema = json.dumps(tool.input_schema["properties"]["response_profile"])
                     self.assertIn("compact_evidence_v1", profile_schema)
@@ -182,6 +199,60 @@ class MCPAdapterTests(unittest.TestCase):
                     self.assertIn("record_id", tool.input_schema["properties"])
                     self.assertNotIn("clause_reference", tool.input_schema.get("required", []))
                     self.assertNotIn("record_id", tool.input_schema.get("required", []))
+                if tool.name == "search":
+                    self.assertEqual(
+                        ["exact_phrase", "all_terms", "any_terms"],
+                        tool.input_schema["properties"]["query_mode"]["enum"],
+                    )
+                    self.assertEqual(
+                        "all_terms",
+                        tool.input_schema["properties"]["query_mode"]["default"],
+                    )
+                if tool.name == "diff_editions":
+                    self.assertFalse(result_schema["additionalProperties"])
+                    for definition_name in (
+                        "_DiffAddedChange",
+                        "_DiffRemovedChange",
+                        "_DiffModifiedChange",
+                        "_DiffMovedChange",
+                        "_DiffUnchangedChange",
+                        "_DiffAlignmentCandidate",
+                        "_DiffDependencyImpact",
+                        "_DiffDependencyEdge",
+                        "_DiffEdgeCause",
+                        "_DiffTargetCause",
+                        "_DiffChangeCounts",
+                        "_DiffEvidenceRecord",
+                        "_DiffRecordDerivation",
+                        "_DiffStructureSpan",
+                        "_DiffStructureRelationship",
+                        "_DiffSemanticStatement",
+                        "_DiffSemanticQualifier",
+                        "_DiffSemanticQuantity",
+                        "_DiffSemanticRecord",
+                        "_DiffReviewer",
+                        "_DiffReviewTool",
+                        "_DiffReviewEvent",
+                        "_DiffUnreviewedStructure",
+                        "_DiffReviewedStructure",
+                        "_DiffSemanticStructure",
+                    ):
+                        self.assertFalse(
+                            tool.output_schema["$defs"][definition_name]["additionalProperties"]
+                        )
+                    edge_schema = result_schema["properties"]["dependency_edges_added"][
+                        "items"
+                    ]
+                    self.assertEqual(4, edge_schema["minItems"])
+                    self.assertEqual(4, edge_schema["maxItems"])
+                    self.assertEqual(
+                        {"statement_role", "method", "review_status"},
+                        set(
+                            tool.output_schema["$defs"]["_DiffRecordDerivation"][
+                                "required"
+                            ]
+                        ),
+                    )
                 self.assertTrue(tool.annotations.read_only_hint)
                 self.assertFalse(tool.annotations.open_world_hint)
 
@@ -288,12 +359,18 @@ class MCPAdapterTests(unittest.TestCase):
         cases = [
             (
                 "search",
-                {"query": "axial load", "package_digest": self.first_digest, "scope_prefix": "4.2"},
+                {
+                    "query": "axial ingress",
+                    "package_digest": self.first_digest,
+                    "scope_prefix": "4.2",
+                    "query_mode": "any_terms",
+                },
                 self.service.search(
-                    "axial load",
+                    "axial ingress",
                     "local-user",
                     package_digest=self.first_digest,
                     scope_prefix="4.2",
+                    query_mode="any_terms",
                 ),
             ),
             (

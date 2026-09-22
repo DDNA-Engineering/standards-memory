@@ -21,6 +21,7 @@ classifiers = [
 [project.optional-dependencies]
 mcp = ["mcp==2.2.0"]
 compiler = ["fonttools==4.65.0", "pypdf==6.19.0"]
+contract = ["jsonschema==4.26.0"]
 
 [project.scripts]
 standardsforge = "standardsforge.cli:main"

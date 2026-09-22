@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/success-response.schema.json",
+  "title": "StandardsForge successful read envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "result"],
+  "properties": {
+    "ok": {"const": true},
+    "result": {
+      "oneOf": [
+        {"$ref": "https://standardsforge.dev/contracts/query-response-0.2.0.schema.json"},
+        {"$ref": "https://standards-memory.invalid/contracts/compact-evidence-response-0.1.0.schema.json"},
+        {"$ref": "https://standardsforge.invalid/contracts/concise-evidence-response-0.1.0.schema.json"}
+      ]
+    }
+  }
+}

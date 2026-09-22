@@ -740,6 +740,9 @@ compiler = [
     { name = "fonttools" },
     { name = "pypdf" },
 ]
+contract = [
+    { name = "jsonschema" },
+]
 mcp = [
     { name = "mcp" },
 ]
@@ -747,10 +750,11 @@ mcp = [
 [package.metadata]
 requires-dist = [
     { name = "fonttools", marker = "extra == 'compiler'", specifier = "==4.65.0" },
+    { name = "jsonschema", marker = "extra == 'contract'", specifier = "==4.26.0" },
     { name = "mcp", marker = "extra == 'mcp'", specifier = "==2.2.0" },
     { name = "pypdf", marker = "extra == 'compiler'", specifier = "==6.19.0" },
 ]
-provides-extras = ["mcp", "compiler"]
+provides-extras = ["mcp", "compiler", "contract"]
 
 [[package]]
 name = "starlette"

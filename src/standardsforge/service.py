@@ -131,9 +131,18 @@ class _RequestVerificationContext:
 
 class StandardsForgeService:
     def __init__(self, db_path: str | Path, object_root: str | Path) -> None:
-        self.store = LocalStore(db_path, object_root)
+        self._configure(LocalStore(db_path, object_root))
+
+    def _configure(self, store: LocalStore) -> None:
+        self.store = store
         self._closure_cache = VersionedLRUCache("required-evidence-closure", "1", max_entries=256)
-        self._search_cache = VersionedLRUCache("authorized-lexical-search", "1", max_entries=256)
+        self._search_cache = VersionedLRUCache("authorized-lexical-search", "2", max_entries=256)
+
+    @classmethod
+    def open_read_only(cls, db_path: str | Path, object_root: str | Path) -> "StandardsForgeService":
+        service = cls.__new__(cls)
+        service._configure(LocalStore.open_existing(db_path, object_root, read_only=True))
+        return service
 
     @staticmethod
     def _validate_package_digest(package_digest: str) -> None:
@@ -395,17 +404,20 @@ class StandardsForgeService:
                     structure_refs[structure_key] = structure_ref
                     node_spans = structure.get("source_spans")
                     require(isinstance(node_spans, list) and node_spans, "response_render_error", "A structural node has no source spans.", record_id=record_id)
-                    structure_nodes.append(
-                        {
-                            "ref": structure_ref,
-                            "record_ref": record_ref,
-                            "logical_id": logical_id,
-                            "content_sha256": structure["content_sha256"],
-                            "parent_logical_id": structure.get("parent_logical_id"),
-                            "ordinal": structure["ordinal"],
-                            "span_refs": [intern_span(span) for span in node_spans],
-                        }
-                    )
+                    concise_structure = {
+                        "ref": structure_ref,
+                        "record_ref": record_ref,
+                        "logical_id": logical_id,
+                        "content_sha256": structure["content_sha256"],
+                        "parent_logical_id": structure.get("parent_logical_id"),
+                        "ordinal": structure["ordinal"],
+                        "span_refs": [intern_span(span) for span in node_spans],
+                    }
+                    if "semantics" in structure:
+                        concise_structure["semantics"] = structure["semantics"]
+                    if "review" in structure:
+                        concise_structure["review"] = structure["review"]
+                    structure_nodes.append(concise_structure)
                 else:
                     prior_node = next(node for node in structure_nodes if node["ref"] == structure_ref)
                     require(prior_node["record_ref"] == record_ref, "response_render_error", "A structural node is attached to conflicting records.")
@@ -846,7 +858,7 @@ class StandardsForgeService:
         }
         structure = json.loads(row["structure_json"])
         if structure:
-            def verify_span(span: Any, *, expected_text: str | None = None) -> None:
+            def verify_span(span: Any, *, expected_text: str | None = None) -> bytes:
                 require(isinstance(span, dict), "source_integrity_failure", "Stored structural source span is invalid.")
                 required = {
                     "path", "sha256", "text_path", "text_sha256", "physical_page",
@@ -905,20 +917,52 @@ class StandardsForgeService:
                         "source_integrity_failure",
                         "Stored structural source span does not reproduce the record text.",
                     )
+                return quote_bytes
 
             node_spans = structure.get("source_spans")
             require(isinstance(node_spans, list) and node_spans, "source_integrity_failure", "Stored structural node spans are missing.")
+            span_fragments: list[str] = []
             for span in node_spans:
-                verify_span(span, expected_text=row["text"])
+                quote_bytes = verify_span(
+                    span,
+                    expected_text=row["text"] if len(node_spans) == 1 else None,
+                )
+                span_fragments.append(quote_bytes.decode("utf-8"))
                 require(
                     span["path"] == source["path"]
                     and span["sha256"] == source["sha256"]
-                    and span["text_path"] == evidence_relative
-                    and span["text_sha256"] == evidence_digest
-                    and span["physical_page"] == source["page"]
-                    and span["quote_sha256"] == source["quote_sha256"],
+                    and (
+                        len(node_spans) > 1
+                        or span["text_path"] == evidence_relative
+                        and span["text_sha256"] == evidence_digest
+                        and span["quote_sha256"] == source["quote_sha256"]
+                    ),
                     "source_integrity_failure",
-                    "Stored structural node span disagrees with its primary citation.",
+                    "Stored structural node span disagrees with the record source.",
+                )
+            require(
+                "\n".join(span_fragments) == row["text"],
+                "source_integrity_failure",
+                "Stored ordered structural spans do not reproduce the record text.",
+            )
+            require(
+                node_spans[0]["physical_page"] == source["page"],
+                "source_integrity_failure",
+                "Stored structural spans disagree with the primary citation page.",
+            )
+            if len(node_spans) > 1:
+                try:
+                    assembled_source_text = evidence_bytes.decode("utf-8")
+                except UnicodeDecodeError as exc:
+                    raise StandardsForgeError(
+                        "source_integrity_failure",
+                        "Stored assembled structural evidence is not UTF-8.",
+                    ) from exc
+                require(
+                    assembled_source_text == row["text"]
+                    and evidence_relative not in {span["text_path"] for span in node_spans},
+                    "source_integrity_failure",
+                    "Stored multi-span structural evidence sidecar is invalid.",
                 )
 
             relationships = structure.get("relationships")
@@ -1358,6 +1402,43 @@ class StandardsForgeService:
         after_root = Path(after_package["object_path"])
         before_verification = _RequestVerificationContext()
         after_verification = _RequestVerificationContext()
+        exact_ids = set(before_rows) & set(after_rows)
+        unmatched_before = set(before_rows) - exact_ids
+        unmatched_after = set(after_rows) - exact_ids
+        before_by_logical_key: dict[tuple[str, str], list[str]] = {}
+        after_by_logical_key: dict[tuple[str, str], list[str]] = {}
+        for record_id in unmatched_before:
+            row = before_rows[record_id]
+            before_by_logical_key.setdefault((row["kind"], row["clause_reference"]), []).append(record_id)
+        for record_id in unmatched_after:
+            row = after_rows[record_id]
+            after_by_logical_key.setdefault((row["kind"], row["clause_reference"]), []).append(record_id)
+        alignment_candidates: list[dict[str, Any]] = []
+        for kind, clause_reference in sorted(
+            set(before_by_logical_key) & set(after_by_logical_key)
+        ):
+            before_candidates = before_by_logical_key[(kind, clause_reference)]
+            after_candidates = after_by_logical_key[(kind, clause_reference)]
+            if len(before_candidates) == 1 and len(after_candidates) == 1:
+                before_id = before_candidates[0]
+                after_id = after_candidates[0]
+                alignment_candidates.append(
+                    {
+                        "before_record_id": before_id,
+                        "after_record_id": after_id,
+                        "kind": kind,
+                        "clause_reference": clause_reference,
+                        "basis": "unique_kind_clause_reference",
+                        "review_status": "review_required",
+                        "before_text_sha256": hashlib.sha256(
+                            before_rows[before_id]["text"].encode("utf-8")
+                        ).hexdigest(),
+                        "after_text_sha256": hashlib.sha256(
+                            after_rows[after_id]["text"].encode("utf-8")
+                        ).hexdigest(),
+                    }
+                )
+
         changes: list[dict[str, Any]] = []
         status_by_id: dict[str, str] = {}
         comparison_fields = (
@@ -1367,19 +1448,59 @@ class StandardsForgeService:
             "text",
             "statement_role",
             "derivation_json",
-            "structure_json",
         )
+
+        def _structure_without_physical_spans(value: Any) -> Any:
+            if isinstance(value, dict):
+                return {
+                    key: _structure_without_physical_spans(item)
+                    for key, item in value.items()
+                    if key not in {"source_spans", "evidence_spans"}
+                }
+            if isinstance(value, list):
+                return [_structure_without_physical_spans(item) for item in value]
+            return value
+
         for record_id in sorted(set(before_rows) | set(after_rows)):
             before = before_rows.get(record_id)
             after = after_rows.get(record_id)
+            before_source = json.loads(before["source_json"]) if before is not None else None
+            after_source = json.loads(after["source_json"]) if after is not None else None
+            location_fields = ("page", "locator", "text_start_byte", "text_end_byte")
+            source_location_changed = bool(
+                before_source is not None
+                and after_source is not None
+                and tuple(before_source.get(field) for field in location_fields)
+                != tuple(after_source.get(field) for field in location_fields)
+            )
             if before is None:
                 status = "added"
             elif after is None:
                 status = "removed"
-            elif any(before[field] != after[field] for field in comparison_fields):
-                status = "modified"
             else:
-                status = "unchanged"
+                structure_changed = before["structure_json"] != after["structure_json"]
+                structure_meaning_changed = False
+                if structure_changed:
+                    before_structure = (
+                        _structure_without_physical_spans(json.loads(before["structure_json"]))
+                        if before["structure_json"] is not None
+                        else None
+                    )
+                    after_structure = (
+                        _structure_without_physical_spans(json.loads(after["structure_json"]))
+                        if after["structure_json"] is not None
+                        else None
+                    )
+                    structure_meaning_changed = before_structure != after_structure
+                substantive_changed = any(
+                    before[field] != after[field] for field in comparison_fields
+                ) or structure_meaning_changed or (structure_changed and not source_location_changed)
+                if substantive_changed:
+                    status = "modified"
+                elif source_location_changed:
+                    status = "moved"
+                else:
+                    status = "unchanged"
             status_by_id[record_id] = status
             change: dict[str, Any] = {"record_id": record_id, "status": status}
             if before is not None:
@@ -1387,10 +1508,10 @@ class StandardsForgeService:
             if after is not None:
                 change["after_text_sha256"] = hashlib.sha256(after["text"].encode("utf-8")).hexdigest()
             if before is not None and after is not None:
-                change["source_location_changed"] = before["source_json"] != after["source_json"]
-            if status in {"removed", "modified"} and before is not None:
+                change["source_location_changed"] = source_location_changed
+            if status in {"removed", "modified", "moved"} and before is not None:
                 change["before"] = self._record_payload(before, before_root, before_verification)
-            if status in {"added", "modified"} and after is not None:
+            if status in {"added", "modified", "moved"} and after is not None:
                 change["after"] = self._record_payload(after, after_root, after_verification)
             changes.append(change)
 
@@ -1402,26 +1523,123 @@ class StandardsForgeService:
             (row["source_record_id"], row["relationship"], row["target_record_id"], bool(row["required"]))
             for row in self.store.all_dependencies(to_package_digest)
         }
-        impacted: set[str] = set()
-        for source_id, relationship, target_id, required in before_dependencies | after_dependencies:
-            edge = (source_id, relationship, target_id, required)
-            if edge not in before_dependencies or edge not in after_dependencies or status_by_id.get(target_id) != "unchanged":
-                impacted.add(source_id)
+        dependency_impact_paths: list[dict[str, Any]] = []
+        before_required = {edge for edge in before_dependencies if edge[3]}
+        after_required = {edge for edge in after_dependencies if edge[3]}
+        for side, side_edges, other_edges, side_record_ids in (
+            ("before", before_required, after_required, set(before_rows)),
+            ("after", after_required, before_required, set(after_rows)),
+        ):
+            edges_by_source: dict[str, list[tuple[str, str, str, bool]]] = {}
+            for edge in sorted(side_edges):
+                edges_by_source.setdefault(edge[0], []).append(edge)
+            for start_id in sorted(side_record_ids):
+                queue: deque[tuple[str, list[tuple[str, str, str, bool]]]] = deque(
+                    [(start_id, [])]
+                )
+                visited = {start_id}
+                causes_seen: set[tuple[Any, ...]] = set()
+                while queue:
+                    source_id, path = queue.popleft()
+                    for edge in edges_by_source.get(source_id, []):
+                        next_path = [*path, edge]
+                        target_id = edge[2]
+                        if edge not in other_edges:
+                            cause = {
+                                "type": (
+                                    "dependency_edge_removed"
+                                    if side == "before"
+                                    else "dependency_edge_added"
+                                ),
+                                "record_id": target_id,
+                            }
+                        else:
+                            target_status = status_by_id.get(target_id, "unresolved")
+                            changed_on_side = target_status in (
+                                {"removed", "modified", "moved"}
+                                if side == "before"
+                                else {"added", "modified", "moved"}
+                            )
+                            cause = (
+                                {
+                                    "type": "target_record_changed",
+                                    "record_id": target_id,
+                                    "status": target_status,
+                                }
+                                if changed_on_side
+                                else None
+                            )
+                        if cause is not None:
+                            cause_key = (
+                                (side, cause["type"], *edge)
+                                if cause["type"]
+                                in {"dependency_edge_added", "dependency_edge_removed"}
+                                else (side, cause["type"], cause["record_id"])
+                            )
+                            if cause_key not in causes_seen:
+                                causes_seen.add(cause_key)
+                                dependency_impact_paths.append(
+                                    {
+                                        "side": side,
+                                        "record_id": start_id,
+                                        "path": [
+                                            {
+                                                "source_record_id": path_edge[0],
+                                                "relationship": path_edge[1],
+                                                "target_record_id": path_edge[2],
+                                                "required": path_edge[3],
+                                            }
+                                            for path_edge in next_path
+                                        ],
+                                        "cause": cause,
+                                    }
+                                )
+                            continue
+                        if target_id not in visited:
+                            visited.add(target_id)
+                            queue.append((target_id, next_path))
 
-        counts = {status: sum(1 for change in changes if change["status"] == status) for status in ("added", "removed", "modified", "unchanged")}
+        dependency_impact_paths.sort(
+            key=lambda item: (
+                item["record_id"],
+                item["side"],
+                len(item["path"]),
+                item["cause"]["type"],
+                item["cause"]["record_id"],
+            )
+        )
+
+        impacted = {item["record_id"] for item in dependency_impact_paths}
+        counts = {
+            status: sum(1 for change in changes if change["status"] == status)
+            for status in ("added", "removed", "modified", "moved", "unchanged")
+        }
         packet: dict[str, Any] = {
-            "schema_version": "0.1.0",
+            "schema_version": "0.2.0",
             "operation": "diff_editions",
-            "alignment_mode": "exact_record_id_only",
+            "alignment_mode": "exact_record_id_only_with_non_authoritative_candidates_v1",
             "from_package": self._package_payload(before_package),
             "to_package": self._package_payload(after_package),
             "changes": changes,
+            "alignment_candidates": alignment_candidates,
             "change_counts": counts,
             "dependency_context_impacts": sorted(impacted),
-            "dependency_edges_added": [list(edge) for edge in sorted(after_dependencies - before_dependencies)],
-            "dependency_edges_removed": [list(edge) for edge in sorted(before_dependencies - after_dependencies)],
+            "dependency_impact_paths": dependency_impact_paths,
+            "dependency_edges_added": [
+                list(edge)
+                for edge in sorted(
+                    after_dependencies - before_dependencies
+                )
+            ],
+            "dependency_edges_removed": [
+                list(edge)
+                for edge in sorted(
+                    before_dependencies - after_dependencies
+                )
+            ],
             "limitations": [
-                "The comparison does not infer record moves or equivalence from text similarity.",
+                "Unique kind and clause-reference matches are review-required candidates only and do not alter authoritative exact-record changes or dependency impacts.",
+                "Reviewed cross-edition alignment, split, merge, and fuzzy equivalence remain unresolved.",
                 "Changes and dependency impacts are review evidence, not project baseline updates.",
             ],
         }
@@ -1437,9 +1655,17 @@ class StandardsForgeService:
         limit: int = 20,
         package_digest: str | None = None,
         scope_prefix: str | None = None,
+        query_mode: str = "all_terms",
     ) -> dict[str, Any]:
         require(type(limit) is int and 1 <= limit <= 100, "invalid_limit", "Search limit must be from 1 to 100.")
         require(isinstance(query, str), "invalid_query", "Search query must be text.")
+        require(
+            isinstance(query_mode, str)
+            and query_mode in {"exact_phrase", "all_terms", "any_terms"},
+            "invalid_query_mode",
+            "Search query mode must be exact_phrase, all_terms, or any_terms.",
+            query_mode=query_mode,
+        )
         requested_package_digest = package_digest
         requested_scope_prefix = scope_prefix
         if requested_package_digest is not None:
@@ -1457,13 +1683,25 @@ class StandardsForgeService:
             max_terms=32,
             actual_terms=len(tokens),
         )
-        fts_query = " AND ".join('"' + token.replace('"', '""') + '"' for token in tokens)
+        quoted_tokens = ['"' + token.replace('"', '""') + '"' for token in tokens]
+        if query_mode == "exact_phrase":
+            fts_query = '"' + " ".join(token.replace('"', '""') for token in tokens) + '"'
+        elif query_mode == "all_terms":
+            fts_query = " AND ".join(quoted_tokens)
+        else:
+            fts_query = " OR ".join(quoted_tokens)
+        query_interpretation = {
+            "mode": query_mode,
+            "normalized_query": " ".join(tokens),
+            "parsed_terms": tokens,
+        }
         for _ in range(2):
             state = self.store.cache_state(principal_id)
             cache_key = self._search_cache.key(
                 {
                     "principal_sha256": hashlib.sha256(principal_id.encode("utf-8")).hexdigest(),
                     "fts_query": fts_query,
+                    "query_mode": query_mode,
                     "limit": limit,
                     "package_digest": requested_package_digest,
                     "scope_prefix": scope_prefix,
@@ -1477,6 +1715,7 @@ class StandardsForgeService:
                     if requested_package_digest is not None:
                         self.store.authorized_package(principal_id, requested_package_digest)
                     cached["query"] = query
+                    cached["query_interpretation"] = query_interpretation
                     cached["filters"] = {
                         "package_digest": requested_package_digest,
                         "scope_prefix": requested_scope_prefix,
@@ -1529,6 +1768,7 @@ class StandardsForgeService:
                 "operation": "search",
                 "retrieval_mode": "lexical_fts5",
                 "query": query,
+                "query_interpretation": query_interpretation,
                 "snippet_markers": {"start": "⟦", "end": "⟧"},
                 "filters": {
                     "package_digest": requested_package_digest,

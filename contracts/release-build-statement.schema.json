@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/release-build-statement.schema.json",
+  "title": "StandardsForge unsigned in-toto Statement v1 and SLSA provenance v1 profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_type", "subject", "predicateType", "predicate"],
+  "$defs": {
+    "digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256"],
+      "properties": {"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+    },
+    "descriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "digest"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1, "pattern": "^[^\\\\:]+$"},
+        "uri": {"type": "string", "minLength": 1},
+        "mediaType": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  },
+  "properties": {
+    "_type": {"const": "https://in-toto.io/Statement/v1"},
+    "subject": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"$ref": "#/$defs/descriptor"}},
+    "predicateType": {"const": "https://slsa.dev/provenance/v1"},
+    "predicate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["buildDefinition", "runDetails", "standardsforgeAuthentication", "standardsforgeSourceControl"],
+      "properties": {
+        "buildDefinition": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["buildType", "externalParameters", "internalParameters", "resolvedDependencies"],
+          "properties": {
+            "buildType": {"enum": ["https://standardsforge.dev/buildtypes/wheel/v1", "https://standardsforge.dev/buildtypes/starter/v1"]},
+            "externalParameters": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["profile", "version", "sourceDateEpoch", "cleanBuildCount"],
+              "properties": {
+                "profile": {"enum": ["core-wheel", "synthetic-starter"]},
+                "version": {"type": "string", "minLength": 1},
+                "sourceDateEpoch": {"const": 1767225600},
+                "cleanBuildCount": {"const": 2}
+              }
+            },
+            "internalParameters": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["networkDependencyResolution", "sourceTreeMode", "pythonHashSeed"],
+              "properties": {
+                "networkDependencyResolution": {"const": false},
+                "sourceTreeMode": {"const": "inventoried-copy"},
+                "pythonHashSeed": {"const": "0"}
+              }
+            },
+            "resolvedDependencies": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/descriptor"}}
+          }
+        },
+        "runDetails": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["builder", "metadata", "byproducts"],
+          "properties": {
+            "builder": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "version"],
+              "properties": {
+                "id": {"const": "https://standardsforge.dev/builders/self-reported-local/v1"},
+                "version": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["python", "pip", "setuptools"],
+                  "properties": {
+                    "python": {"type": "string", "minLength": 1},
+                    "pip": {"type": "string", "minLength": 1},
+                    "setuptools": {"const": "84.0.0"}
+                  }
+                }
+              }
+            },
+            "metadata": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["invocationId"],
+              "properties": {"invocationId": {"type": "string", "pattern": "^urn:sha256:[0-9a-f]{64}$"}}
+            },
+            "byproducts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/descriptor"}}
+          }
+        },
+        "standardsforgeAuthentication": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "signed", "identityVerified", "claim"],
+          "properties": {
+            "mode": {"const": "none"},
+            "signed": {"const": false},
+            "identityVerified": {"const": false},
+            "claim": {"const": "offline_digest_consistency_only"}
+          }
+        },
+        "standardsforgeSourceControl": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "worktreeState", "binding"],
+          "properties": {
+            "kind": {"enum": ["git", "unavailable"]},
+            "repositoryUri": {"type": "string", "pattern": "^https://[^@/]+/[^/]+/[^/]+$"},
+            "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "ref": {"type": "string", "pattern": "^refs/heads/[A-Za-z0-9._/-]+$"},
+            "worktreeState": {"enum": ["clean", "dirty", "unavailable"]},
+            "binding": {"enum": ["exact_commit", "context_only", "inventory_only"]}
+          }
+        }
+      }
+    }
+  }
+}

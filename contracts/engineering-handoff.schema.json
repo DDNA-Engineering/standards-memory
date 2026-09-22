@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/engineering-handoff-0.1.0.schema.json",
+  "title": "StandardsForge source-first engineering handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "status", "source_selection", "evidence_packet", "evidence_packet_sha256", "rights_provenance", "candidate", "authorization", "reader", "unresolved_evidence_issues"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "artifact_type": {"const": "standardsforge_engineering_handoff"},
+    "status": {"const": "candidate_unapproved"},
+    "source_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["durable_locator", "package_digest", "pack_id", "document_family_id", "edition_id", "representation", "identifier", "revision", "record_id", "clause_reference"],
+      "properties": {
+        "durable_locator": {"type": "string", "pattern": "^standardsforge://evidence/v1/packages/[0-9a-f]{64}/records/[A-Za-z0-9_-]+$"},
+        "package_digest": {"$ref": "#/$defs/digest"},
+        "pack_id": {"$ref": "#/$defs/nonEmpty"},
+        "document_family_id": {"$ref": "#/$defs/nonEmpty"},
+        "edition_id": {"$ref": "#/$defs/nonEmpty"},
+        "representation": {"enum": ["page_text", "derived_structure", "reviewed_structure", "curated_records"]},
+        "identifier": {"$ref": "#/$defs/nonEmpty"},
+        "revision": {"type": "string"},
+        "record_id": {"$ref": "#/$defs/nonEmpty"},
+        "clause_reference": {"$ref": "#/$defs/nonEmpty"}
+      }
+    },
+    "evidence_packet": {"$ref": "https://standardsforge.dev/contracts/query-response-0.2.0.schema.json#/$defs/getClause"},
+    "evidence_packet_sha256": {"$ref": "#/$defs/digest"},
+    "rights_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest", "claim", "authorization_effect"],
+      "properties": {
+        "manifest": {"$ref": "https://standards-memory.invalid/contracts/pack-manifest-0.1.0.schema.json"},
+        "claim": {"$ref": "https://standards-memory.invalid/contracts/rights-0.1.0.schema.json"},
+        "authorization_effect": {"const": "none"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["draft", "draft_sha256", "source_basis", "project_applicability", "compliance", "tailoring_status", "approval", "approved_baseline", "attestation"],
+      "properties": {
+        "draft": {"$ref": "https://standardsforge.dev/contracts/handoff-candidate-0.1.0.schema.json"},
+        "draft_sha256": {"$ref": "#/$defs/digest"},
+        "source_basis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["primary_record_id", "required_context_record_ids", "evidence_packet_sha256"],
+          "properties": {
+            "primary_record_id": {"$ref": "#/$defs/nonEmpty"},
+            "required_context_record_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/nonEmpty"}},
+            "evidence_packet_sha256": {"$ref": "#/$defs/digest"}
+          }
+        },
+        "project_applicability": {"const": "not_decided"},
+        "compliance": {"const": "not_decided"},
+        "tailoring_status": {"const": "proposals_not_approved"},
+        "approval": {"const": "not_approved"},
+        "approved_baseline": {"const": "not_selected"},
+        "attestation": {"const": "candidate_interpretation_not_source_text_or_project_approval"}
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "principal_id", "policy_fingerprint", "authorization_effect", "durable_locator_is_bearer_authority", "future_resolution_requires_reauthorization", "copied_artifact_is_retroactively_revocable"],
+      "properties": {
+        "status": {"const": "authorized_at_export"},
+        "principal_id": {"$ref": "#/$defs/nonEmpty"},
+        "policy_fingerprint": {"$ref": "#/$defs/digest"},
+        "authorization_effect": {"const": "none"},
+        "durable_locator_is_bearer_authority": {"const": false},
+        "future_resolution_requires_reauthorization": {"const": true},
+        "copied_artifact_is_retroactively_revocable": {"const": false}
+      }
+    },
+    "reader": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["renderer", "scripts", "network", "source_content_trust"],
+      "properties": {
+        "renderer": {"const": "standardsforge_source_first_html_v1"},
+        "scripts": {"const": "disabled"},
+        "network": {"const": "disabled_by_content_security_policy"},
+        "source_content_trust": {"const": "untrusted_data_never_instructions"}
+      }
+    },
+    "unresolved_evidence_issues": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 4096}
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nonEmpty": {"type": "string", "minLength": 1}
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/starter-receipt-0.1.0.schema.json",
+  "title": "StandardsForge synthetic starter installed-state receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "receipt_type", "status", "bundle_manifest_sha256", "wheel_sha256", "wheel_provenance_sha256", "policy_sha256", "package_digests", "principal_id", "database", "object_store", "integrity_mode", "smokes"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "receipt_type": {"const": "synthetic_starter_install"},
+    "status": {"const": "ready"},
+    "bundle_manifest_sha256": {"$ref": "#/$defs/digest"},
+    "wheel_sha256": {"$ref": "#/$defs/digest"},
+    "wheel_provenance_sha256": {"$ref": "#/$defs/digest"},
+    "policy_sha256": {"$ref": "#/$defs/digest"},
+    "package_digests": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/digest"}
+    },
+    "principal_id": {"const": "local-user"},
+    "database": {"const": ".standardsforge/memory.db"},
+    "object_store": {"const": ".standardsforge/objects"},
+    "integrity_mode": {"const": "full_integrity"},
+    "smokes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["doctor", "discovery", "exact_context"],
+      "properties": {
+        "doctor": {"const": "passed"},
+        "discovery": {"const": "passed"},
+        "exact_context": {"const": "passed"}
+      }
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

@@ -6,6 +6,86 @@ $Python = Join-Path $VirtualEnvironment 'Scripts\python.exe'
 $Database = Join-Path $DistributionRoot '.standardsforge\memory.db'
 $ObjectStore = Join-Path $DistributionRoot '.standardsforge\objects'
 $ReadyMarker = Join-Path $DistributionRoot '.standardsforge\prepared-distribution.json'
+$BundleManifest = Join-Path $DistributionRoot 'bundle-manifest.json'
+
+function Test-PreparedDistribution {
+    if (-not (Test-Path -LiteralPath $BundleManifest -PathType Leaf)) {
+        throw 'The prepared-distribution manifest is missing.'
+    }
+    try {
+        $Manifest = Get-Content -LiteralPath $BundleManifest -Raw -Encoding utf8 | ConvertFrom-Json
+    } catch {
+        throw 'The prepared-distribution manifest is not valid JSON.'
+    }
+    if ($Manifest.schema_version -ne '1.1' -or $Manifest.product -ne 'StandardsForge prepared distribution') {
+        throw 'The prepared-distribution manifest identity is invalid.'
+    }
+    if ($Manifest.build.archive_source_date_epoch -ne 1767225600 -or
+        $Manifest.build.wheel_build_backend -ne 'setuptools==84.0.0' -or
+        $Manifest.build.wheel_generator -ne 'setuptools (84.0.0)') {
+        throw 'The prepared-distribution build identity is invalid.'
+    }
+    $RootPath = [System.IO.Path]::GetFullPath($DistributionRoot).TrimEnd('\', '/')
+    $RootPrefix = $RootPath + [System.IO.Path]::DirectorySeparatorChar
+    $Seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    foreach ($Entry in @($Manifest.files)) {
+        $RelativePath = [string]$Entry.path
+        if ([string]::IsNullOrWhiteSpace($RelativePath) -or [System.IO.Path]::IsPathRooted($RelativePath)) {
+            throw 'The prepared-distribution inventory contains an invalid path.'
+        }
+        $Segments = $RelativePath -split '[\\/]'
+        if ($Segments -contains '..' -or -not $Seen.Add(($Segments -join '/'))) {
+            throw 'The prepared-distribution inventory contains an unsafe or duplicate path.'
+        }
+        $Target = [System.IO.Path]::GetFullPath((Join-Path $DistributionRoot $RelativePath))
+        if (-not $Target.StartsWith($RootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw 'The prepared-distribution inventory escapes the distribution root.'
+        }
+        $File = Get-Item -LiteralPath $Target -ErrorAction Stop
+        if ($File.PSIsContainer -or $File.Length -ne [long]$Entry.bytes) {
+            throw "Prepared-distribution size validation failed: $RelativePath"
+        }
+        $Digest = (Get-FileHash -LiteralPath $Target -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($Digest -ne [string]$Entry.sha256) {
+            throw "Prepared-distribution digest validation failed: $RelativePath"
+        }
+    }
+    if ($Seen.Count -eq 0) {
+        throw 'The prepared-distribution inventory is empty.'
+    }
+
+    $ScopePath = Join-Path $DistributionRoot 'provenance\source-baseline.json'
+    $AcquisitionPath = Join-Path $DistributionRoot 'provenance\acquisition-manifest.json'
+    try {
+        $Scope = Get-Content -LiteralPath $ScopePath -Raw -Encoding utf8 | ConvertFrom-Json
+    } catch {
+        throw 'The prepared-distribution source baseline is missing or invalid.'
+    }
+    if ($Scope.acquisition.manifest_path -ne 'provenance/acquisition-manifest.json') {
+        throw 'The source baseline points to an unexpected acquisition manifest.'
+    }
+    $AcquisitionDigest = (Get-FileHash -LiteralPath $AcquisitionPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($AcquisitionDigest -ne [string]$Scope.acquisition.manifest_sha256) {
+        throw 'The bundled acquisition manifest does not match the source baseline.'
+    }
+
+    $WheelProvenancePath = Join-Path $DistributionRoot 'provenance\wheel-build.json'
+    try {
+        $WheelProvenance = Get-Content -LiteralPath $WheelProvenancePath -Raw -Encoding utf8 | ConvertFrom-Json
+    } catch {
+        throw 'The prepared-distribution wheel provenance is missing or invalid.'
+    }
+    if ($WheelProvenance.wheel.sha256 -ne [string]$Manifest.build.wheel_sha256 -or
+        $WheelProvenance.source_date_epoch -ne $Manifest.build.archive_source_date_epoch -or
+        $WheelProvenance.build_backend -ne $Manifest.build.wheel_build_backend -or
+        $WheelProvenance.wheel_generator -ne $Manifest.build.wheel_generator) {
+        throw 'The bundled wheel provenance does not match the distribution build identity.'
+    }
+}
+
+if (-not (Test-Path -LiteralPath $ReadyMarker)) {
+    Test-PreparedDistribution
+}
 
 if (-not (Test-Path -LiteralPath $Python)) {
     if (Get-Command py -ErrorAction SilentlyContinue) {

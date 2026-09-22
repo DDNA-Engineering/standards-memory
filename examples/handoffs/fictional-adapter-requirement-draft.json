@@ -1,0 +1,25 @@
+{
+  "schema_version": "0.1.0",
+  "kind": "requirement_candidate",
+  "text": "The vehicle adapter retention design should be evaluated against the cited axial-load source evidence and its governing conditioning note.",
+  "author": {
+    "id": "fixture-engineer",
+    "type": "human"
+  },
+  "authored_at": "2026-09-22T12:00:00Z",
+  "method": "fictional fixture handoff drafting",
+  "tool": null,
+  "assumptions": [
+    {
+      "id": "assumption-1",
+      "text": "The fictional adapter assembly is the item under evaluation."
+    }
+  ],
+  "unresolved_questions": [
+    {
+      "id": "question-1",
+      "text": "The project authority has not decided whether this fictional source applies."
+    }
+  ],
+  "tailoring_proposals": []
+}

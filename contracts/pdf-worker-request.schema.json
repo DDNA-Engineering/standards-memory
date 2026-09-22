@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/pdf-worker-request.schema.json",
+  "title": "StandardsForge private PDF worker request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "limit_policy", "source", "parser", "limits"],
+  "properties": {
+    "protocol": {"const": "pdf-extraction-worker/0.1.0"},
+    "limit_policy": {"const": "pdf-limits/0.1.0"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "bytes", "expected_pages"],
+      "properties": {
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1, "maximum": 268435456},
+        "expected_pages": {"type": "integer", "minimum": 1, "maximum": 5000}
+      }
+    },
+    "parser": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pypdf", "fonttools", "strict", "extraction_mode", "encryption_policy", "normalization"],
+      "properties": {
+        "pypdf": {"const": "6.19.0"},
+        "fonttools": {"const": "4.65.0"},
+        "strict": {"const": true},
+        "extraction_mode": {"enum": ["layout_rotated_included", "simple"]},
+        "encryption_policy": {"enum": ["reject", "empty_password_only"]},
+        "normalization": {"const": "unicode_nfc_lf_trim_outer_blank_lines_rstrip_lines"}
+      }
+    },
+    "limits": {"$ref": "extraction-report.schema.json#/properties/compiler/properties/limits"}
+  }
+}

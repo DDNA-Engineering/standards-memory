@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/benchmark-suite-0.1.0.schema.json",
+  "title": "StandardsForge benchmark suite",
+  "description": "Content-bound synthetic benchmark cases with explicit qualification scope and review provenance. reviewed_content_sha256 is SHA-256 over canonical UTF-8 JSON of suite (sorted keys, no insignificant whitespace, non-ASCII preserved, non-finite numbers forbidden).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "suite", "review"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "suite": {"$ref": "#/$defs/suite"},
+    "review": {"$ref": "#/$defs/review"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "suite": {
+            "properties": {"qualification_class": {"const": "synthetic_contract_qualification"}},
+            "required": ["qualification_class"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "suite": {
+            "properties": {
+              "claim_boundary": {"const": "qualifies_benchmark_harness_and_synthetic_contract_behavior_only"}
+            }
+          },
+          "review": {
+            "properties": {
+              "status": {"const": "synthetic_fixture_reviewed"},
+              "reviewer": {
+                "properties": {"type": {"const": "synthetic_author"}},
+                "required": ["type"]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nonEmpty": {"type": "string", "minLength": 1},
+    "sourceBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["binding_id", "pack_path", "package_digest", "pack_id", "edition_id", "representation", "content_class"],
+      "properties": {
+        "binding_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+        "pack_path": {"type": "string", "pattern": "^(?!/)(?!\\.)(?!.*//)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\/$)[A-Za-z0-9._/-]+$"},
+        "package_digest": {"$ref": "#/$defs/digest"},
+        "pack_id": {"$ref": "#/$defs/nonEmpty"},
+        "edition_id": {"$ref": "#/$defs/nonEmpty"},
+        "representation": {"enum": ["page_text", "derived_structure", "reviewed_structure", "curated_records"]},
+        "content_class": {"$ref": "#/$defs/nonEmpty"}
+      }
+    },
+    "criticalFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id", "exact_text"],
+      "properties": {
+        "record_id": {"$ref": "#/$defs/nonEmpty"},
+        "exact_text": {"$ref": "#/$defs/nonEmpty"}
+      }
+    },
+    "jsonExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pointer", "value"],
+      "properties": {
+        "pointer": {"type": "string", "pattern": "^(?:/(?:[^~/]|~[01])*)+$"},
+        "value": true
+      }
+    },
+    "resolveRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier", "edition_id", "representation"],
+      "properties": {
+        "identifier": {"$ref": "#/$defs/nonEmpty"},
+        "edition_id": {"$ref": "#/$defs/nonEmpty"},
+        "representation": {"enum": ["page_text", "derived_structure", "reviewed_structure", "curated_records"]}
+      }
+    },
+    "searchRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["query", "query_mode", "limit", "package_binding"],
+      "properties": {
+        "query": {"$ref": "#/$defs/nonEmpty"},
+        "query_mode": {"enum": ["exact_phrase", "all_terms", "any_terms"]},
+        "limit": {"type": "integer", "minimum": 1, "maximum": 100},
+        "package_binding": {"$ref": "#/$defs/nonEmpty"}
+      }
+    },
+    "getClauseRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_binding", "record_id"],
+      "properties": {
+        "package_binding": {"$ref": "#/$defs/nonEmpty"},
+        "record_id": {"$ref": "#/$defs/nonEmpty"}
+      }
+    },
+    "diffRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_binding", "to_binding"],
+      "properties": {
+        "from_binding": {"$ref": "#/$defs/nonEmpty"},
+        "to_binding": {"$ref": "#/$defs/nonEmpty"}
+      }
+    },
+    "expectations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["answerability", "expected_binding", "relevant_record_ids", "required_record_ids", "forbidden_record_ids", "critical_facts", "forbidden_facts", "expected_change_statuses", "expected_result_count", "required_json_values", "forbidden_claims"],
+      "properties": {
+        "answerability": {"enum": ["answerable", "outside_baseline"]},
+        "expected_binding": {"type": ["string", "null"], "minLength": 1},
+        "relevant_record_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/nonEmpty"}},
+        "required_record_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/nonEmpty"}},
+        "forbidden_record_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/nonEmpty"}},
+        "critical_facts": {"type": "array", "items": {"$ref": "#/$defs/criticalFact"}},
+        "forbidden_facts": {"type": "array", "items": {"$ref": "#/$defs/criticalFact"}},
+        "expected_change_statuses": {
+          "type": "object",
+          "additionalProperties": {"enum": ["added", "removed", "modified", "moved", "unchanged"]}
+        },
+        "expected_result_count": {"type": ["integer", "null"], "minimum": 0},
+        "required_json_values": {"type": "array", "items": {"$ref": "#/$defs/jsonExpectation"}},
+        "forbidden_claims": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["wrong_edition", "fabricated_citation", "false_complete", "applicability", "compliance", "approval"]}
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "dimension", "operation", "question", "request", "expectations"],
+      "properties": {
+        "case_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+        "dimension": {"enum": ["discovery", "context", "fidelity", "honesty", "revision"]},
+        "operation": {"enum": ["resolve_document", "search", "get_clause", "diff_editions"]},
+        "question": {"$ref": "#/$defs/nonEmpty"},
+        "request": {"oneOf": [{"$ref": "#/$defs/resolveRequest"}, {"$ref": "#/$defs/searchRequest"}, {"$ref": "#/$defs/getClauseRequest"}, {"$ref": "#/$defs/diffRequest"}]},
+        "expectations": {"$ref": "#/$defs/expectations"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"operation": {"const": "resolve_document"}}},
+          "then": {"properties": {"request": {"$ref": "#/$defs/resolveRequest"}}}
+        },
+        {
+          "if": {"properties": {"operation": {"const": "search"}}},
+          "then": {"properties": {"request": {"$ref": "#/$defs/searchRequest"}}}
+        },
+        {
+          "if": {"properties": {"operation": {"const": "get_clause"}}},
+          "then": {"properties": {"request": {"$ref": "#/$defs/getClauseRequest"}}}
+        },
+        {
+          "if": {"properties": {"operation": {"const": "diff_editions"}}},
+          "then": {"properties": {"request": {"$ref": "#/$defs/diffRequest"}}}
+        }
+      ]
+    },
+    "suite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["suite_id", "suite_version", "qualification_class", "claim_boundary", "principal_id", "source_bindings", "cases", "release_blocking_max", "unmeasured_dimensions", "exclusions"],
+      "properties": {
+        "suite_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+        "suite_version": {"$ref": "#/$defs/nonEmpty"},
+        "qualification_class": {"const": "synthetic_contract_qualification"},
+        "claim_boundary": {"const": "qualifies_benchmark_harness_and_synthetic_contract_behavior_only"},
+        "principal_id": {"$ref": "#/$defs/nonEmpty"},
+        "source_bindings": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/sourceBinding"}},
+        "cases": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/case"}},
+        "release_blocking_max": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["failed_cases", "wrong_edition_results", "citation_mismatches", "lost_critical_facts", "missing_required_context", "false_complete_results"],
+          "properties": {
+            "failed_cases": {"const": 0},
+            "wrong_edition_results": {"const": 0},
+            "citation_mismatches": {"const": 0},
+            "lost_critical_facts": {"const": 0},
+            "missing_required_context": {"const": 0},
+            "false_complete_results": {"const": 0}
+          }
+        },
+        "unmeasured_dimensions": {
+          "type": "array",
+          "uniqueItems": true,
+          "allOf": [
+            {"contains": {"const": "real_document_discovery_accuracy"}},
+            {"contains": {"const": "real_document_semantic_fidelity"}},
+            {"contains": {"const": "tokenizer_normalized_efficiency"}},
+            {"contains": {"const": "peak_process_resources"}},
+            {"contains": {"const": "engineer_time_saved"}}
+          ],
+          "items": {"enum": ["real_document_discovery_accuracy", "real_document_semantic_fidelity", "tokenizer_normalized_efficiency", "peak_process_resources", "engineer_time_saved"]}
+        },
+        "exclusions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/nonEmpty"}}
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewed_content_sha256", "scope", "reviewer", "reviewed_at", "method", "tool", "unresolved_issues", "attestation"],
+      "properties": {
+        "status": {"enum": ["synthetic_fixture_reviewed", "human_verified"]},
+        "reviewed_content_sha256": {"$ref": "#/$defs/digest"},
+        "scope": {"const": "benchmark_suite"},
+        "reviewer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type"],
+          "properties": {
+            "id": {"$ref": "#/$defs/nonEmpty"},
+            "type": {"enum": ["synthetic_author", "human"]}
+          }
+        },
+        "reviewed_at": {"type": "string", "format": "date-time"},
+        "method": {"$ref": "#/$defs/nonEmpty"},
+        "tool": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "version", "configuration_sha256"],
+              "properties": {
+                "name": {"$ref": "#/$defs/nonEmpty"},
+                "version": {"$ref": "#/$defs/nonEmpty"},
+                "configuration_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+              }
+            }
+          ]
+        },
+        "unresolved_issues": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/nonEmpty"}},
+        "attestation": {"const": "benchmark_review_not_project_applicability_or_approval"}
+      }
+    }
+  }
+}

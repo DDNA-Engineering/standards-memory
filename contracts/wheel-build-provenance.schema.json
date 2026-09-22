@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/wheel-build-provenance.schema.json",
+  "title": "StandardsForge wheel build provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project", "version", "source_date_epoch", "build_backend", "wheel_generator", "builder", "source_files", "wheel_source_paths", "release_metadata_paths", "build_tool", "authentication", "wheel"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "project": {"const": "standardsforge"},
+    "version": {"type": "string", "minLength": 1},
+    "source_date_epoch": {"const": 1767225600},
+    "build_backend": {"const": "setuptools==84.0.0"},
+    "wheel_generator": {"const": "setuptools (84.0.0)"},
+    "builder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python", "pip"],
+      "properties": {
+        "python": {"type": "string", "minLength": 1},
+        "pip": {"type": "string", "minLength": 1}
+      }
+    },
+    "source_files": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "bytes", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "bytes": {"type": "integer", "minimum": 0},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "wheel_source_paths": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "release_metadata_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "build_tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lock_path", "lock_sha256", "artifact"],
+      "properties": {
+        "lock_path": {"const": "build-toolchain.lock.json"},
+        "lock_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "artifact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["filename", "bytes", "sha256"],
+          "properties": {
+            "filename": {"const": "setuptools-84.0.0-py3-none-any.whl"},
+            "bytes": {"const": 818216},
+            "sha256": {"const": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670"}
+          }
+        }
+      }
+    },
+    "authentication": {"const": "none"},
+    "wheel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "bytes", "sha256", "clean_build_count"],
+      "properties": {
+        "filename": {"type": "string", "pattern": "^standardsforge-.*\\.whl$"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "clean_build_count": {"const": 2}
+      }
+    }
+  }
+}

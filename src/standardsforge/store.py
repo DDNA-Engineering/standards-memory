@@ -26,16 +26,40 @@ class LocalStore:
     def __init__(self, db_path: str | Path, object_root: str | Path) -> None:
         self.db_path = Path(db_path).resolve()
         self.object_root = Path(object_root).resolve()
+        self.read_only = False
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.object_root.mkdir(parents=True, exist_ok=True)
         self._initialize()
 
+    @classmethod
+    def open_existing(
+        cls,
+        db_path: str | Path,
+        object_root: str | Path,
+        *,
+        read_only: bool = True,
+    ) -> "LocalStore":
+        """Open configured state without creating directories or migrating it."""
+
+        store = cls.__new__(cls)
+        store.db_path = Path(db_path).resolve(strict=False)
+        store.object_root = Path(object_root).resolve(strict=False)
+        store.read_only = read_only
+        return store
+
     def connect(self) -> sqlite3.Connection:
-        connection = sqlite3.connect(self.db_path)
+        if self.read_only:
+            connection = sqlite3.connect(self.db_path.as_uri() + "?mode=ro", uri=True)
+            connection.execute("PRAGMA query_only = ON")
+        else:
+            connection = sqlite3.connect(self.db_path)
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA foreign_keys = ON")
         connection.execute("PRAGMA busy_timeout = 5000")
         return connection
+
+    def _require_writable(self) -> None:
+        require(not self.read_only, "read_only_store", "The local store was opened read-only.")
 
     @contextmanager
     def _connection(self) -> Iterator[sqlite3.Connection]:
@@ -255,6 +279,7 @@ class LocalStore:
                 shutil.rmtree(staging)
 
     def install(self, pack: ValidatedPack, policy: LocalPolicy) -> dict[str, Any]:
+        self._require_writable()
         object_path = self._copy_pack(pack)
         installed_at = datetime.now(UTC).isoformat()
         inventory_json = json.dumps(
@@ -782,6 +807,7 @@ class LocalStore:
             raise StandardsForgeError("search_error", "The lexical query could not be evaluated.") from exc
 
     def revoke(self, principal_id: str, package_digest: str) -> bool:
+        self._require_writable()
         revoked_at = datetime.now(UTC).isoformat()
         with self._connection() as connection:
             cursor = connection.execute(

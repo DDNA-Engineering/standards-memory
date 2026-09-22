@@ -14,18 +14,16 @@ from .acquisition import verify_mil_std_acquisition
 from .compiler import (
     COMPILER_VERSION,
     FONTTOOLS_VERSION,
-    MAX_PAGE_CONTENT_BYTES,
     MAX_PDF_BYTES,
-    MAX_PDF_PAGES,
     PYPDF_VERSION,
-    _load_pypdf,
-    _normalize_page_text,
 )
 from .errors import StandardsForgeError, require
 from .pack import open_validated_pack, validate_pack_directory, write_pack_archive
+from .pdf_isolation import isolated_pdf_pages
+from .pdf_protocol import DEFAULT_LIMITS, LIMIT_POLICY_VERSION, PROTOCOL_VERSION
 
 
-CORPUS_COMPILER_VERSION = "0.3.0"
+CORPUS_COMPILER_VERSION = "0.4.0"
 MAX_ACQUISITION_MANIFEST_BYTES = 16 * 1024 * 1024
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _TOKEN = re.compile(r"^[0-9]+\.[0-9]+$")
@@ -262,11 +260,13 @@ def _expected_report_compiler() -> dict[str, Any]:
         "fonttools_version": FONTTOOLS_VERSION,
         "extraction_mode": "layout",
         "rotated_text": "included",
+        "parser_protocol": PROTOCOL_VERSION,
+        "limit_policy": LIMIT_POLICY_VERSION,
+        "limits": DEFAULT_LIMITS.to_dict(),
     }
 
 
 def _compile_component(
-    pypdf: Any,
     source_root: Path,
     staging: Path,
     component: dict[str, Any],
@@ -276,37 +276,6 @@ def _compile_component(
     require(source_path.stat().st_size == component["byte_length"], "source_size_mismatch", "A corpus source byte count changed.")
     require(component["byte_length"] <= MAX_PDF_BYTES, "compiler_limit_exceeded", "A corpus PDF exceeds the compiler size limit.")
     require(_file_sha256(source_path) == component["sha256"], "source_hash_mismatch", "A corpus source digest changed.")
-    try:
-        reader = pypdf.PdfReader(source_path, strict=True)
-    except Exception as exc:
-        raise StandardsForgeError("invalid_pdf", "A verified corpus source could not be parsed as a strict PDF.", {"path": component["local_path"]}) from exc
-    encryption_status = "not_encrypted"
-    if reader.is_encrypted:
-        try:
-            decrypted = reader.decrypt("")
-        except Exception as exc:
-            raise StandardsForgeError(
-                "encrypted_pdf",
-                "An encrypted corpus PDF could not be opened with its empty public password.",
-                {"path": component["local_path"]},
-            ) from exc
-        require(
-            bool(decrypted),
-            "encrypted_pdf",
-            "An encrypted corpus PDF requires a non-empty password and cannot be compiled.",
-            path=component["local_path"],
-        )
-        encryption_status = "empty_password_decrypted_for_extraction"
-    page_count = len(reader.pages)
-    require(1 <= page_count <= MAX_PDF_PAGES, "compiler_limit_exceeded", "A corpus PDF page count is outside the compiler limit.")
-    require(
-        page_count == component["page_count"],
-        "pdf_page_count_mismatch",
-        "A corpus PDF page count does not match the acquisition manifest.",
-        expected=component["page_count"],
-        actual=page_count,
-    )
-
     token = component["token"]
     component_key = _component_key(component)
     pdf_relative = f"sources/{component_key}.pdf"
@@ -316,85 +285,59 @@ def _compile_component(
     shutil.copyfile(source_path, pdf_target)
     require(_file_sha256(pdf_target) == component["sha256"], "source_hash_mismatch", "A copied corpus source digest changed.")
 
-    extracted_pages: list[dict[str, Any]] = []
-    report_pages: list[dict[str, Any]] = []
-    for page_index, page in enumerate(reader.pages, start=1):
-        try:
-            contents = page.get_contents()
-            content_bytes = 0 if contents is None else len(contents.get_data())
-            require(
-                content_bytes <= MAX_PAGE_CONTENT_BYTES,
-                "compiler_limit_exceeded",
-                "A corpus PDF page content stream exceeds the compiler limit.",
-                page=page_index,
-                bytes=content_bytes,
-            )
-            raw_text = ""
-            if contents is not None:
-                raw_text = page.extract_text(
-                    extraction_mode="layout",
-                    layout_mode_space_vertically=False,
-                    layout_mode_strip_rotated=False,
-                ) or ""
-        except StandardsForgeError:
-            raise
-        except Exception as exc:
+    with isolated_pdf_pages(
+        source_path,
+        source_sha256=component["sha256"],
+        source_bytes=component["byte_length"],
+        expected_pages=component["page_count"],
+        extraction_mode="layout_rotated_included",
+        encryption_policy="empty_password_only",
+    ) as parsed:
+        page_count = parsed.page_count
+        encryption_status = parsed.encryption_status
+        extracted_pages: list[dict[str, Any]] = []
+        report_pages: list[dict[str, Any]] = []
+        for page in parsed.pages:
+            text_hash = page.sha256 if page.text_layer_status == "extracted" else None
             report_pages.append(
                 {
-                    "physical_page": page_index,
-                    "content_stream_bytes": None,
-                    "text_characters": 0,
-                    "text_sha256": None,
-                    "text_layer_status": "extraction_failed",
-                    "extraction_error_code": type(exc).__name__,
+                    "physical_page": page.physical_page,
+                    "content_stream_bytes": page.content_stream_bytes,
+                    "text_characters": page.text_characters,
+                    "text_sha256": text_hash,
+                    "text_layer_status": page.text_layer_status,
                     "visual_fidelity": "not_verified",
                     "tables": "not_interpreted",
                     "figures": "not_interpreted",
                     "ocr": "not_used",
                 }
             )
-            continue
-        text = _normalize_page_text(raw_text)
-        text_hash = hashlib.sha256(text.encode("utf-8")).hexdigest() if text else None
-        report_pages.append(
-            {
-                "physical_page": page_index,
-                "content_stream_bytes": content_bytes,
-                "text_characters": len(text),
-                "text_sha256": text_hash,
-                "text_layer_status": "extracted" if text else "no_text",
-                "visual_fidelity": "not_verified",
-                "tables": "not_interpreted",
-                "figures": "not_interpreted",
-                "ocr": "not_used",
-            }
-        )
-        if text:
-            extracted_pages.append(
-                {
-                    "physical_page": page_index,
-                    "text": text,
-                    "text_sha256": text_hash,
-                    "marker": f"[[PDF_COMPONENT_{component_key}_PAGE_{page_index:04d}]]",
-                }
-            )
+            if page.text_layer_status == "extracted":
+                extracted_pages.append(
+                    {
+                        "physical_page": page.physical_page,
+                        "text_path": page.path,
+                        "text_sha256": page.sha256,
+                        "marker": f"[[PDF_COMPONENT_{component_key}_PAGE_{page.physical_page:04d}]]",
+                    }
+                )
 
-    sidecar_builder = bytearray()
-    for index, extracted in enumerate(extracted_pages):
-        if index:
-            sidecar_builder.extend(b"\n\n")
-        sidecar_builder.extend(extracted["marker"].encode("utf-8"))
-        sidecar_builder.extend(b"\n")
-        extracted["text_start_byte"] = len(sidecar_builder)
-        sidecar_builder.extend(extracted["text"].encode("utf-8"))
-        extracted["text_end_byte"] = len(sidecar_builder)
-        sidecar_builder.extend(
-            f"\n[[END_PDF_COMPONENT_{component_key}_PAGE_{extracted['physical_page']:04d}]]".encode("utf-8")
-        )
-    sidecar_builder.extend(b"\n")
-    sidecar_bytes = bytes(sidecar_builder)
-    staging.joinpath(*PurePosixPath(text_relative).parts).write_bytes(sidecar_bytes)
-    text_sha256 = hashlib.sha256(sidecar_bytes).hexdigest()
+        sidecar_path = staging.joinpath(*PurePosixPath(text_relative).parts)
+        with sidecar_path.open("wb") as sidecar:
+            for index, extracted in enumerate(extracted_pages):
+                if index:
+                    sidecar.write(b"\n\n")
+                sidecar.write(extracted["marker"].encode("utf-8"))
+                sidecar.write(b"\n")
+                extracted["text_start_byte"] = sidecar.tell()
+                with extracted["text_path"].open("rb") as page_text:
+                    shutil.copyfileobj(page_text, sidecar, 1024 * 1024)
+                extracted["text_end_byte"] = sidecar.tell()
+                sidecar.write(
+                    f"\n[[END_PDF_COMPONENT_{component_key}_PAGE_{extracted['physical_page']:04d}]]".encode("utf-8")
+                )
+            sidecar.write(b"\n")
+        text_sha256 = _file_sha256(sidecar_path)
 
     records = []
     for extracted in extracted_pages:
@@ -446,9 +389,8 @@ def _compile_record_pack(record: dict[str, Any], source_root: Path, output_direc
     output.parent.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix=".standardsforge-corpus-compile-", dir=output.parent))
     try:
-        pypdf = _load_pypdf()
         component_results = [
-            _compile_component(pypdf, source_root, staging, component, edition_id) for component in downloaded
+            _compile_component(source_root, staging, component, edition_id) for component in downloaded
         ]
         records = [record_item for component in component_results for record_item in component["records"]]
         require(records, "pdf_text_layer_empty", "The DLA record has no extractable text-layer pages; OCR is not implicit.")

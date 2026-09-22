@@ -21,7 +21,7 @@ It is an offline-first compiler and evidence engine: every result stays tied to 
 
 **Topics:** [defense-engineering](https://github.com/topics/defense-engineering) · [military-standards](https://github.com/topics/military-standards) · [mil-std](https://github.com/topics/mil-std) · [systems-engineering](https://github.com/topics/systems-engineering) · [requirements-engineering](https://github.com/topics/requirements-engineering) · [mcp](https://github.com/topics/mcp) · [offline-first](https://github.com/topics/offline-first)
 
-[Quickstart](#query-the-prebuilt-corpus) · [Commands](#six-ways-to-read) · [Architecture](#under-the-hood) · [Roadmap](#where-this-is-going) · [Contributing](CONTRIBUTING.md)
+[Quickstart](#run-the-portable-synthetic-starter) · [Prepared corpus](#query-the-prebuilt-corpus) · [Commands](#six-ways-to-read) · [Architecture](#under-the-hood) · [Roadmap](#where-this-is-going) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -42,9 +42,27 @@ For example, a technical standard may require a connector to withstand **80 N fo
 
 The engine supplies evidence, not engineering approval. It does not decide whether a standard applies to a specific product, approve a requirement or test plan, or certify compliance. Those decisions stay with the responsible engineering and program authorities; StandardsForge makes their source basis explicit and reviewable.
 
+## Run the portable synthetic starter
+
+The smallest complete product path is a deterministic ZIP containing the dependency-free core wheel, two fictional contract packs, their exact trusted policy, and portable setup and launcher scripts. It is suitable for learning, CI, and integration work without downloading standards or relying on a source checkout at runtime.
+
+Build and exercise it from a checkout on Windows or POSIX with Python 3.11 or newer:
+
+```text
+python -m pip download --disable-pip-version-check --no-deps --only-binary=:all: --dest build/toolchain-cache setuptools==84.0.0
+python scripts/validate_installed_wheel.py --build-tool-dir build/toolchain-cache --output-dir build/starter-wheel
+python scripts/build_starter_distribution.py --wheel-dir build/starter-wheel --output build/standardsforge-starter.zip
+python scripts/validate_starter_distribution.py build/standardsforge-starter.zip
+python -m zipfile -e build/standardsforge-starter.zip build/starter-extracted
+python -I build/starter-extracted/standardsforge-starter-0.1.0a1/setup.py
+python -I build/starter-extracted/standardsforge-starter-0.1.0a1/run.py search "axial load" --query-mode exact_phrase --principal local-user
+```
+
+Setup validates every immutable bundle byte before writing, installs only the included wheel with package indexes and dependency resolution disabled, validates and installs the exact packs, runs full readiness and evidence smokes, then writes a content-bound receipt. A rerun revalidates the bundle, receipt, installed packages, policy, doctor result, and evidence path. The starter proves fictional contract behavior only; it is not evidence of real-document discovery quality, semantic fidelity, applicability, compliance, approval, or a substitute for the prepared public corpus.
+
 ## Query the prebuilt corpus
 
-The prepared StandardsForge release is already compiled for use. It contains the complete public DLA MIL-STD corpus in verified compressed packs, plus a model-ready MIL-STD-810H derived outline. You do **not** need to download hundreds of PDFs or compile standards before searching them.
+The prepared StandardsForge release is already compiled for use. It contains the recorded active MIL-STD baseline's selected current Distribution Statement A components in verified compressed packs, plus an automated, unreviewed MIL-STD-810H derived outline. It does not include other DLA document classes, historical editions, restricted bytes, or document-wide reviewed semantic interpretation. The bundled machine-readable source baseline records the acquisition snapshot, selection rules, exclusions, failures, extraction gaps, and review coverage. You do **not** need to download hundreds of PDFs or compile standards before searching the included baseline.
 
 The current prepared baseline contains:
 
@@ -59,6 +77,11 @@ Download and extract [standardsforge-ready-0.1.0a1.zip](https://github.com/DDNA-
 # Create the isolated local environment and index the included compiled packs.
 .\setup.ps1
 
+# Confirm the installed state, policy, every package, and exact evidence query path.
+.\standardsforge.ps1 doctor --policy policies\mil-std-corpus-local.json `
+  --principal local-user `
+  --full-integrity
+
 # Search the installed MIL-STD corpus.
 .\standardsforge.ps1 search "environmental testing" --principal local-user --limit 5
 
@@ -70,7 +93,7 @@ $pin = $resolved.result.package_digest
 .\standardsforge.ps1 search "low pressure" --package-digest $pin --principal local-user --limit 5
 ```
 
-The one-time setup installs only the bundled wheel and precompiled packs; it does not fetch standards or call a model. Commands return source-linked JSON with package identity, exact citations, coverage, and interpretation limits. Local state stays inside the extracted distribution.
+The one-time setup installs only the bundled wheel and precompiled packs; it does not fetch standards or call a model. `doctor` opens that state read-only, validates every installed package in this example, reconciles the selected policy scope, and executes one exact source-verifying query through the real read path. It exits `0` only when ready and `3` after a completed `not_ready` report; typed command failures remain exit `2` and unexpected internal failures remain exit `1`. Commands return source-linked JSON with package identity, exact citations, coverage, and interpretation limits. Local state stays inside the extracted distribution.
 
 The source repository also supports an optional MCP adapter for local model hosts:
 
@@ -89,6 +112,7 @@ The host owns the MCP process, so the final command intentionally stays running 
 ```powershell
 python -m standardsforge verify-pack examples/packs/fictional-adapter-v1
 python -m standardsforge install examples/packs/fictional-adapter-v1 --policy examples/policies/local-synthetic.json
+python -m standardsforge doctor --policy examples/policies/local-synthetic.json --principal local-user --full-integrity
 $example = python -m standardsforge resolve EXAMPLE-SPEC-100 --edition example:spec-100:2025-a --representation curated_records --principal local-user | ConvertFrom-Json
 python -m standardsforge get-clause $example.result.package_digest 4.2.1 --principal local-user
 ```
@@ -166,7 +190,7 @@ Corpus compilation is restartable and matches the complete ordered composition p
 
 The compiler preserves the original PDF, creates a separately hashed text sidecar, emits a page record for each extractable physical page, and writes a page-level extraction report. It does not silently run OCR, infer clause boundaries, interpret tables or figures, or classify obligations. Every page record remains `unclassified` and `unreviewed` until later compiler stages add evidence-backed structure and review.
 
-`compile-structure` accepts a separate, edition-bound reviewed-annotation document. It emits stable logical node identities and typed relationships whose node and relationship claims are bound to exact physical-page UTF-8 spans. The shipped acceptance slice covers MIL-STD-810H Method 500.6 section 2.2.2 only and remains explicitly incomplete outside that reviewed scope.
+`compile-structure` accepts a separate, edition-bound reviewed-annotation document. It emits stable logical node identities and typed relationships whose node and relationship claims are bound to one or more ordered exact physical-page UTF-8 spans. Version 0.2 annotations may also carry reviewed, exact-span semantic fields for subject, action, modality, conditions, exceptions, raw quantities, definitions, governing notes, and table context. Each such record exposes its content-bound review event, leaves project applicability undecided, and retrieves declared required context transitively. The real shipped acceptance slice covers MIL-STD-810H Method 500.6 section 2.2.2 as reviewed structure only; the reviewed semantic packet is synthetic acceptance evidence, not document-wide or shipped-corpus semantic coverage.
 
 To create navigable, explicitly unreviewed structure from any verified page-text pack or archive, run:
 
@@ -243,9 +267,20 @@ $Mcp = Join-Path $PWD '.venv\Scripts\standardsforge-mcp.exe'
 | `get-clause` | Retrieve a uniquely referenced clause, note, or compiled page and its required dependency context. |
 | `build-context` | Assemble multiple clauses without duplicating shared evidence. |
 | `enumerate-obligations` | Traverse every explicitly classified obligation in a selected scope, with pagination. |
-| `diff-editions` | Compare records by exact identity and surface changes in their dependency context. |
+| `diff-editions` | Compare records by exact identity, report review-required alignment candidates separately, and surface side-qualified transitive required-dependency impacts. |
 
 Pack validation (`verify-pack`) and administration (`install`, `revoke`) are separate from those six read operations. Source-set verification is also administrative; it does not install, parse, or authorize a document.
+
+`export-handoff` is also administrative: it writes a portable source-first reader and neutral engineering-handoff artifact without expanding the six query operations or MCP surface. The caller supplies a closed candidate draft; StandardsForge retrieves the exact package-pinned record and required context, keeps the candidate separate from source evidence, and fixes applicability, compliance, tailoring, baseline selection, and approval as host-owned undecided states.
+
+Lexical search has three explicit modes. `all_terms` is the compatibility default and requires every parsed lexical chunk; `exact_phrase` requires the chunks in adjacent order; `any_terms` accepts at least one compiled chunk. Search punctuation and familiar operators never select a mode implicitly—quotes, `OR`, wildcards, and parentheses are parsed as ordinary input rather than raw FTS syntax. Every response returns the selected mode, normalized query, and parsed chunks.
+
+```powershell
+standardsforge search 'steady axial load' --principal local-user --query-mode exact_phrase
+standardsforge search 'axial ingress' --principal local-user --query-mode any_terms
+```
+
+Dots, slashes, and hyphens stay inside one reported lexical chunk so identifiers remain visible as entered; SQLite may internally tokenize such a chunk for matching. Search is still ranked candidate discovery, not exhaustive evidence retrieval or applicability.
 
 ## Connect a local MCP host
 
@@ -277,6 +312,29 @@ During MCP initialization the server gives the host a MIL-STD reading workflow, 
 - **The distinction between evidence and judgment.** Source text, derived classifications, automated checks, and human approval remain separate. Retrieved evidence does not decide applicability or certify compliance.
 
 Exhaustive traversal follows the obligations explicitly classified in the installed pack. Its coverage depends on that pack's records and declared scope; a search result is not a completeness claim.
+
+Edition comparison keeps exact record IDs authoritative. A unique unmatched `(kind, clause_reference)` pair is only a content-hashed, review-required candidate and cannot change statuses, dependency deltas, or impact paths. Required dependencies are traversed separately for the before and after packages; each reported path states its side, so no path can be assembled from edges that never coexisted. Source-only relocations are reported as `moved`. Reviewed cross-edition mappings, split/merge alignment, fuzzy equivalence, and semantic change classification are not inferred.
+
+## Inspect and hand off one evidence-backed candidate
+
+After installing the fictional pack, create a deterministic source-first reader and handoff directory:
+
+```powershell
+$resolved = standardsforge resolve EXAMPLE-SPEC-100 `
+  --edition example:spec-100:2025-a `
+  --representation curated_records `
+  --principal local-user | ConvertFrom-Json
+
+standardsforge export-handoff $resolved.result.package_digest `
+  --record-id clause-4.2.1 `
+  --principal local-user `
+  --candidate examples/handoffs/fictional-adapter-requirement-draft.json `
+  --output build/fictional-adapter-handoff
+```
+
+Open `build/fictional-adapter-handoff/reader.html` in a browser. It places the selected exact source language before its required governing context, citations and spans, relationships, derivation/review status, coverage, limitations, rights provenance, and the caller-authored candidate. The static file has a restrictive content-security policy, no script or form, no network or model dependency, and HTML-escapes source-controlled content. Its durable locator is a local package-and-record identity, not a bearer capability; resolving it later still requires the installed package and current authorization.
+
+The directory is closed by `manifest.json`; `evidence-handoff.json` retains the complete detailed query packet and its digest. The draft shape is defined by [the candidate contract](contracts/handoff-candidate.schema.json). A handoff is not a requirement, test plan, applicability decision, compliance result, tailoring approval, approved baseline, or engineering approval.
 
 ## Under the hood
 
@@ -311,6 +369,7 @@ The core is a small Python library backed by SQLite and FTS5. Packs contain data
 | `outline_compiler` | Derive exact-span unreviewed navigation candidates and explicit unsupported regions from page records. |
 | `structure_compiler` | Compile reviewed structural annotations into stable, source-spanned nodes and relationships. |
 | `query_cache` | Keep bounded versioned closure/search projections without caching authorization or source verification. |
+| `handoff` | Bind one authorized detailed evidence packet to a separate caller-authored candidate and deterministic no-script reader. |
 
 Start with [the architecture](docs/ARCHITECTURE.md) or browse [the source](src/standardsforge/).
 
@@ -328,6 +387,15 @@ The larger goal is a **standards compiler and evidence engine**: turn authorized
 | M2 · Compilation | Raw-PDF preservation, page text, automated outlines, and reviewed source-spanned structure | Implemented; document-wide review remains incomplete |
 | M3 · Identification and reading | Honest coverage, concise evidence, batched retrieval, caches, and source-linked scoped search | Implemented; derived nodes remain unreviewed candidates |
 | M4 · Model access and onboarding | Principal-bound stdio MCP, model-facing MIL-STD guidance, and copy-paste local setup | Implemented; additional host adapters remain optional |
+| M4.5 · Source-first handoff | Deterministic no-script reader for one pinned record, required context, and a separate caller-authored candidate | Implemented and locally qualified; corpus-wide interactive reading remains planned |
+
+The same boundary is clearer when grouped by current product maturity:
+
+| Status | Capabilities |
+| --- | --- |
+| Implemented and locally qualified | Closed data-only packs; trusted-policy authorization; six offline read operations; package-pinned search, retrieval, context, enumeration, and conservative edition comparison; detailed, compact, and concise packets; deterministic compilation stages; non-mutating doctor; content-bound synthetic benchmark; reproducible dependency-free wheel; deterministic synthetic starter; one-record source-first reader and neutral engineering handoff |
+| Experimental or bounded | Automated derived outlines; reviewed exact-span structure and semantic packets; real-corpus prepared distribution assembly; local stdio MCP host integration. The fixed PDF worker policy passed the 1,107-page MIL-STD-810H acceptance source on Windows; protected Linux CI remains unobserved. Each retains explicit coverage and review limits |
+| Planned or not yet qualified | Corpus-wide interactive outline/PDF reader and side-by-side rendered editions; reviewed mapping artifacts for split and merged revisions; document-wide human-reviewed semantic quality; OCR and figure interpretation |
 
 Full visual fidelity, table-cell and figure-visual interpretation, reviewed document-wide clause segmentation, and obligation classification have not been established. A hosted multi-tenant service is not a product target. See the [validation report](VALIDATION_REPORT.md) for recorded checks and limits, and the [backlog](backlog/tasks.json) for acceptance criteria.
 
@@ -337,26 +405,38 @@ Run the existing checks from the repository root:
 
 ```powershell
 $env:PYTHONPATH = Join-Path $PWD 'src'
-python -m pip install -e ".[mcp,compiler]"
+python -m pip install -e ".[mcp,compiler,contract]"
+python -m pip check
 python scripts/validate_contracts.py
 python -m unittest discover -s tests -v
+python scripts/run_benchmark.py benchmarks/synthetic-contract-v1.json
+python -m pip download --disable-pip-version-check --no-deps --only-binary=:all: --dest build/toolchain-cache setuptools==84.0.0
+python scripts/validate_installed_wheel.py --build-tool-dir build/toolchain-cache --output-dir build/ci-wheel
+python scripts/build_starter_distribution.py --wheel-dir build/ci-wheel --output build/standardsforge-starter.zip
+python scripts/validate_starter_distribution.py build/standardsforge-starter.zip
+python scripts/release_evidence.py generate --wheel-dir build/ci-wheel --starter build/standardsforge-starter.zip --output build/release-evidence --repository OWNER/REPOSITORY --repository-uri https://github.com/OWNER/REPOSITORY
+python scripts/verify_release_evidence.py build/release-evidence --wheel-dir build/ci-wheel --starter build/standardsforge-starter.zip
 ```
 
-The suite covers pack and source integrity, policy and revocation boundaries, all read operations, MCP in-memory and stdio paths, deterministic PDF/corpus/outline compilation, representation selection, response profiles and budgets, caches, database snapshots, migrations, and negative cases. Real PDFs and generated packs remain ignored local inputs.
+The suite covers pack and source integrity, policy and revocation boundaries, all read operations, MCP in-memory and stdio paths, resource-limited isolated PDF parsing, deterministic PDF/corpus/outline compilation, representation selection, response profiles and budgets, caches, database snapshots, migrations, and negative cases. The disposable PDF worker uses a closed digest-bound protocol and fixed memory, CPU, wall-time, content, text, aggregate, and metadata limits; any parser failure makes the component fail and a corpus remain incomplete. The fixed policy also compiled the tracked 35,214,720-byte, 1,107-page MIL-STD-810H acceptance source on Windows with all pages represented. The separate content-bound benchmark exercises exact resolution, all three lexical modes, required context, outside-baseline honesty, and edition comparison against fictional packs with networking denied. It qualifies synthetic contract behavior only; real-document accuracy, semantic fidelity, tokenizer efficiency beyond that acceptance source, Linux full-document resource behavior, and engineer time remain unmeasured. Real PDFs and generated packs remain ignored local inputs.
 
 Build the prepared release only from the completed local corpus and qualified outline:
 
 ```powershell
-python -m pip wheel . --no-deps --wheel-dir build/prepared-wheel
+python scripts/validate_installed_wheel.py --build-tool-dir build/toolchain-cache --output-dir build/prepared-wheel
 python scripts/build_prepared_distribution.py `
   --corpus-index .standardsforge/corpus/mil-std-current/corpus.json `
+  --acquisition-manifest .standardsforge/sources/dla/mil-std/manifest.json `
   --outline-pack .standardsforge/compiled/mil-std-810h-derived-outline `
   --wheel build/prepared-wheel/standardsforge-0.1.0a1-py3-none-any.whl `
+  --wheel-provenance build/prepared-wheel/standardsforge-0.1.0a1-py3-none-any.whl.provenance.json `
   --output build/standardsforge-ready-0.1.0a1.zip `
   --version 0.1.0a1
 ```
 
-The builder rejects incomplete corpora, missing or changed archives, duplicate pack identities, and policies that do not exactly authorize the public compiled pack set. It emits the release ZIP plus a SHA-256 checksum file.
+The wheel gate installs the exact backend artifact selected by `build-toolchain.lock.json`, builds twice without index access or build isolation under a fixed source epoch, requires byte identity, installs the exact result in a fresh environment, and retains it only after the core smoke passes. The distribution builder rejects a wheel or source tree that differs from `provenance/wheel-build.json`, incomplete corpora, an acquisition manifest that does not match the corpus snapshot, inconsistent scope counts, missing or changed archives, duplicate pack identities, a derived outline that claims review or classified obligations, and policies that do not exactly authorize the public compiled pack set. It reopens the completed archive and verifies every inventoried file before publishing it. The release includes the exact `provenance/acquisition-manifest.json` snapshot, machine-readable `provenance/source-baseline.json` and `provenance/wheel-build.json` records, and a SHA-256 checksum file.
+
+Deterministic sidecar evidence adds CycloneDX 1.7 SBOMs, unsigned in-toto/SLSA-shaped build statements, source and lock bindings, and an offline verifier. Unsigned local evidence proves digest consistency only. The protected main-branch workflow separately rebuilds the release candidate and uses a commit-pinned GitHub action to sign SBOM attestations after the matrix passes; pull-request jobs have no identity-token permission. See [release evidence and attestation verification](docs/RELEASE_EVIDENCE.md) for the online and pre-fetched offline procedures.
 
 Before contributing, read [CONTRIBUTING.md](CONTRIBUTING.md). Bring synthetic or demonstrably redistributable fixtures, and keep source facts distinct from interpretations.
 

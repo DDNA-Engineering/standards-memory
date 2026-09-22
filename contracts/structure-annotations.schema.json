@@ -20,7 +20,7 @@
     "unsupported_regions"
   ],
   "properties": {
-    "schema_version": {"const": "0.1.0"},
+    "schema_version": {"enum": ["0.1.0", "0.2.0"]},
     "document_id": {"type": "string", "minLength": 1},
     "edition_id": {"type": "string", "minLength": 1},
     "source_pdf_sha256": {"$ref": "#/$defs/sha256"},
@@ -47,6 +47,37 @@
       "items": {"$ref": "#/$defs/unsupported_region"}
     }
   },
+  "allOf": [
+    {
+      "if": {"properties": {"schema_version": {"const": "0.1.0"}}, "required": ["schema_version"]},
+      "then": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "properties": {"source_spans": {"maxItems": 1}},
+              "not": {"required": ["semantics"]}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"schema_version": {"const": "0.2.0"}}, "required": ["schema_version"]},
+      "then": {
+        "properties": {
+          "review": {
+            "required": ["reviewer_id", "reviewer_type", "reviewed_at", "method", "tool", "unresolved_issues", "attestation"],
+            "allOf": [
+              {
+                "if": {"properties": {"reviewer_type": {"const": "agent"}}, "required": ["reviewer_type"]},
+                "then": {"properties": {"tool": {"type": "object"}}}
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "sha256": {
       "type": "string",
@@ -102,7 +133,25 @@
       "properties": {
         "reviewer_id": {"type": "string", "minLength": 1},
         "reviewer_type": {"enum": ["agent", "human"]},
-        "reviewed_at": {"type": "string", "format": "date-time"}
+        "reviewed_at": {"type": "string", "format": "date-time"},
+        "method": {"type": "string", "minLength": 1},
+        "tool": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "version", "configuration_sha256"],
+              "properties": {
+                "name": {"type": "string", "minLength": 1},
+                "version": {"type": "string", "minLength": 1},
+                "configuration_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+              }
+            }
+          ]
+        },
+        "unresolved_issues": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "attestation": {"const": "extraction_review_not_project_applicability_or_approval"}
       }
     },
     "source_span": {
@@ -167,13 +216,16 @@
         "source_spans": {
           "type": "array",
           "minItems": 1,
+          "maxItems": 64,
+          "description": "Ordered, non-overlapping source fragments. Version 0.2.0 joins their exact UTF-8 text with a single newline to form exact_text; version 0.1.0 permits one span only.",
           "items": {"$ref": "#/$defs/source_span"}
         },
         "content_sha256": {
           "$ref": "#/$defs/sha256",
           "description": "SHA-256 of the UTF-8 bytes of exact_text, independent of logical identity and source location."
         },
-        "derivation": {"$ref": "#/$defs/derivation"}
+        "derivation": {"$ref": "#/$defs/derivation"},
+        "semantics": {"$ref": "semantic-record.schema.json"}
       }
     },
     "relationship": {
@@ -199,6 +251,7 @@
             "references",
             "caption_of",
             "footnote_for",
+            "table_footnote_for",
             "header_for",
             "illustrates",
             "continues_on"

@@ -23,9 +23,123 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install package with MCP adapter
-        run: python -m pip install --disable-pip-version-check -e ".[mcp]"
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -e ".[mcp,compiler,contract]"
+      - name: Check dependency consistency
+        run: python -m pip check
       - name: Validate contracts
         run: python scripts/validate_contracts.py
       - name: Run tests
         run: python -m unittest discover -s tests -v
+      - name: Run offline synthetic benchmark
+        run: python scripts/run_benchmark.py benchmarks/synthetic-contract-v1.json --output benchmark-run.json
+      - name: Retain synthetic benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: synthetic-benchmark-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: benchmark-run.json
+          if-no-files-found: warn
+      - name: Acquire locked build backend
+        run: >-
+          python -m pip download
+          --disable-pip-version-check
+          --no-deps
+          --only-binary=:all:
+          --dest build/toolchain-cache
+          setuptools==84.0.0
+      - name: Validate installed core wheel
+        run: >-
+          python scripts/validate_installed_wheel.py
+          --build-tool-dir build/toolchain-cache
+          --output-dir build/ci-wheel
+      - name: Build deterministic synthetic starter bundle
+        run: >-
+          python scripts/build_starter_distribution.py
+          --wheel-dir build/ci-wheel
+          --output build/standardsforge-starter.zip
+      - name: Validate extracted synthetic starter bundle
+        run: python scripts/validate_starter_distribution.py build/standardsforge-starter.zip
+      - name: Generate deterministic unsigned release evidence
+        run: >-
+          python scripts/release_evidence.py generate
+          --wheel-dir build/ci-wheel
+          --starter build/standardsforge-starter.zip
+          --output build/release-evidence
+          --repository "${{ github.repository }}"
+          --repository-uri "${{ github.server_url }}/${{ github.repository }}"
+          --require-clean-vcs
+      - name: Verify release evidence offline
+        run: >-
+          python scripts/verify_release_evidence.py
+          build/release-evidence
+          --wheel-dir build/ci-wheel
+          --starter build/standardsforge-starter.zip
+          --require-exact-commit
+      - name: Retain canonical unsigned release evidence
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: canonical-unsigned-release-evidence-${{ github.sha }}
+          path: |
+            build/ci-wheel
+            build/standardsforge-starter.zip
+            build/standardsforge-starter.zip.sha256
+            build/release-evidence
+          if-no-files-found: error
+
+  release-attestation:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: contracts-and-tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install release validation dependency
+        run: python -m pip install --disable-pip-version-check -e ".[contract]"
+      - name: Acquire locked build backend
+        run: >-
+          python -m pip download
+          --disable-pip-version-check
+          --no-deps
+          --only-binary=:all:
+          --dest build/toolchain-cache
+          setuptools==84.0.0
+      - name: Build and exercise release candidate
+        run: |
+          python scripts/validate_installed_wheel.py --build-tool-dir build/toolchain-cache --output-dir build/release-wheel
+          python scripts/build_starter_distribution.py --wheel-dir build/release-wheel --output build/standardsforge-starter.zip
+          python scripts/validate_starter_distribution.py build/standardsforge-starter.zip
+          python scripts/release_evidence.py generate --wheel-dir build/release-wheel --starter build/standardsforge-starter.zip --output build/release-evidence --repository "${{ github.repository }}" --repository-uri "${{ github.server_url }}/${{ github.repository }}" --require-clean-vcs
+          python scripts/verify_release_evidence.py build/release-evidence --wheel-dir build/release-wheel --starter build/standardsforge-starter.zip --require-exact-commit
+      - name: Attest exact wheel with CycloneDX SBOM
+        id: attest-wheel
+        uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d # v4.2.1
+        with:
+          subject-path: build/release-wheel/*.whl
+          sbom-path: build/release-evidence/wheel.cdx.json
+      - name: Attest exact starter with CycloneDX SBOM
+        id: attest-starter
+        uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d # v4.2.1
+        with:
+          subject-path: build/standardsforge-starter.zip
+          sbom-path: build/release-evidence/starter.cdx.json
+      - name: Retain release candidate and signed attestation bundles
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: attested-release-evidence-${{ github.sha }}
+          path: |
+            build/release-wheel
+            build/standardsforge-starter.zip
+            build/standardsforge-starter.zip.sha256
+            build/release-evidence
+            ${{ steps.attest-wheel.outputs.bundle-path }}
+            ${{ steps.attest-starter.outputs.bundle-path }}
+          if-no-files-found: error

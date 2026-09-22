@@ -10,13 +10,32 @@
     "compiler": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "version", "pypdf_version", "extraction_mode", "rotated_text"],
+      "required": ["name", "version", "pypdf_version", "fonttools_version", "extraction_mode", "rotated_text", "parser_protocol", "limit_policy", "limits"],
       "properties": {
         "name": {"const": "standardsforge-pdf-text-layer"},
         "version": {"type": "string", "minLength": 1},
         "pypdf_version": {"type": "string", "minLength": 1},
+        "fonttools_version": {"type": "string", "minLength": 1},
         "extraction_mode": {"const": "layout"},
-        "rotated_text": {"const": "included"}
+        "rotated_text": {"const": "included"},
+        "parser_protocol": {"const": "pdf-extraction-worker/0.1.0"},
+        "limit_policy": {"const": "pdf-limits/0.1.0"},
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_bytes", "pages", "page_content_bytes", "page_text_bytes", "aggregate_text_bytes", "result_bytes", "process_memory_bytes", "cpu_seconds", "wall_seconds"],
+          "properties": {
+            "source_bytes": {"const": 268435456},
+            "pages": {"const": 5000},
+            "page_content_bytes": {"const": 67108864},
+            "page_text_bytes": {"const": 67108864},
+            "aggregate_text_bytes": {"const": 268435456},
+            "result_bytes": {"const": 4194304},
+            "process_memory_bytes": {"const": 1073741824},
+            "cpu_seconds": {"const": 300},
+            "wall_seconds": {"const": 600}
+          }
+        }
       }
     },
     "document_id": {"type": "string", "minLength": 1},

@@ -81,7 +81,7 @@
               "source_spans": {
                 "type": "array",
                 "minItems": 1,
-                "maxItems": 1,
+                "maxItems": 64,
                 "items": {
                   "type": "object",
                   "additionalProperties": false,
@@ -134,8 +134,36 @@
                     }
                   }
                 }
+              },
+              "semantics": {
+                "oneOf": [
+                  {"type": "null"},
+                  {"$ref": "https://standardsforge.dev/contracts/semantic-record.schema.json"}
+                ]
+              },
+              "review": {"$ref": "https://standardsforge.dev/contracts/review-event.schema.json"}
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {"semantics": {"not": {"type": "null"}}},
+                  "required": ["semantics"]
+                },
+                "then": {"required": ["review"]}
+              },
+              {
+                "if": {"required": ["review"]},
+                "then": {
+                  "properties": {
+                    "review": {
+                      "properties": {
+                        "status": {"enum": ["agent_reviewed", "human_verified", "human_verified_with_uncertainty"]}
+                      }
+                    }
+                  }
+                }
               }
-            }
+            ]
           }
         },
         "allOf": [

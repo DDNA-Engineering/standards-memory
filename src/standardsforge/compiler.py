@@ -5,25 +5,39 @@ import json
 import os
 import shutil
 import tempfile
-import unicodedata
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from .errors import StandardsForgeError, require
+from .errors import require
 from .pack import validate_pack_directory
+from .pdf_isolation import isolated_pdf_pages
+from .pdf_protocol import (
+    DEFAULT_LIMITS,
+    FONTTOOLS_VERSION,
+    LIMIT_POLICY_VERSION,
+    PROTOCOL_VERSION,
+    PYPDF_VERSION,
+    normalize_page_text,
+)
 from .source_catalog import load_source_catalog, verify_source_set
 
 
-COMPILER_VERSION = "0.3.1"
-PYPDF_VERSION = "6.19.0"
-FONTTOOLS_VERSION = "4.65.0"
-MAX_PDF_BYTES = 256 * 1024 * 1024
-MAX_PDF_PAGES = 5000
-MAX_PAGE_CONTENT_BYTES = 64 * 1024 * 1024
+COMPILER_VERSION = "0.4.0"
+MAX_PDF_BYTES = DEFAULT_LIMITS.source_bytes
+MAX_PDF_PAGES = DEFAULT_LIMITS.pages
+MAX_PAGE_CONTENT_BYTES = DEFAULT_LIMITS.page_content_bytes
 
 
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        while chunk := source.read(1024 * 1024):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _canonical_json_bytes(value: Any) -> bytes:
@@ -38,40 +52,7 @@ def _write_compact_json(path: Path, value: Any) -> None:
     path.write_bytes((json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8"))
 
 
-def _normalize_page_text(value: str) -> str:
-    normalized = unicodedata.normalize("NFC", value.replace("\r\n", "\n").replace("\r", "\n"))
-    lines = [line.rstrip() for line in normalized.split("\n")]
-    while lines and not lines[0]:
-        lines.pop(0)
-    while lines and not lines[-1]:
-        lines.pop()
-    return "\n".join(lines)
-
-
-def _load_pypdf() -> Any:
-    try:
-        import fontTools
-        import pypdf
-    except ImportError as exc:
-        raise StandardsForgeError(
-            "compiler_dependency_missing",
-            'PDF compilation requires the pinned compiler extra: pip install -e ".[compiler]".',
-        ) from exc
-    require(
-        pypdf.__version__ == PYPDF_VERSION,
-        "unsupported_compiler_dependency",
-        "PDF compilation requires the pinned pypdf version.",
-        expected=PYPDF_VERSION,
-        actual=pypdf.__version__,
-    )
-    require(
-        fontTools.__version__ == FONTTOOLS_VERSION,
-        "unsupported_compiler_dependency",
-        "PDF compilation requires the pinned fontTools version.",
-        expected=FONTTOOLS_VERSION,
-        actual=fontTools.__version__,
-    )
-    return pypdf
+_normalize_page_text = normalize_page_text
 
 
 def _source_document(catalog: dict[str, Any], document_id: str) -> dict[str, Any]:
@@ -98,8 +79,6 @@ def compile_pdf_to_pack(
     verify_source_set(catalog_path, source_root)
     catalog = load_source_catalog(catalog_path)
     document = _source_document(catalog, document_id)
-    pypdf = _load_pypdf()
-
     source_path = Path(source_root).resolve() / document["local_filename"]
     require(source_path.stat().st_size <= MAX_PDF_BYTES, "compiler_limit_exceeded", "The PDF exceeds the compiler size limit.")
 
@@ -108,91 +87,65 @@ def compile_pdf_to_pack(
     output.parent.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix=".standardsforge-compile-", dir=output.parent))
     try:
-        try:
-            reader = pypdf.PdfReader(source_path, strict=True)
-        except Exception as exc:
-            raise StandardsForgeError("invalid_pdf", "The verified source could not be parsed as a strict PDF.") from exc
-        require(not reader.is_encrypted, "encrypted_pdf", "Encrypted PDFs are not supported by the deterministic compiler.")
-        page_count = len(reader.pages)
-        require(1 <= page_count <= MAX_PDF_PAGES, "compiler_limit_exceeded", "The PDF page count is outside the compiler limit.")
-        require(page_count == document["page_count"], "pdf_page_count_mismatch", "The PDF page count does not match catalog metadata.", expected=document["page_count"], actual=page_count)
+        with isolated_pdf_pages(
+            source_path,
+            source_sha256=document["sha256"],
+            source_bytes=document["byte_length"],
+            expected_pages=document["page_count"],
+            extraction_mode="layout_rotated_included",
+            encryption_policy="reject",
+        ) as parsed:
+            page_count = parsed.page_count
+            sources = staging / "sources"
+            sources.mkdir()
+            pdf_relative = f"sources/{document['local_filename']}"
+            pdf_target = sources / document["local_filename"]
+            shutil.copyfile(source_path, pdf_target)
 
-        sources = staging / "sources"
-        sources.mkdir()
-        pdf_relative = f"sources/{document['local_filename']}"
-        pdf_target = sources / document["local_filename"]
-        shutil.copyfile(source_path, pdf_target)
-
-        text_filename = f"{Path(document['local_filename']).stem}.extracted.txt"
-        text_relative = f"sources/{text_filename}"
-        extracted_pages: list[dict[str, Any]] = []
-        report_pages: list[dict[str, Any]] = []
-        for page_index, page in enumerate(reader.pages, start=1):
-            try:
-                contents = page.get_contents()
-                content_bytes = 0 if contents is None else len(contents.get_data())
-                require(
-                    content_bytes <= MAX_PAGE_CONTENT_BYTES,
-                    "compiler_limit_exceeded",
-                    "A PDF page content stream exceeds the compiler limit.",
-                    page=page_index,
-                    bytes=content_bytes,
+            text_filename = f"{Path(document['local_filename']).stem}.extracted.txt"
+            text_relative = f"sources/{text_filename}"
+            extracted_pages: list[dict[str, Any]] = []
+            report_pages: list[dict[str, Any]] = []
+            for page in parsed.pages:
+                text_hash = page.sha256 if page.text_layer_status == "extracted" else None
+                report_pages.append(
+                    {
+                        "physical_page": page.physical_page,
+                        "content_stream_bytes": page.content_stream_bytes,
+                        "text_characters": page.text_characters,
+                        "text_sha256": text_hash,
+                        "text_layer_status": page.text_layer_status,
+                        "visual_fidelity": "not_verified",
+                        "tables": "not_interpreted",
+                        "figures": "not_interpreted",
+                        "ocr": "not_used",
+                    }
                 )
-                raw_text = ""
-                if contents is not None:
-                    raw_text = page.extract_text(
-                        extraction_mode="layout",
-                        layout_mode_space_vertically=False,
-                        layout_mode_strip_rotated=False,
-                    ) or ""
-            except StandardsForgeError:
-                raise
-            except Exception as exc:
-                raise StandardsForgeError("pdf_page_extraction_failed", "A PDF page text layer could not be extracted.", {"page": page_index}) from exc
-            text = _normalize_page_text(raw_text)
-            text_hash = _sha256(text.encode("utf-8")) if text else None
-            report_pages.append(
-                {
-                    "physical_page": page_index,
-                    "content_stream_bytes": content_bytes,
-                    "text_characters": len(text),
-                    "text_sha256": text_hash,
-                    "text_layer_status": "extracted" if text else "no_text",
-                    "visual_fidelity": "not_verified",
-                    "tables": "not_interpreted",
-                    "figures": "not_interpreted",
-                    "ocr": "not_used",
-                }
-            )
-            if not text:
-                continue
-            marker = f"[[PDF_PAGE_{page_index:04d}]]"
-            extracted_pages.append(
-                {
-                    "physical_page": page_index,
-                    "text": text,
-                    "text_sha256": text_hash,
-                    "marker": marker,
-                }
-            )
+                if page.text_layer_status == "extracted":
+                    extracted_pages.append(
+                        {
+                            "physical_page": page.physical_page,
+                            "text_path": page.path,
+                            "text_sha256": page.sha256,
+                            "marker": f"[[PDF_PAGE_{page.physical_page:04d}]]",
+                        }
+                    )
 
-        require(extracted_pages, "pdf_text_layer_empty", "The PDF has no extractable text-layer pages; OCR is not implicit.")
-        sidecar_builder = bytearray()
-        for index, extracted in enumerate(extracted_pages):
-            if index:
-                sidecar_builder.extend(b"\n\n")
-            marker_bytes = extracted["marker"].encode("utf-8")
-            text_bytes = extracted["text"].encode("utf-8")
-            sidecar_builder.extend(marker_bytes)
-            sidecar_builder.extend(b"\n")
-            extracted["text_start_byte"] = len(sidecar_builder)
-            sidecar_builder.extend(text_bytes)
-            extracted["text_end_byte"] = len(sidecar_builder)
-            sidecar_builder.extend(f"\n[[END_PDF_PAGE_{extracted['physical_page']:04d}]]".encode("utf-8"))
-        sidecar_builder.extend(b"\n")
-        sidecar_bytes = bytes(sidecar_builder)
-        (sources / text_filename).write_bytes(sidecar_bytes)
-        text_sha256 = _sha256(sidecar_bytes)
+            require(extracted_pages, "pdf_text_layer_empty", "The PDF has no extractable text-layer pages; OCR is not implicit.")
+            sidecar_path = sources / text_filename
+            with sidecar_path.open("wb") as sidecar:
+                for index, extracted in enumerate(extracted_pages):
+                    if index:
+                        sidecar.write(b"\n\n")
+                    sidecar.write(extracted["marker"].encode("utf-8"))
+                    sidecar.write(b"\n")
+                    extracted["text_start_byte"] = sidecar.tell()
+                    with extracted["text_path"].open("rb") as page_text:
+                        shutil.copyfileobj(page_text, sidecar, 1024 * 1024)
+                    extracted["text_end_byte"] = sidecar.tell()
+                    sidecar.write(f"\n[[END_PDF_PAGE_{extracted['physical_page']:04d}]]".encode("utf-8"))
+                sidecar.write(b"\n")
+            text_sha256 = _file_sha256(sidecar_path)
 
         records = []
         for extracted in extracted_pages:
@@ -267,6 +220,9 @@ def compile_pdf_to_pack(
                 "fonttools_version": FONTTOOLS_VERSION,
                 "extraction_mode": "layout",
                 "rotated_text": "included",
+                "parser_protocol": PROTOCOL_VERSION,
+                "limit_policy": LIMIT_POLICY_VERSION,
+                "limits": DEFAULT_LIMITS.to_dict(),
             },
             "document_id": document["document_id"],
             "edition_id": document["edition_id"],

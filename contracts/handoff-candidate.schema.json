@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/handoff-candidate-0.1.0.schema.json",
+  "title": "StandardsForge caller-authored engineering handoff candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "text", "author", "authored_at", "method", "tool", "assumptions", "unresolved_questions", "tailoring_proposals"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "kind": {"enum": ["requirement_candidate", "test_basis_candidate"]},
+    "text": {"type": "string", "minLength": 1, "maxLength": 20000},
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "maxLength": 256},
+        "type": {"enum": ["human", "agent"]}
+      }
+    },
+    "authored_at": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "method": {"type": "string", "minLength": 1, "maxLength": 512},
+    "tool": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version", "configuration_sha256"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1, "maxLength": 256},
+            "version": {"type": "string", "minLength": 1, "maxLength": 128},
+            "configuration_sha256": {"$ref": "#/$defs/digest"}
+          }
+        }
+      ]
+    },
+    "assumptions": {"$ref": "#/$defs/notes"},
+    "unresolved_questions": {"$ref": "#/$defs/notes"},
+    "tailoring_proposals": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "text", "status"],
+        "properties": {
+          "id": {"$ref": "#/$defs/itemId"},
+          "text": {"$ref": "#/$defs/itemText"},
+          "status": {"const": "proposed_not_approved"}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"author": {"properties": {"type": {"const": "agent"}}}}},
+      "then": {"properties": {"tool": {"type": "object"}}},
+      "else": {"properties": {"tool": {"type": "null"}}}
+    }
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "itemId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "itemText": {"type": "string", "minLength": 1, "maxLength": 4096},
+    "notes": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "text"],
+        "properties": {
+          "id": {"$ref": "#/$defs/itemId"},
+          "text": {"$ref": "#/$defs/itemText"}
+        }
+      }
+    }
+  }
+}
