@@ -2,6 +2,8 @@
 
 These workflows rebuild or refresh artifacts. They are not required to use the prepared offline library.
 
+The published `v0.1.0a5` asset is frozen: it carries the 7,788-record `outline-v1` pack. This checkout's later `outline-v3` and reviewer workflows are source-only until a newly versioned distribution passes the full qualification and publication gates. Do not rebuild or overwrite `0.1.0a5` from later source.
+
 Run them from the repository root in an isolated environment. Source acquisition and generated corpus state live under ignored `.standardsforge/` paths.
 
 ## Prepare the environment
@@ -150,10 +152,10 @@ Acquire the pinned Windows MCP dependency closure into a dedicated wheelhouse. T
   -r scripts/prepared_distribution/mcp-wheelhouse-win-amd64-cp312.txt
 ```
 
-Then bind the completed corpus, acquisition snapshot, qualified outline, wheel, policy, and provenance:
+Then bind the completed corpus, acquisition snapshot, qualified outline, wheel, policy, and provenance. First update the project version and build a matching wheel for a **new** release; replace the placeholder below with that exact qualified version. The output name alone does not version the Python wheel or qualify the corpus:
 
 ```powershell
-$PreparedVersion = '0.1.0a5'
+$PreparedVersion = '<new-qualified-version>'
 & $Python scripts/build_prepared_distribution.py `
   --corpus-index .standardsforge/corpus/mil-std-current/corpus.json `
   --acquisition-manifest .standardsforge/sources/dla/mil-std/manifest.json `

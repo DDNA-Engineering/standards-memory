@@ -79,6 +79,21 @@ python .\run.py search "environmental testing" `
 
 The result is source-linked JSON with the exact package identity, citations, coverage, and interpretation limits.
 
+For a result, use its `evidence_selector` to request the exact record; do not treat a search snippet as a complete answer. A retrieved packet reports the immutable package, physical-page citation and quote verification separately from review and coverage. This excerpt shows selected fields from the published `0.1.0a5` `get-clause` example later in this quickstart (not the full packet or its source text):
+
+```json
+{
+  "operation": "get_clause",
+  "package": { "identifier": "MIL-STD-810H(1)" },
+  "evidence": [{
+    "record_id": "outline-3302b193c76b284a16ce31d5",
+    "citation": { "page": 22, "verified": true }
+  }],
+  "coverage": { "complete_for_requested_scope": false },
+  "provenance": { "derivations": [{ "review_status": "automated_unreviewed" }] }
+}
+```
+
 ### Pin an exact edition and representation
 
 ```powershell
@@ -105,7 +120,8 @@ python .\run.py get-clause `
   15546007f5f19963f3fc83cdd3da89484036348c49ff1bdf0c27f7bb42ca8f76 `
   'derived:5777493-35978-29528947ea16:document:4.2.2.5' `
   --record-id outline-3302b193c76b284a16ce31d5 `
-  --principal local-user
+  --principal local-user `
+  --response-profile concise_evidence_v1
 ```
 
 ```sh
@@ -113,7 +129,8 @@ sh ./standardsforge.sh get-clause \
   15546007f5f19963f3fc83cdd3da89484036348c49ff1bdf0c27f7bb42ca8f76 \
   'derived:5777493-35978-29528947ea16:document:4.2.2.5' \
   --record-id outline-3302b193c76b284a16ce31d5 \
-  --principal local-user
+  --principal local-user \
+  --response-profile concise_evidence_v1
 ```
 
 On this frozen snapshot, the returned source digests and exact quote checks pass, but `review_status` is `automated_unreviewed`, `required_relationships` is empty, and `complete_for_requested_scope` is false. The 438 page-text packs and this outline have no document-wide reviewed obligation classifications or governing-dependency graph. `enumerate-obligations` therefore reports zero **classified** obligations with incomplete source interpretation; that is not evidence that the standards contain no requirements. `diff-editions` needs two separately installed, authorized editions and has no edition pair in this current-edition snapshot.
@@ -121,6 +138,10 @@ On this frozen snapshot, the returned source digests and exact quote checks pass
 On Linux or macOS, replace `python .\run.py` in the query examples with `sh ./standardsforge.sh`. Both launchers validate the manifest-bound receipt and owned runtime, anchor state to the extracted directory, and forward only the CLI arguments. Rerun setup when you want a full closed-bundle revalidation.
 
 For setup details and troubleshooting boundaries, use the [prepared-library guide](docs/wiki/PREPARED_LIBRARY.md).
+
+### Published release versus current source
+
+The downloadable `v0.1.0a5` archive is a frozen release with an `outline-v1` MIL-STD-810H pack containing 7,788 automated records. Subsequent source commits improve outline structure and reviewer workflows, but they are **not** in that archive or the published PyPI wheel. Use the exact release artifact for these quickstart commands; building from a newer checkout requires a separately versioned, qualified release. The [maintainer guide](docs/wiki/MAINTAINER_WORKFLOWS.md) and [validation record](VALIDATION_REPORT.md) distinguish those paths.
 
 ## Choose an MCP channel
 

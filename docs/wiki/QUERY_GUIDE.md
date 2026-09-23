@@ -70,6 +70,8 @@ python .\run.py get-clause $pin '<clause-reference>' `
 
 The detailed profile remains the compatibility default. Compact and concise profiles reduce repeated structure without dropping exact evidence, citations, coverage, authorization, or expansion references. If a byte budget cannot hold required context, the operation fails instead of silently omitting evidence.
 
+In the published `v0.1.0a5` snapshot, a retrieved MIL-STD-810H outline record can have a verified physical-page citation while its derivation remains `automated_unreviewed` and `coverage.complete_for_requested_scope` remains `false`. These are independent fields: exact quote verification is not review, and a selected passage is not complete document interpretation. The [root quickstart](../../README.md#what-this-prepared-snapshot-can-answer-today) gives a concrete selector and selected response fields.
+
 ## Build context
 
 ```powershell
@@ -84,6 +86,8 @@ Required dependencies are collected transitively and shared evidence is returned
 ## Enumerate obligations
 
 Enumeration traverses only records explicitly classified as obligations in the selected pack and scope. Zero results do not prove that the source contains no requirements; page-text and automated-outline packs intentionally do not invent document-wide obligation classifications.
+
+For the prepared `v0.1.0a5` corpus, page records and the unreviewed outline are navigation evidence, not an exhaustive clause/obligation graph. Do not use a lexical search or a physical-page prefix as a substitute for an explicitly classified scope when making completeness claims.
 
 Use returned continuations exactly as issued. Continuations are bound to the principal, query, package, policy, and snapshot state.
 

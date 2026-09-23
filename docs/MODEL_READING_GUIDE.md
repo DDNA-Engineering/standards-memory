@@ -2,6 +2,8 @@
 
 StandardsForge returns source-linked evidence. It does not decide whether a document applies to a project or whether a design complies. A model using the tools should follow this sequence.
 
+The published `v0.1.0a5` prepared archive exposes page-text packs and an automated, unreviewed MIL-STD-810H `outline-v1` pack. Later source-only outline and reviewer improvements are not in that archive or its PyPI wheel. A verified citation establishes an exact source match, not a reviewed interpretation or complete requirements graph.
+
 ## Connect a prepared Windows distribution
 
 On 64-bit Windows with CPython 3.12, run `setup.ps1` once from the extracted distribution. The setup verifies the archive manifest, installs the bundled core and exact hash-locked MCP dependency wheelhouse without network access, installs every bundled pack, and performs a real MCP stdio smoke test. Then configure the model host with an absolute launcher path so startup does not depend on the host's working directory.

@@ -6,8 +6,6 @@ StandardsForge gives a model read-only, principal-bound access to the same local
 
 The prepared corpus is a rights-qualified GitHub release artifact. PyPI publishes independently built StandardsForge code and optional dependencies only. Installing `standardsforge` from PyPI does not install, download, or authorize the prepared standards corpus.
 
-From a source checkout and isolated development environment, the adapter can be installed with:
-
 From a source checkout and isolated environment:
 
 ```powershell
@@ -15,6 +13,8 @@ python -m pip install -e ".[mcp]"
 ```
 
 The core remains dependency-free. The MCP SDK is an optional, separately pinned dependency.
+
+The prepared `v0.1.0a5` model path uses the frozen release's `outline-v1` and page-text packs. Later `main` source improvements are not present in that archive or its PyPI wheel; neither channel gives the model a reviewed applicability or compliance decision.
 
 ## Configure the fully offline Windows profile
 

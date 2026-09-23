@@ -1,10 +1,10 @@
 # Prepared offline library
 
-The prepared StandardsForge release is the normal end-user path. It already contains the dependency-free StandardsForge wheel, compressed public MIL-STD packs, exact local policies, setup and launcher scripts, and recorded provenance. Users do not reacquire PDFs or compile the corpus.
+The published [StandardsForge `v0.1.0a5` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a5) is the normal end-user path. It already contains the dependency-free StandardsForge wheel, compressed MIL-STD packs from the recorded public-source acquisition snapshot, exact local policies, setup and launcher scripts, and recorded provenance. Users do not reacquire PDFs or compile the corpus.
 
 The GitHub prepared release and the PyPI project are separate channels. The prepared release carries the rights-qualified corpus and supports an offline core setup. PyPI carries independently built StandardsForge code only; it does not bundle, fetch, or authorize standards content.
 
-Return to the [three-minute root quickstart](../../README.md#start-the-offline-library) when you only need the commands.
+Return to the [root quickstart](../../README.md#start-the-offline-library) when you only need the commands.
 
 ## Requirements
 
@@ -116,6 +116,8 @@ The pip command is an explicit networked code/dependency installation. It does n
 ## Snapshot scope
 
 The prepared library is a fixed acquisition snapshot completed September 21, 2026 against the DLA ASSIST dataset marked updated September 18, 2026. The complete 438-pack inventory is in the [root README](../../README.md#complete-prepared-library-snapshot).
+
+The published archive contains 438 page-text packs from 912 verified PDFs, plus a separate automated, unreviewed 7,788-record MIL-STD-810H `outline-v1` pack. Later source-only outline and reviewer changes are not part of this frozen release. Its included `CONTENT-NOTICE.md` is frozen with that archive; the [source template](../../scripts/prepared_distribution/CONTENT-NOTICE.md) describes the notice for future builds and must not be mistaken for an update to the published asset.
 
 The prepared set contains every selected publicly exposed current component for those packs. Twenty-five packs are explicitly partial because their current DLA composition also includes restricted components. Restricted bytes and restricted-only records are not included.
 

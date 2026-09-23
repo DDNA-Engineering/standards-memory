@@ -18,7 +18,7 @@ flowchart LR
     Verify --> Evidence["Return evidence + coverage + limits"]
 ```
 
-Query paths do not download documents, execute pack content, call a model, or grant access from imported rights claims.
+Query paths do not download documents, execute pack content, call a model, or grant access from imported rights claims. The published `v0.1.0a5` archive contains an automated `outline-v1`; the later `outline-v3` and reviewer workflows described in the source architecture are not part of that release. Neither representation is a reviewed document-wide obligation graph.
 
 ## Evidence layers
 
