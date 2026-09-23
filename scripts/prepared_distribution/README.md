@@ -6,6 +6,17 @@ The exact acquisition snapshot is preserved at `provenance/acquisition-manifest.
 
 `provenance/wheel-build.json` binds the bundled wheel to its exact source-file inventory, fixed source epoch, pinned build backend, two byte-identical clean builds, and isolated core smoke. `bundle-manifest.json` records and inventories that provenance alongside every release file.
 
+## Connect a model on Windows
+
+This extracted archive already contains the compiled standards library. On 64-bit Windows with CPython 3.12, open PowerShell in this directory and run:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
+(Resolve-Path .\standardsforge-mcp.ps1).Path
+```
+
+Setup validates and indexes the included packs, installs the included MCP dependencies offline, and proves a real stdio query. Give the printed absolute launcher path to your model host using the [Claude Desktop, Claude Code, or Cursor configuration](#connect-claude-desktop-claude-code-or-cursor) below. Then ask the model to list an installed standard, search for a topic, and retrieve the exact cited record with its coverage and review limits. No PDF acquisition or compilation is needed.
+
 ## Start the offline core
 
 The prepared core supports 64-bit Windows and Linux plus Intel and Apple silicon macOS with CPython 3.11 or newer. It installs the bundled core wheel and corpus with package-index access disabled. Choose the commands for the host platform.

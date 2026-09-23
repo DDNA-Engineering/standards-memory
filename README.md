@@ -19,157 +19,69 @@ Download one prepared archive, run one setup command, and search **438 compiled 
 
 ---
 
-## Start the offline library
+## Use the prepared library with your model
 
-The prepared core supports 64-bit Windows and Linux plus Intel and Apple silicon macOS. You need CPython 3.11 or newer with SQLite FTS5 support, the platform shell shown below, and space for the approximately 1 GB archive plus its extracted local state. The fully offline MCP profile has the narrower requirement of 64-bit Windows and CPython 3.12.
+The [prepared release](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip) already contains the compressed standards packs. You do not need to clone this repository, download PDFs, or compile standards. Any model host that can launch a local stdio MCP server can use the library.
 
-### 1. Download and extract
+### Windows: download, set up, connect
 
-Download [`standardsforge-ready-0.1.0a5.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip), extract it to a durable local directory, and open PowerShell or a POSIX shell in that extracted directory.
+This MCP installation uses only bundled files and requires **64-bit Windows and CPython 3.12**. Allow room for the approximately 1 GB download plus extracted and indexed local state.
 
-The [published checksum](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip.sha256) is available when you want to verify the downloaded archive before extraction.
+1. Download and extract [`standardsforge-ready-0.1.0a5.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip) to a permanent folder. Open PowerShell in that extracted folder.
+2. Run the included setup:
 
-### 2. Set up the included corpus
+   ```powershell
+   powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
+   ```
 
-```powershell
-python .\setup.py
-```
+   Setup verifies the archive, installs its bundled code and MCP dependencies without a package index, indexes the **438 prepared packs**, and checks a real MCP query. It prints `StandardsForge is ready.` when the local installation is ready.
+3. Get the launcher path to use in your model host:
 
-```sh
-sh ./setup.sh
-```
+   ```powershell
+   (Resolve-Path .\standardsforge-mcp.ps1).Path
+   ```
 
-`setup.py` is the portable implementation; `setup.sh` invokes it with `python3`. Setup validates the bundle, creates its isolated Python environment, installs the bundled wheel with package indexes disabled, validates and installs the already-compiled packs, builds the local index, proves full-integrity doctor and a real search, and records a receipt. It does not download standards or compile PDFs.
+   For **Claude Desktop** or **Cursor**, add this server entry to the host's MCP configuration (Claude Desktop on Windows: `%APPDATA%\Claude\claude_desktop_config.json`; Cursor: `.cursor/mcp.json`). Replace the example path with the absolute path printed above; JSON paths need doubled backslashes:
 
-### 3. Prove the installation is ready
+   ```json
+   {
+     "mcpServers": {
+       "standardsforge": {
+         "command": "powershell.exe",
+         "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a5\\standardsforge-mcp.ps1"]
+       }
+     }
+   }
+   ```
 
-```powershell
-python .\run.py doctor `
-  --policy policies\prepared-local.json `
-  --principal local-user `
-  --full-integrity
-```
+   For **Claude Code**, register the same local launcher:
 
-```sh
-sh ./standardsforge.sh doctor \
-  --policy policies/prepared-local.json \
-  --principal local-user \
-  --full-integrity
-```
+   ```powershell
+   claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\standardsforge-mcp.ps1).Path
+   claude mcp get standardsforge
+   ```
 
-A ready report exits `0`. The check opens the installed state read-only, validates every included package, reconciles the selected local policy, and proves one exact source-verifying query through the real evidence path.
+   Restart or reconnect the host if needed so it starts the MCP server. The host should show the seven StandardsForge read tools, including `list_documents`, `search`, and `get_clause`.
 
-### 4. Inventory and search the installed library
+4. Ask your model: **“Use StandardsForge to list the installed MIL-STD-810 editions, find the low-pressure section, then retrieve the exact source-linked evidence. Include the page, package identity, and any coverage or review limits.”**
 
-```powershell
-python .\run.py list-documents `
-  --identifier-prefix 'MIL-STD-810' `
-  --principal local-user `
-  --limit 20
-```
+The MCP server reads the installed local corpus. Search finds candidates; exact retrieval supplies the evidence. The model does not choose applicability, project baselines, or compliance.
 
-This authorization-filtered inventory returns exact identifiers, editions, representations, immutable package digests, record counts, and declared coverage. Use it before resolution when an exact installed identifier or suffix is unknown.
+### Linux and macOS
 
-```powershell
-python .\run.py search "environmental testing" `
-  --principal local-user `
-  --query-mode natural_language `
-  --limit 5
-```
+The prepared **core and corpus** work offline on 64-bit Linux and Intel or Apple silicon macOS with CPython 3.11 or newer and SQLite FTS5. From the extracted release, run `sh ./setup.sh`. Connecting an MCP model host then requires a separate install of `standardsforge[mcp]==0.1.0a5` from PyPI into an environment outside the extracted folder. That code install uses the network; queries still use the local prepared corpus. Follow the [copy-paste host setup](docs/wiki/MODEL_INTEGRATION.md#configure-linux-or-macos-against-prepared-state).
 
-The result is source-linked JSON with the exact package identity, citations, coverage, and interpretation limits.
+### Use it without a model
 
-For a result, use its `evidence_selector` to request the exact record; do not treat a search snippet as a complete answer. A retrieved packet reports the immutable package, physical-page citation and quote verification separately from review and coverage. This excerpt shows selected fields from the published `0.1.0a5` `get-clause` example later in this quickstart (not the full packet or its source text):
-
-```json
-{
-  "operation": "get_clause",
-  "package": { "identifier": "MIL-STD-810H(1)" },
-  "evidence": [{
-    "record_id": "outline-3302b193c76b284a16ce31d5",
-    "citation": { "page": 22, "verified": true }
-  }],
-  "coverage": { "complete_for_requested_scope": false },
-  "provenance": { "derivations": [{ "review_status": "automated_unreviewed" }] }
-}
-```
-
-### Pin an exact edition and representation
+From the extracted release, a CLI search is:
 
 ```powershell
-$resolved = python .\run.py resolve 'MIL-STD-810H(1)' `
-  --representation derived_structure `
-  --principal local-user | ConvertFrom-Json
-
-$pin = $resolved.result.package_digest
-
-python .\run.py search "low pressure" `
-  --package-digest $pin `
-  --principal local-user `
-  --limit 5
+python .\run.py search "environmental testing" --principal local-user --query-mode natural_language --limit 5
 ```
 
-The package digest pins the exact installed representation. It does not decide whether that standard applies to a product or select an approved project baseline.
+On Linux or macOS, use `sh ./standardsforge.sh` in place of `python .\run.py`. The [prepared-library guide](docs/wiki/PREPARED_LIBRARY.md) covers installation checks and the [query guide](docs/wiki/QUERY_GUIDE.md) covers inventory, exact edition and package pins, and source retrieval.
 
-### What this prepared snapshot can answer today
-
-The included packs support authorized document inventory, lexical discovery, exact source-linked page retrieval, and an automated **unreviewed** MIL-STD-810H outline. For example, this exact `0.1.0a5` outline record retrieves a source-verified passage from physical PDF page 22:
-
-```powershell
-python .\run.py get-clause `
-  15546007f5f19963f3fc83cdd3da89484036348c49ff1bdf0c27f7bb42ca8f76 `
-  'derived:5777493-35978-29528947ea16:document:4.2.2.5' `
-  --record-id outline-3302b193c76b284a16ce31d5 `
-  --principal local-user `
-  --response-profile concise_evidence_v1
-```
-
-```sh
-sh ./standardsforge.sh get-clause \
-  15546007f5f19963f3fc83cdd3da89484036348c49ff1bdf0c27f7bb42ca8f76 \
-  'derived:5777493-35978-29528947ea16:document:4.2.2.5' \
-  --record-id outline-3302b193c76b284a16ce31d5 \
-  --principal local-user \
-  --response-profile concise_evidence_v1
-```
-
-On this frozen snapshot, the returned source digests and exact quote checks pass, but `review_status` is `automated_unreviewed`, `required_relationships` is empty, and `complete_for_requested_scope` is false. The 438 page-text packs and this outline have no document-wide reviewed obligation classifications or governing-dependency graph. `enumerate-obligations` therefore reports zero **classified** obligations with incomplete source interpretation; that is not evidence that the standards contain no requirements. `diff-editions` needs two separately installed, authorized editions and has no edition pair in this current-edition snapshot.
-
-On Linux or macOS, replace `python .\run.py` in the query examples with `sh ./standardsforge.sh`. Both launchers validate the manifest-bound receipt and owned runtime, anchor state to the extracted directory, and forward only the CLI arguments. Rerun setup when you want a full closed-bundle revalidation.
-
-For setup details and troubleshooting boundaries, use the [prepared-library guide](docs/wiki/PREPARED_LIBRARY.md).
-
-### Published release versus current source
-
-The downloadable `v0.1.0a5` archive is a frozen release with an `outline-v1` MIL-STD-810H pack containing 7,788 automated records. Subsequent source commits improve outline structure and reviewer workflows, but they are **not** in that archive or the published PyPI wheel. Use the exact release artifact for these quickstart commands; building from a newer checkout requires a separately versioned, qualified release. The [maintainer guide](docs/wiki/MAINTAINER_WORKFLOWS.md) and [validation record](VALIDATION_REPORT.md) distinguish those paths.
-
-## Choose an MCP channel
-
-The GitHub prepared archive and PyPI are deliberately separate. The GitHub artifact carries the rights-qualified corpus and supports offline core setup. PyPI carries independently built StandardsForge code and optional dependencies only; it does not bundle, fetch, or authorize standards content.
-
-For a fully offline MCP installation on 64-bit Windows with CPython 3.12, run:
-
-```powershell
-.\setup.ps1
-```
-
-That Windows-only path installs the archive's exact hash-locked MCP dependency closure from its wheelhouse and proves a real stdio round trip. Point the model host at the absolute path to `standardsforge-mcp.ps1`.
-
-On Linux or macOS, first complete the offline core setup above. Then create an environment outside the closed prepared directory and install the exact MCP code package from PyPI:
-
-```sh
-MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
-PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a5
-python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a5"
-"$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
-  --db "$PREPARED_ROOT/.standardsforge/memory.db" \
-  --store "$PREPARED_ROOT/.standardsforge/objects" \
-  --principal local-user \
-  --result-mode structured_only
-```
-
-The pip step is an explicit networked code/dependency install. The server then uses distribution-local corpus state and does not acquire standards. See [model integration](docs/wiki/MODEL_INTEGRATION.md) for model-host configuration and trust boundaries.
+The downloadable `v0.1.0a5` archive is a frozen release. Its page-text packs support source-linked physical-page retrieval; its MIL-STD-810H `outline-v1` has 7,788 automated, **unreviewed** records. It does not provide document-wide reviewed obligation classifications or a project-approved baseline. Later source changes are not in that archive or the published PyPI wheel. See the [validation record](VALIDATION_REPORT.md) for the release boundary.
 
 ## What is included
 

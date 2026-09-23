@@ -1,31 +1,24 @@
 # Local model integration
 
-StandardsForge gives a model read-only, principal-bound access to the same local evidence service used by the CLI. The model host owns process launch and model execution; StandardsForge does not call a model.
+StandardsForge gives a model read-only, principal-bound access to the prepared local library. The model host launches the MCP process; StandardsForge does not call a model.
 
-## Keep corpus and code channels separate
+## Start with the prepared release on Windows
 
-The prepared corpus is a rights-qualified GitHub release artifact. PyPI publishes independently built StandardsForge code and optional dependencies only. Installing `standardsforge` from PyPI does not install, download, or authorize the prepared standards corpus.
-
-From a source checkout and isolated environment:
+On 64-bit Windows with CPython 3.12, download and extract the [prepared `v0.1.0a5` archive](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip). Open PowerShell in the extracted directory and run:
 
 ```powershell
-python -m pip install -e ".[mcp]"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
+(Resolve-Path .\standardsforge-mcp.ps1).Path
 ```
 
-The core remains dependency-free. The MCP SDK is an optional, separately pinned dependency.
-
-The prepared `v0.1.0a5` model path uses the frozen release's `outline-v1` and page-text packs. Later `main` source improvements are not present in that archive or its PyPI wheel; neither channel gives the model a reviewed applicability or compliance decision.
-
-## Configure the fully offline Windows profile
-
-On 64-bit Windows with CPython 3.12, `setup.ps1` installs the archive's exact hash-inventoried Windows MCP dependency closure with package indexes disabled and proves a stdio search. The included `standardsforge-mcp.ps1` anchors Python, the database, the object store, and the fixed `local-user` principal to the extracted directory. Replace the example version and directory with the absolute path to the extracted release. Claude Desktop and Cursor both accept this `mcpServers` entry; for Cursor place it in `.cursor/mcp.json`:
+Setup validates and installs the already-compiled library and the exact Windows MCP wheelhouse with package indexes disabled. It proves a real stdio query before reporting ready. Use the printed absolute launcher path in your model host. Claude Desktop and Cursor both accept this `mcpServers` entry; use `%APPDATA%\Claude\claude_desktop_config.json` for Claude Desktop on Windows or `.cursor/mcp.json` for Cursor. JSON paths need doubled backslashes:
 
 ```json
 {
   "mcpServers": {
     "standardsforge": {
       "command": "powershell.exe",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-<version>\\standardsforge-mcp.ps1"]
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a5\\standardsforge-mcp.ps1"]
     }
   }
 }
@@ -34,9 +27,11 @@ On 64-bit Windows with CPython 3.12, `setup.ps1` installs the archive's exact ha
 Claude Code can register the identical process:
 
 ```powershell
-claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-<version>\standardsforge-mcp.ps1"
+claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\standardsforge-mcp.ps1).Path
 claude mcp get standardsforge
 ```
+
+After the host connects, ask: "Use StandardsForge to list installed MIL-STD-810 editions, find the low-pressure section, and retrieve exact source-linked evidence with page, package identity, and coverage limits." The host should offer seven StandardsForge read tools. Search is discovery; retrieve an exact record before relying on its text.
 
 ## Configure Linux or macOS against prepared state
 
@@ -107,3 +102,7 @@ Models must not interpret zero classified obligations as proof that no requireme
 - Query paths do not fetch URLs, execute pack contents, create listeners, or invoke hidden network or model fallbacks.
 
 Read the complete [model reading guide](../MODEL_READING_GUIDE.md) before building a host integration.
+
+## Source checkout development
+
+From a source checkout and isolated environment, `python -m pip install -e ".[mcp]"` installs the optional MCP dependencies. This path contains no prepared standards corpus. The GitHub prepared artifact and PyPI code package are separate channels; installing from PyPI does not install, download, or authorize standards content. The published `v0.1.0a5` uses page-text packs and an automated, unreviewed `outline-v1`; later source changes are not in that release or its PyPI wheel.
