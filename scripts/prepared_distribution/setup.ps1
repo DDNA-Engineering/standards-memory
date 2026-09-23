@@ -9,6 +9,11 @@ $ReadyMarker = Join-Path $DistributionRoot '.standardsforge\prepared-distributio
 $VenvMarker = Join-Path $VirtualEnvironment '.standardsforge-prepared-venv.json'
 $BundleManifest = Join-Path $DistributionRoot 'bundle-manifest.json'
 $McpRequirementsPath = Join-Path $DistributionRoot 'provenance\mcp-wheelhouse-win-amd64-cp312.txt'
+$PreparedPolicy = Join-Path $DistributionRoot 'policies\prepared-local.json'
+$WasReady = Test-Path -LiteralPath $ReadyMarker
+if ($WasReady) {
+    Remove-Item -LiteralPath $ReadyMarker -Force
+}
 
 function Test-PreparedDistribution {
     if (-not (Test-Path -LiteralPath $BundleManifest -PathType Leaf)) {
@@ -158,18 +163,20 @@ if ($LASTEXITCODE -ne 0) { throw 'The bundled StandardsForge MCP environment has
 & $Python -I (Join-Path $DistributionRoot 'verify_mcp_environment.py') --requirements $McpRequirementsPath --standardsforge-version ([string]$Manifest.version)
 if ($LASTEXITCODE -ne 0) { throw 'The prepared environment differs from its exact runtime lock.' }
 
-if (-not (Test-Path -LiteralPath $ReadyMarker)) {
+if (-not $WasReady) {
     & $Python -I -m standardsforge --db $Database --store $ObjectStore install-corpus `
         (Join-Path $DistributionRoot 'corpus\corpus.json') `
-        --policy (Join-Path $DistributionRoot 'policies\mil-std-corpus-local.json')
+        --policy $PreparedPolicy
     if ($LASTEXITCODE -ne 0) { throw 'Unable to install the precompiled MIL-STD corpus.' }
 
     & $Python -I -m standardsforge --db $Database --store $ObjectStore install `
         (Join-Path $DistributionRoot 'packs\mil-std-810h-derived-outline.zip') `
-        --policy (Join-Path $DistributionRoot 'policies\mil-std-810h-derived-outline-local.json')
+        --policy $PreparedPolicy
     if ($LASTEXITCODE -ne 0) { throw 'Unable to install the precompiled MIL-STD-810H outline.' }
 }
 
+& $Python -I -m standardsforge --db $Database --store $ObjectStore doctor --policy $PreparedPolicy --principal local-user --full-integrity | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'The prepared MIL-STD library did not pass full-integrity doctor.' }
 & $Python -I -m standardsforge --db $Database --store $ObjectStore search 'environmental testing' --principal local-user --limit 1 | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'The prepared MIL-STD corpus did not pass its smoke query.' }
 & $Python -I (Join-Path $DistributionRoot 'smoke_mcp.py') --db $Database --store $ObjectStore --principal local-user --query 'environmental testing'

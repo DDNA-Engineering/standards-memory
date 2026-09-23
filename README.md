@@ -6,7 +6,7 @@
 
 **The already-compressed MIL-STD library for fast, offline, source-linked engineering evidence.**
 
-Download one prepared archive, run one setup command, and search **438 compiled MIL-STD packs** locally. No Git clone, PDF acquisition, corpus compilation, network query, or model call is required to use the included snapshot.
+Download one prepared archive and search **438 compiled MIL-STD packs** locally. No Git clone, PDF acquisition, corpus compilation, network query, or model call is required to use the included snapshot.
 
 [![Prepared release: 0.1.0a5](https://img.shields.io/badge/prepared_release-0.1.0a5-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a5)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
@@ -28,13 +28,14 @@ The [prepared release](https://github.com/DDNA-Engineering/standards-memory/rele
 This MCP installation uses only bundled files and requires **64-bit Windows and CPython 3.12**. Allow room for the approximately 1 GB download plus extracted and indexed local state.
 
 1. Download and extract [`standardsforge-ready-0.1.0a5.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip) to a permanent folder. Open PowerShell in that extracted folder.
-2. Run the included setup:
+2. Run the included core setup, then enable the bundled MCP runtime:
 
    ```powershell
+   python .\setup.py
    powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
    ```
 
-   Setup verifies the archive, installs its bundled code and MCP dependencies without a package index, indexes the **438 prepared packs**, and checks a real MCP query. It prints `StandardsForge is ready.` when the local installation is ready.
+   The first command verifies and indexes the **438 prepared packs** and runs full-integrity doctor. The second installs MCP dependencies from the archive without a package index and checks a real MCP query. This order is required for the published `v0.1.0a5` Windows archive to keep its installed grants aligned with the full-integrity check. The MCP setup prints `StandardsForge is ready.` when complete.
 3. Get the launcher path to use in your model host:
 
    ```powershell

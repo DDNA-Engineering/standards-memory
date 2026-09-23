@@ -7,11 +7,12 @@ StandardsForge gives a model read-only, principal-bound access to the prepared l
 On 64-bit Windows with CPython 3.12, download and extract the [prepared `v0.1.0a5` archive](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip). Open PowerShell in the extracted directory and run:
 
 ```powershell
+python .\setup.py
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
 (Resolve-Path .\standardsforge-mcp.ps1).Path
 ```
 
-Setup validates and installs the already-compiled library and the exact Windows MCP wheelhouse with package indexes disabled. It proves a real stdio query before reporting ready. Use the printed absolute launcher path in your model host. Claude Desktop and Cursor both accept this `mcpServers` entry; use `%APPDATA%\Claude\claude_desktop_config.json` for Claude Desktop on Windows or `.cursor/mcp.json` for Cursor. JSON paths need doubled backslashes:
+For the published `v0.1.0a5` archive, run core setup first: it validates and indexes the already-compiled library and proves full-integrity doctor under the prepared policy. The second command installs the exact Windows MCP wheelhouse with package indexes disabled and proves a real stdio query. Use the printed absolute launcher path in your model host. Claude Desktop and Cursor both accept this `mcpServers` entry; use `%APPDATA%\Claude\claude_desktop_config.json` for Claude Desktop on Windows or `.cursor/mcp.json` for Cursor. JSON paths need doubled backslashes:
 
 ```json
 {

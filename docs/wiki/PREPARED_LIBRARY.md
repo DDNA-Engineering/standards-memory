@@ -4,7 +4,7 @@ The published [StandardsForge `v0.1.0a5` release](https://github.com/DDNA-Engine
 
 The GitHub prepared release and the PyPI project are separate channels. The prepared release carries the rights-qualified corpus and supports an offline core setup. PyPI carries independently built StandardsForge code only; it does not bundle, fetch, or authorize standards content.
 
-Return to the [root quickstart](../../README.md#start-the-offline-library) when you only need the commands.
+Return to the [root quickstart](../../README.md#use-the-prepared-library-with-your-model) when you only need the commands.
 
 ## Requirements
 
@@ -101,7 +101,7 @@ Runtime state stays inside the extracted distribution. Keep the extracted direct
 
 ## MCP installation choices
 
-On 64-bit Windows with CPython 3.12, `setup.ps1` remains the fully offline MCP path. It installs the exact hash-locked MCP dependency closure from the archive's Windows wheelhouse and proves a real stdio round trip before marking MCP ready. Use `standardsforge-mcp.ps1` as the model-host command.
+On 64-bit Windows with CPython 3.12, run the core `setup.py` command above before `setup.ps1` for the published `v0.1.0a5` archive. The latter installs the exact hash-locked MCP dependency closure from the archive's Windows wheelhouse and proves a real stdio round trip before marking MCP ready. Use `standardsforge-mcp.ps1` as the model-host command.
 
 On Linux or macOS, complete the offline core setup first. Then create a separate environment outside the closed prepared directory and install the exact code/MCP package from PyPI:
 
