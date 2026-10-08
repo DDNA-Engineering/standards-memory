@@ -758,6 +758,8 @@ def build_distribution(
         (static_root / "prepared_runtime.py", "prepared_runtime.py"),
         (static_root / "setup.py", "setup.py"),
         (static_root / "run.py", "run.py"),
+        (static_root / "run_mcp.py", "run_mcp.py"),
+        (static_root / "setup.cmd", "setup.cmd"),
         (static_root / "setup.sh", "setup.sh"),
         (static_root / "standardsforge.sh", "standardsforge.sh"),
         (static_root / "setup.ps1", "setup.ps1"),

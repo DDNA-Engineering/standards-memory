@@ -149,6 +149,24 @@ jobs:
             & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $env:PREPARED_ROOT 'setup.ps1')
             if ($LASTEXITCODE -ne 0) { throw "Offline MCP setup attempt $attempt failed." }
           }
+      - name: Verify first and repeat explicit online MCP setup on POSIX
+        if: runner.os != 'Windows'
+        shell: pwsh
+        run: |
+          for ($attempt = 1; $attempt -le 2; $attempt++) {
+            & sh (Join-Path $env:PREPARED_ROOT 'setup.sh') --mcp-online
+            if ($LASTEXITCODE -ne 0) { throw "MCP setup attempt $attempt failed." }
+          }
+      - name: Exercise generated host configuration and actual MCP launcher
+        shell: pwsh
+        run: |
+          $config = Get-Content -LiteralPath (Join-Path $env:PREPARED_ROOT '.standardsforge/mcp-config.json') -Raw | ConvertFrom-Json
+          $entry = $config.mcpServers.standardsforge
+          if ($entry.args.Count -ne 2 -or $entry.args[0] -ne '-I' -or $entry.args[1] -ne (Join-Path $env:PREPARED_ROOT 'run_mcp.py')) {
+            throw 'Generated configuration does not select the exact prepared launcher.'
+          }
+          & $entry.command -I (Join-Path $env:PREPARED_ROOT 'smoke_mcp.py') --launcher $entry.args[1] --db (Join-Path $env:PREPARED_ROOT '.standardsforge/memory.db') --store (Join-Path $env:PREPARED_ROOT '.standardsforge/objects') --principal local-user --query 'environmental testing'
+          if ($LASTEXITCODE -ne 0) { throw 'Generated host launcher failed its real MCP query.' }
       - name: Prove full doctor, exact resolve, search, and source evidence retrieval
         shell: pwsh
         env:

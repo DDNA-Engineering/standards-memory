@@ -1,13 +1,8 @@
 $ErrorActionPreference = 'Stop'
-
-$DistributionRoot = $PSScriptRoot
-$Python = Join-Path $DistributionRoot '.venv\Scripts\python.exe'
-$ReadyMarker = Join-Path $DistributionRoot '.standardsforge\prepared-distribution.json'
-if (-not (Test-Path -LiteralPath $Python) -or -not (Test-Path -LiteralPath $ReadyMarker)) {
-    & (Join-Path $DistributionRoot 'setup.ps1')
+$Python = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
+if (-not (Test-Path -LiteralPath $Python -PathType Leaf)) {
+    [Console]::Error.WriteLine('Run setup.py before querying the prepared library.')
+    exit 1
 }
-
-$Database = Join-Path $DistributionRoot '.standardsforge\memory.db'
-$ObjectStore = Join-Path $DistributionRoot '.standardsforge\objects'
-& $Python -I -m standardsforge --db $Database --store $ObjectStore @args
+& $Python -I (Join-Path $PSScriptRoot 'run.py') @args
 exit $LASTEXITCODE

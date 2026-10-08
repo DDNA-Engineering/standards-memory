@@ -249,18 +249,17 @@ class DistributionScopeTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("$args.Count -ne 0", launcher)
         self.assertNotIn("@args", launcher)
-        self.assertIn("$Python -I -m standardsforge.mcp_server", launcher)
-        self.assertIn("--principal local-user --result-mode structured_only", launcher)
+        self.assertIn("$Python -I (Join-Path $PSScriptRoot 'run_mcp.py')", launcher)
         self.assertNotIn("setup.ps1')", launcher)
         cli_launcher = (
             ROOT / "scripts" / "prepared_distribution" / "standardsforge.ps1"
         ).read_text(encoding="utf-8")
-        self.assertIn("$Python -I -m standardsforge", cli_launcher)
+        self.assertIn("$Python -I (Join-Path $PSScriptRoot 'run.py')", cli_launcher)
         setup = (
             ROOT / "scripts" / "prepared_distribution" / "setup.ps1"
         ).read_text(encoding="utf-8")
         self.assertNotIn("$Python -m ", setup)
-        self.assertIn("$McpRequirementsPath = Join-Path", setup.split("function", 1)[0])
+        self.assertIn("(Join-Path $PSScriptRoot 'setup.py') --mcp", setup)
 
     def test_prepared_environment_must_match_exact_lock(self) -> None:
         with tempfile.TemporaryDirectory(prefix="standardsforge-mcp-environment-test-") as temporary:
@@ -312,6 +311,8 @@ class DistributionScopeTests(unittest.TestCase):
                 "prepared_runtime.py",
                 "setup.py",
                 "run.py",
+                "run_mcp.py",
+                "setup.cmd",
                 "setup.sh",
                 "standardsforge.sh",
                 "setup.ps1",

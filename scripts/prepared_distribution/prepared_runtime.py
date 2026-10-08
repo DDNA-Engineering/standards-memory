@@ -287,11 +287,14 @@ def _write_json_atomic(path: Path, value: dict[str, Any]) -> None:
     os.replace(temporary, path)
 
 
-def _run(command: list[str], root: Path, *, capture: bool = False) -> subprocess.CompletedProcess[str]:
+def _run(command: list[str], root: Path, *, capture: bool = False, dependency_network: bool = False) -> subprocess.CompletedProcess[str]:
+    environment = _clean_environment()
+    if dependency_network:
+        environment["PIP_NO_INDEX"] = "0"
     result = subprocess.run(
         command,
         cwd=root,
-        env=_clean_environment(),
+        env=environment,
         shell=False,
         text=True,
         stdout=subprocess.PIPE if capture else None,
@@ -370,9 +373,74 @@ def validate_ready(root: Path) -> tuple[dict[str, Any], str]:
     return manifest, manifest_sha256
 
 
-def setup_prepared(root: Path, *, quiet: bool = False) -> dict[str, Any]:
+def _check_mcp_profile(mode: str | None) -> None:
+    _require(mode in {None, "offline", "online"}, "Unknown MCP installation mode.")
+    if mode == "offline":
+        _require(
+            sys.platform == "win32" and sys.version_info[:2] == (3, 12)
+            and platform.machine().casefold() in {"amd64", "x86_64"},
+            "Offline MCP requires 64-bit CPython 3.12 on Windows. "
+            "Use --mcp-online for an explicit networked dependency install on other supported runtimes.",
+        )
+
+
+def _mcp_command(root: Path) -> list[str]:
+    return [str(_venv_python(root / ".venv")), "-I", str(root / "run_mcp.py")]
+
+
+def _write_host_configuration(root: Path) -> dict[str, str]:
+    command, *arguments = _mcp_command(root)
+    state = root / ".standardsforge"
+    json_path = state / "mcp-config.json"
+    toml_path = state / "codex-mcp.toml"
+    _write_json_atomic(json_path, {"mcpServers": {"standardsforge": {"command": command, "args": arguments}}})
+    # JSON string escaping is also valid for these TOML basic strings.
+    toml_path.write_text(
+        "[mcp_servers.standardsforge]\n"
+        f"command = {json.dumps(command, ensure_ascii=False)}\n"
+        f"args = {json.dumps(arguments, ensure_ascii=False)}\n",
+        encoding="utf-8", newline="\n",
+    )
+    return {"claude_desktop_or_cursor": str(json_path), "codex": str(toml_path)}
+
+
+def _prepare_mcp(root: Path, python: Path, wheel: Path, manifest: dict[str, Any], mode: str | None) -> None:
+    if mode == "offline":
+        requirements = root / "provenance/mcp-wheelhouse-win-amd64-cp312.txt"
+        _run([str(python), "-I", "-m", "pip", "install", "--disable-pip-version-check", "--no-index",
+              "--find-links", str(root / "wheelhouse"), "--require-hashes", "--no-deps",
+              "--requirement", str(requirements)], root)
+        _run([str(python), "-I", str(root / "verify_mcp_environment.py"), "--requirements", str(requirements),
+              "--standardsforge-version", manifest["version"]], root)
+    elif mode == "online":
+        # Only this explicitly selected administrative path may resolve dependencies online.
+        # The core code still comes from the verified bundled wheel, never another release.
+        _run([str(python), "-I", "-m", "pip", "install", "--disable-pip-version-check", f"{wheel}[mcp]"], root, dependency_network=True)
+    _run([str(python), "-I", "-m", "pip", "check"], root)
+    _run([str(python), "-I", str(root / "smoke_mcp.py"), "--db", str(root / ".standardsforge/memory.db"),
+          "--store", str(root / ".standardsforge/objects"), "--principal", "local-user",
+          "--query", "environmental testing"], root)
+
+
+def setup_prepared(root: Path, *, quiet: bool = False, mcp_mode: str | None = None) -> dict[str, Any]:
     _require(sys.implementation.name == "cpython" and sys.version_info >= (3, 11), "CPython 3.11 or newer is required.")
-    manifest, manifest_sha256 = validate_bundle(root)
+    _check_mcp_profile(mcp_mode)
+    if not quiet:
+        print("Checking the prepared library. First setup indexes the included packs and can take several minutes.", flush=True)
+    try:
+        manifest, manifest_sha256 = validate_bundle(root)
+    except PreparedSetupError:
+        # Preserve the bundle ownership needed for a retry, but never retain readiness
+        # when the closed inventory no longer validates. Do not follow external state.
+        state = root / ".standardsforge"
+        receipt_path = root / RECEIPT_RELATIVE
+        if state.is_dir() and not _is_link_like(state) and receipt_path.is_file() and not _is_link_like(receipt_path):
+            receipt = _load_json(receipt_path, "prepared setup receipt")
+            previous_digest = receipt.get("bundle_manifest_sha256")
+            if isinstance(previous_digest, str) and HEX64.fullmatch(previous_digest):
+                _write_json_atomic(root / PARTIAL_RELATIVE, {"bundle_manifest_sha256": previous_digest})
+                receipt_path.unlink()
+        raise
     root = root.resolve(strict=True)
     state = root / ".standardsforge"
     venv_root = root / ".venv"
@@ -402,6 +470,10 @@ def setup_prepared(root: Path, *, quiet: bool = False) -> dict[str, Any]:
             _require_no_links_tree(venv_root, "Prepared .venv")
             if recovering_partial:
                 shutil.rmtree(venv_root)
+    if existing_ready:
+        # A failed revalidation must not leave an old ready receipt usable by launchers.
+        _write_json_atomic(partial_path, {"bundle_manifest_sha256": manifest_sha256})
+        receipt_path.unlink()
     if not venv_root.exists():
         if not existing_ready:
             state.mkdir()
@@ -445,17 +517,27 @@ def setup_prepared(root: Path, *, quiet: bool = False) -> dict[str, Any]:
     search_result = _parse_cli_success(search, "search")
     _require(isinstance(search_result.get("results"), list) and search_result["results"], "Prepared search returned no evidence.")
 
+    mcp_ready = mcp_mode is not None or (existing_receipt is not None and existing_receipt["mcp_status"] == "ready")
+    if mcp_ready:
+        if not quiet:
+            print("Checking the model connection through a real local MCP query.", flush=True)
+        _prepare_mcp(root, python, wheel, manifest, mcp_mode)
+    configuration = _write_host_configuration(root) if mcp_ready else None
     receipt = {
         "bundle_manifest_sha256": manifest_sha256,
         "principal_id": "local-user",
         "status": "ready",
-        "mcp_status": existing_receipt["mcp_status"] if existing_receipt is not None else "not_installed",
+        "mcp_status": "ready" if mcp_ready else "not_installed",
         "version": manifest["version"],
         "wheel_sha256": manifest["build"]["wheel_sha256"],
     }
     _write_json_atomic(receipt_path, receipt)
     partial_path.unlink(missing_ok=True)
-    result = {"ok": True, "status": "already_ready" if existing_ready else "ready", "version": manifest["version"], "runtime_profile": _runtime_profile(), "network_dependency_resolution": "disabled"}
+    result = {"ok": True, "status": "already_ready" if existing_ready else "ready", "version": manifest["version"], "runtime_profile": _runtime_profile(), "network_dependency_resolution": "explicit_mcp_dependencies" if mcp_mode == "online" else "disabled"}
+    if configuration is not None:
+        result["host_configuration"] = configuration
     if not quiet:
         print(json.dumps(result, indent=2, sort_keys=True))
+        if configuration is not None:
+            print("Model connection ready. Copy the generated configuration into your host, then restart its MCP connection.")
     return result

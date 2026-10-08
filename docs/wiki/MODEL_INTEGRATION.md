@@ -16,7 +16,7 @@ codex plugin list --marketplace standardsforge --json
 
 For a local source checkout, replace the first command with `codex plugin marketplace add .` from the repository root. The marketplace stores only this small skill plugin in the plugin cache; it does not copy the repository's local corpus or database. The plugin reuses an existing `standardsforge` or `standardsforge-local` MCP connection. It has no bundled MCP server, credentials, machine-specific paths, network fallback or installation hook. Installing it does not install or upgrade the runtime or standards content.
 
-Plugin 0.1.4 includes original PDF links in standards answers. This requires the updated source runtime's `get_source_pdfs` tool (eleven read tools); the published a6 runtime has seven tools and does not include it. To upgrade an existing MCP environment from a checked-out source revision, run that environment's Python with `-m pip install ".[mcp]"` from the repository root, then restart the host's MCP connection or start a new chat. Keep its existing database, object store and trusted principal configuration. Refreshing the plugin alone does not update the runtime.
+Plugin 0.1.4 includes original PDF links in standards answers. The a7 runtime supplies `get_source_pdfs` and all eleven read tools. Upgrade by installing the a7 prepared archive into a new folder, then use its generated host configuration and restart the MCP connection. Updating the plugin alone does not update the runtime.
 
 Start a new chat after installation. In Codex CLI or the IDE extension, use `/skills` to select **StandardsForge**. Codex qualifies the skill name with its plugin name, so the explicit invocation is:
 
@@ -26,7 +26,7 @@ $standardsforge:standardsforge Use only my installed database; no web. What does
 
 In desktop surfaces that offer plugin mentions, type `@` and select **StandardsForge**. Supported Codex task views also offer **Sources -> Use plugins -> StandardsForge**. Select the installed entry in the picker; plain `@StandardsForge` text is not proof that the host selected it. If a local plugin is not visible, refresh the plugin list or restart the app. The exact selector depends on the host; this package does not register a universal `/standardsforge` command. See the host's [skill invocation](https://learn.chatgpt.com/docs/build-skills) and [plugin selection](https://help.openai.com/en/articles/20001256-plugins-in-chatgpt) documentation.
 
-The skill works with the seven core read tools in published a6 and uses `browse_records`, `select_evidence` and `follow_references` only when the installed runtime advertises them. Selecting the plugin never makes source-only features appear in an older runtime. Missing connections or optional capabilities are reported explicitly.
+The skill also works with the seven core read tools in older releases and reports unavailable optional capabilities explicitly. Use the connected tool inventory to confirm which runtime your host launched.
 
 ### Installed-library answer scope
 
@@ -36,62 +36,56 @@ The plugin supplies instructions, not a host-enforced tool restriction. A succes
 
 ## Start with the prepared release on Windows
 
-On 64-bit Windows with CPython 3.12, download and extract the [prepared `v0.1.0a6` archive](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a6/standardsforge-ready-0.1.0a6.zip). Open PowerShell in the extracted directory and run:
+Download and extract [v0.1.0a7](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a7). Install 64-bit CPython 3.12 with its Python launcher, then double-click `setup.cmd`. Or run:
 
 ```powershell
-python .\setup.py
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
-(Resolve-Path .\standardsforge-mcp.ps1).Path
 ```
 
-For the published `v0.1.0a6` archive, run core setup first: it validates and indexes the already-compiled library and proves full-integrity doctor under the prepared policy. The second command installs the exact Windows MCP wheelhouse with package indexes disabled and proves a real stdio query. Use the printed absolute launcher path in your model host. Claude Desktop and Cursor both accept this `mcpServers` entry; use `%APPDATA%\Claude\claude_desktop_config.json` for Claude Desktop on Windows or `.cursor/mcp.json` for Cursor. JSON paths need doubled backslashes:
-
-```json
-{
-  "mcpServers": {
-    "standardsforge": {
-      "command": "powershell.exe",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a6\\standardsforge-mcp.ps1"]
-    }
-  }
-}
-```
-
-Claude Code can register the identical process:
-
-```powershell
-claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\standardsforge-mcp.ps1).Path
-claude mcp get standardsforge
-```
-
-For Codex, register the same prepared launcher:
-
-```powershell
-codex mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\standardsforge-mcp.ps1).Path
-codex mcp get standardsforge
-```
-
-After the host connects, ask: "Use StandardsForge to list installed MIL-STD-810 editions, find the low-pressure section, and retrieve exact source-linked evidence with page, package identity, and coverage limits." The host should offer seven StandardsForge read tools. Search is discovery; retrieve an exact record before relying on its text.
+One setup installs the library and exact hash-locked MCP dependencies offline, verifies the evidence, and makes a real stdio query. Python 3.11 or 3.13 users can explicitly choose `python setup.py --mcp-online` for networked dependencies instead.
 
 ## Configure Linux or macOS against prepared state
 
-First run the prepared archive's offline core setup with `sh ./setup.sh`. Then create an MCP environment outside the prepared directory and install the exact code/MCP extra from PyPI:
+With Python 3.11+ and `venv` installed, run this in the extracted directory:
 
 ```sh
-MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
-PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a6
-python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a6"
-"$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
-  --db "$PREPARED_ROOT/.standardsforge/memory.db" \
-  --store "$PREPARED_ROOT/.standardsforge/objects" \
-  --principal local-user \
-  --result-mode structured_only
+sh ./setup.sh --mcp-online
 ```
 
-The pip step is networked and installs code and dependencies only. The server uses the prepared distribution's local database and object store; it does not fetch corpus content. Keep the MCP environment outside `PREPARED_ROOT` so the prepared archive's closed inventory continues to validate.
+Only this explicit option downloads MCP dependencies. The verified code wheel and standards library remain bundled. Setup owns the local environment, verifies package consistency and runs a real stdio query before producing host configuration. Run `sh ./setup.sh` for offline terminal-only setup.
 
-For a model host, set the command to the absolute path of `$MCP_VENV/bin/python` and pass `-I`, `-m`, `standardsforge.mcp_server`, and the same absolute state, principal, and result-mode arguments. Do not let the model choose the principal or state paths.
+## Connect your model host
+
+Setup writes absolute, correctly escaped paths into `.standardsforge/mcp-config.json` and `.standardsforge/codex-mcp.toml`. Open those files and merge the StandardsForge entry into the appropriate host file:
+
+| Host | Destination |
+|---|---|
+| Claude Desktop, Windows | `%APPDATA%\Claude\claude_desktop_config.json` |
+| Claude Desktop, macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Cursor | Project `.cursor/mcp.json` or the host's MCP settings |
+| Codex | `~/.codex/config.toml` (or your configured Codex home) |
+
+Preserve other server entries and avoid duplicate StandardsForge sections. Restart the host's MCP connection after saving. The generated command uses the prepared environment's Python and `run_mcp.py`; it fixes local state, principal and structured responses, and never installs anything during a query.
+
+Codex and Claude Code users can register that same launcher directly from the extracted folder:
+
+```powershell
+codex mcp add standardsforge -- (Resolve-Path .\.venv\Scripts\python.exe).Path -I (Resolve-Path .\run_mcp.py).Path
+# For Claude Code, replace codex with claude.
+```
+
+```sh
+codex mcp add standardsforge -- "$PWD/.venv/bin/python" -I "$PWD/run_mcp.py"
+# For Claude Code, replace codex with claude.
+```
+
+Ask the host to list installed MIL-STD-810 editions, find the low-pressure section and retrieve exact source evidence and its original PDF. The connected a7 server advertises eleven tools. Search results are candidates; retrieve an exact record before relying on its text.
+
+## Upgrade or troubleshoot
+
+Extract upgrades into a new directory, run setup, replace only the StandardsForge host entry with the new generated one, then restart the connection. Do not copy an old `.venv` or database into the new archive. Keep the prior install until the new one works.
+
+If `python` is missing on Windows, install Python 3.12 with its launcher and use `setup.cmd`. If Linux reports missing `ensurepip`, install the matching `python3-venv` package. If setup fails, correct the reported cause and rerun the same command. If the host still lists seven tools, its process is using the old installation; check the configured executable and restart it. The optional `standardsforge-mcp.ps1` wrapper remains available for existing Windows host conventions.
 
 ## Start the local stdio server
 
@@ -109,7 +103,7 @@ The command intentionally remains running when launched directly because the hos
 
 ## Exposed tools
 
-Published a6 exposes these seven tools:
+The a7 release exposes these eleven tools:
 
 - `search`
 - `list_documents`
@@ -119,7 +113,12 @@ Published a6 exposes these seven tools:
 - `enumerate_obligations`
 - `diff_editions`
 
-The current source runtime additionally exposes `browse_records`, `select_evidence`, `follow_references` and `get_source_pdfs`. Use the connected server's tool inventory as the authority for availability.
+- `browse_records`
+- `select_evidence`
+- `follow_references`
+- `get_source_pdfs`
+
+Use the connected server's tool inventory as the authority for availability.
 
 It does not expose installation, pack verification, revocation, acquisition, compilation, HTTP, or a caller-selected principal.
 
@@ -151,4 +150,4 @@ Read the complete [model reading guide](../MODEL_READING_GUIDE.md) before buildi
 
 ## Source checkout development
 
-From a source checkout and isolated environment, `python -m pip install -e ".[mcp]"` installs the optional MCP dependencies. This path contains no prepared standards corpus. The GitHub prepared artifact and PyPI code package are separate channels; installing from PyPI does not install, download, or authorize standards content. The published `v0.1.0a6` uses page-text packs and an automated, unreviewed `outline-v3`; later source changes are not in that release or its PyPI wheel.
+From a source checkout and isolated environment, `python -m pip install -e ".[mcp]"` installs the optional MCP dependencies. This path contains no prepared standards corpus. The GitHub prepared artifact and PyPI code package are separate channels; installing from PyPI does not install, download, or authorize standards content. The prepared `v0.1.0a7` retains the page-text packs, automated unreviewed `outline-v3` and bounded 1661 recovery packs. Later corpus representations do not become installed merely by upgrading code.
