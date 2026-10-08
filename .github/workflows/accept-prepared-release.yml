@@ -35,6 +35,9 @@ concurrency:
 jobs:
   native-prepared-acceptance:
     name: ${{ matrix.os }} / CPython 3.12
+    # GitHub exposes draft releases only to callers with push access.
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -42,7 +45,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     env:
-      GH_TOKEN: ${{ github.token }}
       ALLOW_DRAFT: ${{ inputs.allow_draft }}
       RELEASE_TAG: ${{ inputs.release_tag }}
       ASSET_NAME: ${{ inputs.asset_name }}
@@ -54,6 +56,8 @@ jobs:
           python-version: "3.12"
       - name: Download exact published assets and verify outer identity
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if ($env:EXPECTED_SHA256 -cnotmatch '^[0-9a-f]{64}$') { throw 'expected_sha256 must be 64 lowercase hexadecimal characters.' }
           try { $expectedBytes = [long]$env:EXPECTED_BYTES } catch { throw 'expected_bytes must be an integer.' }
