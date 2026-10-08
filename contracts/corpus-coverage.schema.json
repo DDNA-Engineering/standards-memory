@@ -1,0 +1,113 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "corpus_index_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}\\.json$"
+              },
+              "ledger_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "package_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "identifier": {
+                "type": "string",
+                "minLength": 1
+              },
+              "physical_pages": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "pages_without_text": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "text_bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "unavailable_components": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "path",
+              "ledger_sha256",
+              "package_digest",
+              "identifier",
+              "physical_pages",
+              "pages_without_text",
+              "text_bytes",
+              "unavailable_components"
+            ]
+          }
+        },
+        "physical_pages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pages_without_text": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "undisposed_text_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "semantic_qualification": {
+          "const": "not_established"
+        },
+        "visual_review": {
+          "const": "pending"
+        },
+        "approval": {
+          "const": "not_granted"
+        }
+      },
+      "required": [
+        "corpus_index_sha256",
+        "packages",
+        "physical_pages",
+        "pages_without_text",
+        "undisposed_text_bytes",
+        "semantic_qualification",
+        "visual_review",
+        "approval"
+      ]
+    },
+    "coverage_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema_version",
+    "coverage",
+    "coverage_sha256"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.org/contracts/corpus-coverage/0.1.0",
+  "title": "Corpus ledger manifest written after all package ledgers"
+}

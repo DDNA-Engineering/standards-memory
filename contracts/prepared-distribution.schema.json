@@ -4,49 +4,191 @@
   "title": "StandardsForge prepared distribution manifest",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "product", "version", "build", "state", "files"],
+  "required": [
+    "schema_version",
+    "product",
+    "version",
+    "build",
+    "state",
+    "files"
+  ],
   "properties": {
-    "schema_version": {"const": "1.3"},
-    "product": {"const": "StandardsForge prepared distribution"},
-    "version": {"type": "string", "minLength": 1},
+    "schema_version": {
+      "const": "1.3"
+    },
+    "product": {
+      "const": "StandardsForge prepared distribution"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
     "build": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["archive_source_date_epoch", "archive_timestamp", "wheel_build_backend", "wheel_generator", "wheel_sha256", "wheel_provenance_sha256", "mcp_requirement", "mcp_wheel_count", "mcp_wheelhouse_sha256", "mcp_requirements_sha256", "core_runtime_python", "core_runtime_platforms", "mcp_runtime_python", "mcp_runtime_platform", "corpus_compiler_version"],
+      "required": [
+        "archive_source_date_epoch",
+        "archive_timestamp",
+        "wheel_build_backend",
+        "wheel_generator",
+        "wheel_sha256",
+        "wheel_provenance_sha256",
+        "mcp_requirement",
+        "mcp_wheel_count",
+        "mcp_wheelhouse_sha256",
+        "mcp_requirements_sha256",
+        "core_runtime_python",
+        "core_runtime_platforms",
+        "mcp_runtime_python",
+        "mcp_runtime_platform",
+        "corpus_compiler_version"
+      ],
       "properties": {
-        "archive_source_date_epoch": {"const": 1767225600},
-        "archive_timestamp": {"const": "2026-01-01T00:00:00Z"},
-        "wheel_build_backend": {"const": "setuptools==84.0.0"},
-        "wheel_generator": {"const": "setuptools (84.0.0)"},
-        "wheel_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "wheel_provenance_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "mcp_requirement": {"const": "mcp==2.2.0"},
-        "mcp_wheel_count": {"type": "integer", "minimum": 1},
-        "mcp_wheelhouse_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "mcp_requirements_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "core_runtime_python": {"const": "CPython >=3.11"},
-        "core_runtime_platforms": {
-          "const": ["windows_x86_64", "linux_x86_64", "macos_arm64", "macos_x86_64"]
+        "archive_source_date_epoch": {
+          "const": 1767225600
         },
-        "mcp_runtime_python": {"const": "CPython 3.12"},
-        "mcp_runtime_platform": {"const": "win_amd64"},
-        "corpus_compiler_version": {"type": "string", "minLength": 1}
+        "archive_timestamp": {
+          "const": "2026-01-01T00:00:00Z"
+        },
+        "wheel_build_backend": {
+          "const": "setuptools==84.0.0"
+        },
+        "wheel_generator": {
+          "const": "setuptools (84.0.0)"
+        },
+        "wheel_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "wheel_provenance_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "mcp_requirement": {
+          "const": "mcp==2.2.0"
+        },
+        "mcp_wheel_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "mcp_wheelhouse_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "mcp_requirements_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "core_runtime_python": {
+          "const": "CPython >=3.11"
+        },
+        "core_runtime_platforms": {
+          "const": [
+            "windows_x86_64",
+            "linux_x86_64",
+            "macos_arm64",
+            "macos_x86_64"
+          ]
+        },
+        "mcp_runtime_python": {
+          "const": "CPython 3.12"
+        },
+        "mcp_runtime_platform": {
+          "const": "win_amd64"
+        },
+        "corpus_compiler_version": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "state": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["corpus_id", "corpus_package_count", "included_package_count", "page_record_count", "source_pdf_count", "physical_page_count", "principal_id", "mil_std_810h_derived_package_digest", "source_baseline_id"],
+      "required": [
+        "corpus_id",
+        "corpus_package_count",
+        "included_package_count",
+        "page_record_count",
+        "source_pdf_count",
+        "physical_page_count",
+        "principal_id",
+        "mil_std_810h_derived_package_digest",
+        "source_baseline_id"
+      ],
       "properties": {
-        "corpus_id": {"type": "string", "minLength": 1},
-        "corpus_package_count": {"type": "integer", "minimum": 1},
-        "included_package_count": {"type": "integer", "minimum": 2},
-        "page_record_count": {"type": "integer", "minimum": 0},
-        "source_pdf_count": {"type": "integer", "minimum": 0},
-        "physical_page_count": {"type": "integer", "minimum": 0},
-        "principal_id": {"const": "local-user"},
-        "mil_std_810h_derived_package_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "source_baseline_id": {"type": "string", "minLength": 1}
+        "corpus_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "corpus_package_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "included_package_count": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "page_record_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_pdf_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "physical_page_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "principal_id": {
+          "const": "local-user"
+        },
+        "mil_std_810h_derived_package_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_baseline_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualified_packs": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "pack_id",
+              "package_digest",
+              "suite_path",
+              "run_path"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^packs/recovery/[a-z0-9-]+\\.zip$"
+              },
+              "pack_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "package_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "suite_path": {
+                "type": "string",
+                "pattern": "^qualification/recovery/[a-z0-9-]+-suite\\.json$"
+              },
+              "run_path": {
+                "type": "string",
+                "pattern": "^qualification/recovery/[a-z0-9-]+-run\\.json$"
+              }
+            }
+          }
+        }
       }
     },
     "files": {
@@ -55,11 +197,24 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["path", "bytes", "sha256"],
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
         "properties": {
-          "path": {"type": "string", "minLength": 1},
-          "bytes": {"type": "integer", "minimum": 0},
-          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
         }
       }
     }

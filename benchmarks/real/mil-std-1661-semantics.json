@@ -1,0 +1,1847 @@
+{
+  "suite": {
+    "suite_id": "mil-std-1661-semantics-visual-review-2",
+    "qualification": "bounded_real_document_regression",
+    "package_digest": "4c5e1c46a0584d97bd0c9fc6cbd6735a58ea12251bd0b3a3d53ae7ca1402add0",
+    "edition_id": "dla:mil-std-ident:37053:composition:e3a46104409fa274545d8034209f5be6858f405912f645632ec359a89d368242",
+    "cases": [
+      {
+        "case_id": "review-4.1.3",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-c5bc96c3e10e610491e1b58f"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-c5bc96c3e10e610491e1b58f",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-c5bc96c3e10e610491e1b58f",
+              "page": 7,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "94e8a5890596ee82d05eef28959f7ecdf8f05f835a2419f19df4f54db61eb16f"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [
+            "shall not be applied retroactively"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-c5bc96c3e10e610491e1b58f",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "The MARK and MOD system",
+                "action": "be applied retroactively",
+                "modality": "shall",
+                "polarity": "negative",
+                "exact_text": "4.1.3 The MARK and MOD system shall not be applied retroactively\nto items previously assigned approved MARK and MOD nomenclature assign-\nments or type designations under other nomenclature systems. A list of\napproved MARK and MOD nomenclature assignments is contained in NAVSEA MK-MOD 0,\n\"Index of MARK-MOD Equipment Designations\".",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": []
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-4.1.4",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-c0a021d2d5ebf3f4e97bfa12"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-c0a021d2d5ebf3f4e97bfa12",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-c0a021d2d5ebf3f4e97bfa12",
+              "page": 7,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "04ac17838ff9b7bef5d005013dbcc80782c4a41b938640636c1323c5ebb45822"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [
+            "even if the original project is"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-c0a021d2d5ebf3f4e97bfa12",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "type designation",
+                "action": "be assigned",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "4.1.4 One individual type designation shall be assigned to a\nconfiguration item. Once a type designation has been assigned, it shall\nnot be used to identify any other item, even if the original project is\ncancelled.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "Once a type designation has been assigned",
+                  "span_indices": [
+                    0
+                  ]
+                },
+                {
+                  "kind": "exception",
+                  "exact_text": "even if the original project is\ncancelled.",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-4.2.1",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-f48b8d65425fa7ca4180b11f"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-f48b8d65425fa7ca4180b11f",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296",
+            "struct-2ee4f1636da52bda2cfe27fd"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-f48b8d65425fa7ca4180b11f",
+              "page": 7,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "91eba37c8ff3d1f1a27362138d751a85ce69a6f5976c1a1d929541973157290d"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            },
+            {
+              "record_id": "struct-2ee4f1636da52bda2cfe27fd",
+              "page": 17,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "19924010b8a1e4a509fb9947db53dfa0199fadd5ac59965b7ad13ee91b79d449"
+            }
+          ],
+          "critical_facts": [
+            "submit only the original"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-f48b8d65425fa7ca4180b11f",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "nomenclature assignment requests",
+                "action": "be delivered",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "4.2.1 All Mark and MOD nomenclature assignment requests shall\nbe delivered to the NAVSEASYSCOMHQ code specified in the contract or\norder for assignment and approval action (see Appendix, paragraph 10.2.1).",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": []
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-4.2.3",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-748687b6e4bd68e3eccd9f72"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-748687b6e4bd68e3eccd9f72",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296",
+            "struct-d881426ad4b62fe09c3e476a",
+            "struct-7bb2f1f94724c2e16046b775"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-748687b6e4bd68e3eccd9f72",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "b772b5381dc3ac30ffa003a783f4c1db9c01c03ba274b13c3cf04b2f7515bd67"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            },
+            {
+              "record_id": "struct-d881426ad4b62fe09c3e476a",
+              "page": 15,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f6462f7bd7d31ac14795aa1a4126152b179882fb3c835875da21d3e0f6ff6c2d"
+            },
+            {
+              "record_id": "struct-7bb2f1f94724c2e16046b775",
+              "page": 16,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "117187b9433716ce11afb95eef45cef0f56d722e330d42e86f17db7430e3fa75"
+            }
+          ],
+          "critical_facts": [
+            "SAMPLE",
+            "OP 9987",
+            "No\nreproductions will be accepted."
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-748687b6e4bd68e3eccd9f72",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "Requests",
+                "action": "be prepared",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "4.2.3 Requests for assignment of MARK and MOD nomenclature or EX\nand MOD nomenclature shall be prepared on form NAVSEA 5030/1 Nomenclature\nAssignment Request. (See Figure 1).",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": []
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-5.4.1",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-ae290a82b9e2d2abc300df49"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-ae290a82b9e2d2abc300df49",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-ae290a82b9e2d2abc300df49",
+              "page": 9,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "91cb20933618bfcb771d8b58f51211a2ac3e62be569ef853b46fbe0837f9c1e6"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [
+            "physically or functionally interchangeable"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-ae290a82b9e2d2abc300df49",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "MARK or EX number",
+                "action": "be changed",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "5.4.1 If the item is changed to the extent that it is no longer\nphysically or functionally interchangeable, the MARK or EX number shall\nbe changed.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "If the item is changed to the extent that it is no longer\nphysically or functionally interchangeable",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-5.4.4",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-71a6c78ca4822f7dffc6fbdb"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-71a6c78ca4822f7dffc6fbdb",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-71a6c78ca4822f7dffc6fbdb",
+              "page": 9,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "88cdf0021e61d1cee5f06c58da920c32427604469952fbc5b36bedb526b5c645"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [
+            "shall not affect"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-71a6c78ca4822f7dffc6fbdb",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "number change",
+                "action": "affect",
+                "modality": "shall",
+                "polarity": "negative",
+                "exact_text": "5.4.4 A MOD number change at a lower level of assembly in an\nequipment or system, shall not affect the designation at the next higher\n\nlevel if physical and functional interchangeability at the higher level\nis retained.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "if physical and functional interchangeability at the higher level\nis retained.",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-5.5.1",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-96609706bec98e100059910e"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-96609706bec98e100059910e",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-96609706bec98e100059910e",
+              "page": 9,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "e8be39ef62b8a9da4a10eca23942674470e8fa099aba761ab27c7db4321b8aef"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [
+            "except where space is"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-96609706bec98e100059910e",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "Abbreviations",
+                "action": "be used",
+                "modality": "shall",
+                "polarity": "negative",
+                "exact_text": "5.5.1 Abbreviations. The applicable standard abbreviations listed\nin MIL-STD-12 shall be used. Abbreviations of an item name shall not be\nused on nameplates or in the titles of documents except where space is\nlimited. In limited space \"MK\" may be substituted. In all other appli-\ncations either \"MARK\" or \"MK\" may be utilized. Modification abbreviation\n\"MOD\" shall be used with all three letters capitalized. In correspondence\nor technical writing, the words MARK and MOD may be written in lower case\nletters with the letter \"M\" capitalized in both words.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "exception",
+                  "exact_text": "except where space is\nlimited.",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-5.5.2",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-6948cdc9990b892583dc1c8b"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-6948cdc9990b892583dc1c8b",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-6948cdc9990b892583dc1c8b",
+              "page": 9,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f1c0ec7453e5b24ec96a006bb2716444e2f9aded8bbf47a4faec3bcf6340a02f"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [
+            "shall retain its original nomenclature"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-6948cdc9990b892583dc1c8b",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "Equipment",
+                "action": "retain",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "5.5.2 Equipment of Other Services Adopted for NAVSEASYSCOM Use.\nEquipment developed under other than NAVSEASYSCOM cognizance and adopted\nfor use without change by the Command shall retain its original nomenclature.\nHowever, when such equipment is designed or modified specifically for\nNAVSEASYSCOM use, either by the original producer or by NAVSEASYSCOM, an\nofficial MARK and MOD type designation shall be assigned.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "without change",
+                  "span_indices": [
+                    0
+                  ]
+                },
+                {
+                  "kind": "exception",
+                  "exact_text": "However, when such equipment is designed or modified specifically for\nNAVSEASYSCOM use",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-5.9.2",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-35380b11bd1dcc3be8167186"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-35380b11bd1dcc3be8167186",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296",
+            "struct-f48b8d65425fa7ca4180b11f",
+            "struct-2ee4f1636da52bda2cfe27fd"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-35380b11bd1dcc3be8167186",
+              "page": 10,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "08304b7a579cf4957497629d6ce3884b7d13e84d6e1eccc845dc72494162b15d"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            },
+            {
+              "record_id": "struct-f48b8d65425fa7ca4180b11f",
+              "page": 7,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "91eba37c8ff3d1f1a27362138d751a85ce69a6f5976c1a1d929541973157290d"
+            },
+            {
+              "record_id": "struct-2ee4f1636da52bda2cfe27fd",
+              "page": 17,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "19924010b8a1e4a509fb9947db53dfa0199fadd5ac59965b7ad13ee91b79d449"
+            }
+          ],
+          "critical_facts": [
+            "until the designation has"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-35380b11bd1dcc3be8167186",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "no official publica-\ntion, drawing or nameplate",
+                "action": "be released",
+                "modality": "shall",
+                "polarity": "negative",
+                "exact_text": "5.9.2 Use of Tentative Reservations. A tentative reservation\nof an EX designation is sufficient authorization for use of such designa-\ntion on drawings and in correspondence. However, no official publica-\ntion, drawing or nameplate shall be released until the designation has\nbeen approved on form NAVSEA 5030/1 (see 4.2.1).",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "until the designation has\nbeen approved on form NAVSEA 5030/1 (see 4.2.1).",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-5.10.4",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-84875fad29721b3bcc1a5e8f"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-84875fad29721b3bcc1a5e8f",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-84875fad29721b3bcc1a5e8f",
+              "page": 11,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "c35375144db2c75c896cde5688ba0309aa04477b938812c0eba94f3012c608b9"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [
+            "requests for EX nomenclature."
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-84875fad29721b3bcc1a5e8f",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "request",
+                "action": "be prepared",
+                "modality": "shall",
+                "polarity": "negative",
+                "exact_text": "5.10.4 No request for change of MARK or MOD shall be prepared until\nthe authorization for the change is received. Space 5, form NAVSEA 5030/1,\nshall indicate either the higher authority directive number which resulted\nin the change, the authorizing Change Control Board (CCB) Directive Number\nor, for originators not employing the ECP/CCB change control process, the\nnumber of the authorizing document issued by the cognizant organization\nto generate the change. Any portions of the ECP or technical documents\n\nwhich the originator may deem necessary to justify the change may be\nattached to the form NAVSEA 5030/1. This paragraph does not apply to\nrequests for EX nomenclature.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "until\nthe authorization for the change is received.",
+                  "span_indices": [
+                    0
+                  ]
+                },
+                {
+                  "kind": "exception",
+                  "exact_text": "This paragraph does not apply to\nrequests for EX nomenclature.",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-5.11.1",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-6ed615c125bbedf070f4467e"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-6ed615c125bbedf070f4467e",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296",
+            "struct-7bb2f1f94724c2e16046b775",
+            "struct-1f94cea24568cb240ec3a4e8"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-6ed615c125bbedf070f4467e",
+              "page": 11,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "3d1e25b5d5d58a55e62066eb199d86ba47de40cade207bcd6ceda6a9f6d1efff"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            },
+            {
+              "record_id": "struct-7bb2f1f94724c2e16046b775",
+              "page": 16,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "117187b9433716ce11afb95eef45cef0f56d722e330d42e86f17db7430e3fa75"
+            },
+            {
+              "record_id": "struct-1f94cea24568cb240ec3a4e8",
+              "page": 14,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "2411d66b6c5be4266c21a9a2d2a9ef1d652c9378fd82e6e9929efc1950a287b1"
+            }
+          ],
+          "critical_facts": [
+            "except 7, 15, 17, 18 and 19"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-6ed615c125bbedf070f4467e",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "All spaces",
+                "action": "be completed",
+                "modality": "must",
+                "polarity": "affirmative",
+                "exact_text": "5.11.1 All spaces except 7, 15, 17, 18 and 19 must be completed.\nWhen not applicable, enter \"N/A\". (See Figure 1)",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "exception",
+                  "exact_text": "except 7, 15, 17, 18 and 19",
+                  "span_indices": [
+                    0
+                  ]
+                },
+                {
+                  "kind": "condition",
+                  "exact_text": "When not applicable",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-5.11.8",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-9356ce48d16d8b287a828a9c"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-9356ce48d16d8b287a828a9c",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296",
+            "struct-84875fad29721b3bcc1a5e8f"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-9356ce48d16d8b287a828a9c",
+              "page": 12,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "01c56017a431085df5b5ff7e29c84b4f4eeb2feb25044b60ae582da471bf8df3"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            },
+            {
+              "record_id": "struct-84875fad29721b3bcc1a5e8f",
+              "page": 11,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "c35375144db2c75c896cde5688ba0309aa04477b938812c0eba94f3012c608b9"
+            }
+          ],
+          "critical_facts": [
+            "requests for EX nomenclature."
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-9356ce48d16d8b287a828a9c",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "space 5",
+                "action": "enter",
+                "modality": "other",
+                "polarity": "affirmative",
+                "exact_text": "5.11.8 In space 5, enter the CCB Directive Number or other\nauthorizing document number. (See 5.10.4, above)",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": []
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-5.11.13-space-8",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-8823e5846b7282905ee4e6fc"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-8823e5846b7282905ee4e6fc",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-8823e5846b7282905ee4e6fc",
+              "page": 12,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "ee5c970477fd2356c59ea802a2d5e8b9f79b4bab1f1c5903634cb9f1e123d913"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [
+            "a. Material",
+            "l. Intended use",
+            "as applicable:",
+            "When a new MOD number is requested"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-8823e5846b7282905ee4e6fc",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "item description",
+                "action": "include",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "5.11.13 In space 8, enter the item description, which shall contain\nsufficient electrical, mechanical, and reference data to distinguish the\nitem described from all other items. The item description shall include\nthe following information as applicable:\n\na. Material\nb. Specifications\n\nc. Chemical composition\nd. Electrical data\n\ne. Dimensions\n\nf. Weight\n\ng. Arrangement of parts\n\nh. Principles of operation\n\ni. Other physical data\n\nj. Performance characteristics\n\nk. Component parts\n\nl. Intended use\n\nWhen a new MOD number is requested, characteristics that are considered\nto justify a new MOD number shall be described in detail. A statement\nshall be included on the form similar to the following: This item is\n\nsimilar to the MOD ________________, except that _______________________\n(See Figure (1)).",
+                "span_indices": [
+                  0,
+                  1
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "source_applicability",
+                  "exact_text": "as applicable:",
+                  "span_indices": [
+                    0
+                  ]
+                },
+                {
+                  "kind": "condition",
+                  "exact_text": "When a new MOD number is requested",
+                  "span_indices": [
+                    1
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-5.11.13-space-9",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-121e6cef1a39922034523530"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-121e6cef1a39922034523530",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-121e6cef1a39922034523530",
+              "page": 13,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "ef71c4aeb173bb4829bf36b7ce68c5e925f9dc7ea6c9f9d750606d0df9187e48"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [
+            "In space 9",
+            "in lieu of the sub-system"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-121e6cef1a39922034523530",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "space 9",
+                "action": "enter",
+                "modality": "other",
+                "polarity": "affirmative",
+                "exact_text": "5.11.13 In space 9, enter the equipment with which the item is used.\n(Next higher assembly and sub-system. If the next higher assembly is the\nsub-system, enter the system in lieu of the sub-system).",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "If the next higher assembly is the\nsub-system",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-10.1",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-d2fc8307be254afb2a2a3c95"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-d2fc8307be254afb2a2a3c95",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296",
+            "struct-6d262f315dd21985e8819813",
+            "struct-261041802761207f56c09af6"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-d2fc8307be254afb2a2a3c95",
+              "page": 17,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "e90d3ef216c15302c32b4d85feee604aecd57fa366a3b8eb45b4331310c82f35"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            },
+            {
+              "record_id": "struct-6d262f315dd21985e8819813",
+              "page": 17,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "3be593f86f88747db5f2bfca6d7a31bbc9b386067189700ff28c8882e3e50623"
+            },
+            {
+              "record_id": "struct-261041802761207f56c09af6",
+              "page": 17,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "710e347346140d58317db7a9fd2041326879c84db7356d366ef9dd40a971705a"
+            }
+          ],
+          "critical_facts": [
+            "DID NUMBER TITLE",
+            "DI-E-2000A REQUEST, NOMENCLATURE ASSIGNMENT, FORM NAVSEA 5030/1"
+          ],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-d2fc8307be254afb2a2a3c95",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "Data",
+                "action": "be prepared",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "10.1 General. When this standard is used in a procurement which\nincorporates a DD Form 1423 and invokes the provisions of 7-104.9(n) of\nthe Armed Services Procurement Regulations, the data requirements identified\nbelow will be developed as specified by an approved Data Item Description\n(DD Form 1664) and delivered in accordance with the approved Contract Data\nRequirements List (DD Form 1423) incorporated into the contract. When\nthe provisions of ASPR-7-104.9(n) are not invoked, the data identified\nbelow will be delivered by the contractor in accordance with the contract\nrequirements. Data shall be prepared in accordance with the following\nData Item Description (DID) cited by number in block 4 of the DD Form 1423.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "When this standard is used in a procurement which\nincorporates a DD Form 1423 and invokes the provisions of 7-104.9(n)",
+                  "span_indices": [
+                    0
+                  ]
+                },
+                {
+                  "kind": "condition",
+                  "exact_text": "When\nthe provisions of ASPR-7-104.9(n) are not invoked",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "cross-page-exclusions",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-db637029067397378b750296"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [
+            "a. Guided missiles",
+            "f. Electronic equipment",
+            "MIL-STD-196"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "review-4.2.4/experimental-assignment",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-bf7bb38073e6325d51e23e05"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-bf7bb38073e6325d51e23e05",
+            "struct-719c70c1106034ef307fcaee",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-bf7bb38073e6325d51e23e05",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "d6a9ea8ba11b440eecbf843f693fbf45769dce3f644cd2906aeb749d0364c450"
+            },
+            {
+              "record_id": "struct-719c70c1106034ef307fcaee",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "ffaa0f503dc59708b8c421b5268d90c2e11bb17a40d051c0044053b5fae57e19"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-bf7bb38073e6325d51e23e05",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "EX and MOD nomenclature",
+                "action": "be assigned",
+                "modality": "will",
+                "polarity": "affirmative",
+                "exact_text": "4.2.4 EX and MOD nomenclature will be assigned to major items or\nequipments in the experimental or developmental phase when it is likely\nthat there will be a period of technical, operational or service evaluation.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "when it is likely\nthat there will be a period of technical, operational or service evaluation.",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-4.2.4/avoid-permanent-assignment",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-ebc7ca4b5083d72f3d1c3c9d"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-ebc7ca4b5083d72f3d1c3c9d",
+            "struct-719c70c1106034ef307fcaee",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-ebc7ca4b5083d72f3d1c3c9d",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "499c93440bd854f118a25995f654d42f6384c112e2f8c0eedb485dfbf25dcb6d"
+            },
+            {
+              "record_id": "struct-719c70c1106034ef307fcaee",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "ffaa0f503dc59708b8c421b5268d90c2e11bb17a40d051c0044053b5fae57e19"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-ebc7ca4b5083d72f3d1c3c9d",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "Assignment\nof permanent MARK and MOD numbers to items undergoing evaluation",
+                "action": "be\navoided",
+                "modality": "must",
+                "polarity": "affirmative",
+                "exact_text": "Assignment\nof permanent MARK and MOD numbers to items undergoing evaluation must be\navoided, since MARK and MOD identification indicates that the item is in\nproduction and available through supply channels.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "source_applicability",
+                  "exact_text": "items undergoing evaluation",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-4.2.4/retain-no-service-number",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-6bcd849786571c6ed3a8d1ad"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-6bcd849786571c6ed3a8d1ad",
+            "struct-719c70c1106034ef307fcaee",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-6bcd849786571c6ed3a8d1ad",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "caf6e1df9ad1e89b0ec07e90a73ca10dbb3d230cd7d80dce33c7c2b7efff80b6"
+            },
+            {
+              "record_id": "struct-719c70c1106034ef307fcaee",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "ffaa0f503dc59708b8c421b5268d90c2e11bb17a40d051c0044053b5fae57e19"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-6bcd849786571c6ed3a8d1ad",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "items",
+                "action": "be identified",
+                "modality": "shall",
+                "polarity": "negative",
+                "exact_text": "such\nitems shall not be identified by the MARK and MOD number assigned to it\nas a service item",
+                "span_indices": [
+                  1
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "When an item, currently\nin service use, is selected for further development or evaluation",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-4.2.4/use-ex-during-evaluation",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-e8146b77df8f082af11a7980"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-e8146b77df8f082af11a7980",
+            "struct-719c70c1106034ef307fcaee",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-e8146b77df8f082af11a7980",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "3e9059f641afd3b183f41817ffef8e2c6a6b045db5c81294355eee9a79465c9c"
+            },
+            {
+              "record_id": "struct-719c70c1106034ef307fcaee",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "ffaa0f503dc59708b8c421b5268d90c2e11bb17a40d051c0044053b5fae57e19"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-e8146b77df8f082af11a7980",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "items",
+                "action": "be reidentified",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "such\nitems\nshall be reidentified by EX and MOD during this\nperiod of evaluation.",
+                "span_indices": [
+                  1,
+                  2
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "When an item, currently\nin service use, is selected for further development or evaluation",
+                  "span_indices": [
+                    0
+                  ]
+                },
+                {
+                  "kind": "condition",
+                  "exact_text": "during this\nperiod of evaluation.",
+                  "span_indices": [
+                    2
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-4.2.4/restore-mark-after-evaluation",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-7675eb29f8c778587c52440c"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-7675eb29f8c778587c52440c",
+            "struct-719c70c1106034ef307fcaee",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-7675eb29f8c778587c52440c",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "3d3acf9b39ff8c60154c8bb0b931ee09bcbccb6386763d621ffd2e4a8f8df1aa"
+            },
+            {
+              "record_id": "struct-719c70c1106034ef307fcaee",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "ffaa0f503dc59708b8c421b5268d90c2e11bb17a40d051c0044053b5fae57e19"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-7675eb29f8c778587c52440c",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "the item",
+                "action": "be identified",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "When evaluation is completed, the item shall again\nbe identified by an appropriate MARK and MOD number.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "When evaluation is completed",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "review-4.2.4",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "struct-719c70c1106034ef307fcaee"
+        },
+        "expected": {
+          "record_ids": [
+            "struct-719c70c1106034ef307fcaee",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-719c70c1106034ef307fcaee",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "ffaa0f503dc59708b8c421b5268d90c2e11bb17a40d051c0044053b5fae57e19"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-719c70c1106034ef307fcaee",
+              "content_role": "note",
+              "statement": null,
+              "qualifiers": []
+            }
+          ]
+        }
+      },
+      {
+        "case_id": "enumerate-4.2.4-directives",
+        "operation": "enumerate_obligations",
+        "request": {
+          "scope_prefix": "4.2.4",
+          "limit": 100
+        },
+        "expected": {
+          "record_ids": [
+            "struct-bf7bb38073e6325d51e23e05",
+            "struct-ebc7ca4b5083d72f3d1c3c9d",
+            "struct-6bcd849786571c6ed3a8d1ad",
+            "struct-e8146b77df8f082af11a7980",
+            "struct-7675eb29f8c778587c52440c",
+            "struct-719c70c1106034ef307fcaee",
+            "struct-7adcdc40e8dd8921bdfb2ee4",
+            "struct-6c99be2575e5c6f0de22bbff",
+            "struct-db637029067397378b750296"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "struct-bf7bb38073e6325d51e23e05",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "d6a9ea8ba11b440eecbf843f693fbf45769dce3f644cd2906aeb749d0364c450"
+            },
+            {
+              "record_id": "struct-ebc7ca4b5083d72f3d1c3c9d",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "499c93440bd854f118a25995f654d42f6384c112e2f8c0eedb485dfbf25dcb6d"
+            },
+            {
+              "record_id": "struct-6bcd849786571c6ed3a8d1ad",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "caf6e1df9ad1e89b0ec07e90a73ca10dbb3d230cd7d80dce33c7c2b7efff80b6"
+            },
+            {
+              "record_id": "struct-e8146b77df8f082af11a7980",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "3e9059f641afd3b183f41817ffef8e2c6a6b045db5c81294355eee9a79465c9c"
+            },
+            {
+              "record_id": "struct-7675eb29f8c778587c52440c",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "3d3acf9b39ff8c60154c8bb0b931ee09bcbccb6386763d621ffd2e4a8f8df1aa"
+            },
+            {
+              "record_id": "struct-719c70c1106034ef307fcaee",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "ffaa0f503dc59708b8c421b5268d90c2e11bb17a40d051c0044053b5fae57e19"
+            },
+            {
+              "record_id": "struct-7adcdc40e8dd8921bdfb2ee4",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "f9c3a8963c759eae980d2d9567540b4ea4493188f41d7a166d063230299117b0"
+            },
+            {
+              "record_id": "struct-6c99be2575e5c6f0de22bbff",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "92bf410c26072b40f36bf68c8e172a37a9a8aba3f1d0792973ecbcd0e3265e6a"
+            },
+            {
+              "record_id": "struct-db637029067397378b750296",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "55848c96e0a0736f4d7df5b06737cdee256a5b1a145b1cf3d60fcf07036c5924"
+            }
+          ],
+          "critical_facts": [],
+          "complete_for_requested_scope": false,
+          "semantic_assertions": [
+            {
+              "record_id": "struct-bf7bb38073e6325d51e23e05",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "EX and MOD nomenclature",
+                "action": "be assigned",
+                "modality": "will",
+                "polarity": "affirmative",
+                "exact_text": "4.2.4 EX and MOD nomenclature will be assigned to major items or\nequipments in the experimental or developmental phase when it is likely\nthat there will be a period of technical, operational or service evaluation.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "when it is likely\nthat there will be a period of technical, operational or service evaluation.",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            },
+            {
+              "record_id": "struct-ebc7ca4b5083d72f3d1c3c9d",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "Assignment\nof permanent MARK and MOD numbers to items undergoing evaluation",
+                "action": "be\navoided",
+                "modality": "must",
+                "polarity": "affirmative",
+                "exact_text": "Assignment\nof permanent MARK and MOD numbers to items undergoing evaluation must be\navoided, since MARK and MOD identification indicates that the item is in\nproduction and available through supply channels.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "source_applicability",
+                  "exact_text": "items undergoing evaluation",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            },
+            {
+              "record_id": "struct-6bcd849786571c6ed3a8d1ad",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "items",
+                "action": "be identified",
+                "modality": "shall",
+                "polarity": "negative",
+                "exact_text": "such\nitems shall not be identified by the MARK and MOD number assigned to it\nas a service item",
+                "span_indices": [
+                  1
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "When an item, currently\nin service use, is selected for further development or evaluation",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            },
+            {
+              "record_id": "struct-e8146b77df8f082af11a7980",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "items",
+                "action": "be reidentified",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "such\nitems\nshall be reidentified by EX and MOD during this\nperiod of evaluation.",
+                "span_indices": [
+                  1,
+                  2
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "When an item, currently\nin service use, is selected for further development or evaluation",
+                  "span_indices": [
+                    0
+                  ]
+                },
+                {
+                  "kind": "condition",
+                  "exact_text": "during this\nperiod of evaluation.",
+                  "span_indices": [
+                    2
+                  ]
+                }
+              ]
+            },
+            {
+              "record_id": "struct-7675eb29f8c778587c52440c",
+              "content_role": "requirement_candidate",
+              "statement": {
+                "subject": "the item",
+                "action": "be identified",
+                "modality": "shall",
+                "polarity": "affirmative",
+                "exact_text": "When evaluation is completed, the item shall again\nbe identified by an appropriate MARK and MOD number.",
+                "span_indices": [
+                  0
+                ]
+              },
+              "qualifiers": [
+                {
+                  "kind": "condition",
+                  "exact_text": "When evaluation is completed",
+                  "span_indices": [
+                    0
+                  ]
+                }
+              ]
+            },
+            {
+              "record_id": "struct-719c70c1106034ef307fcaee",
+              "content_role": "note",
+              "statement": null,
+              "qualifiers": []
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "review": {
+    "kind": "agent",
+    "identity": "Codex direct visual review of all 18 MIL-STD-1661 pages; bounded same-agent reference assertions, no independent human adjudication",
+    "reviewed_at": "2026-10-08T13:11:39.800371Z",
+    "suite_sha256": "fc4b685cb0e4dda0ca614fb4b4d65eb8092a91af7f2a752327e79ed2835e7268"
+  }
+}

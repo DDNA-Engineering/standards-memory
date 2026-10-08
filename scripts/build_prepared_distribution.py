@@ -19,7 +19,9 @@ SOURCE_ROOT = REPOSITORY_ROOT / "src"
 if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
-from standardsforge.pack import validate_pack_directory, write_pack_archive  # noqa: E402
+from standardsforge.pack import validate_pack_directory, write_pack_archive, open_validated_pack  # noqa: E402
+from standardsforge.coverage_ledger import digest  # noqa: E402
+from standardsforge.real_benchmark import validate_run  # noqa: E402
 
 
 FIXED_ZIP_TIME = (2026, 1, 1, 0, 0, 0)
@@ -649,6 +651,10 @@ def build_distribution(
     output: Path,
     version: str,
     compresslevel: int,
+    *,
+    outline_policy_path: Path | None = None,
+    qualification_directory: Path | None = None,
+    recovery_directory: Path | None = None,
 ) -> dict:
     corpus_index = corpus_index.resolve()
     acquisition_manifest = acquisition_manifest.resolve()
@@ -681,9 +687,70 @@ def build_distribution(
         acquisition, acquisition_sha256, index, outline
     )
     corpus_policy = REPOSITORY_ROOT / ".standardsforge" / "policies" / "mil-std-corpus-local.json"
-    outline_policy = REPOSITORY_ROOT / ".standardsforge" / "policies" / "mil-std-810h-derived-outline-local.json"
+    outline_policy = outline_policy_path or REPOSITORY_ROOT / ".standardsforge" / "policies" / "mil-std-810h-derived-outline-local.json"
     _validate_policy(corpus_policy, {entry["pack_id"] for entry in entries}, "local-user")
     _validate_policy(outline_policy, {outline.manifest["pack_id"]}, "local-user")
+
+    qualification_payloads = []
+    if qualification_directory is not None:
+        qualification_directory = qualification_directory.resolve()
+        coverage_path = qualification_directory / "coverage" / "coverage.json"
+        coverage_document = _load_json(coverage_path)
+        coverage = coverage_document["coverage"]
+        if coverage_document["coverage_sha256"] != digest(coverage) or coverage["corpus_index_sha256"] != _sha256(corpus_index):
+            raise ValueError("Coverage evidence is stale or changed.")
+        if {p["package_digest"] for p in coverage["packages"]} != {p["package_digest"] for p in entries} or len(coverage["packages"]) != len(entries):
+            raise ValueError("Coverage must account for every included corpus package exactly once.")
+        qualification_payloads.append((coverage_path, "qualification/coverage/coverage.json"))
+        for package in coverage["packages"]:
+            if package["path"] != f"{package['package_digest']}.json":
+                raise ValueError("Coverage ledger path does not match its package identity.")
+            path = coverage_path.parent / package["path"]
+            ledger = _load_json(path)
+            if ledger["ledger_sha256"] != digest(ledger["ledger"]) or ledger["ledger_sha256"] != package["ledger_sha256"] or ledger["ledger"]["package_digest"] != package["package_digest"]:
+                raise ValueError("A package coverage ledger failed content binding.")
+            qualification_payloads.append((path, f"qualification/coverage/{package['path']}"))
+        suite_path = qualification_directory / "real-suite.json"
+        run_path = qualification_directory / "real-benchmark.json"
+        suite, run = _load_json(suite_path), _load_json(run_path)
+        validate_run(run, suite)
+        with zipfile.ZipFile(wheel) as wheel_archive:
+            runtime_sources = {name.removeprefix("standardsforge/"): hashlib.sha256(wheel_archive.read(name)).hexdigest()
+                               for name in wheel_archive.namelist() if name.startswith("standardsforge/") and name.endswith(".py")}
+        if run["run"]["runtime_source_sha256"] != digest(runtime_sources):
+            raise ValueError("Real-document regressions were not run against the exact wheel sources.")
+        if suite["suite"]["package_digest"] != outline.package_digest or not run["run"]["gate"]["passed"]:
+            raise ValueError("Prepared outline must pass its exact real-document regression suite.")
+        qualification_payloads.extend([(suite_path, "qualification/real-suite.json"), (run_path, "qualification/real-benchmark.json")])
+
+    qualified_packs, recovery_payloads = [], []
+    if recovery_directory is not None:
+        if qualification_directory is None:
+            raise ValueError("Recovery requires the base corpus qualification.")
+        recovery_directory = recovery_directory.resolve()
+        for name in ("transcription", "semantics"):
+            archive = recovery_directory / f"packs/mil-std-1661-{name}.zip"
+            suite_path = recovery_directory / f"qualification/{name}-suite.json"
+            run_path = recovery_directory / f"qualification/{name}-run.json"
+            suite, run = _load_json(suite_path), _load_json(run_path)
+            validate_run(run, suite)
+            with open_validated_pack(archive) as pack:
+                _validate_policy(recovery_directory / f"policies/{name}.json", {pack.manifest["pack_id"]}, "local-user")
+                if (suite["suite"]["package_digest"] != pack.package_digest or suite["suite"]["edition_id"] != pack.manifest["edition_id"]
+                        or not run["run"]["gate"]["passed"] or run["run"]["runtime_source_sha256"] != digest(runtime_sources)):
+                    raise ValueError("Recovery qualification must pass for the exact pack and wheel runtime.")
+                qualified_packs.append({"path": f"packs/recovery/{name}.zip", "pack_id": pack.manifest["pack_id"], "package_digest": pack.package_digest,
+                                        "suite_path": f"qualification/recovery/{name}-suite.json", "run_path": f"qualification/recovery/{name}-run.json"})
+            recovery_payloads.extend([(archive, qualified_packs[-1]["path"]), (suite_path, qualified_packs[-1]["suite_path"]), (run_path, qualified_packs[-1]["run_path"])])
+        with open_validated_pack(recovery_directory / "packs/mil-std-1661-transcription.zip") as pages, open_validated_pack(recovery_directory / "packs/mil-std-1661-semantics.zip") as semantics:
+            from standardsforge.coverage_ledger import page_ledger, link_semantic_evidence
+            report = _load_json(pages.root / "transcription-report.json")
+            if report["source_package_digest"] not in {e["package_digest"] for e in entries}:
+                raise ValueError("Recovery source must belong to the included acquisition-pinned corpus.")
+            coverage_path = recovery_directory / "qualification/coverage.json"
+            if _load_json(coverage_path) != link_semantic_evidence(pages, semantics, page_ledger(pages)):
+                raise ValueError("Recovery coverage differs from its exact source and semantic packages.")
+            recovery_payloads.append((coverage_path, "qualification/recovery/coverage.json"))
 
     static_root = REPOSITORY_ROOT / "scripts" / "prepared_distribution"
     static_files = [
@@ -731,7 +798,7 @@ def build_distribution(
                     "allow_admin_install": True,
                     "allow_serve": True,
                     "allowed_pack_ids": sorted(
-                        {entry["pack_id"] for entry in entries} | {outline.manifest["pack_id"]}
+                        {entry["pack_id"] for entry in entries} | {outline.manifest["pack_id"]} | {p["pack_id"] for p in qualified_packs}
                     ),
                     "allowed_content_classes": ["public_government_standard"],
                 },
@@ -745,6 +812,8 @@ def build_distribution(
         payload_files = [
             *static_files,
             *mcp_payloads,
+            *qualification_payloads,
+            *recovery_payloads,
             (scope_path, "provenance/source-baseline.json"),
             (prepared_policy_path, "policies/prepared-local.json"),
             *corpus_payloads,
@@ -758,13 +827,14 @@ def build_distribution(
         distribution_summary = {
             "corpus_id": index.get("corpus_id"),
             "corpus_package_count": len(entries),
-            "included_package_count": len(entries) + 1,
+            "included_package_count": len(entries) + 1 + len(qualified_packs),
             "page_record_count": summary.get("page_records"),
             "source_pdf_count": summary.get("verified_pdf_count"),
             "physical_page_count": summary.get("physical_pages"),
             "principal_id": "local-user",
             "mil_std_810h_derived_package_digest": outline.package_digest,
             "source_baseline_id": distribution_scope["baseline_id"],
+            **({"qualified_packs": qualified_packs} if qualified_packs else {}),
         }
         manifest = {
             "schema_version": "1.3",
@@ -842,7 +912,10 @@ def main() -> int:
     parser.add_argument("--mcp-requirements", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--version", required=True)
+    parser.add_argument("--outline-policy", type=Path, required=True)
+    parser.add_argument("--qualification-directory", type=Path, required=True, help="Coverage ledger, real-suite.json, and passing real-benchmark.json for the exact inputs")
     parser.add_argument("--compresslevel", type=int, choices=range(1, 10), default=9)
+    parser.add_argument("--recovery-directory", type=Path, help="Qualified MIL-STD-1661 recovery supplement to install with the corpus")
     args = parser.parse_args()
     result = build_distribution(
         args.corpus_index,
@@ -855,6 +928,9 @@ def main() -> int:
         args.output,
         args.version,
         args.compresslevel,
+        outline_policy_path=args.outline_policy,
+        qualification_directory=args.qualification_directory,
+        recovery_directory=args.recovery_directory,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0

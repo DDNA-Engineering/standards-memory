@@ -19,7 +19,7 @@ from .models import InventoryEntry, ValidatedPack
 MAX_FILES = 512
 MAX_TOTAL_BYTES = 512 * 1024 * 1024
 MAX_JSON_BYTES = 32 * 1024 * 1024
-ALLOWED_SUFFIXES = {".json", ".txt", ".md", ".pdf"}
+ALLOWED_SUFFIXES = {".json", ".txt", ".md", ".pdf", ".png"}
 REQUIRED_FILES = {"manifest.json", "rights.json", "records.json"}
 
 _MANIFEST_KEYS = {

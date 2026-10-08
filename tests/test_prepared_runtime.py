@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import copy
 import json
 import os
 import subprocess
@@ -147,6 +148,28 @@ class PreparedRuntimeTests(unittest.TestCase):
         value = (json.dumps(self.manifest, indent=2, sort_keys=True) + "\n").encode()
         (self.root / "bundle-manifest.json").write_bytes(value)
         return _sha256(value)
+
+    def test_qualified_pack_manifest_requires_closed_paths_and_inventory(self) -> None:
+        entry = {"path": "packs/recovery/semantics.zip", "suite_path": "qualification/recovery/semantics-suite.json",
+                 "run_path": "qualification/recovery/semantics-run.json", "pack_id": "reviewed", "package_digest": "a" * 64}
+        for key in ("path", "suite_path", "run_path"):
+            target = self.root / entry[key]
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(b"fixture")
+            self.manifest["files"].append({"path": entry[key], "bytes": 7, "sha256": _sha256(b"fixture")})
+        self.manifest["state"].update(qualified_packs=[entry], included_package_count=440)
+        self._write_manifest()
+        validate_bundle(self.root)
+        baseline = copy.deepcopy(self.manifest)
+        for change in (lambda m: m["state"]["qualified_packs"][0].update(path="../outside.zip"),
+                       lambda m: m["state"].update(included_package_count=439),
+                       lambda m: m["state"]["qualified_packs"].append(copy.deepcopy(entry)),
+                       lambda m: m["files"].pop()):
+            self.manifest = copy.deepcopy(baseline)
+            change(self.manifest)
+            self._write_manifest()
+            with self.assertRaises(PreparedSetupError):
+                validate_bundle(self.root)
 
     def test_validates_closed_bundle_and_bound_receipts(self) -> None:
         manifest, digest = validate_bundle(self.root)

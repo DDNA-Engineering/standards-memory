@@ -1,0 +1,211 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "suite_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "qualification": {
+          "const": "bounded_real_document_regression"
+        },
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "agent",
+                "human"
+              ]
+            },
+            "identity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reviewed_at": {
+              "type": "string",
+              "minLength": 1
+            },
+            "suite_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "kind",
+            "identity",
+            "reviewed_at",
+            "suite_sha256"
+          ]
+        },
+        "runtime_source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "package_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "edition_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "case_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "passed": {
+                "type": "boolean"
+              },
+              "errors": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "record_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "record_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "fact": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "code"
+                  ]
+                }
+              },
+              "expected_records": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "found_expected_records": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "response": {
+                "type": "object"
+              },
+              "response_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "case_id",
+              "passed",
+              "errors",
+              "expected_records",
+              "found_expected_records",
+              "response",
+              "response_sha256"
+            ]
+          },
+          "minItems": 1
+        },
+        "metrics": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cases": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "failed_cases": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "expected_records": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "found_expected_records": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "cases",
+            "failed_cases",
+            "expected_records",
+            "found_expected_records"
+          ]
+        },
+        "gate": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maximum_failed_cases": {
+              "const": 0
+            },
+            "passed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "maximum_failed_cases",
+            "passed"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "suite_sha256",
+        "qualification",
+        "review",
+        "runtime_source_sha256",
+        "package_digest",
+        "edition_id",
+        "case_results",
+        "metrics",
+        "gate",
+        "limitations"
+      ]
+    },
+    "run_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run",
+    "run_sha256"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.org/contracts/real-benchmark-run/0.1.0",
+  "title": "Source-bound real-document raw responses and recomputed gate"
+}

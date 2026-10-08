@@ -4,7 +4,7 @@ StandardsForge gives a model read-only, principal-bound access to the prepared l
 
 ## Start with the prepared release on Windows
 
-On 64-bit Windows with CPython 3.12, download and extract the [prepared `v0.1.0a5` archive](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip). Open PowerShell in the extracted directory and run:
+On 64-bit Windows with CPython 3.12, download and extract the [prepared `v0.1.0a6` archive](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a6/standardsforge-ready-0.1.0a6.zip). Open PowerShell in the extracted directory and run:
 
 ```powershell
 python .\setup.py
@@ -12,14 +12,14 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
 (Resolve-Path .\standardsforge-mcp.ps1).Path
 ```
 
-For the published `v0.1.0a5` archive, run core setup first: it validates and indexes the already-compiled library and proves full-integrity doctor under the prepared policy. The second command installs the exact Windows MCP wheelhouse with package indexes disabled and proves a real stdio query. Use the printed absolute launcher path in your model host. Claude Desktop and Cursor both accept this `mcpServers` entry; use `%APPDATA%\Claude\claude_desktop_config.json` for Claude Desktop on Windows or `.cursor/mcp.json` for Cursor. JSON paths need doubled backslashes:
+For the published `v0.1.0a6` archive, run core setup first: it validates and indexes the already-compiled library and proves full-integrity doctor under the prepared policy. The second command installs the exact Windows MCP wheelhouse with package indexes disabled and proves a real stdio query. Use the printed absolute launcher path in your model host. Claude Desktop and Cursor both accept this `mcpServers` entry; use `%APPDATA%\Claude\claude_desktop_config.json` for Claude Desktop on Windows or `.cursor/mcp.json` for Cursor. JSON paths need doubled backslashes:
 
 ```json
 {
   "mcpServers": {
     "standardsforge": {
       "command": "powershell.exe",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a5\\standardsforge-mcp.ps1"]
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a6\\standardsforge-mcp.ps1"]
     }
   }
 }
@@ -40,9 +40,9 @@ First run the prepared archive's offline core setup with `sh ./setup.sh`. Then c
 
 ```sh
 MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
-PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a5
+PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a6
 python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a5"
+"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a6"
 "$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
   --db "$PREPARED_ROOT/.standardsforge/memory.db" \
   --store "$PREPARED_ROOT/.standardsforge/objects" \
@@ -106,4 +106,4 @@ Read the complete [model reading guide](../MODEL_READING_GUIDE.md) before buildi
 
 ## Source checkout development
 
-From a source checkout and isolated environment, `python -m pip install -e ".[mcp]"` installs the optional MCP dependencies. This path contains no prepared standards corpus. The GitHub prepared artifact and PyPI code package are separate channels; installing from PyPI does not install, download, or authorize standards content. The published `v0.1.0a5` uses page-text packs and an automated, unreviewed `outline-v1`; later source changes are not in that release or its PyPI wheel.
+From a source checkout and isolated environment, `python -m pip install -e ".[mcp]"` installs the optional MCP dependencies. This path contains no prepared standards corpus. The GitHub prepared artifact and PyPI code package are separate channels; installing from PyPI does not install, download, or authorize standards content. The published `v0.1.0a6` uses page-text packs and an automated, unreviewed `outline-v3`; later source changes are not in that release or its PyPI wheel.

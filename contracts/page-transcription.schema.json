@@ -1,0 +1,191 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "0.1.0",
+        "0.2.0"
+      ]
+    },
+    "transcription": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_package_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_pdf_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "renderer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text_method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pages": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "physical_page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "text": {
+                "type": "string"
+              },
+              "raster_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "review_notes": {
+                "type": "string",
+                "minLength": 1
+              },
+              "disposition": {
+                "enum": [
+                  "transcribed_text",
+                  "reviewed_blank"
+                ]
+              }
+            },
+            "required": [
+              "physical_page",
+              "text",
+              "raster_sha256",
+              "review_notes"
+            ]
+          }
+        }
+      },
+      "required": [
+        "source_package_digest",
+        "source_pdf_sha256",
+        "renderer",
+        "text_method",
+        "pages"
+      ]
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "transcription_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reviewer_type": {
+          "enum": [
+            "agent",
+            "human"
+          ]
+        },
+        "reviewer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "attestation": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "transcription_sha256",
+        "reviewer_type",
+        "reviewer_id",
+        "reviewed_at",
+        "attestation"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "transcription",
+    "review"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/page-transcription.schema.json",
+  "title": "Content-bound reviewed visual page transcription",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "0.1.0"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "transcription": {
+            "properties": {
+              "pages": {
+                "items": {
+                  "not": {
+                    "required": [
+                      "disposition"
+                    ]
+                  },
+                  "properties": {
+                    "text": {
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "transcription": {
+            "properties": {
+              "pages": {
+                "items": {
+                  "required": [
+                    "disposition"
+                  ],
+                  "if": {
+                    "properties": {
+                      "disposition": {
+                        "const": "reviewed_blank"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "text": {
+                        "const": ""
+                      }
+                    }
+                  },
+                  "else": {
+                    "properties": {
+                      "text": {
+                        "minLength": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

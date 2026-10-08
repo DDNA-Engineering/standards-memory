@@ -1,6 +1,6 @@
 # Prepared offline library
 
-The published [StandardsForge `v0.1.0a5` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a5) is the normal end-user path. It already contains the dependency-free StandardsForge wheel, compressed MIL-STD packs from the recorded public-source acquisition snapshot, exact local policies, setup and launcher scripts, and recorded provenance. Users do not reacquire PDFs or compile the corpus.
+The published [StandardsForge `v0.1.0a6` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a6) is the normal end-user path. It already contains the dependency-free StandardsForge wheel, compressed MIL-STD packs from the recorded public-source acquisition snapshot, exact local policies, setup and launcher scripts, and recorded provenance. Users do not reacquire PDFs or compile the corpus.
 
 The GitHub prepared release and the PyPI project are separate channels. The prepared release carries the rights-qualified corpus and supports an offline core setup. PyPI carries independently built StandardsForge code only; it does not bundle, fetch, or authorize standards content.
 
@@ -101,14 +101,14 @@ Runtime state stays inside the extracted distribution. Keep the extracted direct
 
 ## MCP installation choices
 
-On 64-bit Windows with CPython 3.12, run the core `setup.py` command above before `setup.ps1` for the published `v0.1.0a5` archive. The latter installs the exact hash-locked MCP dependency closure from the archive's Windows wheelhouse and proves a real stdio round trip before marking MCP ready. Use `standardsforge-mcp.ps1` as the model-host command.
+On 64-bit Windows with CPython 3.12, run the core `setup.py` command above before `setup.ps1` for the published `v0.1.0a6` archive. The latter installs the exact hash-locked MCP dependency closure from the archive's Windows wheelhouse and proves a real stdio round trip before marking MCP ready. Use `standardsforge-mcp.ps1` as the model-host command.
 
 On Linux or macOS, complete the offline core setup first. Then create a separate environment outside the closed prepared directory and install the exact code/MCP package from PyPI:
 
 ```sh
 MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
 python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a5"
+"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a6"
 ```
 
 The pip command is an explicit networked code/dependency installation. It does not download the prepared corpus or any standards content. Start the installed module with absolute paths to the prepared distribution's `.standardsforge/memory.db` and `.standardsforge/objects`; the [model integration guide](MODEL_INTEGRATION.md) gives the full command and host boundary.
@@ -117,7 +117,7 @@ The pip command is an explicit networked code/dependency installation. It does n
 
 The prepared library is a fixed acquisition snapshot completed September 21, 2026 against the DLA ASSIST dataset marked updated September 18, 2026. The complete 438-pack inventory is in the [root README](../../README.md#complete-prepared-library-snapshot).
 
-The published archive contains 438 page-text packs from 912 verified PDFs, plus a separate automated, unreviewed 7,788-record MIL-STD-810H `outline-v1` pack. Later source-only outline and reviewer changes are not part of this frozen release. Its included `CONTENT-NOTICE.md` is frozen with that archive; the [source template](../../scripts/prepared_distribution/CONTENT-NOTICE.md) describes the notice for future builds and must not be mistaken for an update to the published asset.
+The published archive contains 438 page-text packs from 912 verified PDFs, plus a separate automated, unreviewed 8,319-record MIL-STD-810H `outline-v3` pack. Later source-only outline and reviewer changes are not part of this frozen release. Its included `CONTENT-NOTICE.md` is frozen with that archive; the [source template](../../scripts/prepared_distribution/CONTENT-NOTICE.md) describes the notice for future builds and must not be mistaken for an update to the published asset.
 
 The prepared set contains every selected publicly exposed current component for those packs. Twenty-five packs are explicitly partial because their current DLA composition also includes restricted components. Restricted bytes and restricted-only records are not included.
 

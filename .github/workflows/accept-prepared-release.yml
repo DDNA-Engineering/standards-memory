@@ -1,8 +1,13 @@
-name: Accept published prepared distribution
+name: Accept prepared distribution
 
 on:
   workflow_dispatch:
     inputs:
+      allow_draft:
+        description: Validate an unpublished draft candidate before publication
+        required: false
+        type: boolean
+        default: false
       release_tag:
         description: Published release tag
         required: true
@@ -38,6 +43,7 @@ jobs:
     timeout-minutes: 120
     env:
       GH_TOKEN: ${{ github.token }}
+      ALLOW_DRAFT: ${{ inputs.allow_draft }}
       RELEASE_TAG: ${{ inputs.release_tag }}
       ASSET_NAME: ${{ inputs.asset_name }}
       EXPECTED_SHA256: ${{ inputs.expected_sha256 }}
@@ -56,8 +62,8 @@ jobs:
             throw 'asset_name must be a plain ZIP filename.'
           }
           $release = gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --json tagName,isDraft,publishedAt | ConvertFrom-Json
-          if ($LASTEXITCODE -ne 0 -or $release.tagName -ne $env:RELEASE_TAG -or $release.isDraft -or -not $release.publishedAt) {
-            throw 'The requested tag is not an exact published release.'
+          if ($LASTEXITCODE -ne 0 -or $release.tagName -ne $env:RELEASE_TAG -or ($release.isDraft -and $env:ALLOW_DRAFT -ne 'true') -or (-not $release.isDraft -and -not $release.publishedAt)) {
+            throw 'The requested release is absent or is an unapproved draft.'
           }
           $download = Join-Path $env:RUNNER_TEMP 'published-prepared'
           New-Item -ItemType Directory -Path $download -Force | Out-Null

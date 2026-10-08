@@ -1,0 +1,763 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "suite": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "suite_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualification": {
+          "const": "bounded_real_document_regression"
+        },
+        "package_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "edition_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "case_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "operation": {
+                    "const": "get_clause"
+                  },
+                  "request": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "record_id": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "record_id"
+                    ]
+                  },
+                  "expected": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "record_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "uniqueItems": true
+                      },
+                      "forbidden_record_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "uniqueItems": true
+                      },
+                      "citations": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "record_id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "page": {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            "source_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "quote_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "record_id",
+                            "page",
+                            "source_sha256",
+                            "quote_sha256"
+                          ]
+                        }
+                      },
+                      "critical_facts": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "uniqueItems": true
+                      },
+                      "complete_for_requested_scope": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "semantic_assertions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "record_id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "content_role": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "statement": {
+                              "type": [
+                                "object",
+                                "null"
+                              ],
+                              "additionalProperties": false,
+                              "properties": {
+                                "subject": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "action": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "exact_text": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "modality": {
+                                  "enum": [
+                                    "shall",
+                                    "must",
+                                    "should",
+                                    "may",
+                                    "will",
+                                    "other"
+                                  ]
+                                },
+                                "polarity": {
+                                  "enum": [
+                                    "affirmative",
+                                    "negative"
+                                  ]
+                                },
+                                "span_indices": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "uniqueItems": true,
+                                  "items": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  }
+                                }
+                              },
+                              "required": [
+                                "subject",
+                                "action",
+                                "modality",
+                                "polarity",
+                                "exact_text",
+                                "span_indices"
+                              ]
+                            },
+                            "qualifiers": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "condition",
+                                      "exception",
+                                      "source_applicability",
+                                      "test_condition",
+                                      "acceptance_criterion",
+                                      "tailoring_instruction"
+                                    ]
+                                  },
+                                  "exact_text": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "span_indices": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "uniqueItems": true,
+                                    "items": {
+                                      "type": "integer",
+                                      "minimum": 0
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "exact_text",
+                                  "span_indices"
+                                ]
+                              }
+                            }
+                          },
+                          "required": [
+                            "record_id",
+                            "content_role",
+                            "statement",
+                            "qualifiers"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "record_ids",
+                      "forbidden_record_ids",
+                      "citations",
+                      "critical_facts",
+                      "complete_for_requested_scope"
+                    ]
+                  }
+                },
+                "required": [
+                  "case_id",
+                  "operation",
+                  "request",
+                  "expected"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "case_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "operation": {
+                    "const": "search"
+                  },
+                  "request": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "query": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "query_mode": {
+                        "enum": [
+                          "exact_phrase",
+                          "all_terms",
+                          "any_terms",
+                          "natural_language"
+                        ]
+                      },
+                      "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100
+                      }
+                    },
+                    "required": [
+                      "query",
+                      "query_mode",
+                      "limit"
+                    ]
+                  },
+                  "expected": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "record_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "uniqueItems": true
+                      },
+                      "forbidden_record_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "uniqueItems": true
+                      },
+                      "citations": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "record_id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "page": {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            "source_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "quote_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "record_id",
+                            "page",
+                            "source_sha256",
+                            "quote_sha256"
+                          ]
+                        }
+                      },
+                      "critical_facts": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "uniqueItems": true
+                      },
+                      "complete_for_requested_scope": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "semantic_assertions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "record_id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "content_role": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "statement": {
+                              "type": [
+                                "object",
+                                "null"
+                              ],
+                              "additionalProperties": false,
+                              "properties": {
+                                "subject": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "action": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "exact_text": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "modality": {
+                                  "enum": [
+                                    "shall",
+                                    "must",
+                                    "should",
+                                    "may",
+                                    "will",
+                                    "other"
+                                  ]
+                                },
+                                "polarity": {
+                                  "enum": [
+                                    "affirmative",
+                                    "negative"
+                                  ]
+                                },
+                                "span_indices": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "uniqueItems": true,
+                                  "items": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  }
+                                }
+                              },
+                              "required": [
+                                "subject",
+                                "action",
+                                "modality",
+                                "polarity",
+                                "exact_text",
+                                "span_indices"
+                              ]
+                            },
+                            "qualifiers": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "condition",
+                                      "exception",
+                                      "source_applicability",
+                                      "test_condition",
+                                      "acceptance_criterion",
+                                      "tailoring_instruction"
+                                    ]
+                                  },
+                                  "exact_text": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "span_indices": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "uniqueItems": true,
+                                    "items": {
+                                      "type": "integer",
+                                      "minimum": 0
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "exact_text",
+                                  "span_indices"
+                                ]
+                              }
+                            }
+                          },
+                          "required": [
+                            "record_id",
+                            "content_role",
+                            "statement",
+                            "qualifiers"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "record_ids",
+                      "forbidden_record_ids",
+                      "citations",
+                      "critical_facts",
+                      "complete_for_requested_scope"
+                    ]
+                  }
+                },
+                "required": [
+                  "case_id",
+                  "operation",
+                  "request",
+                  "expected"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "case_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "operation": {
+                    "const": "enumerate_obligations"
+                  },
+                  "request": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "scope_prefix": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100
+                      }
+                    },
+                    "required": [
+                      "scope_prefix",
+                      "limit"
+                    ]
+                  },
+                  "expected": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "record_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "uniqueItems": true
+                      },
+                      "forbidden_record_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "uniqueItems": true
+                      },
+                      "citations": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "record_id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "page": {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            "source_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "quote_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          },
+                          "required": [
+                            "record_id",
+                            "page",
+                            "source_sha256",
+                            "quote_sha256"
+                          ]
+                        }
+                      },
+                      "critical_facts": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "uniqueItems": true
+                      },
+                      "complete_for_requested_scope": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      },
+                      "semantic_assertions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "record_id": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "content_role": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "statement": {
+                              "type": [
+                                "object",
+                                "null"
+                              ],
+                              "additionalProperties": false,
+                              "properties": {
+                                "subject": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "action": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "exact_text": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "modality": {
+                                  "enum": [
+                                    "shall",
+                                    "must",
+                                    "should",
+                                    "may",
+                                    "will",
+                                    "other"
+                                  ]
+                                },
+                                "polarity": {
+                                  "enum": [
+                                    "affirmative",
+                                    "negative"
+                                  ]
+                                },
+                                "span_indices": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "uniqueItems": true,
+                                  "items": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  }
+                                }
+                              },
+                              "required": [
+                                "subject",
+                                "action",
+                                "modality",
+                                "polarity",
+                                "exact_text",
+                                "span_indices"
+                              ]
+                            },
+                            "qualifiers": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "condition",
+                                      "exception",
+                                      "source_applicability",
+                                      "test_condition",
+                                      "acceptance_criterion",
+                                      "tailoring_instruction"
+                                    ]
+                                  },
+                                  "exact_text": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "span_indices": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "uniqueItems": true,
+                                    "items": {
+                                      "type": "integer",
+                                      "minimum": 0
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "exact_text",
+                                  "span_indices"
+                                ]
+                              }
+                            }
+                          },
+                          "required": [
+                            "record_id",
+                            "content_role",
+                            "statement",
+                            "qualifiers"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "record_ids",
+                      "forbidden_record_ids",
+                      "citations",
+                      "critical_facts",
+                      "complete_for_requested_scope"
+                    ]
+                  }
+                },
+                "required": [
+                  "case_id",
+                  "operation",
+                  "request",
+                  "expected"
+                ]
+              }
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 1000
+        }
+      },
+      "required": [
+        "suite_id",
+        "qualification",
+        "package_digest",
+        "edition_id",
+        "cases"
+      ]
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "agent",
+            "human"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewed_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "suite_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "kind",
+        "identity",
+        "reviewed_at",
+        "suite_sha256"
+      ]
+    }
+  },
+  "required": [
+    "suite",
+    "review"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.org/contracts/real-benchmark-suite/0.1.0",
+  "title": "Source-bound real-document regression suite"
+}

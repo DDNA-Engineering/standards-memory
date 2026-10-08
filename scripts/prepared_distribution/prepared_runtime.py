@@ -172,6 +172,22 @@ def _validate_manifest_identity(manifest: dict[str, Any]) -> None:
     state = manifest["state"]
     _require(isinstance(state, dict) and state.get("principal_id") == "local-user", "Prepared state identity is invalid.")
     _require(type(state.get("corpus_package_count")) is int and state["corpus_package_count"] > 0, "Prepared corpus count is invalid.")
+    extras = state.get("qualified_packs", [])
+    _require(isinstance(extras, list), "Qualified packs must be a list.")
+    seen = set()
+    for item in extras:
+        _require(isinstance(item, dict) and set(item) == {"path", "pack_id", "package_digest", "suite_path", "run_path"}, "Qualified pack fields are invalid.")
+        _require(isinstance(item["pack_id"], str) and item["pack_id"] and isinstance(item["package_digest"], str)
+                 and HEX64.fullmatch(item["package_digest"]) is not None, "Qualified pack identity is invalid.")
+        _require(item["package_digest"] not in seen, "Duplicate qualified pack.")
+        seen.add(item["package_digest"])
+        for key, prefix, suffix in (("path", "packs/recovery/", ".zip"), ("suite_path", "qualification/recovery/", "-suite.json"), ("run_path", "qualification/recovery/", "-run.json")):
+            value = item[key]
+            _require(isinstance(value, str) and value.startswith(prefix) and value.endswith(suffix)
+                     and re.fullmatch(r"[a-z0-9-]+", value[len(prefix):-len(suffix)]) is not None, "Qualified pack path is invalid.")
+            _require(sum(f["path"] == value for f in manifest["files"]) == 1, "Qualified pack input must be inventoried exactly once.")
+    if extras:
+        _require(state.get("included_package_count") == state["corpus_package_count"] + 1 + len(extras), "Qualified pack count is inconsistent.")
 
 
 def _disk_inventory(root: Path) -> set[str]:
@@ -407,11 +423,24 @@ def setup_prepared(root: Path, *, quiet: bool = False) -> dict[str, Any]:
         policy = root / "policies/prepared-local.json"
         _cli(python, root, ["install-corpus", str(root / "corpus/corpus.json"), "--policy", str(policy)])
         _cli(python, root, ["install", str(root / "packs/mil-std-810h-derived-outline.zip"), "--policy", str(policy)])
+        for item in manifest["state"].get("qualified_packs", []):
+            _cli(python, root, ["install", str(root / item["path"]), "--policy", str(policy)])
 
     policy = root / "policies/prepared-local.json"
     doctor = _cli(python, root, ["doctor", "--policy", str(policy), "--principal", "local-user", "--full-integrity"], capture=True)
     doctor_result = _parse_cli_success(doctor, "doctor")
     _require(doctor_result.get("ready") is True and doctor_result.get("integrity", {}).get("complete") is True, "Prepared full-integrity doctor did not establish readiness.")
+    suites = [(root / "qualification/real-suite.json", root / "qualification/real-benchmark.json")]
+    suites.extend((root / item["suite_path"], root / item["run_path"]) for item in manifest["state"].get("qualified_packs", []))
+    for suite_path, run_path in suites:
+        if not suite_path.is_file():
+            continue  # Historical bundles predate real-document qualification.
+        qualification = _parse_cli_success(_cli(python, root, ["qualify-real", str(suite_path), "--principal", "local-user"], capture=True), "qualify-real")
+        recorded = _load_json(run_path, "real-document regression evidence")["run"]
+        _require(qualification.get("gate", {}).get("passed") is True
+                 and qualification.get("suite_sha256") == recorded["suite_sha256"]
+                 and qualification.get("runtime_source_sha256") == recorded["runtime_source_sha256"],
+                 "Installed real-document regressions did not match the qualified runtime and suite.")
     search = _cli(python, root, ["search", "environmental testing", "--principal", "local-user", "--query-mode", "natural_language", "--limit", "1"], capture=True)
     search_result = _parse_cli_success(search, "search")
     _require(isinstance(search_result.get("results"), list) and search_result["results"], "Prepared search returned no evidence.")

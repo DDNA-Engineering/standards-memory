@@ -154,12 +154,16 @@ Acquire the pinned Windows MCP dependency closure into a dedicated wheelhouse. T
 
 Then bind the completed corpus, acquisition snapshot, qualified outline, wheel, policy, and provenance. First update the project version and build a matching wheel for a **new** release; replace the placeholder below with that exact qualified version. The output name alone does not version the Python wheel or qualify the corpus:
 
+Before building, generate `build/prepared-qualification/coverage` with `scripts/build_coverage_ledger.py`, copy the exact reviewed suite to `build/prepared-qualification/real-suite.json`, and run `qualify-real --output build/prepared-qualification/real-benchmark.json` against the selected installed outline. Use the same runtime sources as the wheel. Write a separate exact outline policy with `write-pack-policy`; do not widen or overwrite an older release's policy. See [coverage and real qualification](../COVERAGE_AND_REAL_QUALIFICATION.md).
+
 ```powershell
 $PreparedVersion = '<new-qualified-version>'
 & $Python scripts/build_prepared_distribution.py `
   --corpus-index .standardsforge/corpus/mil-std-current/corpus.json `
   --acquisition-manifest .standardsforge/sources/dla/mil-std/manifest.json `
   --outline-pack .standardsforge/compiled/mil-std-810h-derived-outline `
+  --outline-policy build/prepared-outline-policy.json `
+  --qualification-directory build/prepared-qualification `
   --wheel "build/prepared-wheel/standardsforge-$PreparedVersion-py3-none-any.whl" `
   --wheel-provenance "build/prepared-wheel/standardsforge-$PreparedVersion-py3-none-any.whl.provenance.json" `
   --mcp-wheelhouse build/prepared-mcp-wheelhouse `
@@ -175,3 +179,6 @@ The builder must reject incomplete scope, mismatched acquisition identity, chang
 Do not add acquired PDFs or generated packs to Git. Distribution Statement A does not itself establish blanket republication rights. Do not bulk-download or redistribute licensed standards text without applicable processing and sharing rights. Keep source access, compilation permission, model-use permission, and redistribution permission separate.
 
 See [validation and releases](VALIDATION_AND_RELEASES.md) before publishing anything.
+
+
+For the unified a6 prepared release, pass `--recovery-directory` with the qualified 1661 supplement to `build_prepared_distribution.py`. The builder revalidates both recovery packs, trusted policies, complete real-suite results against the bundled wheel, membership in the source corpus, and semantic coverage. Both portable and Windows MCP setup install the recovery packs and replay all three suites before readiness. Prepared-release acceptance supports an explicit draft-candidate run before public publication.

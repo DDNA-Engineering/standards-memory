@@ -61,6 +61,24 @@ class LocalStore:
     def _require_writable(self) -> None:
         require(not self.read_only, "read_only_store", "The local store was opened read-only.")
 
+    def require_query_ready(self) -> None:
+        """Check existing query state without initializing or migrating it."""
+        require(
+            self.db_path.is_file() and self.object_root.is_dir(),
+            "store_not_initialized",
+            "Query state does not exist. Install a pack administratively before querying.",
+        )
+        try:
+            with self._connection() as connection:
+                row = connection.execute("SELECT value FROM metadata WHERE key = 'schema_version'").fetchone()
+                require(
+                    row is not None and row["value"] == str(SCHEMA_VERSION),
+                    "schema_migration_required",
+                    "The store schema is incompatible. Run an administrative install with the current runtime before querying.",
+                )
+        except sqlite3.Error as exc:
+            raise StandardsForgeError("storage_error", "Existing query state could not be read.") from exc
+
     @contextmanager
     def _connection(self) -> Iterator[sqlite3.Connection]:
         connection = self.connect()

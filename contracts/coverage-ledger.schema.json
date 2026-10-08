@@ -1,0 +1,268 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "ledger": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "package_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "edition_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identifier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "package_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "source_path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "physical_page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "page_key": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "record_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "text_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "text_bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "extraction_status": {
+                "type": "string",
+                "minLength": 1
+              },
+              "dispositions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "start_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_byte": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "disposition": {
+                      "enum": [
+                        "requires_semantic_extraction",
+                        "non_normative",
+                        "unresolved"
+                      ]
+                    },
+                    "rationale": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "start_byte",
+                    "end_byte",
+                    "disposition",
+                    "rationale"
+                  ]
+                }
+              },
+              "undisposed_bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "visual_review": {
+                "enum": [
+                  "pending",
+                  "agent_reviewed",
+                  "human_reviewed"
+                ]
+              },
+              "semantic_review": {
+                "const": "pending"
+              },
+              "review_provenance": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "agent",
+                      "human"
+                    ]
+                  },
+                  "identity": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reviewed_at": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "kind",
+                  "identity",
+                  "reviewed_at"
+                ]
+              },
+              "semantic_links": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "package_digest": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "record_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "start_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_byte": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "quote_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "content_role": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "reviewer_type": {
+                      "enum": [
+                        "agent",
+                        "human"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "package_digest",
+                    "record_id",
+                    "start_byte",
+                    "end_byte",
+                    "quote_sha256",
+                    "content_role",
+                    "reviewer_type"
+                  ]
+                }
+              },
+              "semantically_linked_bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "semantically_unlinked_bytes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "package_digest",
+              "source_path",
+              "source_sha256",
+              "physical_page",
+              "page_key",
+              "record_id",
+              "text_sha256",
+              "text_bytes",
+              "extraction_status",
+              "dispositions",
+              "undisposed_bytes",
+              "visual_review",
+              "semantic_review"
+            ]
+          }
+        },
+        "physical_pages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pages_without_text": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "text_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unavailable_components": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "semantic_qualification": {
+          "const": "not_established"
+        },
+        "approval": {
+          "const": "not_granted"
+        },
+        "review_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "package_digest",
+        "edition_id",
+        "identifier",
+        "pages",
+        "physical_pages",
+        "pages_without_text",
+        "text_bytes",
+        "unavailable_components",
+        "semantic_qualification",
+        "approval"
+      ]
+    },
+    "ledger_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema_version",
+    "ledger",
+    "ledger_sha256"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.org/contracts/coverage-ledger/0.1.0",
+  "title": "Exact physical-page and text-byte coverage ledger"
+}

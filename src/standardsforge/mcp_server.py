@@ -814,7 +814,7 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
-        service = StandardsForgeService(Path(args.db), Path(args.store))
+        service = StandardsForgeService.open_read_only(Path(args.db), Path(args.store))
         server = create_mcp_server(service, args.principal, result_mode=args.result_mode)
     except StandardsForgeError as exc:
         print(_json({"ok": False, "error": exc.as_dict()}), file=sys.stderr)

@@ -9,17 +9,20 @@ from typing import Any, Sequence
 from .acquisition import acquire_active_mil_stds, verify_mil_std_acquisition
 from .compiler import compile_pdf_to_pack
 from .corpus_compiler import compile_mil_std_corpus, install_compiled_corpus, write_corpus_policy
+from .coverage_ledger import apply_dispositions, page_ledger, write_artifact, link_semantic_evidence
 from .doctor import run_doctor
 from .errors import StandardsForgeError, require
 from .handoff import export_engineering_handoff
 from .outline_compiler import compile_derived_outline_pack
 from .outline_review import export_outline_review_draft, promote_outline_review
-from .pack import write_pack_archive
+from .pack import open_validated_pack, write_pack_archive
 from .policy import write_pack_policy
 from .review_shard import export_outline_review_shard, merge_outline_review_shard
+from .real_benchmark import run_real_benchmark
 from .service import StandardsForgeService
 from .source_catalog import verify_source_set
-from .structure_compiler import compile_structured_page_pack_section, compile_structured_pdf_section
+from .structure_compiler import compile_structured_page_pack_section, compile_structured_pdf_section, compile_reviewed_page_section
+from .transcription import compile_page_transcription
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -36,6 +39,28 @@ def _parser() -> argparse.ArgumentParser:
 
     verify = commands.add_parser("verify-pack", help="Validate a data-only pack without installing it")
     verify.add_argument("source")
+
+    coverage = commands.add_parser("coverage-ledger", help="Administrative: inventory every physical page and pending source disposition")
+    coverage.add_argument("source")
+    coverage.add_argument("output")
+    coverage.add_argument("--review", help="Explicit page-local reviewer dispositions bound to the original ledger digest")
+    coverage.add_argument("--semantic-pack", help="Exact reviewed-structure pack whose source spans should be linked")
+
+    transcription = commands.add_parser("compile-page-transcription", help="Administrative: compile explicitly reviewed visual page text against a pinned source pack")
+    transcription.add_argument("source")
+    transcription.add_argument("transcription")
+    transcription.add_argument("rasters")
+    transcription.add_argument("output")
+
+    reviewed_section = commands.add_parser("compile-reviewed-page-section", help="Administrative: compile explicit semantic and relationship review against exact page text")
+    reviewed_section.add_argument("source")
+    reviewed_section.add_argument("annotations")
+    reviewed_section.add_argument("output")
+
+    qualify = commands.add_parser("qualify-real", help="Administrative: run explicit source-pinned real-document regressions")
+    qualify.add_argument("suite")
+    qualify.add_argument("--principal", required=True)
+    qualify.add_argument("--output", help="Optional new file retaining all raw responses and verdicts")
 
     archive = commands.add_parser("archive-pack", help="Administrative: write a deterministic compressed pack archive")
     archive.add_argument("source")
@@ -261,6 +286,31 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def _run(args: argparse.Namespace) -> dict[str, Any]:
+    if args.command == "qualify-real":
+        suite_path = Path(args.suite)
+        require(suite_path.stat().st_size <= 16 * 1024 * 1024, "invalid_real_suite", "Suite exceeds 16 MiB.")
+        artifact = run_real_benchmark(StandardsForgeService.open_read_only(args.db, args.store), args.principal, json.loads(suite_path.read_text(encoding="utf-8")))
+        if args.output:
+            write_artifact(args.output, artifact)
+        require(artifact["run"]["gate"]["passed"], "real_qualification_failed", "One or more real-document regression cases failed.", metrics=artifact["run"]["metrics"])
+        return {key: artifact["run"][key] for key in ("suite_sha256", "runtime_source_sha256", "metrics", "gate", "qualification")}
+    if args.command == "compile-page-transcription":
+        return compile_page_transcription(args.source, args.transcription, args.rasters, args.output)
+    if args.command == "compile-reviewed-page-section":
+        return compile_reviewed_page_section(args.source, args.annotations, args.output)
+    if args.command == "coverage-ledger":
+        with open_validated_pack(args.source) as pack:
+            if args.review:
+                review_path = Path(args.review)
+                require(review_path.stat().st_size <= 16 * 1024 * 1024, "invalid_coverage_review", "Review JSON exceeds 16 MiB.")
+                artifact = apply_dispositions(pack, json.loads(review_path.read_text(encoding="utf-8")))
+            else:
+                artifact = page_ledger(pack)
+            if args.semantic_pack:
+                with open_validated_pack(args.semantic_pack) as reviewed:
+                    artifact = link_semantic_evidence(pack, reviewed, artifact)
+        write_artifact(args.output, artifact)
+        return {"output": args.output, "ledger_sha256": artifact["ledger_sha256"], "physical_pages": artifact["ledger"]["physical_pages"], "semantic_qualification": "not_established"}
     if args.command == "doctor":
         return run_doctor(
             args.db,
@@ -356,7 +406,11 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
             clause_reference=args.clause_reference,
             record_id=args.record_id,
         )
-    service = StandardsForgeService(Path(args.db), Path(args.store))
+    service = (
+        StandardsForgeService(Path(args.db), Path(args.store))
+        if args.command in {"install", "revoke", "verify-pack"}
+        else StandardsForgeService.open_read_only(Path(args.db), Path(args.store))
+    )
     if args.command == "verify-pack":
         return service.verify_pack(args.source)
     if args.command == "install":

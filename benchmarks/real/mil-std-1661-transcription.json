@@ -1,0 +1,484 @@
+{
+  "suite": {
+    "suite_id": "mil-std-1661-transcription-visual-review-1",
+    "qualification": "bounded_real_document_regression",
+    "package_digest": "45db3b3e308f6c9f382ad2214464816053fa1e451ee3754236d61a73d9ece435",
+    "edition_id": "dla:mil-std-ident:37053:composition:e3a46104409fa274545d8034209f5be6858f405912f645632ec359a89d368242",
+    "cases": [
+      {
+        "case_id": "physical-page-1",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0001-b8ab25ec81a5"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0001-b8ab25ec81a5"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0001-b8ab25ec81a5",
+              "page": 1,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "b8ab25ec81a55112486d02a9538f6c045322e00697048cd4f2d40cbfb75f9702"
+            }
+          ],
+          "critical_facts": [
+            "MARK AND MOD NOMENCLATURE SYSTEM",
+            "29 JULY 1971"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-2",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0002-9011a83ca6c8"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0002-9011a83ca6c8"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0002-9011a83ca6c8",
+              "page": 2,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "9011a83ca6c80378a8ab87b54cb1aeb4c640f1b373c2882a43a55c64f2b1144a"
+            }
+          ],
+          "critical_facts": [
+            "FOREWARD",
+            "NAVMATINST"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-3",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0003-0a42cd853045"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0003-0a42cd853045"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0003-0a42cd853045",
+              "page": 3,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "0a42cd8530457443d900df3dae9abdbf3bbb51c42f844bc06fc9453aa69f90d8"
+            }
+          ],
+          "critical_facts": [
+            "5.11 Preparation of Nomenclature Assignment Request | 8"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-4",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0004-1dd33df1a6ed"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0004-1dd33df1a6ed"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0004-1dd33df1a6ed",
+              "page": 4,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "1dd33df1a6edd1792283837943906b34d1f8b624a9c5a4231ab3dda9515f0503"
+            }
+          ],
+          "critical_facts": [
+            "excluding Sonar systems.",
+            "c. Computer programs"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-5",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0005-74a6dec46fad"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0005-74a6dec46fad"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0005-74a6dec46fad",
+              "page": 5,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "74a6dec46fad25d90da2a52439314d359303abd1b8268df5e4f6068a0f31caee"
+            }
+          ],
+          "critical_facts": [
+            "e. Weapons control systems",
+            "MIL-STD-196"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-6",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0006-9ff986cd4cbd"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0006-9ff986cd4cbd"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0006-9ff986cd4cbd",
+              "page": 6,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "9ff986cd4cbd1036d9f71be1f0aa1a065b285f1f3145f70a76a0e2e4cad413ea"
+            }
+          ],
+          "critical_facts": [
+            "3.4 MARK and MOD Nomenclature.",
+            "3.7 Modification Number."
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-7",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0007-a581bd81708c"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0007-a581bd81708c"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0007-a581bd81708c",
+              "page": 7,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "a581bd81708cf273f3766ee8ace1e67ff6d92ca5d028cd7ddd2daf5106a4cc17"
+            }
+          ],
+          "critical_facts": [
+            "shall not be applied retroactively",
+            "even if the original project is"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-8",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0008-58037e77117e"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0008-58037e77117e"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0008-58037e77117e",
+              "page": 8,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "58037e77117eafbb88f7b156ab7b0ffc64aa1ba3e247dc8c52b3c91e08e081f8"
+            }
+          ],
+          "critical_facts": [
+            "prior to approval for service use.",
+            "Reservations of blocks of numbers will not be permitted."
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-9",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0009-4035dcf89447"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0009-4035dcf89447"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0009-4035dcf89447",
+              "page": 9,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "4035dcf89447ea9bf7432d5cc05715117cd92bd8ff4b86772e6070bf30a5cf19"
+            }
+          ],
+          "critical_facts": [
+            "except where space is",
+            "only the MOD number shall be"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-10",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0010-c7dffb048735"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0010-c7dffb048735"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0010-c7dffb048735",
+              "page": 10,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "c7dffb0487351a95dace7c08f0343ad94bb3e2f7def6b47f324502b5e539c701"
+            }
+          ],
+          "critical_facts": [
+            "no official publica-",
+            "will not be\nreassigned."
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-11",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0011-12da4ed52041"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0011-12da4ed52041"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0011-12da4ed52041",
+              "page": 11,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "12da4ed52041c46778020fb9735f26d30939d867db57bcc70a92cfe804c61c33"
+            }
+          ],
+          "critical_facts": [
+            "This paragraph does not apply to",
+            "except 7, 15, 17, 18 and 19"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-12",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0012-480bdf28884c"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0012-480bdf28884c"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0012-480bdf28884c",
+              "page": 12,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "480bdf28884c371e3083b20304e661820d1cd2d57b39d0234079175c76bbfbff"
+            }
+          ],
+          "critical_facts": [
+            "5.11.13 In space 8",
+            "as applicable:"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-13",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0013-e389354b1b43"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0013-e389354b1b43"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0013-e389354b1b43",
+              "page": 13,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "e389354b1b43785a8810e1102cce9719975d709bbb812b382c10608a3db9f761"
+            }
+          ],
+          "critical_facts": [
+            "l. Intended use",
+            "5.11.13 In space 9"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-14",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0014-6e4f56ae29e9"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0014-6e4f56ae29e9"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0014-6e4f56ae29e9",
+              "page": 14,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "6e4f56ae29e9d6f76600e6328d11efa7db22d19f3ecb5372c3a554920d9e7f0b"
+            }
+          ],
+          "critical_facts": [
+            "Originators outside the Command Headquarters",
+            "NOT\nAUTOMATICALLY DECLASSIFIED"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-15",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0015-fa8e3daaddbd"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0015-fa8e3daaddbd"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0015-fa8e3daaddbd",
+              "page": 15,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "fa8e3daaddbd73fdeb7c25ec4c1eaa86c3b0d6e6d2e9b2904149b6a1d67f542a"
+            }
+          ],
+          "critical_facts": [
+            "SAMPLE",
+            "11. APPLICABLE PUBLICATIONS: OP 9987",
+            "12. WEIGHT: 29,176 lb."
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-16",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0016-5e7395a2b298"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0016-5e7395a2b298"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0016-5e7395a2b298",
+              "page": 16,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "5e7395a2b2983104efe6f1b5f6dd91432135f36b9a22c02f5d23af1ab27837a6"
+            }
+          ],
+          "critical_facts": [
+            "only original forms shall be submitted.",
+            "Other originators following the tentative"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-17",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0017-4dc80dc986bf"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0017-4dc80dc986bf"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0017-4dc80dc986bf",
+              "page": 17,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "4dc80dc986bf70c0ab0b3b999e7b94b4208c5a58b587f82cce3155724dfa24f7"
+            }
+          ],
+          "critical_facts": [
+            "DI-E-2000A REQUEST, NOMENCLATURE ASSIGNMENT, FORM NAVSEA 5030/1",
+            "are not invoked"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "physical-page-18",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "transcribed-page-0018-579465c892f7"
+        },
+        "expected": {
+          "record_ids": [
+            "transcribed-page-0018-579465c892f7"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "transcribed-page-0018-579465c892f7",
+              "page": 18,
+              "source_sha256": "c247bae118afda595b1a7abf3927e2c3c7e525cfb42281a9dcf2f1c7b3f5e5fb",
+              "quote_sha256": "579465c892f76c617362b1bfbc39d295bc3cc7b5308f6caedcb46c35de8831ba"
+            }
+          ],
+          "critical_facts": [
+            "OMB Approval No. 22-R255",
+            "do not constitute or imply authorization to waive any"
+          ],
+          "complete_for_requested_scope": false
+        }
+      }
+    ]
+  },
+  "review": {
+    "kind": "agent",
+    "identity": "Codex direct visual review of all 18 MIL-STD-1661 pages; bounded same-agent reference assertions, no independent human adjudication",
+    "reviewed_at": "2026-10-08T12:52:23.660861Z",
+    "suite_sha256": "2f8b8b0d481a05f4396326aaac2074bc24db89ae42186f82c91868ada8671a70"
+  }
+}

@@ -70,7 +70,7 @@ class QuerySelectorAdapterTests(unittest.TestCase):
         service = Mock()
         service.get_clause.side_effect = [{"selector": "clause"}, {"selector": "record"}]
 
-        with patch("standardsforge.cli.StandardsForgeService", return_value=service):
+        with patch("standardsforge.cli.StandardsForgeService.open_read_only", return_value=service):
             self.assertEqual({"selector": "clause"}, cli_run(legacy_args))
             self.assertEqual({"selector": "record"}, cli_run(record_args))
 

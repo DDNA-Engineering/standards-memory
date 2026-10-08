@@ -826,6 +826,29 @@ class VerticalSliceTests(unittest.TestCase):
                 impact["cause"],
             )
 
+    def test_diff_verifies_unchanged_evidence_in_both_editions(self) -> None:
+        candidate = Path(self.temp.name) / "unchanged-edition"
+        shutil.copytree(PACK_V1, candidate)
+        manifest = json.loads((candidate / "manifest.json").read_text(encoding="utf-8"))
+        manifest.update(edition_id="example:spec-100:2026-b", revision="B")
+        self._rewrite_inventoried_json(candidate, "manifest.json", manifest)
+        records = json.loads((candidate / "records.json").read_text(encoding="utf-8"))
+        for record in records["records"]:
+            record["edition_id"] = manifest["edition_id"]
+        self._rewrite_inventoried_json(candidate, "records.json", records)
+        before = self.service.install_pack(PACK_V1, POLICY)
+        after = self.service.install_pack(candidate, POLICY)
+        query = lambda: self.service.diff_editions(before["package_digest"], after["package_digest"], "local-user")
+        self.assertEqual(3, query()["change_counts"]["unchanged"])
+        for installed in (before, after):
+            source = Path(installed["object_path"]) / "sources/example-spec-100a.txt"
+            original = source.read_bytes()
+            source.write_bytes(b"corrupt source")
+            with self.assertRaises(StandardsForgeError) as caught:
+                query()
+            self.assertEqual("source_integrity_failure", caught.exception.code)
+            source.write_bytes(original)
+
     def test_diff_editions_reports_source_only_move_without_content_change(self) -> None:
         candidate = Path(self.temp.name) / "moved-v1"
         shutil.copytree(PACK_V1, candidate)

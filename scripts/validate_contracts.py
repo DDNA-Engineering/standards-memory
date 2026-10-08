@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from standardsforge.errors import StandardsForgeError  # noqa: E402
 from standardsforge.benchmark import validate_suite_document  # noqa: E402
+from standardsforge.real_benchmark import validate_suite as validate_real_suite  # noqa: E402
 from standardsforge.doctor import run_doctor  # noqa: E402
 from standardsforge.handoff import export_engineering_handoff, validate_handoff_bundle  # noqa: E402
 from standardsforge.pack import validate_pack_directory  # noqa: E402
@@ -97,6 +98,10 @@ def validate_repository_instances(
         for path in sorted((ROOT / "benchmarks").glob("*.json"))
     )
     instances.extend(
+        ("real-benchmark-suite.schema.json", path)
+        for path in sorted((ROOT / "benchmarks" / "real").glob("*.json"))
+    )
+    instances.extend(
         ("handoff-candidate.schema.json", path)
         for path in sorted((ROOT / "examples" / "handoffs").glob("*.json"))
     )
@@ -107,6 +112,8 @@ def validate_repository_instances(
         validate_with_schema(schemas, registry, schema_name, instance)
         if schema_name == "benchmark-suite.schema.json":
             validate_suite_document(instance, ROOT)
+        if schema_name == "real-benchmark-suite.schema.json":
+            validate_real_suite(instance)
         validated.append(path.relative_to(ROOT).as_posix())
     return validated
 

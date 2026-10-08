@@ -27,3 +27,10 @@ The traversal job is exhaustive only over records explicitly classified as oblig
 7. Do not make query paths fetch, import, activate, publish, or execute content.
 
 The machine-readable acceptance subset for the implemented slice is in `docs/requirements/requirements.json`.
+
+The unpublished a6 source also supplies complete physical-page coverage accounting and a separately labeled eleven-case, agent-reviewed real 810H source-text regression suite. Its zero-failure gate checks selected records, exact citations, critical text, and completeness, and binds results to the exact wheel sources. This closes the absence of executable real-document regression evidence for that bounded selection; corpus-wide recall, semantic fidelity, and visual qualification remain unmeasured. See `docs/COVERAGE_AND_REAL_QUALIFICATION.md`.
+
+
+### Reviewed scan recovery (TASK-044)
+
+An explicit source-bound transcription import now preserves original PDF bytes, complete physical-page inventory, reviewed text and PNG evidence, and distinct agent/human provenance in a separate package. Direct reviewed page annotations support semantic records and cross-page dependencies without an outline prerequisite. Local MIL-STD-1661 evidence covers all 18 transcribed pages and 41 selected reviewed records; corpus-wide semantic recall and independent adjudication remain unqualified. No query-time OCR, rendering, model call, or network fallback is introduced.

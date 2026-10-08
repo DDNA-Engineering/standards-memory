@@ -202,6 +202,7 @@ class StandardsForgeService:
     def open_read_only(cls, db_path: str | Path, object_root: str | Path) -> "StandardsForgeService":
         service = cls.__new__(cls)
         service._configure(LocalStore.open_existing(db_path, object_root, read_only=True))
+        service.store.require_query_ready()
         return service
 
     @staticmethod
@@ -1834,10 +1835,16 @@ class StandardsForgeService:
                 change["after_text_sha256"] = hashlib.sha256(after["text"].encode("utf-8")).hexdigest()
             if before is not None and after is not None:
                 change["source_location_changed"] = source_location_changed
-            if status in {"removed", "modified", "moved"} and before is not None:
-                change["before"] = self._record_payload(before, before_root, before_verification)
-            if status in {"added", "modified", "moved"} and after is not None:
-                change["after"] = self._record_payload(after, after_root, after_verification)
+            # Unchanged is an evidence assertion too. Verify every contributing
+            # record, while retaining the compact unchanged response shape.
+            if before is not None:
+                before_payload = self._record_payload(before, before_root, before_verification)
+                if status in {"removed", "modified", "moved"}:
+                    change["before"] = before_payload
+            if after is not None:
+                after_payload = self._record_payload(after, after_root, after_verification)
+                if status in {"added", "modified", "moved"}:
+                    change["after"] = after_payload
             changes.append(change)
 
         before_dependencies = {

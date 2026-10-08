@@ -30,3 +30,10 @@ StandardsForge machine contracts are closed interfaces, not examples. Every sche
 - Added query response and success envelope 0.4.0 for bounded natural-language discovery, retained query response 0.3.0 and its success envelope under versioned filenames, and eliminated the prior unversioned success-envelope identifier.
 
 Future changes append a dated entry here in the same commit as the schema, generator, validation, migration or compatibility behavior, and negative tests.
+
+- Added page-transcription 0.1.0 and structure-annotations 0.6.0 for explicitly reviewed, source-package-pinned visual transcription and direct page-span semantic review. Earlier annotation versions retain their restrictions. Coverage ledgers accept declared agent/human visual review and optional verified semantic-span links; real-suite expectations accept optional modality/polarity/qualifier assertions.
+
+
+The unpublished transcription 0.2.0 extension adds explicit `transcribed_text` and `reviewed_blank` page dispositions. Legacy 0.1.0 remains supported without the new field. A reviewed blank has exactly empty text, retained raster/review evidence, and no text record; it stays in the physical-page ledger. The unpublished real-suite semantic assertion shape now requires the full nullable statement and exact typed qualifier objects with span indices. Earlier partial semantic assertions are rejected and require explicit review/migration; historical results remain tied to their historical runtime. Source-only suites without semantic assertions remain valid.
+
+Prepared distribution 1.3 accepts an optional closed `state.qualified_packs` list binding each additional archive and exact suite/run paths to its pack identity. The combined trusted policy includes these packages; both setup profiles install them and replay their regression suites before readiness. Legacy manifests without the list retain their prior behavior.

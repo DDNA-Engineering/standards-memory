@@ -128,6 +128,38 @@ class CorpusCompilerTests(unittest.TestCase):
         with path.open("wb") as output:
             writer.write(output)
 
+    def test_source_coverage_accounts_for_all_pages_and_rejects_invalid_review(self) -> None:
+        import copy
+        from standardsforge.coverage_ledger import page_ledger, apply_dispositions
+        output = self.root / "coverage-corpus"
+        compile_mil_std_corpus(self.manifest_path, self.sources, output)
+        index = json.loads((output / "corpus.json").read_text(encoding="utf-8"))
+        with open_validated_pack(output / index["entries"][0]["archive_path"]) as pack:
+            ledger = page_ledger(pack)
+            ledger_schema = json.loads((ROOT / "contracts/coverage-ledger.schema.json").read_text(encoding="utf-8"))
+            validator_for(ledger_schema)(ledger_schema).validate(ledger)
+            self.assertEqual(1, ledger["ledger"]["physical_pages"])
+            self.assertEqual(1, ledger["ledger"]["unavailable_components"])
+            page = ledger["ledger"]["pages"][0]
+            review = {"ledger_sha256": ledger["ledger_sha256"], "reviewer": {"kind": "agent", "identity": "synthetic-test", "reviewed_at": "2026-10-08T00:00:00Z"},
+                      "pages": [{"page_key": page["page_key"], "text_sha256": page["text_sha256"], "segments": [{"start_byte": 0, "end_byte": page["text_bytes"], "disposition": "unresolved", "rationale": "Synthetic source requires semantic review."}]}]}
+            reviewed = apply_dispositions(pack, review)
+            review_schema = json.loads((ROOT / "contracts/coverage-review.schema.json").read_text(encoding="utf-8"))
+            validator_for(review_schema)(review_schema).validate(review)
+            validator_for(ledger_schema)(ledger_schema).validate(reviewed)
+            self.assertEqual(0, reviewed["ledger"]["pages"][0]["undisposed_bytes"])
+            self.assertEqual("not_established", reviewed["ledger"]["semantic_qualification"])
+            self.assertEqual("pending", reviewed["ledger"]["pages"][0]["visual_review"])
+            invalid = []
+            stale = copy.deepcopy(review); stale["ledger_sha256"] = "0" * 64; invalid.append(stale)
+            gap = copy.deepcopy(review); gap["pages"][0]["segments"][0]["start_byte"] = 1; invalid.append(gap)
+            tail = copy.deepcopy(review); tail["pages"][0]["segments"][0]["end_byte"] -= 1; invalid.append(tail)
+            duplicate = copy.deepcopy(review); duplicate["pages"] *= 2; invalid.append(duplicate)
+            approval = copy.deepcopy(review); approval["pages"][0]["segments"][0]["disposition"] = "approved"; invalid.append(approval)
+            for bad in invalid:
+                with self.assertRaises(StandardsForgeError):
+                    apply_dispositions(pack, bad)
+
     def test_compiles_resumes_installs_and_retrieves_mixed_composition(self) -> None:
         output = self.root / "compiled-corpus"
         real_corpus_replace = corpus_compiler_module.os.replace

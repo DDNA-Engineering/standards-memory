@@ -848,7 +848,9 @@
       "task_id": "TASK-038",
       "title": "Full method-numbered caption identities in derived outlines",
       "status": "complete",
-      "requirements": ["SM-FR-078"],
+      "requirements": [
+        "SM-FR-078"
+      ],
       "acceptance": [
         "Verify current caption truncation and omission against synthetic examples and the real 810H source; do not infer its frequency from raw detected-kind counts.",
         "Parse complete table and figure designators, including method numbers, suffix letters, Roman numerals, and layout spacing around separators; never promote a table-of-contents leader as a substantive caption.",
@@ -860,7 +862,9 @@
       "task_id": "TASK-039",
       "title": "Reviewer-mediated recovery of ambiguous numbered outline evidence",
       "status": "complete",
-      "requirements": ["SM-FR-079"],
+      "requirements": [
+        "SM-FR-079"
+      ],
       "acceptance": [
         "Keep numeric table and plot rows unsupported by default; only exact ambiguous-numbered records may enter the new pending-classification draft path.",
         "Bind each pending draft to exact outline and page-pack digests, source spans and candidate identity, and retain its unsupported origin; never present an unreviewed clause classification as fact.",
@@ -872,11 +876,108 @@
       "task_id": "TASK-040",
       "title": "Source-evidenced PART outline boundaries without stale method scope",
       "status": "complete",
-      "requirements": ["SM-FR-080"],
+      "requirements": [
+        "SM-FR-080"
+      ],
       "acceptance": [
         "Detect only a body PART title supported by same-page numbered structural text, not a running header or TOC title; retain exact text, source coordinates, and automated unreviewed status.",
         "Reset prior method numbering and parent state at the boundary, give subsequent numbered candidates a distinct PART scope, and keep old outline packs separately addressable.",
         "Prove synthetic positive and TOC/header negatives, then replay exact 810H pages 9, 1051, and 1055 to show Part Three 1.1 and 1.2 no longer inherit METHOD-528.1; report any remaining Annex and table false-positive limits."
+      ]
+    },
+    {
+      "task_id": "TASK-041",
+      "title": "Source-verified edition comparison and non-mutating query startup",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-026",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-031"
+      ],
+      "acceptance": [
+        "Verify both sides of every compared record including unchanged rows without changing the response shape.",
+        "Open CLI and stdio MCP query state read-only; reject missing or incompatible state without creating or migrating it.",
+        "Prove corruption in either unchanged edition fails, existing queries preserve database bytes, and missing/old state fails without mutation."
+      ]
+    },
+    {
+      "task_id": "TASK-042",
+      "title": "Source-bound corpus coverage accounting and real-document regression qualification",
+      "status": "active",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-019",
+        "SM-FR-025",
+        "SM-FR-046",
+        "SM-FR-049",
+        "SM-FR-064",
+        "SM-FR-081",
+        "SM-FR-082"
+      ],
+      "acceptance": [
+        "Account for every physical source page and exact text byte in an administrative coverage ledger, including missing text and unresolved interpretation.",
+        "Bind page-local review dispositions to exact source spans and provenance; reject gaps, overlaps, stale source identities, and unsupported completeness claims. Link reviewed semantic spans to their exact source page packages with byte-level coverage; corpus-wide adjudication remains outstanding.",
+        "Evaluate explicitly reviewed real-document cases against exact package pins, preserve raw results and metric denominators, and fail on missing context, wrong editions, source mismatch, or false completeness.",
+        "Keep agent review, human review, bounded regression qualification, and full-corpus semantic qualification separate.",
+        "Real semantic cases must compare complete subject/action/modality/polarity statements and typed qualifiers with exact evidence-span bindings; reject partial expectations and meaning-changing regressions."
+      ]
+    },
+    {
+      "task_id": "TASK-043",
+      "title": "Prepare a current-source offline release candidate with outline-v3",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-018",
+        "SM-FR-030",
+        "SM-FR-057",
+        "SM-FR-059",
+        "SM-FR-075"
+      ],
+      "acceptance": [
+        "Build a distinct unpublished candidate from the current source and verified legacy corpus with current outline-v3 identities.",
+        "Bind coverage and real-document regression evidence to the release candidate without relabeling unreviewed content.",
+        "Validate reproducible wheel, extracted starter, prepared bundle inventory, and local first/repeat setup; keep native CI and publication explicit outstanding states."
+      ]
+    },
+    {
+      "task_id": "TASK-044",
+      "title": "Recover scanned source pages through explicitly reviewed visual transcription",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-018",
+        "SM-FR-025",
+        "SM-FR-081",
+        "SM-FR-082"
+      ],
+      "acceptance": [
+        "Compile an explicit source-package-bound, full-component transcription with preserved PDF bytes, inventoried page images, exact text spans, and content-bound agent or human reviewer provenance.",
+        "Reject stale source identities, omitted or repeated physical pages, altered rendered evidence, and unreviewed transcription; preserve separate prior package identities and no query-time OCR or model fallback.",
+        "Recover and visually inspect all 18 MIL-STD-1661 pages and qualify actual installed retrieval, source identity, critical conditions, cross-page continuation, and table row alignment.",
+        "Report bounded reviewed evidence separately from human approval and corpus-wide semantic qualification.",
+        "Represent explicitly reviewed blank pages with raster evidence, empty text, and complete physical-page coverage without inventing retrieval text.",
+        "Split MIL-STD-1661 clause 4.2.4 into five separately qualified statement records, retain the complete source clause as required context, and verify scoped enumeration and each statement through installed retrieval."
+      ]
+    },
+    {
+      "task_id": "TASK-045",
+      "title": "Publish unified a6 prepared library and CLI code package",
+      "status": "active",
+      "requirements": [
+        "SM-FR-018",
+        "SM-FR-030",
+        "SM-FR-057",
+        "SM-FR-059",
+        "SM-FR-075",
+        "SM-FR-081",
+        "SM-FR-082"
+      ],
+      "acceptance": [
+        "Include the acquisition corpus, outline-v3 and both reviewed 1661 recovery packages under one closed prepared inventory and trusted policy.",
+        "First and repeated setup install every declared package and replay all three runtime-bound real-document suites before readiness.",
+        "Verify a clean tagged source through CI, a reproducible code wheel, the native prepared-install matrix, trusted PyPI publication and public download identity."
       ]
     }
   ]

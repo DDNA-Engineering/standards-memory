@@ -173,10 +173,31 @@ if (-not $WasReady) {
         (Join-Path $DistributionRoot 'packs\mil-std-810h-derived-outline.zip') `
         --policy $PreparedPolicy
     if ($LASTEXITCODE -ne 0) { throw 'Unable to install the precompiled MIL-STD-810H outline.' }
+    $RecoveryPacks = @()
+    if ($Manifest.state.PSObject.Properties.Name -contains 'qualified_packs') { $RecoveryPacks = @($Manifest.state.qualified_packs) }
+    foreach ($Pack in $RecoveryPacks) {
+        & $Python -I -m standardsforge --db $Database --store $ObjectStore install (Join-Path $DistributionRoot $Pack.path) --policy $PreparedPolicy
+        if ($LASTEXITCODE -ne 0) { throw 'Unable to install a qualified recovery pack.' }
+    }
 }
 
 & $Python -I -m standardsforge --db $Database --store $ObjectStore doctor --policy $PreparedPolicy --principal local-user --full-integrity | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'The prepared MIL-STD library did not pass full-integrity doctor.' }
+$Suites = @(@{ suite_path = 'qualification/real-suite.json'; run_path = 'qualification/real-benchmark.json' })
+if ($Manifest.state.PSObject.Properties.Name -contains 'qualified_packs') { $Suites += @($Manifest.state.qualified_packs) }
+foreach ($Suite in $Suites) {
+    $RealSuite = Join-Path $DistributionRoot $Suite.suite_path
+    if (-not (Test-Path -LiteralPath $RealSuite -PathType Leaf)) { continue }
+    $QualificationJson = & $Python -I -m standardsforge --db $Database --store $ObjectStore qualify-real $RealSuite --principal local-user
+    if ($LASTEXITCODE -ne 0) { throw 'The installed real-document regression suite failed.' }
+    $Qualification = $QualificationJson | ConvertFrom-Json
+    $Recorded = Get-Content -LiteralPath (Join-Path $DistributionRoot $Suite.run_path) -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($Qualification.result.gate.passed -ne $true -or
+        $Qualification.result.suite_sha256 -ne $Recorded.run.suite_sha256 -or
+        $Qualification.result.runtime_source_sha256 -ne $Recorded.run.runtime_source_sha256) {
+        throw 'The installed real-document regressions differ from the qualified runtime or suite.'
+    }
+}
 & $Python -I -m standardsforge --db $Database --store $ObjectStore search 'environmental testing' --principal local-user --limit 1 | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'The prepared MIL-STD corpus did not pass its smoke query.' }
 & $Python -I (Join-Path $DistributionRoot 'smoke_mcp.py') --db $Database --store $ObjectStore --principal local-user --query 'environmental testing'

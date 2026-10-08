@@ -1,0 +1,268 @@
+{
+  "suite": {
+    "suite_id": "mil-std-810h-outline-v3-text-regression-1",
+    "qualification": "bounded_real_document_regression",
+    "package_digest": "ff9824bb1adf8b55d53bd6f409294c012dd12479003796fc9637294fbb049e35",
+    "edition_id": "dla:mil-std-ident:35978:composition:06653c9bf6f7847ba07726f1f23f76e77c1159366ee9da4f66d3f1a40ff49320",
+    "cases": [
+      {
+        "case_id": "operational-environment",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "outline-9e1659de2f6ee0400ffa9d58"
+        },
+        "expected": {
+          "record_ids": [
+            "outline-9e1659de2f6ee0400ffa9d58"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "outline-9e1659de2f6ee0400ffa9d58",
+              "page": 22,
+              "source_sha256": "29528947ea16a1121decbbe59db1f9603fe1e3ba29e7cf8a50e64f24c0b9752f",
+              "quote_sha256": "0ee2f7740fb6c8bee2b9878469012cd6c063b504e547c6c79cd8233de3f2a538"
+            }
+          ],
+          "critical_facts": [
+            "Operational Environment Documentation Plan"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "tailored-criteria",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "outline-5e4ad8bf34dd1c01b1ef11d4"
+        },
+        "expected": {
+          "record_ids": [
+            "outline-5e4ad8bf34dd1c01b1ef11d4"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "outline-5e4ad8bf34dd1c01b1ef11d4",
+              "page": 22,
+              "source_sha256": "29528947ea16a1121decbbe59db1f9603fe1e3ba29e7cf8a50e64f24c0b9752f",
+              "quote_sha256": "d16da8712a8ebc54d24ec344230db004ba400da17ba88eb69c7f09b3a12c7a3c"
+            }
+          ],
+          "critical_facts": [
+            "rationale and assumptions"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "detailed-test-plan",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "outline-8c5254ac49681c4334b159b6"
+        },
+        "expected": {
+          "record_ids": [
+            "outline-8c5254ac49681c4334b159b6"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "outline-8c5254ac49681c4334b159b6",
+              "page": 22,
+              "source_sha256": "29528947ea16a1121decbbe59db1f9603fe1e3ba29e7cf8a50e64f24c0b9752f",
+              "quote_sha256": "8ae21986a049c52199e8cc5b01bc1ce0185c1680c9cb7f881b04e863c6f72fa9"
+            }
+          ],
+          "critical_facts": [
+            "The DETP may stand alone"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "test-report-limits",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "outline-44fd341130c86b81f5d95503"
+        },
+        "expected": {
+          "record_ids": [
+            "outline-44fd341130c86b81f5d95503"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "outline-44fd341130c86b81f5d95503",
+              "page": 22,
+              "source_sha256": "29528947ea16a1121decbbe59db1f9603fe1e3ba29e7cf8a50e64f24c0b9752f",
+              "quote_sha256": "886b6d770f0653e869766fab77714af4fdbc661efe4e639bddb5e44767a0b0a4"
+            }
+          ],
+          "critical_facts": [
+            "do not serve as substitutes"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "table-full-designator",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "outline-77070d728a6c7c27f9d37d1a"
+        },
+        "expected": {
+          "record_ids": [
+            "outline-77070d728a6c7c27f9d37d1a"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "outline-77070d728a6c7c27f9d37d1a",
+              "page": 99,
+              "source_sha256": "29528947ea16a1121decbbe59db1f9603fe1e3ba29e7cf8a50e64f24c0b9752f",
+              "quote_sha256": "fa2d5fd6394fb34c6d104a6664cad29b4efb4bf2227c626a0a9e203f59d795f2"
+            }
+          ],
+          "critical_facts": [
+            "High temperature cycles"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "part-three-purpose",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "outline-feca4aecb1bab35e4a1bd656"
+        },
+        "expected": {
+          "record_ids": [
+            "outline-feca4aecb1bab35e4a1bd656"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "outline-feca4aecb1bab35e4a1bd656",
+              "page": 1055,
+              "source_sha256": "29528947ea16a1121decbbe59db1f9603fe1e3ba29e7cf8a50e64f24c0b9752f",
+              "quote_sha256": "525cbb5153b81824570aabba12135ce92886b9cb040a5e1ef226a80914e840f9"
+            }
+          ],
+          "critical_facts": [
+            "research, development, test, and evaluation"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "part-three-organization",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "outline-df28ab240b83d29225349849"
+        },
+        "expected": {
+          "record_ids": [
+            "outline-df28ab240b83d29225349849"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "outline-df28ab240b83d29225349849",
+              "page": 1055,
+              "source_sha256": "29528947ea16a1121decbbe59db1f9603fe1e3ba29e7cf8a50e64f24c0b9752f",
+              "quote_sha256": "973d45fd9fc3c939e82000ca89afe922407d776e627291c437120ac9b8cd9e9d"
+            }
+          ],
+          "critical_facts": [
+            "logical sequence of events"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "climate-scope-exception",
+        "operation": "get_clause",
+        "request": {
+          "record_id": "outline-26669dbc1cb7f5b3633731c4"
+        },
+        "expected": {
+          "record_ids": [
+            "outline-26669dbc1cb7f5b3633731c4"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [
+            {
+              "record_id": "outline-26669dbc1cb7f5b3633731c4",
+              "page": 1055,
+              "source_sha256": "29528947ea16a1121decbbe59db1f9603fe1e3ba29e7cf8a50e64f24c0b9752f",
+              "quote_sha256": "b515900edeebaa68f0ffdfc081fb3e6cd8539b17bc565be5be98ff310ef2776c"
+            }
+          ],
+          "critical_facts": [
+            "except t he Antarctic",
+            "not to be confused"
+          ],
+          "complete_for_requested_scope": false
+        }
+      },
+      {
+        "case_id": "discover-test-plan",
+        "operation": "search",
+        "request": {
+          "query": "Preparing a Detailed Environmental Test Plan",
+          "query_mode": "exact_phrase",
+          "limit": 20
+        },
+        "expected": {
+          "record_ids": [
+            "outline-8c5254ac49681c4334b159b6"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [],
+          "critical_facts": [],
+          "complete_for_requested_scope": null
+        }
+      },
+      {
+        "case_id": "discover-tailored-criteria",
+        "operation": "search",
+        "request": {
+          "query": "rationale and assumptions",
+          "query_mode": "exact_phrase",
+          "limit": 20
+        },
+        "expected": {
+          "record_ids": [
+            "outline-5e4ad8bf34dd1c01b1ef11d4"
+          ],
+          "forbidden_record_ids": [],
+          "citations": [],
+          "critical_facts": [],
+          "complete_for_requested_scope": null
+        }
+      },
+      {
+        "case_id": "unclassified-is-not-no-requirements",
+        "operation": "enumerate_obligations",
+        "request": {
+          "scope_prefix": null,
+          "limit": 100
+        },
+        "expected": {
+          "record_ids": [],
+          "forbidden_record_ids": [],
+          "citations": [],
+          "critical_facts": [],
+          "complete_for_requested_scope": false
+        }
+      }
+    ]
+  },
+  "review": {
+    "kind": "agent",
+    "identity": "Codex source-text review; no PDF visual or human approval",
+    "reviewed_at": "2026-10-08T11:35:24Z",
+    "suite_sha256": "f53302680adb30cce8821bbbae4f5f97e1ca723256d381586bf4ec6c041b234a"
+  }
+}

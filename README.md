@@ -8,12 +8,12 @@
 
 Download one prepared archive and search **438 compiled MIL-STD packs** locally. No Git clone, PDF acquisition, corpus compilation, network query, or model call is required to use the included snapshot.
 
-[![Prepared release: 0.1.0a5](https://img.shields.io/badge/prepared_release-0.1.0a5-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a5)
+[![Prepared release: 0.1.0a6](https://img.shields.io/badge/prepared_release-0.1.0a6-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a6)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
 [![Queries: offline](https://img.shields.io/badge/queries-offline-253247?style=flat-square)](docs/wiki/ARCHITECTURE_AND_TRUST.md)
 [![Library: 438 packs](https://img.shields.io/badge/library-438_packs-EA6A23?style=flat-square)](#complete-prepared-library-snapshot)
 
-[Download the prepared library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip.sha256) · [Wiki](docs/wiki/README.md) · [Contributing](CONTRIBUTING.md)
+[Download the prepared library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a6/standardsforge-ready-0.1.0a6.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a6/standardsforge-ready-0.1.0a6.zip.sha256) · [Wiki](docs/wiki/README.md) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -21,13 +21,13 @@ Download one prepared archive and search **438 compiled MIL-STD packs** locally.
 
 ## Use the prepared library with your model
 
-The [prepared release](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip) already contains the compressed standards packs. You do not need to clone this repository, download PDFs, or compile standards. Any model host that can launch a local stdio MCP server can use the library.
+The [prepared release](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a6/standardsforge-ready-0.1.0a6.zip) already contains the compressed standards packs. You do not need to clone this repository, download PDFs, or compile standards. Any model host that can launch a local stdio MCP server can use the library.
 
 ### Windows: download, set up, connect
 
 This MCP installation uses only bundled files and requires **64-bit Windows and CPython 3.12**. Allow room for the approximately 1 GB download plus extracted and indexed local state.
 
-1. Download and extract [`standardsforge-ready-0.1.0a5.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a5/standardsforge-ready-0.1.0a5.zip) to a permanent folder. Open PowerShell in that extracted folder.
+1. Download and extract [`standardsforge-ready-0.1.0a6.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a6/standardsforge-ready-0.1.0a6.zip) to a permanent folder. Open PowerShell in that extracted folder.
 2. Run the included core setup, then enable the bundled MCP runtime:
 
    ```powershell
@@ -35,7 +35,7 @@ This MCP installation uses only bundled files and requires **64-bit Windows and 
    powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
    ```
 
-   The first command verifies and indexes the **438 prepared packs** and runs full-integrity doctor. The second installs MCP dependencies from the archive without a package index and checks a real MCP query. This order is required for the published `v0.1.0a5` Windows archive to keep its installed grants aligned with the full-integrity check. The MCP setup prints `StandardsForge is ready.` when complete.
+   The first command verifies and indexes the **438 prepared packs** and runs full-integrity doctor. The second installs MCP dependencies from the archive without a package index and checks a real MCP query. Setup installs all 441 packages: 438 acquisition-pinned page packs, the 810H outline, and the two reviewed 1661 recovery packs. It replays 52 source-bound real-document checks before readiness. The MCP setup prints `StandardsForge is ready.` when complete.
 3. Get the launcher path to use in your model host:
 
    ```powershell
@@ -49,7 +49,7 @@ This MCP installation uses only bundled files and requires **64-bit Windows and 
      "mcpServers": {
        "standardsforge": {
          "command": "powershell.exe",
-         "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a5\\standardsforge-mcp.ps1"]
+         "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-0.1.0a6\\standardsforge-mcp.ps1"]
        }
      }
    }
@@ -70,7 +70,7 @@ The MCP server reads the installed local corpus. Search finds candidates; exact 
 
 ### Linux and macOS
 
-The prepared **core and corpus** work offline on 64-bit Linux and Intel or Apple silicon macOS with CPython 3.11 or newer and SQLite FTS5. From the extracted release, run `sh ./setup.sh`. Connecting an MCP model host then requires a separate install of `standardsforge[mcp]==0.1.0a5` from PyPI into an environment outside the extracted folder. That code install uses the network; queries still use the local prepared corpus. Follow the [copy-paste host setup](docs/wiki/MODEL_INTEGRATION.md#configure-linux-or-macos-against-prepared-state).
+The prepared **core and corpus** work offline on 64-bit Linux and Intel or Apple silicon macOS with CPython 3.11 or newer and SQLite FTS5. From the extracted release, run `sh ./setup.sh`. Connecting an MCP model host then requires a separate install of `standardsforge[mcp]==0.1.0a6` from PyPI into an environment outside the extracted folder. That code install uses the network; queries still use the local prepared corpus. Follow the [copy-paste host setup](docs/wiki/MODEL_INTEGRATION.md#configure-linux-or-macos-against-prepared-state).
 
 ### Use it without a model
 
@@ -82,7 +82,15 @@ python .\run.py search "environmental testing" --principal local-user --query-mo
 
 On Linux or macOS, use `sh ./standardsforge.sh` in place of `python .\run.py`. The [prepared-library guide](docs/wiki/PREPARED_LIBRARY.md) covers installation checks and the [query guide](docs/wiki/QUERY_GUIDE.md) covers inventory, exact edition and package pins, and source retrieval.
 
-The downloadable `v0.1.0a5` archive is a frozen release. Its page-text packs support source-linked physical-page retrieval; its MIL-STD-810H `outline-v1` has 7,788 automated, **unreviewed** records. It does not provide document-wide reviewed obligation classifications or a project-approved baseline. Later source changes are not in that archive or the published PyPI wheel. See the [validation record](VALIDATION_REPORT.md) for the release boundary.
+The downloadable `v0.1.0a6` archive is a frozen release. Its page-text packs support source-linked physical-page retrieval; its MIL-STD-810H `outline-v3` has 8,319 automated, **unreviewed** records. It does not provide document-wide reviewed obligation classifications or a project-approved baseline. The release also includes 18 reviewed 1661 transcriptions and 41 reviewed semantic records, including five separate 4.2.4 directives; these remain bounded agent-reviewed evidence. See the [validation record](VALIDATION_REPORT.md) for the release boundary.
+
+### Install the code CLI only
+
+```sh
+python -m pip install "standardsforge==0.1.0a6"
+```
+
+The PyPI wheel contains code. Use the prepared archive above for the already compiled library.
 
 ## What is included
 

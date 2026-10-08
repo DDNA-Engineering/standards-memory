@@ -1,5 +1,7 @@
 # StandardsForge ready-to-query distribution
 
+Current candidates include `qualification/coverage/coverage.json` and three exact source-bound real-document regression suites (52 cases). Setup installs all 441 packages, including the two 1661 recovery packs, and replays every included suite against the installed wheel before writing readiness. Coverage ledgers enumerate unresolved source pages and text; they do not establish complete requirements extraction, visual interpretation, applicability, or approval.
+
 This package contains StandardsForge and a precompiled local evidence corpus for the publicly distributed current MIL-STD components included in its recorded DLA source baseline. No standards download, PDF compilation, or network access is required. The one-time local setup validates and indexes the compiled packs in the extracted directory.
 
 The exact acquisition snapshot is preserved at `provenance/acquisition-manifest.json`. Its digest, selection rules, exclusions, failed-acquisition and extraction counts, and representation review coverage are recorded in `provenance/source-baseline.json`. The included `corpus/corpus.json` inventories the compiled pack set. Publisher currentness does not replace a project's approved contractual baseline.

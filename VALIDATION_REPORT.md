@@ -1,5 +1,9 @@
 # Validation report
 
+## October 8 unpublished a6 gap closure
+
+See [gap-closure evidence](docs/GAP_CLOSURE_2026-10-08.md) for the unchanged-record integrity fix, non-mutating query startup, 438-pack physical-page ledger, eleven-case real 810H regression gate, and current-source prepared candidate. Full-corpus semantic and visual qualification and public publication remain outstanding. Historical validation below retains its original scope and identities.
+
 Date: 2026-09-22
 
 Scope: `TASK-001` through `TASK-040` deterministic local evidence engine, authorization-safe installed-document discovery, stdio MCP adapter with model-facing MIL-STD reading guidance and operation-specific output schemas, official-source integrity boundary, PDF/derived-outline/reviewed-structure/corpus compilers, bounded reviewed semantic packets and procedure ordering, explicit lexical discovery modes, conservative edition-alignment candidates and side-qualified transitive dependency impacts, content-bound offline synthetic qualification, non-mutating portable readiness diagnosis, honest coverage, concise responses, exact page/structure spans, source-linked scoped discovery, executable response contracts and versioned generated-artifact schemas, dependency-complete CI, reproducible core-wheel acceptance and build provenance, a deterministic synthetic starter, a source-first engineering handoff, offline-verifiable release evidence, process-isolated PDF parsing, lossless storage/wire compression, policy-bound installation of the downloaded local MIL-STD corpus, acquisition-pinned prepared-distribution scope, an offline model-ready prepared runtime, bounded exact-outline review shards, complete method-numbered outline caption identities, reviewer-mediated recovery of ambiguous numbered evidence, and source-evidenced PART body scoping
@@ -301,3 +305,16 @@ The local database is schema version 5. Tested v1/v2/v3-to-v5 migrations add exp
 - The seven read operations are implemented in the local library, CLI, and stdio MCP adapter; no HTTP transport is implemented, and a hosted multi-tenant service is not a product target.
 - A one-record static source-first reader and deterministic CycloneDX release SBOMs are implemented. There is no corpus-wide interactive reader, persistent background compilation service, model adapter, broad performance benchmark, configured runtime tokenizer, or locally observed signed release artifact.
 - Exact quote presence is not proof of PDF fidelity, and returned evidence is not an applicability, compliance, or human approval decision.
+
+## October 8 scan-recovery follow-up
+
+The latest source passes 194 tests (two platform skips) and 47-schema/56-requirement contract validation. All 34 new real-document cases pass both locally and from the freshly installed reproducible wheel with sockets denied. See [scan recovery evidence](docs/SCAN_RECOVERY_2026-10-08.md) for exact package, wheel, and supplement identities, reviewed scope, and remaining corpus-wide limits. Earlier prepared-candidate evidence applies only to that earlier archive.
+
+
+## 2026-10-08 follow-up: semantic assertions, separate directives, and blank pages
+
+The three follow-up gaps are fixed locally. Real semantic assertions now bind complete statements and exact typed qualifier objects with spans; the previous wrong-actor/action and swapped-condition/exception probes fail. MIL-STD-1661 4.2.4 has five distinct directives with the original parent clause retained as required context, verified by detailed reads and scoped enumeration. Explicitly reviewed blank pages retain raster/review evidence and ledger coverage without fabricated text records; legacy transcription 0.1.0 remains readable.
+
+Validation: 196-test suite passes with two platform skips; 47 schemas and 56 requirements validate; eight synthetic cases pass; 18 transcription and 23 semantic/context cases pass (127 expected record occurrences), repeated in a fresh offline installed wheel outside checkout imports with socket creation denied. All 41 semantic objects, annotations, coverage, and run contracts validate. The wheel and 19,281,875-byte v2 supplement each built twice identically; ZIP inventory readback passed.
+
+Current artifact: `build/gap-closure/standardsforge-mil-std-1661-recovery-v2.zip`, SHA-256 `01406cd8ccc5aa26d057bc3b4247ccc5e124074e070b0c62845806d082cde313`. See [the recovery report](docs/SCAN_RECOVERY_2026-10-08.md) for exact package/wheel pins. Prior a6 candidate and recovery supplement are retained as historical artifacts. Nothing committed or published; hosted CI, independent corpus-wide qualification, and decomposition of other compound clauses remain outside this bounded fix.

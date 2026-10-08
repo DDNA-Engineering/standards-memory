@@ -1,0 +1,100 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ledger_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "agent",
+            "human"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewed_at": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "identity",
+        "reviewed_at"
+      ]
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "page_key": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "text_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "start_byte": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "end_byte": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "disposition": {
+                  "enum": [
+                    "requires_semantic_extraction",
+                    "non_normative",
+                    "unresolved"
+                  ]
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "start_byte",
+                "end_byte",
+                "disposition",
+                "rationale"
+              ]
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "page_key",
+          "text_sha256",
+          "segments"
+        ]
+      }
+    }
+  },
+  "required": [
+    "ledger_sha256",
+    "reviewer",
+    "pages"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.org/contracts/coverage-review/0.1.0",
+  "title": "Source-bound text dispositions; no approval"
+}
