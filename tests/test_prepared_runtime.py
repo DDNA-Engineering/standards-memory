@@ -9,6 +9,8 @@ import sys
 import tempfile
 import unittest
 import venv
+import tomllib
+from unittest.mock import patch
 from pathlib import Path
 
 
@@ -23,6 +25,10 @@ from prepared_runtime import (  # noqa: E402
     setup_prepared,
     validate_bundle,
     validate_receipt,
+    _check_mcp_profile,
+    _write_host_configuration,
+    _venv_python,
+    VENV_MARKER,
 )
 
 
@@ -31,6 +37,51 @@ def _sha256(value: bytes) -> str:
 
 
 class PreparedRuntimeTests(unittest.TestCase):
+    def test_offline_mcp_rejects_other_platforms_before_setup(self) -> None:
+        with patch("prepared_runtime.sys.platform", "darwin"):
+            with self.assertRaisesRegex(PreparedSetupError, "Offline MCP requires"):
+                setup_prepared(self.root, mcp_mode="offline", quiet=True)
+        self.assertFalse((self.root / ".venv").exists())
+        self.assertFalse((self.root / ".standardsforge").exists())
+        _check_mcp_profile("online")
+
+    def test_generated_host_configs_round_trip_paths_with_spaces_and_unicode(self) -> None:
+        root = self.root / "Prepared library ü"
+        (root / ".standardsforge").mkdir(parents=True)
+        paths = _write_host_configuration(root)
+        json_entry = json.loads(Path(paths["claude_desktop_or_cursor"]).read_text(encoding="utf-8"))["mcpServers"]["standardsforge"]
+        toml_entry = tomllib.loads(Path(paths["codex"]).read_text(encoding="utf-8"))["mcp_servers"]["standardsforge"]
+        self.assertEqual(json_entry, toml_entry)
+        self.assertEqual(["-I", str(root / "run_mcp.py")], json_entry["args"])
+        self.assertTrue(Path(json_entry["command"]).is_absolute())
+
+    def test_mcp_launcher_rejects_overrides_and_missing_readiness_without_setup(self) -> None:
+        launcher = ROOT / "scripts/prepared_distribution/run_mcp.py"
+        for arguments, code, message in ((["--principal", "other"], 2, "does not accept"), ([], 1, "prepared_mcp_not_ready")):
+            result = subprocess.run([sys.executable, "-I", str(launcher), *arguments], capture_output=True, text=True)
+            self.assertEqual(code, result.returncode)
+            self.assertIn(message, result.stderr)
+            self.assertEqual("", result.stdout)
+
+    def test_failed_revalidation_removes_stale_readiness(self) -> None:
+        manifest, digest = validate_bundle(self.root)
+        state = self.root / ".standardsforge"
+        state.mkdir()
+        receipt = state / "prepared-distribution.json"
+        receipt.write_text(json.dumps({
+            "bundle_manifest_sha256": digest, "mcp_status": "ready", "principal_id": "local-user",
+            "status": "ready", "version": manifest["version"], "wheel_sha256": manifest["build"]["wheel_sha256"],
+        }), encoding="utf-8")
+        python = _venv_python(self.root / ".venv")
+        python.parent.mkdir(parents=True)
+        python.touch()
+        (self.root / ".venv" / VENV_MARKER).write_text(json.dumps({"bundle_manifest_sha256": digest}), encoding="utf-8")
+        with patch("prepared_runtime._run", side_effect=PreparedSetupError("installation failed")):
+            with self.assertRaisesRegex(PreparedSetupError, "installation failed"):
+                setup_prepared(self.root, quiet=True)
+        self.assertFalse(receipt.exists())
+        self.assertTrue((state / "prepared-setup-incomplete.json").is_file())
+
     @unittest.skipUnless(sys.platform.startswith("linux"), "Linux venv alias behavior")
     def test_standard_linux_venv_alias_is_removed_but_external_link_is_rejected(self) -> None:
         venv_root = self.root / ".venv"

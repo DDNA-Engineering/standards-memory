@@ -1,6 +1,6 @@
 # Prepared offline library
 
-The published [StandardsForge `v0.1.0a6` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a6) is the normal end-user path. It already contains the dependency-free StandardsForge wheel, compressed MIL-STD packs from the recorded public-source acquisition snapshot, exact local policies, setup and launcher scripts, and recorded provenance. Users do not reacquire PDFs or compile the corpus.
+The published [StandardsForge `v0.1.0a7` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a7) is the normal end-user path. It already contains the dependency-free StandardsForge wheel, compressed MIL-STD packs from the recorded public-source acquisition snapshot, exact local policies, setup and launcher scripts, and recorded provenance. Users do not reacquire PDFs or compile the corpus.
 
 The GitHub prepared release and the PyPI project are separate channels. The prepared release carries the rights-qualified corpus and supports an offline core setup. PyPI carries independently built StandardsForge code only; it does not bundle, fetch, or authorize standards content.
 
@@ -22,7 +22,9 @@ A Git clone is not required.
 2. Optionally compare the archive with the published SHA-256 file.
 3. Extract the ZIP to a durable local directory.
 4. Open PowerShell or a POSIX shell in the extracted directory.
-5. Run the platform-appropriate offline core setup.
+5. For a model connection, double-click `setup.cmd` on Windows with Python 3.12, or run `sh setup.sh --mcp-online` on Linux/macOS. Setup prints generated host configuration with the actual paths. See [model integration](MODEL_INTEGRATION.md#connect-your-model-host).
+
+For a terminal-only installation, use the offline core commands below.
 
 PowerShell:
 
@@ -38,7 +40,7 @@ sh ./setup.sh
 
 `setup.py` is the portable implementation; `setup.sh` invokes it with `python3`. Setup validates the closed bundle inventory before writes, creates an isolated environment, installs only the bundled wheel with package-index access disabled, validates and installs the included packs, builds the local index, runs full-integrity doctor and search smokes, and records a receipt. It does not acquire standards, compile PDFs, call a model, or need a Git checkout.
 
-Rerunning setup revalidates the bundle and installed state rather than trusting a marker.
+Rerunning setup revalidates the bundle and installed state. MCP setup also proves a real stdio query and writes `.standardsforge/mcp-config.json` and `.standardsforge/codex-mcp.toml`. Only `--mcp-online` resolves dependencies from the network; core code and standards always use the bundled files. Extract upgrades into a new folder and switch the host configuration after setup succeeds.
 
 ## Prove readiness
 
@@ -101,17 +103,11 @@ Runtime state stays inside the extracted distribution. Keep the extracted direct
 
 ## MCP installation choices
 
-On 64-bit Windows with CPython 3.12, run the core `setup.py` command above before `setup.ps1` for the published `v0.1.0a6` archive. The latter installs the exact hash-locked MCP dependency closure from the archive's Windows wheelhouse and proves a real stdio round trip before marking MCP ready. Use `standardsforge-mcp.ps1` as the model-host command.
+On Windows x64 CPython 3.12, double-click `setup.cmd` or run `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1`. One command installs the library and bundled MCP dependencies offline.
 
-On Linux or macOS, complete the offline core setup first. Then create a separate environment outside the closed prepared directory and install the exact code/MCP package from PyPI:
+On Linux/macOS, run `sh ./setup.sh --mcp-online`. This explicit option downloads MCP dependencies for the bundled code wheel into the same owned environment. Standards queries remain offline.
 
-```sh
-MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
-python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a6"
-```
-
-The pip command is an explicit networked code/dependency installation. It does not download the prepared corpus or any standards content. Start the installed module with absolute paths to the prepared distribution's `.standardsforge/memory.db` and `.standardsforge/objects`; the [model integration guide](MODEL_INTEGRATION.md) gives the full command and host boundary.
+Both paths generate host configuration with the actual absolute paths and prove a real stdio query. See [model integration](MODEL_INTEGRATION.md#connect-your-model-host) for host configuration locations.
 
 ## Snapshot scope
 

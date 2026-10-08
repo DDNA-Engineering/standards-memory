@@ -8,72 +8,79 @@
 
 Search a precompiled MIL-STD library from your terminal or model host. The **441-package release** preserves exact source evidence, edition identities, and review status in a local library.
 
-[![Release: 0.1.0a6 alpha](https://img.shields.io/badge/release-0.1.0a6_alpha-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a6)
+[![Release: 0.1.0a7 alpha](https://img.shields.io/badge/release-0.1.0a7_alpha-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a7)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
 [![Queries: offline](https://img.shields.io/badge/queries-offline-253247?style=flat-square)](docs/wiki/ARCHITECTURE_AND_TRUST.md)
 [![Library: 441 packages](https://img.shields.io/badge/library-441_packages-EA6A23?style=flat-square)](#what-is-included)
 
-[Download library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a6/standardsforge-ready-0.1.0a6.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a6/standardsforge-ready-0.1.0a6.zip.sha256) · [Install CLI](#install-the-code-cli-only) · [Release evidence](docs/RELEASE_0.1.0a6.md) · [Documentation](docs/wiki/README.md)
+[Download library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a7/standardsforge-ready-0.1.0a7.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a7/standardsforge-ready-0.1.0a7.zip.sha256) · [Install CLI](#install-the-code-cli-only) · [Release evidence](docs/RELEASE_0.1.0a7.md) · [Documentation](docs/wiki/README.md)
 
 </div>
 
 ---
 
-Unreleased source work adds original PDF delivery, structural browsing, measured evidence selection, explicit concept discovery, deduplicated content bundles, and [reviewed cross-standard navigation and answer qualification](docs/REVIEW_AND_REFERENCE_QUALIFICATION.md). See [knowledge access and compression](docs/KNOWLEDGE_ACCESS.md). These changes are not included in the a6 downloads below.
+The a7 runtime includes **eleven read-only model tools**, including original PDF delivery, structural browsing, evidence selection and reviewed-reference navigation. The prepared library retains the qualified 441-package source baseline. See [knowledge access](docs/KNOWLEDGE_ACCESS.md) for representation and coverage limits.
 
 <a id="use-the-prepared-library-with-your-model"></a>
 
-## Quick start: prepared library
+## Install and connect your model
 
-Download and extract [`standardsforge-ready-0.1.0a6.zip`](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a6/standardsforge-ready-0.1.0a6.zip) to a permanent folder, then open a terminal in that folder. Setup uses the bundled code and compressed standards; no Git clone, PDF download, or compilation is needed.
+1. Download and extract [StandardsForge ready 0.1.0a7](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a7/standardsforge-ready-0.1.0a7.zip) to a permanent folder.
+2. Run setup below. It installs the already-compiled library and checks the model connection.
+3. Copy the generated configuration into your model host and restart its MCP connection.
 
-Requires **CPython 3.11+** with `venv` and SQLite FTS5 on 64-bit Windows/Linux or Intel/Apple silicon macOS. Allow space for the **1.08 GB download**, extracted files, and local index. See the [installation guide](docs/wiki/PREPARED_LIBRARY.md#requirements) for platform prerequisites.
+No Git clone, standards download, PDF compilation or manual database paths are needed. Allow several minutes for the first local indexing pass and enough disk space for the approximately **1.08 GB download**, extracted packs and installed library.
 
-**Windows PowerShell**
-
-```powershell
-python .\setup.py
-python .\run.py search "environmental testing" --principal local-user --query-mode natural_language --limit 5
-```
-
-**Linux or macOS**
-
-```sh
-sh ./setup.sh
-sh ./standardsforge.sh search "environmental testing" --principal local-user --query-mode natural_language --limit 5
-```
-
-Setup installs all **441 packages** offline, verifies integrity, and replays **52 real-document checks** before reporting readiness. Repeated setup revalidates the installation. Search returns candidates with source citations; use the [query guide](docs/wiki/QUERY_GUIDE.md) to retrieve exact evidence, select editions, and inspect coverage.
-
-## Connect a model
-
-For a selectable **StandardsForge** entry, install the repository's [skill/plugin](docs/wiki/MODEL_INTEGRATION.md#select-standardsforge-in-your-chat) after connecting MCP. Use `$standardsforge:standardsforge` or the host's skill/plugin picker to ask a question. The skill answers only from your installed library by default, preserves exact source evidence and reports gaps; external research requires an explicit request. Host tool permissions are configured separately.
-
-The published a6 release exposes seven read-only tools over local stdio MCP. Your model host launches the server and queries the installed library.
-
-On **Windows x64 with CPython 3.12**, run these commands after core setup to enable the bundled offline MCP runtime and print its launcher path:
+**Windows — install 64-bit [Python 3.12](https://www.python.org/downloads/) with the Python launcher, then double-click `setup.cmd`.** Everything needed for the library and MCP is bundled for this profile. Terminal equivalent:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
-(Resolve-Path .\standardsforge-mcp.ps1).Path
 ```
 
-Follow the [Windows host configuration](docs/wiki/MODEL_INTEGRATION.md#start-with-the-prepared-release-on-windows) for Claude Desktop, Claude Code, or Cursor. On **Linux/macOS**, use the [MCP integration guide](docs/wiki/MODEL_INTEGRATION.md#configure-linux-or-macos-against-prepared-state); it installs the PyPI MCP extra into a separate environment using the network. Evidence queries remain local on every platform.
+**Linux or macOS — install Python 3.11+ with `venv`, open a terminal in the extracted folder, then run:**
 
-Try: “List the installed MIL-STD-810 editions, find the low-pressure section, and retrieve its exact evidence with source pages and coverage limits.”
+```sh
+sh ./setup.sh --mcp-online
+```
+
+This option explicitly downloads MCP dependencies. Standards content and core code come from the archive; queries run locally. On Debian/Ubuntu, install `python3-venv` if Python reports that `ensurepip` is unavailable. See [platform requirements](docs/wiki/PREPARED_LIBRARY.md#requirements).
+
+Setup prints the paths to these ready-to-copy files, with your actual installation paths already filled in:
+
+| Model host | Generated configuration |
+|---|---|
+| Claude Desktop or Cursor | `.standardsforge/mcp-config.json` — merge its `standardsforge` entry into the host's `mcpServers` configuration |
+| Codex | `.standardsforge/codex-mcp.toml` — append its section to your Codex `config.toml` |
+
+Keep your other server entries. [Host locations and CLI registration commands](docs/wiki/MODEL_INTEGRATION.md#connect-your-model-host) are in the integration guide. Setup does not edit host settings for you.
+
+Try: “List the installed MIL-STD-810 editions, find the low-pressure section, and retrieve its exact evidence with the original PDF, source pages and coverage limits.”
+
+For a selectable **StandardsForge** entry, add the optional [skill/plugin](docs/wiki/MODEL_INTEGRATION.md#select-standardsforge-in-your-chat). MCP alone provides the eleven tools. The skill guides answers from your installed library and reports missing evidence.
+
+## Terminal only, fully offline
+
+With Python 3.11+ installed:
+
+```sh
+python setup.py
+python run.py search "environmental testing" --principal local-user --query-mode natural_language --limit 5
+```
+
+Use `python3` on Linux/macOS. Core setup never uses a package index. Setup verifies all **441 packages** and replays **52 bounded real-document checks** before reporting readiness. Repeat the same setup command to revalidate. For an upgrade, extract the new version into a new folder and use its generated host configuration; keep the old folder until the new connection works.
 
 ## Install the code CLI only
 
 ```sh
-python -m pip install "standardsforge==0.1.0a6"
+python -m pip install "standardsforge==0.1.0a7"
 standardsforge --help
 ```
 
-The [PyPI package](https://pypi.org/project/standardsforge/0.1.0a6/) contains the CLI and library code. Standards content comes from the prepared archive above or packs you install separately. The prepared archive already includes this same code wheel.
+The [PyPI package](https://pypi.org/project/standardsforge/0.1.0a7/) contains the CLI and library code. Standards content comes from the prepared archive above or packs you install separately. The prepared archive already includes this same code wheel.
 
 ## What is included
 
-The **October 8, 2026 a6 release** contains:
+The **October 8, 2026 a7 release** contains:
 
 | Content | Packages | Scope |
 |---|---:|---|
@@ -82,11 +89,11 @@ The **October 8, 2026 a6 release** contains:
 | MIL-STD-1661 scan recovery | 2 | 18 transcribed pages with raster evidence and 41 semantic records, including five separate 4.2.4 directives; bounded agent review |
 | **Total** | **441** | Additional representations preserve the same source documents |
 
-The archive also includes the dependency-free core wheel, setup scripts, CLI launchers, local policies, checksums, build provenance, qualification records, and the Windows offline MCP dependencies.
+The archive also includes the dependency-free core wheel, one-command setup, CLI/MCP launchers, generated host configuration, local policies, checksums, build provenance, qualification records, and the Windows offline MCP dependencies. New runtime tools operate on this existing evidence; corpus-wide semantic review and newer outline representations are separate work.
 
 ## Validation and evidence limits
 
-The released archive passed first and repeated installation on **Windows, Linux, Intel macOS, and Apple silicon macOS**. The release also passed source CI, 52 bounded real-document cases, public download verification, and a fresh PyPI CLI installation. Exact hashes, workflow results, and qualification scope are recorded in the [a6 release evidence](docs/RELEASE_0.1.0a6.md).
+Release acceptance covers first and repeated installation on **Windows, Linux, Intel macOS, and Apple silicon macOS**, source CI, 52 bounded real-document cases, MCP connectivity and public artifact identity. See the [a7 release evidence](docs/RELEASE_0.1.0a7.md) for observed results, exact hashes and qualification scope.
 
 This is an **alpha release**. Source-linked page text, automated outlines, and reviewed records retain their distinct coverage and review status. The bounded checks do not establish corpus-wide visual or semantic completeness or globally optimal compression. Applicability, project baselines, and compliance decisions remain with the responsible engineering authorities.
 
@@ -555,7 +562,7 @@ Evidence packets retain exact edition and package identity, source citations, an
 | Connect a local model through read-only MCP | [Model integration](docs/wiki/MODEL_INTEGRATION.md) |
 | Acquire sources and rebuild packs or releases | [Maintainer workflows](docs/wiki/MAINTAINER_WORKFLOWS.md) |
 | Understand authorization, integrity, rights, and evidence layers | [Architecture and trust](docs/wiki/ARCHITECTURE_AND_TRUST.md) |
-| Check the published a6 artifacts and acceptance results | [Release evidence](docs/RELEASE_0.1.0a6.md) |
+| Check the published a7 artifacts and acceptance results | [Release evidence](docs/RELEASE_0.1.0a7.md) |
 | Run qualification and release gates | [Validation and releases](docs/wiki/VALIDATION_AND_RELEASES.md) |
 | Browse all documentation | [StandardsForge wiki](docs/wiki/README.md) |
 

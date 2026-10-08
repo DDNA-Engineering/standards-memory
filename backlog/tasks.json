@@ -1155,6 +1155,17 @@
         "Verify every returned PDF digest and reauthorize before returning; deny tampered sources and revoked access, and report absent PDFs explicitly.",
         "Make original PDF links the default skill deliverable for cited standards, install the updated runtime and skill, and exercise the actual installed stdio operation and deliver verified PDFs from the reported test."
       ]
+    },
+    {
+      "task_id": "TASK-059",
+      "title": "One-command model setup and current-runtime prepared release",
+      "status": "in_progress",
+      "requirements": ["SM-FR-030", "SM-FR-057", "SM-FR-059", "SM-FR-075"],
+      "acceptance": [
+        "Use one portable setup implementation for offline core, locked Windows MCP and explicitly networked MCP dependencies; generate absolute host configuration after a real stdio smoke.",
+        "Keep default setup offline, reject incompatible offline MCP profiles before mutation, recheck existing readiness on reruns and reject launcher overrides or failed setup readiness.",
+        "Publish a new version with the current eleven read tools, refreshed installation documentation, exact runtime-bound corpus qualification, native install acceptance and public artifact verification."
+      ]
     }
   ]
 }

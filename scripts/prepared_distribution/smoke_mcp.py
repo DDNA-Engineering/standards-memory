@@ -23,7 +23,7 @@ EXPECTED_TOOLS = [
 ]
 
 
-async def _smoke(db: str, store: str, principal: str, query: str) -> None:
+async def _smoke(db: str, store: str, principal: str, query: str, launcher: str | None = None) -> None:
     parameters = StdioServerParameters(
         command=sys.executable,
         args=[
@@ -40,6 +40,8 @@ async def _smoke(db: str, store: str, principal: str, query: str) -> None:
             "structured_only",
         ],
     )
+    if launcher is not None:
+        parameters = StdioServerParameters(command=sys.executable, args=["-I", launcher])
     async with Client(parameters, raise_exceptions=True) as client:
         tools = await client.list_tools()
         if [tool.name for tool in tools.tools] != EXPECTED_TOOLS:
@@ -63,8 +65,9 @@ def main() -> int:
     parser.add_argument("--store", required=True)
     parser.add_argument("--principal", required=True)
     parser.add_argument("--query", required=True)
+    parser.add_argument("--launcher", help="Also qualify the generated host launcher after setup completes.")
     args = parser.parse_args()
-    asyncio.run(_smoke(args.db, args.store, args.principal, args.query))
+    asyncio.run(_smoke(args.db, args.store, args.principal, args.query, args.launcher))
     return 0
 
 

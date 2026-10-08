@@ -1,98 +1,61 @@
-# StandardsForge ready-to-query distribution
+# StandardsForge ready-to-query library
 
-Current candidates include `qualification/coverage/coverage.json` and three exact source-bound real-document regression suites (52 cases). Setup installs all 441 packages, including the two 1661 recovery packs, and replays every included suite against the installed wheel before writing readiness. Coverage ledgers enumerate unresolved source pages and text; they do not establish complete requirements extraction, visual interpretation, applicability, or approval.
+The archive contains 441 precompiled packages: 438 acquisition-pinned MIL-STD page packs, the automated MIL-STD-810H outline-v3, and two bounded MIL-STD-1661 recovery packs. No Git clone, standards download or PDF compilation is needed. First setup validates and indexes the library, checks every package and replays 52 bounded real-document cases. Allow several minutes.
 
-This package contains StandardsForge and a precompiled local evidence corpus for the publicly distributed current MIL-STD components included in its recorded DLA source baseline. No standards download, PDF compilation, or network access is required. The one-time local setup validates and indexes the compiled packs in the extracted directory.
+## Install with a model connection
 
-The exact acquisition snapshot is preserved at `provenance/acquisition-manifest.json`. Its digest, selection rules, exclusions, failed-acquisition and extraction counts, and representation review coverage are recorded in `provenance/source-baseline.json`. The included `corpus/corpus.json` inventories the compiled pack set. Publisher currentness does not replace a project's approved contractual baseline.
-
-`provenance/wheel-build.json` binds the bundled wheel to its exact source-file inventory, fixed source epoch, pinned build backend, two byte-identical clean builds, and isolated core smoke. `bundle-manifest.json` records and inventories that provenance alongside every release file.
-
-## Connect a model on Windows
-
-This extracted archive already contains the compiled standards library. On 64-bit Windows with CPython 3.12, open PowerShell in this directory and run:
+**Windows:** install 64-bit CPython 3.12 with the Python launcher, then double-click `setup.cmd`. Terminal equivalent:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
-(Resolve-Path .\standardsforge-mcp.ps1).Path
 ```
 
-Setup validates and indexes the included packs, installs the included MCP dependencies offline, and proves a real stdio query. Give the printed absolute launcher path to your model host using the [Claude Desktop, Claude Code, or Cursor configuration](#connect-claude-desktop-claude-code-or-cursor) below. Then ask the model to list an installed standard, search for a topic, and retrieve the exact cited record with its coverage and review limits. No PDF acquisition or compilation is needed.
+This profile is fully offline, including its hash-locked MCP dependencies. If a different supported Python version is installed, explicitly choose `python setup.py --mcp-online` instead.
 
-## Start the offline core
-
-The prepared core supports 64-bit Windows and Linux plus Intel and Apple silicon macOS with CPython 3.11 or newer. It installs the bundled core wheel and corpus with package-index access disabled. Choose the commands for the host platform.
-
-PowerShell:
-
-```powershell
-python .\setup.py
-python .\run.py search "environmental testing" --principal local-user --limit 5
-```
-
-POSIX shell:
+**Linux/macOS:** use CPython 3.11+ with `venv`, open a terminal here, and run:
 
 ```sh
-sh ./setup.sh
-sh ./standardsforge.sh search "environmental testing" --principal local-user --limit 5
+sh ./setup.sh --mcp-online
 ```
 
-`setup.py` is the portable implementation; `setup.sh` invokes it with `python3`. `run.py` and `standardsforge.sh` validate the manifest-bound receipt and owned runtime before every launch, anchor the database and object store to this extracted directory, and forward only the CLI arguments. Rerun setup for a full closed-bundle revalidation. Setup validates and installs the already-compiled packs and proves full-integrity doctor plus a real search. It does not acquire standards, compile PDFs, call a model, or resolve a package from the network.
+That option explicitly downloads MCP dependencies. The core code and standards come from the verified archive. Debian/Ubuntu Python may need its matching `python3-venv` package. Queries never download content or invoke a model.
 
-## Choose an MCP channel
+## Connect your host
 
-The prepared GitHub archive and the PyPI project are separate distribution channels. This archive contains the rights-qualified corpus and never needs PyPI for core setup or query. The PyPI project contains independently built code only; it neither bundles nor downloads standards content.
+Setup makes a real stdio query and prints the paths to:
 
-For a fully offline MCP installation, use 64-bit Windows with CPython 3.12:
+- `.standardsforge/mcp-config.json`: merge the StandardsForge server into Claude Desktop or Cursor's `mcpServers` configuration.
+- `.standardsforge/codex-mcp.toml`: append the StandardsForge section to Codex's `config.toml`.
+
+All paths are already absolute and escaped. Preserve other host entries, then restart the MCP connection. The host launches `.venv` Python with `-I run_mcp.py`; do not launch it manually and wait for a terminal prompt. It communicates over stdin/stdout. Setup does not modify host settings.
+
+Codex or Claude Code can register the same launcher from this directory:
 
 ```powershell
-.\setup.ps1
+codex mcp add standardsforge -- (Resolve-Path .\.venv\Scripts\python.exe).Path -I (Resolve-Path .\run_mcp.py).Path
 ```
-
-That Windows-only path installs StandardsForge and its exact hash-locked MCP dependency closure from the included wheelhouse, then proves a real stdio MCP round trip. Model hosts use `standardsforge-mcp.ps1`.
-
-On Linux or macOS, first complete the offline core setup above. MCP then requires this explicit networked code/dependency install from PyPI into a separate environment outside the distribution; replace `PREPARED_VERSION` with the exact `version` in `bundle-manifest.json`:
 
 ```sh
-MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
-PREPARED_ROOT=/absolute/path/to/standardsforge-ready-PREPARED_VERSION
-python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==PREPARED_VERSION"
-"$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
-  --db "$PREPARED_ROOT/.standardsforge/memory.db" \
-  --store "$PREPARED_ROOT/.standardsforge/objects" \
-  --principal local-user \
-  --result-mode structured_only
+codex mcp add standardsforge -- "$PWD/.venv/bin/python" -I "$PWD/run_mcp.py"
 ```
 
-Keep the networked MCP environment outside the extracted archive so the archive's closed inventory remains unchanged. The server command uses the distribution-local corpus state and does not fetch standards. Use the same absolute paths in a model host.
+Replace `codex` with `claude` for Claude Code. Ask: "List installed MIL-STD-810 editions, find the low-pressure section and retrieve its exact evidence with original PDF links and coverage limits."
 
-## Connect Claude Desktop, Claude Code, or Cursor
+The a7 runtime exposes eleven read-only tools. Search discovers candidates; exact evidence retrieval verifies source spans, required context and authorization. Original PDF paths refer to files on the machine running MCP. Applicability, compliance and approval remain engineering decisions.
 
-Replace the example directory with the absolute path to this extracted release. Claude Desktop and Cursor both accept an `mcpServers` entry; for Cursor place it in `.cursor/mcp.json`:
+## Terminal only, offline
 
-```json
-{
-  "mcpServers": {
-    "standardsforge": {
-      "command": "powershell.exe",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\absolute\\path\\to\\standardsforge-ready-PREPARED_VERSION\\standardsforge-mcp.ps1"]
-    }
-  }
-}
+```sh
+python setup.py
+python run.py search "environmental testing" --principal local-user --query-mode natural_language --limit 5
 ```
 
-Claude Code can register the same local stdio process:
+Use `python3` on Linux/macOS. Windows/Linux x64 and Intel/Apple silicon macOS need CPython 3.11+ with SQLite FTS5. Core setup uses only the bundled wheel, with package indexes disabled. All launchers anchor state to this directory regardless of the current working directory.
 
-```powershell
-claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\absolute\path\to\standardsforge-ready-PREPARED_VERSION\standardsforge-mcp.ps1"
-claude mcp get standardsforge
-```
+Rerun the same setup command to revalidate. Extract new versions into new folders, run setup and switch the host to the newly generated configuration. Keep the old installation until the new connection works. Never transplant an old virtual environment or database into the new bundle.
 
-The launcher fixes the trusted principal to `local-user`, exposes the ten declared read tools in the current source runtime, and writes no startup banner to protocol stdout. Published a6 archives retain their original seven-tool runtime. Use `list_documents` when the exact installed identifier is unknown; the returned packages and continuations remain bound to that principal.
+## Evidence and provenance
 
-The bundle is offline and read-only during queries. Its database contains grants only for the generic local principal `local-user`.
+`provenance/acquisition-manifest.json` preserves the source snapshot. `provenance/source-baseline.json` records selection, exclusions and incomplete coverage. `provenance/wheel-build.json` binds the code wheel to its source inventory and reproducible build. `bundle-manifest.json` inventories all immutable files. Local generated state stays in `.standardsforge` and `.venv`.
 
-## Evidence boundary
-
-The corpus contains source-linked physical-page text and a separate automated, unreviewed MIL-STD-810H outline. Search results identify evidence candidates; they do not establish product applicability, approved requirements, test adequacy, or compliance. Review [CONTENT-NOTICE.md](CONTENT-NOTICE.md) before redistributing the standards evidence.
+The library retains source PDFs, edition identities, representation distinctions and review status. Page text and automated outlines are not a corpus-wide reviewed requirements graph. The 52 checks qualify selected evidence and context only. Restricted components and unresolved pages remain explicit. See `CONTENT-NOTICE.md` for content boundaries.
