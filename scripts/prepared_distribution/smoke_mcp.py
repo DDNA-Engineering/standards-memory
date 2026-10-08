@@ -16,6 +16,9 @@ EXPECTED_TOOLS = [
     "build_context",
     "enumerate_obligations",
     "diff_editions",
+    "browse_records",
+    "select_evidence",
+    "follow_references",
 ]
 
 

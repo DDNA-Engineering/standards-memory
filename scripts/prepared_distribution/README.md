@@ -89,7 +89,7 @@ claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypa
 claude mcp get standardsforge
 ```
 
-The launcher fixes the trusted principal to `local-user`, exposes only the seven declared read tools, and writes no startup banner to protocol stdout. Use `list_documents` when the exact installed identifier is unknown; the returned packages and continuations remain bound to that principal.
+The launcher fixes the trusted principal to `local-user`, exposes the ten declared read tools in the current source runtime, and writes no startup banner to protocol stdout. Published a6 archives retain their original seven-tool runtime. Use `list_documents` when the exact installed identifier is unknown; the returned packages and continuations remain bound to that principal.
 
 The bundle is offline and read-only during queries. Its database contains grants only for the generic local principal `local-user`.
 
