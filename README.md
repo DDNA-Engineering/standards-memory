@@ -19,7 +19,7 @@ Search a precompiled MIL-STD library from your terminal or model host. The **441
 
 ---
 
-Unreleased source work adds structural browsing, measured evidence selection, explicit concept discovery, deduplicated content bundles, and [reviewed cross-standard navigation and answer qualification](docs/REVIEW_AND_REFERENCE_QUALIFICATION.md). See [knowledge access and compression](docs/KNOWLEDGE_ACCESS.md). These changes are not included in the a6 downloads below.
+Unreleased source work adds original PDF delivery, structural browsing, measured evidence selection, explicit concept discovery, deduplicated content bundles, and [reviewed cross-standard navigation and answer qualification](docs/REVIEW_AND_REFERENCE_QUALIFICATION.md). See [knowledge access and compression](docs/KNOWLEDGE_ACCESS.md). These changes are not included in the a6 downloads below.
 
 <a id="use-the-prepared-library-with-your-model"></a>
 

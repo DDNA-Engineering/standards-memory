@@ -19,6 +19,7 @@ EXPECTED_TOOLS = [
     "browse_records",
     "select_evidence",
     "follow_references",
+    "get_source_pdfs",
 ]
 
 

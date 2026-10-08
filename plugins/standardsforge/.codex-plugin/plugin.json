@@ -1,6 +1,6 @@
 {
   "name": "standardsforge",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Answer defense engineering standards questions from the installed StandardsForge database, with exact evidence and explicit gaps.",
   "author": {
     "name": "StandardsForge contributors"
@@ -13,9 +13,11 @@
     "longDescription": "Answer from installed defense engineering standards, retrieve exact edition-bound evidence, and report missing evidence without unsolicited web research. Requires an operator-configured local StandardsForge MCP connection and installed corpus. This plugin supplies workflow instructions; it does not install a runtime, download standards, grant access or disable host web tools.",
     "developerName": "StandardsForge contributors",
     "category": "Productivity",
-    "capabilities": ["Read"],
+    "capabilities": [
+      "Read"
+    ],
     "defaultPrompt": [
-      "Use $standardsforge:standardsforge with only my installed database; no web. Cite editions and readable source pages."
+      "Use $standardsforge:standardsforge with only my installed database; no web. Cite exact editions and link original PDFs."
     ]
   }
 }

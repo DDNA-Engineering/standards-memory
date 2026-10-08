@@ -16,6 +16,8 @@ codex plugin list --marketplace standardsforge --json
 
 For a local source checkout, replace the first command with `codex plugin marketplace add .` from the repository root. The marketplace stores only this small skill plugin in the plugin cache; it does not copy the repository's local corpus or database. The plugin reuses an existing `standardsforge` or `standardsforge-local` MCP connection. It has no bundled MCP server, credentials, machine-specific paths, network fallback or installation hook. Installing it does not install or upgrade the runtime or standards content.
 
+Plugin 0.1.4 includes original PDF links in standards answers. This requires the updated source runtime's `get_source_pdfs` tool (eleven read tools); the published a6 runtime has seven tools and does not include it. To upgrade an existing MCP environment from a checked-out source revision, run that environment's Python with `-m pip install ".[mcp]"` from the repository root, then restart the host's MCP connection or start a new chat. Keep its existing database, object store and trusted principal configuration. Refreshing the plugin alone does not update the runtime.
+
 Start a new chat after installation. In Codex CLI or the IDE extension, use `/skills` to select **StandardsForge**. Codex qualifies the skill name with its plugin name, so the explicit invocation is:
 
 ```text
@@ -117,7 +119,7 @@ Published a6 exposes these seven tools:
 - `enumerate_obligations`
 - `diff_editions`
 
-The current source runtime additionally exposes `browse_records`, `select_evidence` and `follow_references`. Use the connected server's tool inventory as the authority for availability.
+The current source runtime additionally exposes `browse_records`, `select_evidence`, `follow_references` and `get_source_pdfs`. Use the connected server's tool inventory as the authority for availability.
 
 It does not expose installation, pack verification, revocation, acquisition, compilation, HTTP, or a caller-selected principal.
 
@@ -133,7 +135,9 @@ It does not expose installation, pack verification, revocation, acquisition, com
 
 Models must not interpret zero classified obligations as proof that no requirements exist. Physical page text, automated derived structure, reviewed structure, and curated records carry different evidence and review claims.
 
-User-facing evidence should show quoted passages with standard, edition, clause and physical PDF page citations. Full hashes and replay IDs remain in the underlying packet or optional audit details. The skill includes a dependency-free HTML source-sheet renderer and a single-document loopback browser preview. A Codex HTML file tab may show source code: open the preview helper's printed URL with a browser target and verify the rendered view before sharing its link. Use confirmed original PDF pages/images or inline passages if rendering is unavailable. The renderer preserves every returned record and reports the packet's coverage limits. These host helpers display a saved retrieval snapshot; they do not query, authorize or verify source files. The core MCP remains stdio-only. See the [skill workflow](../../plugins/standardsforge/skills/standardsforge/SKILL.md).
+User-facing evidence includes original PDF links alongside standard, edition, clause and physical page citations. Call `get_source_pdfs(package_digest)` for each cited package and link the returned absolute `local_path` files. The read-only operation verifies every inventoried PDF under `sources/`, includes notice/change components, and reauthorizes the package before returning. It never fetches, renders or copies files. CLI equivalent: `standardsforge --db <db> --store <objects> source-pdfs <package_digest> --principal <principal>`. A text-only package returns `no_pdf_sources`; verification or authorization failures return errors. Paths are accessible on the MCP host, not public downloads, and are verified at lookup time. A remote chat requires its host's supported file delivery mechanism.
+
+Full hashes and replay IDs remain in the underlying packet or optional audit details. The optional HTML source sheet supplements PDF links. A Codex HTML file tab may show source code: open the preview helper's printed URL with a browser target and verify the rendered view before sharing its link. The renderer preserves every returned record and reports the packet's coverage limits. These presentation helpers display a saved retrieval snapshot; they do not query, authorize or verify source files. The core MCP remains stdio-only. See the [skill workflow](../../plugins/standardsforge/skills/standardsforge/SKILL.md).
 
 ## Security boundary
 

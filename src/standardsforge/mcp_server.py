@@ -28,6 +28,7 @@ MCP_TOOL_NAMES = (
     "browse_records",
     "select_evidence",
     "follow_references",
+    "get_source_pdfs",
 )
 MCP_TOOL_TITLES = {
     "search": "Search standards evidence",
@@ -40,6 +41,7 @@ MCP_TOOL_TITLES = {
     "browse_records": "Browse records and structural links",
     "select_evidence": "Select measured compact evidence",
     "follow_references": "Follow reviewed cross-standard references",
+    "get_source_pdfs": "Get original source PDFs",
 }
 MCP_SERVER_INSTRUCTIONS = (
     "Read MIL-STDs as edition-pinned evidence, not as free-floating prose. If the exact identifier is unknown, "
@@ -62,6 +64,7 @@ MCP_SERVER_INSTRUCTIONS = (
     "its disclosed alternatives. It never resolves a referenced standard's edition or establishes normative equivalence."
 )
 MCP_TOOL_DESCRIPTIONS = {
+    "get_source_pdfs": "Get verified absolute local PDF paths for an authorized exact package. Call for each package cited in an answer and provide the returned PDFs as readable file links. Includes all preserved PDF source components, including notices. Every file is digest-checked and the package reauthorized before return. Paths are on the MCP host, not remote URLs. No fetching, rendering, copying or caller-supplied paths.",
     "follow_references": "Follow explicitly reviewed cross-standard references from one exact record using a trusted host-configured binding artifact. Every endpoint is pinned to its package, edition, record and quote and independently authorized and source-verified. Reviewer-selected navigation editions are not source-mandated editions or project baselines. Results include unresolved bindings and each target's required evidence; zero bindings does not establish reference completeness. No acquisition, automatic latest-edition selection or recursive traversal occurs.",
     "select_evidence": "Retrieve one exact record with its required context and select the smallest lossless evidence profile. Use host-configured local token counts when available, otherwise exact JSON bytes. Limits cover the nested evidence packet; tool schemas, selection metadata and chat framing are excluded. A token budget requires the host to configure a pinned local tokenizer. No text is truncated.",
     "browse_records": (
@@ -554,6 +557,30 @@ class _SelectEvidenceResult(_ClosedTypedDict):
     evidence: dict[str, Any]
 
 
+class _SourcePdfFile(_ClosedTypedDict):
+    source_path: str
+    local_path: str
+    sha256: str
+    bytes: int
+    media_type: Literal["application/pdf"]
+    verified: Literal[True]
+
+
+class _SourcePdfsResult(_ClosedTypedDict):
+    schema_version: Literal["0.1.0"]
+    operation: Literal["get_source_pdfs"]
+    retrieval_mode: Literal["verified_local_source_pdfs"]
+    package: _DiffPackage
+    availability: Literal["available", "no_pdf_sources"]
+    files: list[_SourcePdfFile]
+    limitations: list[str]
+
+
+class _SourcePdfsSuccess(_ClosedTypedDict):
+    ok: Literal[True]
+    result: _SourcePdfsResult
+
+
 class _FollowReferencesResult(_ClosedTypedDict):
     schema_version: Literal["0.1.0"]
     operation: Literal["follow_references"]
@@ -639,6 +666,7 @@ EnumerateObligationsToolResult = Annotated[CallToolResult, _EnumerateObligations
 DiffEditionsToolResult = Annotated[CallToolResult, _DiffEditionsSuccess]
 FollowReferencesToolResult = Annotated[CallToolResult, _FollowReferencesSuccess]
 MCPResultMode = Literal["text_and_structured", "structured_only"]
+SourcePdfsToolResult = Annotated[CallToolResult, _SourcePdfsSuccess]
 
 
 def _json(payload: dict[str, Any]) -> str:
@@ -892,6 +920,12 @@ def create_mcp_server(
     ) -> FollowReferencesToolResult:
         return _invoke(lambda: service.follow_references(package_digest, record_id, bound_principal,
             max_bytes=max_bytes), result_mode=result_mode)
+
+    @server.tool(title=MCP_TOOL_TITLES["get_source_pdfs"], description=MCP_TOOL_DESCRIPTIONS["get_source_pdfs"], annotations=read_only)
+    def get_source_pdfs(
+        package_digest: Annotated[str, Field(description="Exact authorized package SHA-256 pin.")],
+    ) -> SourcePdfsToolResult:
+        return _invoke(lambda: service.get_source_pdfs(package_digest, bound_principal), result_mode=result_mode)
 
     return server
 
