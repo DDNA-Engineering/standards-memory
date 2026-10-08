@@ -8,6 +8,8 @@ import json
 import sys
 import tempfile
 import unittest
+import threading
+from http.client import HTTPConnection
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -19,6 +21,9 @@ SCRIPT = ROOT / "plugins/standardsforge/skills/standardsforge/scripts/render_evi
 SPEC = importlib.util.spec_from_file_location("evidence_reader", SCRIPT)
 reader = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(reader)
+PREVIEW_SPEC = importlib.util.spec_from_file_location("evidence_preview", SCRIPT.with_name("serve_evidence.py"))
+preview = importlib.util.module_from_spec(PREVIEW_SPEC)
+PREVIEW_SPEC.loader.exec_module(preview)
 
 
 class ReaderDocument(HTMLParser):
@@ -128,6 +133,47 @@ class EvidenceReaderTests(unittest.TestCase):
         (root / "page.png").write_bytes(b"not the preview")
         with self.assertRaises(ValueError):
             reader.load_previews(mapping)
+
+    def start_preview(self):
+        document = Path(self.temporary.name) / "source sheet.html"
+        content = reader.render(self.packet, "Evidence · original source")
+        document.write_bytes(content.encode("utf-8"))
+        server = preview.create_server(document)
+        worker = threading.Thread(target=server.serve_forever, daemon=True)
+        worker.start()
+
+        def stop():
+            server.shutdown()
+            server.server_close()
+            worker.join(timeout=5)
+
+        self.addCleanup(stop)
+        return server, content.encode("utf-8")
+
+    def test_browser_preview_serves_the_rendered_sheet_as_utf8_html(self):
+        server, content = self.start_preview()
+        self.assertEqual("127.0.0.1", server.server_address[0])
+        connection = HTTPConnection(*server.server_address, timeout=5)
+        self.addCleanup(connection.close)
+        for method in ("GET", "HEAD"):
+            connection.request(method, "/")
+            response = connection.getresponse()
+            self.assertEqual(200, response.status)
+            self.assertEqual("text/html; charset=utf-8", response.getheader("Content-Type"))
+            self.assertEqual(len(content), int(response.getheader("Content-Length")))
+            self.assertEqual(content if method == "GET" else b"", response.read())
+
+    def test_browser_preview_does_not_serve_neighboring_files_or_other_hosts(self):
+        server, _ = self.start_preview()
+        (Path(self.temporary.name) / "private.json").write_text('"not source evidence"', encoding="utf-8")
+        connection = HTTPConnection(*server.server_address, timeout=5)
+        self.addCleanup(connection.close)
+        for path, headers, expected in (("/private.json", {}, 404), ("/../private.json", {}, 404),
+                                        ("/", {"Host": "unrelated.example"}, 403)):
+            connection.request("GET", path, headers=headers)
+            response = connection.getresponse()
+            self.assertEqual(expected, response.status)
+            self.assertNotIn(b"not source evidence", response.read())
 
 
 if __name__ == "__main__":

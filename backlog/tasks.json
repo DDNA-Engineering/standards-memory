@@ -1133,6 +1133,17 @@
         "Keep missing connections, empty search results, unavailable editions, external references and location-specific inputs as explicit gaps; permit external research only when the user requests it and keep its evidence separate.",
         "Install the updated plugin and verify actual host discovery and local evidence retrieval; distinguish instruction and metadata verification from a new model-run behavioral result and from host-enforced web restrictions."
       ]
+    },
+    {
+      "task_id": "TASK-057",
+      "title": "Open evidence as a rendered reader instead of HTML source",
+      "status": "complete",
+      "requirements": ["SM-FR-024", "SM-FR-030"],
+      "acceptance": [
+        "Provide a host-side loopback preview for one explicit saved reader, with an HTML content type and no directory serving or core query listener.",
+        "Require an actual browser or rendered preview for the primary evidence link, verify it visually, and use source pages or inline passages when rendering is unavailable.",
+        "Repair the reported source sheet with citation-matched original page previews, verify its rendered appearance, and install the updated skill."
+      ]
     }
   ]
 }

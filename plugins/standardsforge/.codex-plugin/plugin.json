@@ -1,6 +1,6 @@
 {
   "name": "standardsforge",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Answer defense engineering standards questions from the installed StandardsForge database, with exact evidence and explicit gaps.",
   "author": {
     "name": "StandardsForge contributors"
