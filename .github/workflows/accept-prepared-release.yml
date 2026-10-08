@@ -134,6 +134,17 @@ jobs:
               }
             }
           } finally { Pop-Location }
+      - name: Verify first and repeat Windows offline MCP setup
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = $null
+          $env:PYTHONHOME = $null
+          $env:VIRTUAL_ENV = $null
+          for ($attempt = 1; $attempt -le 2; $attempt++) {
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $env:PREPARED_ROOT 'setup.ps1')
+            if ($LASTEXITCODE -ne 0) { throw "Offline MCP setup attempt $attempt failed." }
+          }
       - name: Prove full doctor, exact resolve, search, and source evidence retrieval
         shell: pwsh
         env:

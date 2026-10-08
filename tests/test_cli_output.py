@@ -37,11 +37,11 @@ class CLIOutputTests(unittest.TestCase):
                 args = parser.parse_args(
                     ["search", "axial ingress", "--principal", "local-user", *extra]
                 )
-                with patch(
-                    "standardsforge.cli.StandardsForgeService.search",
-                    return_value={"operation": "search"},
-                ) as search:
+                with patch("standardsforge.cli.StandardsForgeService.open_read_only") as open_store:
+                    search = open_store.return_value.search
+                    search.return_value = {"operation": "search"}
                     self.assertEqual({"operation": "search"}, _run(args))
+                    open_store.assert_called_once_with(Path(args.db), Path(args.store))
                 search.assert_called_once_with(
                     "axial ingress",
                     "local-user",
@@ -65,11 +65,11 @@ class CLIOutputTests(unittest.TestCase):
                 "local-user",
             ]
         )
-        with patch(
-            "standardsforge.cli.StandardsForgeService.list_documents",
-            return_value={"operation": "list_documents"},
-        ) as list_documents:
+        with patch("standardsforge.cli.StandardsForgeService.open_read_only") as open_store:
+            list_documents = open_store.return_value.list_documents
+            list_documents.return_value = {"operation": "list_documents"}
             self.assertEqual({"operation": "list_documents"}, _run(args))
+            open_store.assert_called_once_with(Path(args.db), Path(args.store))
         list_documents.assert_called_once_with(
             "local-user", "MIL-STD-810", 25, "signed-cursor"
         )
