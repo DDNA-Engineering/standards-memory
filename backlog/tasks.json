@@ -1144,6 +1144,17 @@
         "Require an actual browser or rendered preview for the primary evidence link, verify it visually, and use source pages or inline passages when rendering is unavailable.",
         "Repair the reported source sheet with citation-matched original page previews, verify its rendered appearance, and install the updated skill."
       ]
+    },
+    {
+      "task_id": "TASK-058",
+      "title": "Deliver verified local source PDFs with standards answers",
+      "status": "complete",
+      "requirements": ["SM-FR-024", "SM-FR-030"],
+      "acceptance": [
+        "Expose a read-only package-pinned library, CLI and MCP operation returning verified local PDF paths from the authorized package inventory, without fetching, rendering, copying or accepting caller paths.",
+        "Verify every returned PDF digest and reauthorize before returning; deny tampered sources and revoked access, and report absent PDFs explicitly.",
+        "Make original PDF links the default skill deliverable for cited standards, install the updated runtime and skill, and exercise the actual installed stdio operation and deliver verified PDFs from the reported test."
+      ]
     }
   ]
 }

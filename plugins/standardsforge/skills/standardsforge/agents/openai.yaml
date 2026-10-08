@@ -1,4 +1,4 @@
 interface:
   display_name: "StandardsForge"
   short_description: "Ask your installed standards library, without web research"
-  default_prompt: "Use $standardsforge:standardsforge with only my installed database; no web. Cite editions and readable source pages."
+  default_prompt: "Use $standardsforge:standardsforge with only my installed database; no web. Cite exact editions and link original PDFs."

@@ -131,11 +131,11 @@ class _RequestVerificationContext:
         relative_path: str,
         expected_sha256: str,
         failure_message: str,
-    ) -> None:
+    ) -> Path:
         path, _ = self._path(object_path, relative_path)
         cache_key = (str(path), expected_sha256)
         if cache_key in self._verified_files or cache_key in self._verified_bytes:
-            return
+            return path
         try:
             with path.open("rb") as stream:
                 actual_sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
@@ -143,6 +143,7 @@ class _RequestVerificationContext:
             raise StandardsForgeError("source_integrity_failure", "Stored source evidence could not be read.") from exc
         require(actual_sha256 == expected_sha256, "source_integrity_failure", failure_message)
         self._verified_files.add(cache_key)
+        return path
 
     def verified_bytes(
         self,
@@ -1364,6 +1365,40 @@ class StandardsForgeService:
                         queue.append(edge["target_record_id"])
             projected[reference] = (ordered_rows, ordered_edges)
         return projected
+
+    def get_source_pdfs(self, package_digest: str, principal_id: str) -> dict[str, Any]:
+        """Locate preserved PDFs without reading their contents into the response."""
+        self._validate_package_digest(package_digest)
+        package = self.store.authorized_package(principal_id, package_digest)
+        verification = _RequestVerificationContext()
+        files = []
+        for entry in json.loads(package["inventory_json"]):
+            relative = PurePosixPath(entry["path"])
+            if relative.parts[0] != "sources" or relative.suffix.lower() != ".pdf":
+                continue
+            path = verification.verified_file(
+                Path(package["object_path"]), entry["path"], entry["sha256"],
+                "Stored source PDF failed its digest check.",
+            )
+            files.append({
+                "source_path": entry["path"], "local_path": path.as_posix(),
+                "sha256": entry["sha256"], "bytes": entry["bytes"],
+                "media_type": "application/pdf", "verified": True,
+            })
+        result = {
+            "schema_version": "0.1.0", "operation": "get_source_pdfs",
+            "retrieval_mode": "verified_local_source_pdfs",
+            "package": self._package_payload(package),
+            "availability": "available" if files else "no_pdf_sources",
+            "files": sorted(files, key=lambda item: item["source_path"]),
+            "limitations": [
+                "Paths refer to preserved files on the MCP host; they are not remote download URLs.",
+                "Authorization and file digests are checked for this response; a returned path is not an access-control capability.",
+                "Files preserve this package's source components; delivery does not establish applicability or compliance.",
+            ],
+        }
+        self.store.authorized_package(principal_id, package_digest)
+        return result
 
     def get_clause(
         self,

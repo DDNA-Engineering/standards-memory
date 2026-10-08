@@ -285,6 +285,8 @@ def validate_actual_query_contracts(
                 query_mode="natural_language",
             ),
         ]
+        natural_search_result = detailed_results[-1]
+        detailed_results.append(service.get_source_pdfs(first_digest, "local-user"))
         profile_results = [
             service.get_clause(
                 first_digest,
@@ -468,7 +470,7 @@ def validate_actual_query_contracts(
         else:
             raise AssertionError("Semantic evidence without review passed response validation.")
 
-        malformed_interpretation = json.loads(json.dumps(detailed_results[-1]))
+        malformed_interpretation = json.loads(json.dumps(natural_search_result))
         malformed_interpretation["query_interpretation"]["mode"] = "implicit"
         try:
             validate_with_schema(
@@ -482,7 +484,7 @@ def validate_actual_query_contracts(
         else:
             raise AssertionError("An undeclared search query mode passed response validation.")
 
-        missing_natural_strategy = json.loads(json.dumps(detailed_results[-1]))
+        missing_natural_strategy = json.loads(json.dumps(natural_search_result))
         del missing_natural_strategy["query_interpretation"]["selected_strategy"]
         try:
             validate_with_schema(

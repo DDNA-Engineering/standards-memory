@@ -275,6 +275,10 @@ def _parser() -> argparse.ArgumentParser:
     list_documents.add_argument("--cursor")
     list_documents.add_argument("--principal", required=True)
 
+    source_pdfs = commands.add_parser("source-pdfs", help="Read-only: locate verified preserved source PDFs")
+    source_pdfs.add_argument("package_digest")
+    source_pdfs.add_argument("--principal", required=True)
+
     browse = commands.add_parser("browse-records", help="Read-only: browse source-verified records and structural links")
     browse.add_argument("package_digest")
     browse.add_argument("--principal", required=True)
@@ -506,6 +510,8 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
         return service.resolve_document(args.identifier, args.principal, args.edition, args.representation)
     if args.command == "list-documents":
         return service.list_documents(args.principal, args.identifier_prefix, args.limit, args.cursor)
+    if args.command == "source-pdfs":
+        return service.get_source_pdfs(args.package_digest, args.principal)
     if args.command == "browse-records":
         return service.browse_records(args.package_digest, args.principal, relation=args.relation,
                                       record_id=args.record_id, kind=args.kind, scope_prefix=args.scope_prefix,

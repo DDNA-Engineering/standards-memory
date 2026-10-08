@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/source-pdfs-0.1.0.schema.json",
+  "title": "Verified local source PDFs",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "operation", "retrieval_mode", "package", "availability", "files", "limitations"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "operation": {"const": "get_source_pdfs"},
+    "retrieval_mode": {"const": "verified_local_source_pdfs"},
+    "package": {"$ref": "https://standardsforge.dev/contracts/query-response-0.6.0.schema.json#/$defs/package"},
+    "availability": {"enum": ["available", "no_pdf_sources"]},
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_path", "local_path", "sha256", "bytes", "media_type", "verified"],
+        "properties": {
+          "source_path": {"type": "string", "pattern": "^sources/"},
+          "local_path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "bytes": {"type": "integer", "minimum": 0},
+          "media_type": {"const": "application/pdf"},
+          "verified": {"const": true}
+        }
+      }
+    },
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "allOf": [{
+    "if": {"properties": {"availability": {"const": "available"}}},
+    "then": {"properties": {"files": {"minItems": 1}}},
+    "else": {"properties": {"files": {"maxItems": 0}}}
+  }]
+}

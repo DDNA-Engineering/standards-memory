@@ -348,6 +348,20 @@
         }
       },
       "output_contract": "success-response.schema.json + reference-navigation.schema.json"
+    },
+    {
+      "name": "get_source_pdfs",
+      "description": "Get verified absolute local PDF paths for an authorized exact package. Call for each package cited in an answer and provide the returned PDFs as readable file links. Includes all preserved PDF source components, including notices. Every file is digest-checked and the package reauthorized before return. Paths are on the MCP host, not remote URLs. No fetching, rendering, copying or caller-supplied paths.",
+      "title": "Get original source PDFs",
+      "arguments": [
+        "package_digest"
+      ],
+      "argument_schemas": {
+        "package_digest": {
+          "description": "Exact authorized package SHA-256 pin."
+        }
+      },
+      "output_contract": "success-response.schema.json + source-pdfs.schema.json"
     }
   ],
   "invariants": [
