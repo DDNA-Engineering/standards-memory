@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/reference-navigation-0.1.0.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "operation",
+    "binding_artifact_sha256",
+    "source_evidence",
+    "references",
+    "coverage",
+    "limitations",
+    "budget"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "operation": {
+      "const": "follow_references"
+    },
+    "binding_artifact_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_evidence": {
+      "$ref": "https://standardsforge.dev/contracts/query-response-0.6.0.schema.json#/$defs/getClause"
+    },
+    "references": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "binding",
+          "target_evidence"
+        ],
+        "properties": {
+          "binding": {
+            "$ref": "https://standardsforge.dev/contracts/reference-bindings-0.1.0.schema.json#/$defs/binding"
+          },
+          "target_evidence": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "https://standardsforge.dev/contracts/query-response-0.6.0.schema.json#/$defs/getClause"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "returned",
+        "unresolved",
+        "all_source_references_reviewed",
+        "transitive_closure_complete",
+        "project_applicability"
+      ],
+      "properties": {
+        "scope": {
+          "const": "configured_reviewed_bindings_for_record"
+        },
+        "returned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "all_source_references_reviewed": {
+          "const": false
+        },
+        "transitive_closure_complete": {
+          "const": false
+        },
+        "project_applicability": {
+          "const": "not_decided"
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096
+      }
+    },
+    "budget": {
+      "$ref": "https://standardsforge.dev/contracts/query-response-0.6.0.schema.json#/$defs/budget"
+    }
+  }
+}

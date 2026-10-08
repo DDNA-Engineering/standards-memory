@@ -979,6 +979,124 @@
         "First and repeated setup install every declared package and replay all three runtime-bound real-document suites before readiness.",
         "Verify a clean tagged source through CI, a reproducible code wheel, the native prepared-install matrix, trusted PyPI publication and public download identity."
       ]
+    },
+    {
+      "task_id": "TASK-046",
+      "title": "Source-verified structural browsing and stable navigation",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-006",
+        "SM-FR-008",
+        "SM-FR-022",
+        "SM-FR-024",
+        "SM-FR-025",
+        "SM-FR-029",
+        "SM-FR-030",
+        "SM-FR-031"
+      ],
+      "acceptance": [
+        "Expose all-record, root, child, parent, adjacent and typed incoming/outgoing navigation through library, CLI and principal-bound MCP.",
+        "Bind continuation to package, query, principal and grant; verify returned source evidence and reauthorize before returning.",
+        "Preserve unclassified and automated status; prove source tampering, changed grants, invalid selectors and cursor reuse fail closed.",
+        "Replay real 810H outline and reviewed 1661 navigation without network or database mutation."
+      ]
+    },
+    {
+      "task_id": "TASK-047",
+      "title": "Explicit local concept discovery without changing lexical compatibility",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-022",
+        "SM-FR-024"
+      ],
+      "acceptance": [
+        "Disclose versioned concept alternatives and row-local distinct-concept ranking.",
+        "Preserve existing lexical mode behavior and authorization isolation; record diagnostic limits without claiming independent answer quality."
+      ]
+    },
+    {
+      "task_id": "TASK-048",
+      "title": "Content-addressed lossless pack transport",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-018",
+        "SM-FR-030"
+      ],
+      "acceptance": [
+        "Deduplicate exact file bytes and select a smaller supported text codec.",
+        "Reconstruct original package identities under closed inventory and trusted local installation policy.",
+        "Measure and verify all 441 existing packages; leave installed objects independent."
+      ]
+    },
+    {
+      "task_id": "TASK-049",
+      "title": "Offline measured evidence profile selection",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-024",
+        "SM-FR-029",
+        "SM-FR-030"
+      ],
+      "acceptance": [
+        "Select the smallest lossless profile by actual tokens when a local tokenizer is pinned, or by exact bytes.",
+        "Expose CLI and principal-bound MCP with explicit token counting scope and no query-time acquisition.",
+        "Reject insufficient budgets without truncating source evidence."
+      ]
+    },
+    {
+      "task_id": "TASK-050",
+      "title": "Corpus-wide automated outline preparation",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-008",
+        "SM-FR-018"
+      ],
+      "acceptance": [
+        "Compile and validate outlines for every base corpus package with resumable exact-source binding.",
+        "Preserve automated unreviewed status; report failures explicitly and keep semantic review separate."
+      ]
+    },
+    {
+      "task_id": "TASK-051",
+      "title": "Reviewed cross-standard navigation with exact edition bindings",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-024",
+        "SM-FR-030"
+      ],
+      "acceptance": [
+        "Load only an explicit locally pinned reviewed binding artifact at trusted startup; query callers cannot supply paths or widen authorization.",
+        "Return verified source reference and exact target evidence with separate edition selection rationale and no applicability claim.",
+        "Verify both endpoints, missing targets, stale source spans, changed grants, budgets, CLI and MCP; replay reviewed real corpus links."
+      ]
+    },
+    {
+      "task_id": "TASK-052",
+      "title": "Source-bound corpus semantic review",
+      "status": "in_progress",
+      "requirements": [
+        "SM-FR-024",
+        "SM-FR-030"
+      ],
+      "acceptance": [
+        "Review additional real source scopes preserving every condition and exception, compile exact annotations and replay installed packets.",
+        "Publish measured reviewed coverage separately from all pending corpus pages; never infer reviewer approval from automated extraction.",
+        "Complete source-level semantic review across all 438 base packages; partial reviewed packs and automated outlines do not satisfy this criterion."
+      ]
+    },
+    {
+      "task_id": "TASK-053",
+      "title": "Content-bound answer quality adjudication",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-024",
+        "SM-FR-030"
+      ],
+      "acceptance": [
+        "Freeze source-bound question and rubric artifacts before submitting answers; separate author, respondent and reviewer identity.",
+        "Retain exact answers, cited source evidence, claim and qualifier judgments and raw metrics; reject missing cases, stale bindings and self-adjudication for independent status.",
+        "Demonstrate evaluation with real source questions and explicit reviewer verdicts; preserve user-requested agent self-review as self_review, with independent human and corpus-wide quality claims remaining false."
+      ]
     }
   ]
 }

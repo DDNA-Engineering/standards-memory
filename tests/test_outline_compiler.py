@@ -239,7 +239,7 @@ class OutlineCompilerTests(unittest.TestCase):
             second = compile_derived_outline_pack(fixture.base_pack, fixture.root / "caption-second")
             self.assertEqual(first["package_digest"], second["package_digest"])
             with open_validated_pack(fixture.root / "caption-first") as pack:
-                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v3"))
+                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v4"))
                 captions = [record for record in pack.records if record["kind"] in {"table", "figure"}]
                 references = {record["clause_reference"].split(":")[-1] for record in captions}
                 self.assertEqual({
@@ -256,6 +256,39 @@ class OutlineCompilerTests(unittest.TestCase):
                     self.assertEqual(record["text"], sidecar[span["start_byte"]:span["end_byte"]].decode("utf-8"))
         finally:
             fixture.tearDown()
+
+    def test_case_distinct_labels_and_offset_backed_structure_round_trip(self) -> None:
+        class CaseFixture(OutlineCompilerTests):
+            def _write_base_page_pack(self):
+                self.page_text = "Appendix B\n1.1  Café must remain.\nAPPENDIX B\n1.1  Other statement.\n"
+                super()._write_base_page_pack()
+        fixture = CaseFixture()
+        fixture.setUp()
+        self.addCleanup(fixture.tearDown)
+        target = fixture.root / "case-outline"
+        compile_derived_outline_pack(fixture.base_pack, target)
+        pack = validate_pack_directory(target)
+        appendices = [r for r in pack.records if r["kind"] == "section"]
+        self.assertEqual(2, len(appendices))
+        self.assertEqual(2, len({r["record_id"] for r in appendices}))
+        raw = json.loads((target / "records.json").read_text(encoding="utf-8"))
+        self.assertEqual("0.3.0", raw["schema_version"])
+        self.assertTrue(all("text" not in r for r in raw["records"]))
+        self.assertTrue(any("Café" in r["text"] for r in pack.records))
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate_contracts as contracts
+        schemas = contracts.load_schemas()
+        contracts.validate_with_schema(schemas, contracts.check_schema_documents(schemas), "records-v0.3.schema.json", raw)
+        raw["records"][0]["source"]["text_start_byte"] += 1
+        fixture._write_json(target / "records.json", raw)
+        inventory = json.loads((target / "inventory.json").read_text(encoding="utf-8"))
+        for entry in inventory["files"]:
+            if entry["path"] == "records.json":
+                data = (target / "records.json").read_bytes()
+                entry.update(sha256=hashlib.sha256(data).hexdigest(), bytes=len(data))
+        fixture._write_json(target / "inventory.json", inventory)
+        with self.assertRaises(StandardsForgeError):
+            validate_pack_directory(target)
 
     def test_caption_parser_rejects_partial_designator_and_toc_leaders(self) -> None:
         self.assertEqual([], _candidate_matches("Table 500.6-I-A. Unknown composite label"))
@@ -284,7 +317,7 @@ class OutlineCompilerTests(unittest.TestCase):
             second = compile_derived_outline_pack(fixture.base_pack, fixture.root / "part-second")
             self.assertEqual(first["package_digest"], second["package_digest"])
             with open_validated_pack(fixture.root / "part-first") as pack:
-                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v3"))
+                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v4"))
                 part = next(record for record in pack.records if record["clause_reference"].endswith(":PART-THREE"))
                 self.assertEqual("section", part["kind"])
                 self.assertIsNone(part["structure"]["parent_logical_id"])

@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/reference-bindings-0.1.0.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "binding_set",
+    "binding_set_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "binding_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding_set_id",
+        "bindings",
+        "scope",
+        "project_applicability"
+      ],
+      "properties": {
+        "binding_set_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "bindings": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/binding"
+          }
+        },
+        "scope": {
+          "const": "reviewed_navigation_only"
+        },
+        "project_applicability": {
+          "const": "not_decided"
+        }
+      }
+    },
+    "binding_set_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "$defs": {
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding_id",
+        "source",
+        "reference",
+        "target",
+        "status",
+        "edition_basis",
+        "rationale",
+        "review"
+      ],
+      "properties": {
+        "binding_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "package_digest",
+            "edition_id",
+            "record_id",
+            "quote_sha256"
+          ],
+          "properties": {
+            "package_digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "edition_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "record_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "quote_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "reference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "start_byte",
+            "end_byte",
+            "exact_text"
+          ],
+          "properties": {
+            "start_byte": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "end_byte": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "exact_text": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          }
+        },
+        "target": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "package_digest",
+                "edition_id",
+                "record_id",
+                "quote_sha256"
+              ],
+              "properties": {
+                "package_digest": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "edition_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "record_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "quote_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "resolved",
+            "unresolved"
+          ]
+        },
+        "edition_basis": {
+          "enum": [
+            "source_explicit_edition",
+            "reviewer_selected_navigation_edition",
+            "unresolved"
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "identity",
+            "reviewed_at",
+            "binding_sha256"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "agent",
+                "human"
+              ]
+            },
+            "identity": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "reviewed_at": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "binding_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "unresolved"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "target": {
+                "type": "null"
+              },
+              "edition_basis": {
+                "const": "unresolved"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "target": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "package_digest",
+                  "edition_id",
+                  "record_id",
+                  "quote_sha256"
+                ],
+                "properties": {
+                  "package_digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "edition_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "record_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "quote_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                }
+              },
+              "edition_basis": {
+                "enum": [
+                  "source_explicit_edition",
+                  "reviewer_selected_navigation_edition"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -23,7 +23,7 @@ from .pdf_protocol import DEFAULT_LIMITS, LIMIT_POLICY_VERSION, PROTOCOL_VERSION
 from .source_catalog import load_source_catalog, verify_source_set
 
 
-STRUCTURE_COMPILER_VERSION = "0.6.0"
+STRUCTURE_COMPILER_VERSION = "0.7.0"
 MAX_NODE_SOURCE_SPANS = 64
 NODE_KINDS = {
     "document",
@@ -499,9 +499,15 @@ def _compile_page_pack_annotations(source_page_pack: str | Path, annotations: di
         require(annotations["edition_id"] == base.manifest["edition_id"], "structure_identity_mismatch", "Structure annotations belong to a different edition.")
         page_records = [record for record in base.records if record["kind"] == "page"]
         require(page_records and len(page_records) == len(base.records), "structure_source_not_page_text", "Source pack contains non-page records.")
+        if annotations["schema_version"] == "0.6.0":
+            # The annotation already pins the source component and complete parent
+            # package. Physical page numbers are local to that exact component.
+            page_records = [record for record in page_records
+                            if record["source"]["sha256"] == annotations["source_pdf_sha256"]]
+            require(page_records, "structure_identity_mismatch", "The reviewed component is absent from the pinned source package.")
         source_paths = {record["source"]["path"] for record in page_records}
         source_hashes = {record["source"]["sha256"] for record in page_records}
-        require(len(source_paths) == len(source_hashes) == 1, "structure_source_ambiguous", "Select a one-component page-text pack for structural review.")
+        require(len(source_paths) == len(source_hashes) == 1, "structure_source_ambiguous", "The selected source component must resolve to one exact source path.")
         source_relative = next(iter(source_paths))
         source_sha256 = next(iter(source_hashes))
         require(annotations["source_pdf_sha256"] == source_sha256, "structure_identity_mismatch", "Annotations bind a different source component.")
@@ -899,6 +905,7 @@ def _compile_structured_section(
         if annotations["schema_version"] == "0.6.0":
             report["compiler"] = {"name": "standardsforge-reviewed-structure", "version": STRUCTURE_COMPILER_VERSION,
                                   "source_method": "verified_page_pack", "extraction_mode": "verified_page_text"}
+            report["limitations"]["component_scope"] = "only_the_exact_source_pdf_sha256_was_reviewed_other_components_remain_unreviewed"
         _write_json(staging / "manifest.json", manifest)
         _write_json(staging / "rights.json", rights)
         _write_json(staging / "records.json", {"schema_version": "0.1.0", "records": records})

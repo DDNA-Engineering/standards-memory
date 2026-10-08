@@ -18,6 +18,7 @@ from unittest.mock import patch
 
 from jsonschema import FormatChecker
 from jsonschema.validators import validator_for
+from referencing import Registry, Resource
 
 from . import __version__
 from .errors import StandardsForgeError
@@ -62,7 +63,9 @@ def _validator(schema_path: Path):
     schema = _load_json(schema_path)
     validator_class = validator_for(schema)
     validator_class.check_schema(schema)
-    return validator_class(schema, format_checker=FormatChecker())
+    resources = [_load_json(path) for path in sorted(schema_path.parent.glob("*.schema.json"))]
+    registry = Registry().with_resources((item["$id"], Resource.from_contents(item)) for item in resources)
+    return validator_class(schema, registry=registry, format_checker=FormatChecker())
 
 
 def _validate_schema(instance: Any, schema_path: Path, label: str) -> None:

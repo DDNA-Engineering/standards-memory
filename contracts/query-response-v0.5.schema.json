@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://standardsforge.dev/contracts/query-response-0.6.0.schema.json",
+  "$id": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json",
   "title": "StandardsForge read-operation result packets",
-  "description": "Concrete result contracts for the ten read operations. Compact and concise evidence packets use their dedicated profile schemas.",
+  "description": "Concrete result contracts for the nine read operations. Compact and concise evidence packets use their dedicated profile schemas.",
   "oneOf": [
     {"$ref": "#/$defs/search"},
     {"$ref": "#/$defs/listDocuments"},
@@ -12,8 +12,7 @@
     {"$ref": "#/$defs/enumerateObligations"},
     {"$ref": "#/$defs/diffEditions"},
     {"$ref": "#/$defs/browseRecords"},
-    {"$ref": "#/$defs/selectEvidence"},
-    {"$ref": "#/$defs/followReferences"}
+    {"$ref": "#/$defs/selectEvidence"}
   ],
   "$defs": {
     "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
@@ -634,7 +633,6 @@
       }
     },
     "browseRecords": {"$ref": "https://standardsforge.dev/contracts/record-navigation-0.1.0.schema.json"},
-    "selectEvidence": {"$ref": "https://standardsforge.dev/contracts/evidence-selection-0.1.0.schema.json"},
-    "followReferences": {"$ref": "https://standardsforge.dev/contracts/reference-navigation-0.1.0.schema.json"}
+    "selectEvidence": {"$ref": "https://standardsforge.dev/contracts/evidence-selection-0.1.0.schema.json"}
   }
 }

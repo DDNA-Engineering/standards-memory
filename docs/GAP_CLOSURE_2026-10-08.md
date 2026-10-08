@@ -1,46 +1,33 @@
-# October 8 gap-closure evidence
+# Knowledge access gap closure — 2026-10-08
 
-This work fixes the two reproduced runtime defects and prepares a current-source release candidate. Full-corpus semantic and visual qualification is not complete. No commit or publication was performed.
+Status: local, uncommitted, unpublished source changes after a6. The released a6 artifacts remain unchanged. Usage is documented in [knowledge access and compression](KNOWLEDGE_ACCESS.md).
 
-| Original finding | Result |
-|---|---|
-| Edition comparison skips unchanged source verification | Fixed. Every before/after record is source-verified; corruption in either unchanged edition fails. Response shape stays compatible. |
-| CLI/MCP query startup creates or migrates state | Fixed. Queries open SQLite read-only and reject missing or incompatible state without mutation. Administrative installation retains migration. |
-| Comprehensive engineering-requirement extraction | Still open. Exact page/text coverage and reviewer disposition tooling now make the missing work explicit; they do not infer or approve semantic records. |
-| No executable real-document quality gate | Partially closed. Eleven agent-reviewed 810H source-text cases pass, with exact runtime-source binding, raw results, and independently recomputed gates. Full-corpus recall and visual fidelity remain unmeasured. |
-| Prepared release trails current source | Local candidate prepared with outline-v3 and qualification evidence. Public publication and native hosted CI remain outstanding. |
+## Implemented and observed
+
+| Gap | Result | Evidence boundary |
+|---|---|---|
+| No complete structural navigation | `browse_records` exposes all records, roots, children, parents, adjacency and typed incoming/outgoing links through library, CLI and MCP. | Exact package pin; signed pagination; source verification; reauthorization; no query-time database writes. |
+| Only one broadly structured standard | Outline compiler 0.4.0 generated 438 separate `outline-v4` packages containing **203,698 records**. Every record was installed and traversed; every package also passed an exact evidence read. Restarting the corpus compiler reused and revalidated all 438 outputs. | Entire base acquisition corpus; automated, unreviewed structure. Original source packages and previously released outlines remain intact. |
+| Whole-corpus compiler failures | Fixed case/punctuation collisions in logical identities and added records 0.3.0 with exact structural byte offsets. | Six initial failures reduced to zero. MIL-STD-3031B's 14,772-record JSON fits in 27,972,513 bytes, below the unchanged 32 MiB limit. No source text was discarded. |
+| Repeated span-file reads | Pack validation reuses already-read evidence bytes within one validation call. | No cache survives the call. Hash, UTF-8, exact quote, relationship and graph checks remain. One local validation of the 14,772-record outline took approximately 0.8 seconds; no general latency SLO is asserted. |
+| Paraphrases absent from literal search | Explicit `concept_language` discloses its fixed local alternatives and distinct-concept ranking. | Existing lexical modes retain behavior. Across ten existing diagnostic questions, either natural or concept search found the known target in the first ten results for nine questions, versus seven previously. This is two explicit query modes, not an independently judged recall or answer-quality benchmark. |
+| Byte-only response measurements | `select_evidence` chooses the smallest of three lossless profiles using a host-pinned local BPE tokenizer, or exact bytes when no tokenizer is configured. | Across 48 existing exact-read cases with `o200k_base`: **190,692 → 165,584 tokens** for canonical successful JSON responses including the selection envelope, a **13.2% reduction**. Nested evidence alone fell **18.6%**. Tool schemas, host formatting and model chat framing are excluded. |
+| Repeated files across packs | Data-only content bundles store exact file blobs once and use LZMA for text when smaller than Deflate. All 441 original package identities reconstructed and validated. | For the same 441-pack content set: **1,060,421,845 → 1,009,446,904 bytes**, a **4.8% reduction**. Deduplication removes 54,159,018 raw duplicate bytes. Installed object files remain independent copies. |
 
 ## Verification
 
-- Full suite: 190 tests, two platform skips, no failures in the latest completed full run.
-- Eight synthetic benchmark cases pass.
-- Eleven real 810H cases pass, finding all ten explicitly expected record occurrences across exact retrieval and discovery. This denominator describes those selected cases only.
-- All 438 package ledgers, their corpus manifest, and the real regression run pass their schemas.
-- Corpus accounting: 35,235 physical pages; 35,218 page records; 159,752,989 extracted UTF-8 bytes awaiting disposition. The 17 pages without extracted text are all in the 18-page MIL-STD-1661 package `51261c722ce6458dbc3e8af1053d38416b1184d1d824655a1da9c15f400e9c48`.
-- The separate compiler-0.4 rebuild remains incomplete at 437 packs because MIL-STD-1661 raises `pdf_page_extraction_failed` on page 2. The candidate preserves the verified 438-pack compiler-0.3 snapshot and its explicit fidelity limits; no failure was converted into successful extraction.
-- The current 810H outline reproduces package `ff9824bb1adf8b55d53bd6f409294c012dd12479003796fc9637294fbb049e35`, with 8,319 automated, unreviewed records and 2,787 unsupported regions.
-- The final core wheel built twice byte-identically and installed outside the checkout without extras. Its SHA-256 is `d03f5a46174feae4d499808d05d98917eb59cbaa0174eaa7ebe19fe22a8f693a`.
-- The extracted synthetic starter passed first/repeat offline setup with unchanged immutable bundle contents.
-- Final candidate WSL Ubuntu first/repeat offline core setup passed, including full-integrity doctor and installed real-regression replay. Linux MCP was not installed or qualified.
-- Final candidate Windows PowerShell 7 first/repeat offline MCP setup passed, including exact dependency checks, full-integrity doctor, installed real-regression replay, and the seven-tool stdio smoke. Its receipt matches the Linux candidate manifest; evidence is retained in `build/gap-closure/windows-candidate-acceptance.json`. An initial Windows PowerShell 5 launch inherited an incompatible module environment and failed before installation because `Get-FileHash` was unavailable; that launch is not counted as acceptance.
+- 211 unit/integration tests ran: 209 passed and two Linux-only venv-alias tests were skipped on Windows.
+- Machine-contract validation passed, including the new navigation, evidence selection, tokenizer, bundle and structural-record schemas.
+- All 52 existing real-document regression cases passed: 810H outline, 1661 transcription and 1661 semantic evidence.
+- All eight synthetic benchmark cases passed offline.
+- The final wheel was built twice with identical bytes, installed outside the checkout without extras, and passed core read/doctor smoke checks. SHA-256: `318987ac9838193edb9b23f891a23c7d1974b4765e17262c6654c995026e0950`.
+- The synthetic starter passed fresh and repeated installation with the final wheel. This local test wheel still carries the checkout's a6 version; it is not the published a6 wheel and must not replace that immutable release.
+- The complete 441-package content bundle installed successfully in a fresh isolated store and on repeat (288.0 seconds and 241.5 seconds locally). All 52 real-document regressions passed against that installed bundle.
 
-## Candidate
+Local raw evidence is retained under `build/knowledge-audit-2026-10-08/`: `outline-v4-runtime-qualification.json`, `corpus-outlines-v4/outlines.json`, `content-bundle-report.json`, `final-access-measurements.json`, the three `final-mil-std-*.json` regressions, contract/test logs and wheel/starter provenance. These generated local artifacts are not committed source or public release artifacts.
 
-The unpublished `0.1.0a6` candidate is `build/gap-closure/candidate/standardsforge-ready-0.1.0a6.zip`:
+## Remaining qualification
 
-- Size: 1,062,803,275 bytes.
-- SHA-256: `309267ba415474ce728355e462db13599b13a4f969c6db05045780f13a4179f7`.
-- Included packages: 438 page-text packs plus the qualified automated 810H outline.
-- Bundled evidence: all physical-page ledgers, the exact real suite, and its passing raw-result report.
-- Both portable core setup and the Windows MCP setup replay the suite before writing readiness.
+These changes do **not** establish corpus-wide semantic completeness. The new outlines remain unclassified. Subsequent local work adds 31 reviewed records across four more standards, exact reviewed cross-standard navigation, and a 12-question human answer-review packet; see [review and reference qualification](REVIEW_AND_REFERENCE_QUALIFICATION.md). Tables, figures, cross-page conditions and exceptions still require broader source-level review. Unresolved references are not silently promoted. The wheel and 211-test results above describe the earlier compression/navigation snapshot, not these subsequent changes.
 
-Build, contract, benchmark, and platform logs are retained under `build/gap-closure/`. The source changes remain uncommitted. This candidate has not been uploaded to GitHub or PyPI and has no new hosted CI or signed release-attestation claim.
-
-## Work still needed for complete closure
-
-1. Closed in the follow-up [MIL-STD-1661 recovery](SCAN_RECOVERY_2026-10-08.md): all 18 scanned pages were recovered in distinct packages. The earlier candidate below retains its original corpus snapshot.
-2. Continue corpus-wide adjudication. The follow-up provides 36 reviewed records and exact semantic coverage links for a bounded MIL-STD-1661 scope; the rest of the corpus still needs reviewed obligations, conditions, exceptions, tables, figures, and cross-page dependency links. A text disposition is not a semantic record or proof that every obligation was found.
-3. Build an independently adjudicated real-document reference set covering omitted obligations, wrong governing context, visual tables, cross-page clauses, and edition confusion. Measure full-scope recall and fidelity against that set rather than treating this selected regression suite as a substitute.
-4. Run native hosted release acceptance for the final candidate and publish only with explicit direction.
-
-The operational workflow and reviewer formats are documented in [coverage and real qualification](COVERAGE_AND_REAL_QUALIFICATION.md).
+Independent held-out questions and reviewed model answers are still needed to establish broad retrieval/answer quality. No exhaustive codec or retrieval comparison establishes global optimality. Native CI and publication of these source changes have not occurred.

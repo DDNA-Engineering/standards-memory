@@ -1,0 +1,274 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "operation",
+    "retrieval_mode",
+    "package",
+    "filters",
+    "records",
+    "page",
+    "coverage",
+    "limitations",
+    "budget"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "operation": {
+      "const": "browse_records"
+    },
+    "retrieval_mode": {
+      "const": "source_verified_record_navigation"
+    },
+    "package": {
+      "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/package"
+    },
+    "filters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relation",
+        "record_id",
+        "kind",
+        "scope_prefix"
+      ],
+      "properties": {
+        "relation": {
+          "enum": [
+            "all",
+            "roots",
+            "children",
+            "parent",
+            "adjacent",
+            "outgoing",
+            "incoming"
+          ]
+        },
+        "record_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scope_prefix": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "records": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "record_id",
+          "clause_reference",
+          "kind",
+          "heading",
+          "ordinal",
+          "statement_role",
+          "derivation",
+          "logical_id",
+          "parent_logical_id",
+          "relationships",
+          "citation",
+          "source_checks",
+          "evidence_selector",
+          "traversed_relationships"
+        ],
+        "properties": {
+          "record_id": {
+            "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/nonEmptyString"
+          },
+          "clause_reference": {
+            "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/nonEmptyString"
+          },
+          "kind": {
+            "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/nonEmptyString"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "ordinal": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "statement_role": {
+            "enum": [
+              "unclassified",
+              "obligation",
+              "governing_note",
+              "informative"
+            ]
+          },
+          "derivation": {
+            "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/derivation"
+          },
+          "logical_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "parent_logical_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "relationships": {
+            "type": "array",
+            "items": {
+              "$ref": "https://standards-memory.invalid/contracts/records-0.1.0.schema.json#/properties/records/items/properties/structure/properties/relationships/items"
+            }
+          },
+          "citation": {
+            "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/citation"
+          },
+          "source_checks": {
+            "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/sourceChecks"
+          },
+          "evidence_selector": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "operation",
+              "package_digest",
+              "record_id",
+              "clause_reference",
+              "response_profile"
+            ],
+            "properties": {
+              "operation": {
+                "const": "get_clause"
+              },
+              "package_digest": {
+                "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/digest"
+              },
+              "record_id": {
+                "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/nonEmptyString"
+              },
+              "clause_reference": {
+                "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/nonEmptyString"
+              },
+              "response_profile": {
+                "const": "concise_evidence_v1"
+              }
+            }
+          },
+          "traversed_relationships": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "source_record_id",
+                "target_record_id",
+                "relationship",
+                "required"
+              ],
+              "properties": {
+                "source_record_id": {
+                  "type": "string"
+                },
+                "target_record_id": {
+                  "type": "string"
+                },
+                "relationship": {
+                  "type": "string"
+                },
+                "required": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "returned",
+        "previously_returned",
+        "cumulative_returned",
+        "matching_record_count",
+        "has_more",
+        "next_cursor"
+      ],
+      "properties": {
+        "returned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "previously_returned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cumulative_returned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "matching_record_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "has_more": {
+          "type": "boolean"
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "declared_pack_coverage",
+        "traversal_complete",
+        "scope_interpretation"
+      ],
+      "properties": {
+        "declared_pack_coverage": {
+          "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/declaredCoverage"
+        },
+        "traversal_complete": {
+          "type": "boolean"
+        },
+        "scope_interpretation": {
+          "const": "installed_records_matching_filters_not_source_semantic_completeness"
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "budget": {
+      "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json#/$defs/budget"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/record-navigation-0.1.0.schema.json",
+  "title": "Source-verified record navigation"
+}

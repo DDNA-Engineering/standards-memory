@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://standardsforge.dev/contracts/success-response-0.6.0.schema.json",
-  "title": "StandardsForge successful read envelope 0.6",
+  "$id": "https://standardsforge.dev/contracts/success-response-0.5.0.schema.json",
+  "title": "StandardsForge successful read envelope 0.5",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -15,7 +15,7 @@
     "result": {
       "oneOf": [
         {
-          "$ref": "https://standardsforge.dev/contracts/query-response-0.6.0.schema.json"
+          "$ref": "https://standardsforge.dev/contracts/query-response-0.5.0.schema.json"
         },
         {
           "$ref": "https://standards-memory.invalid/contracts/compact-evidence-response-0.1.0.schema.json"

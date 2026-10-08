@@ -1,0 +1,149 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "operation",
+    "selected_profile",
+    "selection_basis",
+    "tokenizer",
+    "measurement_scope",
+    "limits",
+    "candidates",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "operation": {
+      "const": "select_evidence"
+    },
+    "selected_profile": {
+      "enum": [
+        "detailed_json_v1",
+        "compact_evidence_v1",
+        "concise_evidence_v1"
+      ]
+    },
+    "selection_basis": {
+      "enum": [
+        "tokens",
+        "utf8_bytes"
+      ]
+    },
+    "tokenizer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "encoding",
+            "artifact_sha256",
+            "implementation",
+            "implementation_version"
+          ],
+          "properties": {
+            "encoding": {
+              "type": "string"
+            },
+            "artifact_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "implementation": {
+              "const": "tiktoken"
+            },
+            "implementation_version": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "measurement_scope": {
+      "const": "canonical_evidence_packet_json_only_excludes_selection_wrapper_tool_schema_and_model_chat_framing"
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_tokens",
+        "max_bytes"
+      ],
+      "properties": {
+        "max_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "max_bytes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "profile",
+          "utf8_bytes",
+          "tokens",
+          "fits"
+        ],
+        "properties": {
+          "profile": {
+            "enum": [
+              "detailed_json_v1",
+              "compact_evidence_v1",
+              "concise_evidence_v1"
+            ]
+          },
+          "utf8_bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "tokens": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "fits": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "oneOf": [
+        {
+          "$ref": "https://standardsforge.dev/contracts/query-response-0.4.0.schema.json"
+        },
+        {
+          "$ref": "https://standards-memory.invalid/contracts/compact-evidence-response-0.1.0.schema.json"
+        },
+        {
+          "$ref": "https://standardsforge.invalid/contracts/concise-evidence-response-0.1.0.schema.json"
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/evidence-selection-0.1.0.schema.json",
+  "title": "Measured lossless evidence selection 0.1.0"
+}

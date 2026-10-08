@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://standardsforge.dev/contracts/query-response-0.6.0.schema.json",
+  "$id": "https://standardsforge.dev/contracts/query-response-0.4.0.schema.json",
   "title": "StandardsForge read-operation result packets",
-  "description": "Concrete result contracts for the ten read operations. Compact and concise evidence packets use their dedicated profile schemas.",
+  "description": "Concrete result contracts for the seven read operations. Compact and concise evidence packets use their dedicated profile schemas.",
   "oneOf": [
     {"$ref": "#/$defs/search"},
     {"$ref": "#/$defs/listDocuments"},
@@ -10,10 +10,7 @@
     {"$ref": "#/$defs/getClause"},
     {"$ref": "#/$defs/buildContext"},
     {"$ref": "#/$defs/enumerateObligations"},
-    {"$ref": "#/$defs/diffEditions"},
-    {"$ref": "#/$defs/browseRecords"},
-    {"$ref": "#/$defs/selectEvidence"},
-    {"$ref": "#/$defs/followReferences"}
+    {"$ref": "#/$defs/diffEditions"}
   ],
   "$defs": {
     "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
@@ -183,199 +180,33 @@
         "query_interpretation": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "mode",
-            "normalized_query",
-            "parsed_terms"
-          ],
+          "required": ["mode", "normalized_query", "parsed_terms"],
           "properties": {
-            "mode": {
-              "enum": [
-                "exact_phrase",
-                "all_terms",
-                "any_terms",
-                "natural_language",
-                "concept_language"
-              ]
-            },
-            "normalized_query": {
-              "$ref": "#/$defs/nonEmptyString"
-            },
-            "parsed_terms": {
-              "type": "array",
-              "minItems": 1,
-              "maxItems": 32,
-              "items": {
-                "$ref": "#/$defs/nonEmptyString"
-              }
-            },
-            "effective_terms": {
-              "type": "array",
-              "minItems": 1,
-              "maxItems": 32,
-              "items": {
-                "$ref": "#/$defs/nonEmptyString"
-              }
-            },
-            "ignored_terms": {
-              "type": "array",
-              "maxItems": 32,
-              "items": {
-                "$ref": "#/$defs/nonEmptyString"
-              }
-            },
-            "attempted_strategies": {
-              "type": "array",
-              "minItems": 1,
-              "maxItems": 2,
-              "items": {
-                "enum": [
-                  "stemmed_all_terms",
-                  "stemmed_any_terms"
-                ]
-              }
-            },
-            "selected_strategy": {
-              "enum": [
-                "stemmed_all_terms",
-                "stemmed_any_terms"
-              ]
-            },
-            "tokenizer": {
-              "const": "porter_unicode61"
-            },
-            "ranker": {
-              "enum": [
-                "sqlite-fts5-row-local-distinct-term-coverage-natural-v2",
-                "sqlite-fts5-row-local-length-normalized-natural-v1"
-              ]
-            },
-            "stop_word_policy": {
-              "const": "standardsforge-question-stopwords-v1"
-            },
-            "expansion_policy": {
-              "const": "standardsforge-engineering-discovery-v1"
-            },
-            "concept_groups": {
-              "type": "array",
-              "minItems": 1,
-              "maxItems": 32,
-              "items": {
-                "type": "array",
-                "minItems": 1,
-                "maxItems": 5,
-                "items": {
-                  "type": "string",
-                  "minLength": 1
-                }
-              }
-            }
+            "mode": {"enum": ["exact_phrase", "all_terms", "any_terms", "natural_language"]},
+            "normalized_query": {"$ref": "#/$defs/nonEmptyString"},
+            "parsed_terms": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"$ref": "#/$defs/nonEmptyString"}},
+            "effective_terms": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"$ref": "#/$defs/nonEmptyString"}},
+            "ignored_terms": {"type": "array", "maxItems": 32, "items": {"$ref": "#/$defs/nonEmptyString"}},
+            "attempted_strategies": {"type": "array", "minItems": 1, "maxItems": 2, "items": {"enum": ["stemmed_all_terms", "stemmed_any_terms"]}},
+            "selected_strategy": {"enum": ["stemmed_all_terms", "stemmed_any_terms"]},
+            "tokenizer": {"const": "porter_unicode61"},
+            "ranker": {"const": "sqlite-fts5-row-local-length-normalized-natural-v1"},
+            "stop_word_policy": {"const": "standardsforge-question-stopwords-v1"}
           },
           "allOf": [
             {
-              "if": {
-                "properties": {
-                  "mode": {
-                    "enum": [
-                      "natural_language",
-                      "concept_language"
-                    ]
-                  }
-                },
-                "required": [
-                  "mode"
-                ]
-              },
-              "then": {
-                "required": [
-                  "effective_terms",
-                  "ignored_terms",
-                  "attempted_strategies",
-                  "selected_strategy",
-                  "tokenizer",
-                  "ranker",
-                  "stop_word_policy"
-                ]
-              },
+              "if": {"properties": {"mode": {"const": "natural_language"}}, "required": ["mode"]},
+              "then": {"required": ["effective_terms", "ignored_terms", "attempted_strategies", "selected_strategy", "tokenizer", "ranker", "stop_word_policy"]},
               "else": {
                 "not": {
                   "anyOf": [
-                    {
-                      "required": [
-                        "effective_terms"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "ignored_terms"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "attempted_strategies"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "selected_strategy"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "tokenizer"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "ranker"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "stop_word_policy"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "expansion_policy"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "concept_groups"
-                      ]
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "if": {
-                "properties": {
-                  "mode": {
-                    "const": "concept_language"
-                  }
-                }
-              },
-              "then": {
-                "required": [
-                  "expansion_policy",
-                  "concept_groups"
-                ]
-              },
-              "else": {
-                "not": {
-                  "anyOf": [
-                    {
-                      "required": [
-                        "expansion_policy"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "concept_groups"
-                      ]
-                    }
+                    {"required": ["effective_terms"]},
+                    {"required": ["ignored_terms"]},
+                    {"required": ["attempted_strategies"]},
+                    {"required": ["selected_strategy"]},
+                    {"required": ["tokenizer"]},
+                    {"required": ["ranker"]},
+                    {"required": ["stop_word_policy"]}
                   ]
                 }
               }
@@ -632,9 +463,6 @@
         "change_counts": {"type": "object", "additionalProperties": false, "required": ["added", "removed", "modified", "moved", "unchanged"], "properties": {"added": {"type": "integer", "minimum": 0}, "removed": {"type": "integer", "minimum": 0}, "modified": {"type": "integer", "minimum": 0}, "moved": {"type": "integer", "minimum": 0}, "unchanged": {"type": "integer", "minimum": 0}}},
         "dependency_context_impacts": {"type": "array", "items": {"type": "string"}}, "dependency_impact_paths": {"type": "array", "items": {"$ref": "#/$defs/dependencyImpact"}}, "dependency_edges_added": {"type": "array", "items": {"type": "array", "minItems": 4, "maxItems": 4, "prefixItems": [{"type": "string"}, {"type": "string"}, {"type": "string"}, {"type": "boolean"}], "items": false}}, "dependency_edges_removed": {"type": "array", "items": {"type": "array", "minItems": 4, "maxItems": 4, "prefixItems": [{"type": "string"}, {"type": "string"}, {"type": "string"}, {"type": "boolean"}], "items": false}}, "limitations": {"type": "array", "items": {"type": "string"}}, "budget": {"$ref": "#/$defs/budget"}
       }
-    },
-    "browseRecords": {"$ref": "https://standardsforge.dev/contracts/record-navigation-0.1.0.schema.json"},
-    "selectEvidence": {"$ref": "https://standardsforge.dev/contracts/evidence-selection-0.1.0.schema.json"},
-    "followReferences": {"$ref": "https://standardsforge.dev/contracts/reference-navigation-0.1.0.schema.json"}
+    }
   }
 }

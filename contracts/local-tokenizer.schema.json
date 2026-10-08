@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "name",
+    "pat_str",
+    "special_tokens",
+    "mergeable_ranks"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "name": {
+      "type": "string"
+    },
+    "pat_str": {
+      "type": "string"
+    },
+    "special_tokens": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "mergeable_ranks": {
+      "type": "array",
+      "minItems": 256,
+      "maxItems": 500000,
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "prefixItems": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer",
+            "minimum": 0
+          }
+        ],
+        "items": false
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://standardsforge.dev/contracts/local-tokenizer-0.1.0.schema.json",
+  "title": "Local tokenizer artifact 0.1.0"
+}

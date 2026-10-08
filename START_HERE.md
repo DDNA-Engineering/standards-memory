@@ -6,7 +6,7 @@ StandardsForge is a standalone, source-first standards compiler and evidence eng
 
 The `0.1.0a6` release baseline adds source verification for unchanged edition-comparison records, non-mutating CLI/MCP query startup, complete physical-page coverage ledgers, and bounded real-document regression qualification. See [coverage and qualification](docs/COVERAGE_AND_REAL_QUALIFICATION.md). The prepared a6 distribution installs 441 packages: the unchanged acquisition baseline, outline-v3, and both reviewed 1661 recovery packs. Its setup replays 52 bounded real-document cases; this does not establish corpus-wide semantic completeness.
 
-- Seven query operations are implemented in the library, CLI, and principal-bound stdio MCP adapter, including authorization-safe installed-document discovery.
+- The published a6 interface has seven query operations. Unreleased source adds `browse_records`, `select_evidence` and `follow_references`, explicit concept discovery and deduplicated pack transport; see [knowledge access](docs/KNOWLEDGE_ACCESS.md) and [reference and answer qualification](docs/REVIEW_AND_REFERENCE_QUALIFICATION.md).
 - Official-source verification, deterministic PDF page compilation, restartable DLA corpus compilation, automated derived outlines, and reviewed structural or bounded semantic annotations are separate administrative stages.
 - Installed evidence is immutable and package-pinned. Authorization comes from trusted local policy, not imported rights claims.
 - Search is discovery only. Its compatibility default remains strict `all_terms`; the opt-in `natural_language` mode uses a separate local Porter index, fixed question stop words, and at most one disclosed strict-to-relaxed fallback. Ranking is row-local so records outside the caller's authorization cannot alter visible scores or order. Retrieval reauthorizes, rechecks exact source hashes and spans, and reports coverage and unresolved context.
@@ -28,7 +28,7 @@ Run the required checks from the repository root:
 
 ```powershell
 $env:PYTHONPATH = Join-Path $PWD 'src'
-python -m pip install -e ".[mcp,compiler,contract]"
+python -m pip install -e ".[mcp,compiler,contract,tokens]"
 python -m pip check
 python scripts/validate_contracts.py
 python -m unittest discover -s tests -v
