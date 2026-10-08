@@ -2,7 +2,9 @@
 
 Validation evidence must state exactly what ran and what it proves. Local source checks, installed-wheel acceptance, protected CI, publication, anonymous download, clean extraction, and end-user acceptance are separate facts.
 
-The published [`v0.1.0a5` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a5) is a frozen artifact, not the latest checkout. Later source commit `5cc82cd` passed the [protected cross-platform CI matrix and wheel/starter attestation job](https://github.com/DDNA-Engineering/standards-memory/actions/runs/35795549605), but that result does not republish or attest the prepared ZIP or PyPI wheel and does not establish real-document semantic or visual acceptance.
+The current [`v0.1.0a6` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a6) publishes the unified 441-package library and the exact PyPI code wheel. All four native prepared-install jobs passed, including first/repeat Windows offline MCP setup; anonymous download and fresh installed CLI checks also passed. See [the a6 release record](../RELEASE_0.1.0a6.md) for immutable identities, the 52-case qualification boundary, and separate CI/publication evidence.
+
+The earlier published [`v0.1.0a5` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a5) is a frozen artifact, not the latest checkout. Later source commit `5cc82cd` passed the [protected cross-platform CI matrix and wheel/starter attestation job](https://github.com/DDNA-Engineering/standards-memory/actions/runs/35795549605), but that result does not republish or attest the prepared ZIP or PyPI wheel and does not establish real-document semantic or visual acceptance.
 
 ## Standard local gate
 

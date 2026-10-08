@@ -318,3 +318,9 @@ The three follow-up gaps are fixed locally. Real semantic assertions now bind co
 Validation: 196-test suite passes with two platform skips; 47 schemas and 56 requirements validate; eight synthetic cases pass; 18 transcription and 23 semantic/context cases pass (127 expected record occurrences), repeated in a fresh offline installed wheel outside checkout imports with socket creation denied. All 41 semantic objects, annotations, coverage, and run contracts validate. The wheel and 19,281,875-byte v2 supplement each built twice identically; ZIP inventory readback passed.
 
 Current artifact: `build/gap-closure/standardsforge-mil-std-1661-recovery-v2.zip`, SHA-256 `01406cd8ccc5aa26d057bc3b4247ccc5e124074e070b0c62845806d082cde313`. See [the recovery report](docs/SCAN_RECOVERY_2026-10-08.md) for exact package/wheel pins. Prior a6 candidate and recovery supplement are retained as historical artifacts. Nothing committed or published; hosted CI, independent corpus-wide qualification, and decomposition of other compound clauses remain outside this bounded fix.
+
+## 2026-10-08 published a6 release
+
+The follow-up changes above are now published from source commit `7974fe8b9b91a048ec0c2b0d001529283e633f4f` as `v0.1.0a6`. The unified prepared archive installs 441 packages and replays 52 bounded real-document cases. CI, all four native prepared-install jobs, eight PyPI wheel-install jobs, and trusted publication passed. Both complete prepared builds were byte-identical. The public ZIP/checksum were downloaded anonymously and verified; a fresh public PyPI wheel installation exercised the installed CLI and passed all 41 recovery cases offline.
+
+See [the a6 release record](docs/RELEASE_0.1.0a6.md) for the exact public archive and wheel hashes, workflow links, installation commands, and remaining alpha/coverage limits. Earlier local candidates and supplement reports remain historical evidence for their own byte identities.

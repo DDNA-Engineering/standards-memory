@@ -964,7 +964,7 @@
     {
       "task_id": "TASK-045",
       "title": "Publish unified a6 prepared library and CLI code package",
-      "status": "active",
+      "status": "complete",
       "requirements": [
         "SM-FR-018",
         "SM-FR-030",
