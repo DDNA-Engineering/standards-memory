@@ -1,4 +1,4 @@
 interface:
   display_name: "StandardsForge"
-  short_description: "Ask standards questions with exact source evidence"
-  default_prompt: "Use $standardsforge:standardsforge to answer my standards question with exact editions, source pages and governing conditions."
+  short_description: "Ask your installed standards library, without web research"
+  default_prompt: "Use $standardsforge:standardsforge with only my installed database; no web. Cite editions and readable source pages."

@@ -19,12 +19,18 @@ For a local source checkout, replace the first command with `codex plugin market
 Start a new chat after installation. In Codex CLI or the IDE extension, use `/skills` to select **StandardsForge**. Codex qualifies the skill name with its plugin name, so the explicit invocation is:
 
 ```text
-$standardsforge:standardsforge What does the installed MIL-STD-25C say about general material notes? Include the exact edition, conditions and source pages.
+$standardsforge:standardsforge Use only my installed database; no web. What does MIL-STD-25C say about general material notes? Include the exact edition, conditions and source pages.
 ```
 
 In desktop surfaces that offer plugin mentions, type `@` and select **StandardsForge**. Supported Codex task views also offer **Sources -> Use plugins -> StandardsForge**. Select the installed entry in the picker; plain `@StandardsForge` text is not proof that the host selected it. If a local plugin is not visible, refresh the plugin list or restart the app. The exact selector depends on the host; this package does not register a universal `/standardsforge` command. See the host's [skill invocation](https://learn.chatgpt.com/docs/build-skills) and [plugin selection](https://help.openai.com/en/articles/20001256-plugins-in-chatgpt) documentation.
 
 The skill works with the seven core read tools in published a6 and uses `browse_records`, `select_evidence` and `follow_references` only when the installed runtime advertises them. Selecting the plugin never makes source-only features appear in an older runtime. Missing connections or optional capabilities are reported explicitly.
+
+### Installed-library answer scope
+
+The skill and picker prompts default to the installed library only. An answer must retrieve exact MCP evidence, preserve its conditions and cite readable source passages. A missing connection, empty search, unavailable edition, unresolved reference or location-specific input is reported as a gap. Broad questions about a deployment location do not authorize web climate research, vendor recommendations or publisher lookups. External research requires an explicit user request and separate attribution.
+
+The plugin supplies instructions, not a host-enforced tool restriction. A successful plugin install or MCP retrieval does not prove that a model avoided the web. Check the chat's actual tool trace when validating this workflow: it should retrieve local evidence before answering and contain no external research unless requested. Hosts that require a hard restriction must configure their web/browser tools separately. The plugin does not change those permissions.
 
 ## Start with the prepared release on Windows
 
