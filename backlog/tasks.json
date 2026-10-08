@@ -1159,7 +1159,7 @@
     {
       "task_id": "TASK-059",
       "title": "One-command model setup and current-runtime prepared release",
-      "status": "in_progress",
+      "status": "complete",
       "requirements": ["SM-FR-030", "SM-FR-057", "SM-FR-059", "SM-FR-075"],
       "acceptance": [
         "Use one portable setup implementation for offline core, locked Windows MCP and explicitly networked MCP dependencies; generate absolute host configuration after a real stdio smoke.",
