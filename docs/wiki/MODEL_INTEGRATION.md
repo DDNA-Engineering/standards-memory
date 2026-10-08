@@ -127,6 +127,8 @@ It does not expose installation, pack verification, revocation, acquisition, com
 
 Models must not interpret zero classified obligations as proof that no requirements exist. Physical page text, automated derived structure, reviewed structure, and curated records carry different evidence and review claims.
 
+User-facing evidence should show quoted passages with standard, edition, clause and physical PDF page citations. Full hashes and replay IDs remain in the underlying packet or optional audit details. The skill includes a dependency-free HTML source-sheet renderer for detailed packets; use a rendered preview for the primary evidence link, with raw JSON secondary. The renderer preserves every returned record and reports the packet's coverage limits. It formats a saved retrieval snapshot; it does not query, authorize or verify source files. See the [skill workflow](../../plugins/standardsforge/skills/standardsforge/SKILL.md).
+
 ## Security boundary
 
 - The principal comes from trusted process startup configuration.
