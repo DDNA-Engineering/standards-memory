@@ -14,7 +14,7 @@ codex plugin add standardsforge@standardsforge
 codex plugin list --marketplace standardsforge --json
 ```
 
-For a local source checkout, replace the first command with `codex plugin marketplace add .` from the repository root. The marketplace stores only this small skill plugin in the plugin cache; it does not copy the repository's local corpus or database. The plugin reuses an existing `standardsforge` or `standardsforge-local` MCP connection. It has no bundled server, credentials, machine-specific paths, network fallback or installation hook. Installing it does not install or upgrade the runtime or standards content.
+For a local source checkout, replace the first command with `codex plugin marketplace add .` from the repository root. The marketplace stores only this small skill plugin in the plugin cache; it does not copy the repository's local corpus or database. The plugin reuses an existing `standardsforge` or `standardsforge-local` MCP connection. It has no bundled MCP server, credentials, machine-specific paths, network fallback or installation hook. Installing it does not install or upgrade the runtime or standards content.
 
 Start a new chat after installation. In Codex CLI or the IDE extension, use `/skills` to select **StandardsForge**. Codex qualifies the skill name with its plugin name, so the explicit invocation is:
 
@@ -133,7 +133,7 @@ It does not expose installation, pack verification, revocation, acquisition, com
 
 Models must not interpret zero classified obligations as proof that no requirements exist. Physical page text, automated derived structure, reviewed structure, and curated records carry different evidence and review claims.
 
-User-facing evidence should show quoted passages with standard, edition, clause and physical PDF page citations. Full hashes and replay IDs remain in the underlying packet or optional audit details. The skill includes a dependency-free HTML source-sheet renderer for detailed packets; use a rendered preview for the primary evidence link, with raw JSON secondary. The renderer preserves every returned record and reports the packet's coverage limits. It formats a saved retrieval snapshot; it does not query, authorize or verify source files. See the [skill workflow](../../plugins/standardsforge/skills/standardsforge/SKILL.md).
+User-facing evidence should show quoted passages with standard, edition, clause and physical PDF page citations. Full hashes and replay IDs remain in the underlying packet or optional audit details. The skill includes a dependency-free HTML source-sheet renderer and a single-document loopback browser preview. A Codex HTML file tab may show source code: open the preview helper's printed URL with a browser target and verify the rendered view before sharing its link. Use confirmed original PDF pages/images or inline passages if rendering is unavailable. The renderer preserves every returned record and reports the packet's coverage limits. These host helpers display a saved retrieval snapshot; they do not query, authorize or verify source files. The core MCP remains stdio-only. See the [skill workflow](../../plugins/standardsforge/skills/standardsforge/SKILL.md).
 
 ## Security boundary
 

@@ -22,4 +22,4 @@ Use this optional path only when the host has an authorized local PDF matching t
 
 3. Add `--page-images page-previews.json` to the reader command. It embeds the PNG bytes, so the HTML remains portable without external requests. Original page previews appear first, extracted text is expandable, and technical audit details stay closed. Records without a preview retain their full text; no governing evidence is discarded.
 
-Open the HTML in a rendered host preview or browser. When a host cannot show HTML, attach the confirmed original PDF pages or show their images alongside readable citations and important qualifications in chat.
+Open the HTML in a rendered host preview or browser and inspect the result. A Codex file tab may show HTML source: use the skill's `serve_evidence.py` helper and a browser target with its printed loopback URL instead. Where available, also attach a PDF containing the cited original pages, retaining physical-page citations and source context. When a host cannot show HTML, attach those confirmed PDF pages or show their images alongside readable citations and important qualifications in chat.
