@@ -9,12 +9,13 @@ import tempfile
 import time
 from pathlib import Path, PurePosixPath
 from typing import Any
+from urllib.parse import quote
 
 from .errors import StandardsForgeError, require
 from .pack import open_validated_pack, validate_pack_directory
 
 
-OUTLINE_COMPILER_VERSION = "0.3.0"
+OUTLINE_COMPILER_VERSION = "0.4.0"
 _METHOD = re.compile(
     r"(?mi)^[^\S\r\n]*(?P<label>M\s*E\s*T\s*H\s*O\s*D\s+(?P<method_number>\d+(?:\.\d+)*))[^\S\r\n]*(?:\r?\n|$)"
 )
@@ -184,12 +185,12 @@ def _byte_offset(text: str, character_offset: int) -> int:
 
 
 def _component_context(record: dict[str, Any]) -> str:
-    source_name = PurePosixPath(record["source"]["path"]).stem
-    return re.sub(r"[^a-z0-9.-]+", "-", source_name.lower()).strip("-") or "component"
+    # Keep distinct source paths distinct, including case and punctuation.
+    return quote(record["source"]["path"], safe=".-")
 
 
 def _logical_suffix(value: str) -> str:
-    return re.sub(r"[^a-z0-9.-]+", "-", value.lower()).strip("-") or "node"
+    return quote(value, safe=".-")
 
 
 def _copy_source(pack_root: Path, staging: Path, relative: str) -> None:
@@ -297,7 +298,6 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
                         "kind": kind,
                         "clause_reference": clause_reference,
                         "heading": heading,
-                        "text": exact_text,
                         "source": {
                             "path": source["path"],
                             "sha256": source["sha256"],
@@ -306,6 +306,8 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
                             "page": source["page"],
                             "locator": f"physical PDF page {source['page']}; UTF-8 bytes {global_start}:{global_end}",
                             "quote_sha256": quote_sha256,
+                            "text_start_byte": global_start,
+                            "text_end_byte": global_end,
                         },
                         "derivation": {
                             "statement_role": "unclassified",
@@ -486,7 +488,7 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
             }
             manifest = {
                 "schema_version": "0.1.0",
-                "pack_id": f"derived.{base.manifest['pack_id']}.outline-v3",
+                "pack_id": f"derived.{base.manifest['pack_id']}.outline-v4",
                 "document_family_id": base.manifest["document_family_id"],
                 "edition_id": base.manifest["edition_id"],
                 "publisher": base.manifest["publisher"],
@@ -527,7 +529,12 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
             _write_json(staging / report_relative, report)
             _write_json(staging / "manifest.json", manifest)
             _write_json(staging / "rights.json", rights)
-            _write_json(staging / "records.json", {"schema_version": "0.1.0", "records": derived_records})
+            # Formatting whitespace carries no evidence. Compact JSON retains
+            # every exact text/span field while fitting large valid outlines
+            # within the existing bounded reader contract.
+            (staging / "records.json").write_text(json.dumps(
+                {"schema_version": "0.3.0", "records": derived_records},
+                sort_keys=True, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
             inventoried = sorted(
                 {
                     "manifest.json",

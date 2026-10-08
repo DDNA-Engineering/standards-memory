@@ -25,6 +25,9 @@ MCP_TOOL_NAMES = (
     "build_context",
     "enumerate_obligations",
     "diff_editions",
+    "browse_records",
+    "select_evidence",
+    "follow_references",
 )
 MCP_TOOL_TITLES = {
     "search": "Search standards evidence",
@@ -34,6 +37,9 @@ MCP_TOOL_TITLES = {
     "build_context": "Build clause context",
     "enumerate_obligations": "Enumerate classified obligations",
     "diff_editions": "Compare standard editions",
+    "browse_records": "Browse records and structural links",
+    "select_evidence": "Select measured compact evidence",
+    "follow_references": "Follow reviewed cross-standard references",
 }
 MCP_SERVER_INSTRUCTIONS = (
     "Read MIL-STDs as edition-pinned evidence, not as free-floating prose. If the exact identifier is unknown, "
@@ -50,12 +56,25 @@ MCP_SERVER_INSTRUCTIONS = (
     "enumerate_obligations covers only explicitly classified records, so zero results with incomplete "
     "classification does not mean the standard has no requirements. Never upgrade automated or unreviewed "
     "derivations into confirmed requirements or approval. Administrative operations are not exposed."
+    " Use browse_records for roots, children, parents, adjacent records and incoming or outgoing links, including "
+    "unclassified records. Use select_evidence for the smallest measured lossless packet; inspect its selection "
+    "basis and measurement scope. If lexical wording misses a concept, explicitly try concept_language and inspect "
+    "its disclosed alternatives. It never resolves a referenced standard's edition or establishes normative equivalence."
 )
 MCP_TOOL_DESCRIPTIONS = {
+    "follow_references": "Follow explicitly reviewed cross-standard references from one exact record using a trusted host-configured binding artifact. Every endpoint is pinned to its package, edition, record and quote and independently authorized and source-verified. Reviewer-selected navigation editions are not source-mandated editions or project baselines. Results include unresolved bindings and each target's required evidence; zero bindings does not establish reference completeness. No acquisition, automatic latest-edition selection or recursive traversal occurs.",
+    "select_evidence": "Retrieve one exact record with its required context and select the smallest lossless evidence profile. Use host-configured local token counts when available, otherwise exact JSON bytes. Limits cover the nested evidence packet; tool schemas, selection metadata and chat framing are excluded. A token budget requires the host to configure a pinned local tokenizer. No text is truncated.",
+    "browse_records": (
+        "Browse source-verified installed records, including unclassified pages and automated outlines. "
+        "Use all or roots without a record selector; children, parent, adjacent, outgoing and incoming require "
+        "an exact record_id. Pagination is bound to the package, filters, principal and authorization snapshot. "
+        "Replay returned evidence selectors for exact text and required context; navigation is not semantic completeness."
+    ),
     "search": (
         "Discover authorized records by explicit local lexical mode: exact_phrase preserves token order and "
         "adjacency, all_terms requires every parsed term, any_terms accepts at least one, and natural_language "
-        "uses bounded stemming with a disclosed one-step relaxation when its strict match is empty. Results are "
+        "uses bounded stemming with a disclosed one-step relaxation when its strict match is empty. "
+        "concept_language adds disclosed local discovery alternatives and distinct-concept ranking. Results are "
         "candidates and include identifier, edition_id, and package_digest for replay; they do not establish applicability, "
         "obligation completeness, or exact document identity; use resolve_document for an identifier and replay "
         "a selected evidence_selector through get_clause."
@@ -90,7 +109,7 @@ MCP_TOOL_DESCRIPTIONS = {
 }
 
 class _SearchInterpretation(TypedDict):
-    mode: Literal["exact_phrase", "all_terms", "any_terms", "natural_language"]
+    mode: Literal["exact_phrase", "all_terms", "any_terms", "natural_language", "concept_language"]
     normalized_query: str
     parsed_terms: list[str]
     effective_terms: NotRequired[list[str]]
@@ -99,6 +118,8 @@ class _SearchInterpretation(TypedDict):
     selected_strategy: NotRequired[str]
     tokenizer: NotRequired[str]
     ranker: NotRequired[str]
+    expansion_policy: NotRequired[str]
+    concept_groups: NotRequired[list[list[str]]]
     stop_word_policy: NotRequired[str]
 
 
@@ -521,6 +542,57 @@ class _DiffEditionsResult(_ClosedTypedDict):
     budget: _DiffBudget
 
 
+class _SelectEvidenceResult(_ClosedTypedDict):
+    schema_version: Literal["0.1.0"]
+    operation: Literal["select_evidence"]
+    selected_profile: str
+    selection_basis: Literal["tokens", "utf8_bytes"]
+    tokenizer: dict[str, Any] | None
+    measurement_scope: str
+    limits: dict[str, Any]
+    candidates: list[dict[str, Any]]
+    evidence: dict[str, Any]
+
+
+class _FollowReferencesResult(_ClosedTypedDict):
+    schema_version: Literal["0.1.0"]
+    operation: Literal["follow_references"]
+    binding_artifact_sha256: str
+    source_evidence: dict[str, Any]
+    references: list[dict[str, Any]]
+    coverage: dict[str, Any]
+    limitations: list[str]
+    budget: dict[str, Any]
+
+
+class _FollowReferencesSuccess(_ClosedTypedDict):
+    ok: Literal[True]
+    result: _FollowReferencesResult
+
+
+class _SelectEvidenceSuccess(_ClosedTypedDict):
+    ok: Literal[True]
+    result: _SelectEvidenceResult
+
+
+class _BrowseRecordsResult(_ClosedTypedDict):
+    schema_version: Literal["0.1.0"]
+    operation: Literal["browse_records"]
+    retrieval_mode: Literal["source_verified_record_navigation"]
+    package: dict[str, Any]
+    filters: dict[str, Any]
+    records: list[dict[str, Any]]
+    page: dict[str, Any]
+    coverage: dict[str, Any]
+    limitations: list[str]
+    budget: dict[str, Any]
+
+
+class _BrowseRecordsSuccess(_ClosedTypedDict):
+    ok: Literal[True]
+    result: _BrowseRecordsResult
+
+
 class _SearchSuccess(TypedDict):
     ok: Literal[True]
     result: _SearchResult
@@ -557,12 +629,15 @@ class _DiffEditionsSuccess(_ClosedTypedDict):
 
 
 SearchToolResult = Annotated[CallToolResult, _SearchSuccess]
+BrowseRecordsToolResult = Annotated[CallToolResult, _BrowseRecordsSuccess]
+SelectEvidenceToolResult = Annotated[CallToolResult, _SelectEvidenceSuccess]
 ListDocumentsToolResult = Annotated[CallToolResult, _ListDocumentsSuccess]
 ResolveDocumentToolResult = Annotated[CallToolResult, _ResolveDocumentSuccess]
 GetClauseToolResult = Annotated[CallToolResult, _GetClauseSuccess]
 BuildContextToolResult = Annotated[CallToolResult, _BuildContextSuccess]
 EnumerateObligationsToolResult = Annotated[CallToolResult, _EnumerateObligationsSuccess]
 DiffEditionsToolResult = Annotated[CallToolResult, _DiffEditionsSuccess]
+FollowReferencesToolResult = Annotated[CallToolResult, _FollowReferencesSuccess]
 MCPResultMode = Literal["text_and_structured", "structured_only"]
 
 
@@ -649,7 +724,7 @@ def create_mcp_server(
         package_digest: Annotated[str | None, Field(description="Optional exact authorized package SHA-256 pin.")] = None,
         scope_prefix: Annotated[str | None, Field(description="Optional exact clause reference or dot-delimited descendant scope.")] = None,
         query_mode: Annotated[
-            Literal["exact_phrase", "all_terms", "any_terms", "natural_language"],
+            Literal["exact_phrase", "all_terms", "any_terms", "natural_language", "concept_language"],
             Field(description="Explicit lexical interpretation; natural_language applies bounded stemming and discloses any fallback."),
         ] = "all_terms",
     ) -> SearchToolResult:
@@ -784,6 +859,40 @@ def create_mcp_server(
             result_mode=result_mode,
         )
 
+    @server.tool(title=MCP_TOOL_TITLES["browse_records"], description=MCP_TOOL_DESCRIPTIONS["browse_records"], annotations=read_only)
+    def browse_records(
+        package_digest: Annotated[str, Field(description="Exact authorized package SHA-256 pin.")],
+        relation: Annotated[Literal["all", "roots", "children", "parent", "adjacent", "outgoing", "incoming"], Field(description="Structural navigation relation; all and roots need no anchor.")] = "all",
+        record_id: Annotated[str | None, Field(description="Exact anchor record for children, parent, adjacent or link navigation.")] = None,
+        kind: Annotated[str | None, Field(description="Optional exact record kind.")] = None,
+        scope_prefix: Annotated[str | None, Field(description="Optional exact clause reference or dot-descendant scope.")] = None,
+        limit: Annotated[int, Field(description="Maximum records from 1 through 100.")] = 50,
+        cursor: Annotated[str | None, Field(description="Signed continuation from the preceding page.")] = None,
+        max_bytes: Annotated[int | None, Field(description="Optional positive UTF-8 response byte budget.")] = None,
+    ) -> BrowseRecordsToolResult:
+        return _invoke(lambda: service.browse_records(package_digest, bound_principal, relation=relation,
+            record_id=record_id, kind=kind, scope_prefix=scope_prefix, limit=limit, cursor=cursor,
+            max_bytes=max_bytes), result_mode=result_mode)
+
+    @server.tool(title=MCP_TOOL_TITLES["select_evidence"], description=MCP_TOOL_DESCRIPTIONS["select_evidence"], annotations=read_only)
+    def select_evidence(
+        package_digest: Annotated[str, Field(description="Exact authorized package SHA-256 pin.")],
+        record_id: Annotated[str, Field(description="Exact record identity to retrieve with required context.")],
+        max_tokens: Annotated[int | None, Field(description="Optional positive evidence-packet token budget; requires host-configured local tokenizer.")] = None,
+        max_bytes: Annotated[int | None, Field(description="Optional positive evidence-packet UTF-8 byte budget.")] = None,
+    ) -> SelectEvidenceToolResult:
+        return _invoke(lambda: service.select_evidence(package_digest, record_id, bound_principal,
+            max_tokens=max_tokens, max_bytes=max_bytes), result_mode=result_mode)
+
+    @server.tool(title=MCP_TOOL_TITLES["follow_references"], description=MCP_TOOL_DESCRIPTIONS["follow_references"], annotations=read_only)
+    def follow_references(
+        package_digest: Annotated[str, Field(description="Exact authorized source package SHA-256 pin.")],
+        record_id: Annotated[str, Field(description="Exact source record containing reviewed references.")],
+        max_bytes: Annotated[int | None, Field(description="Optional positive UTF-8 byte budget for the complete result.")] = None,
+    ) -> FollowReferencesToolResult:
+        return _invoke(lambda: service.follow_references(package_digest, record_id, bound_principal,
+            max_bytes=max_bytes), result_mode=result_mode)
+
     return server
 
 
@@ -794,6 +903,10 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--db", default=".standardsforge/memory.db", help="SQLite metadata database")
     parser.add_argument("--store", default=".standardsforge/objects", help="Immutable object directory")
+    parser.add_argument("--tokenizer-artifact", help="Explicit local tokenizer artifact for select_evidence")
+    parser.add_argument("--tokenizer-sha256", help="Trusted SHA-256 pin for the tokenizer artifact")
+    parser.add_argument("--reference-bindings", help="Trusted local reviewed cross-standard binding artifact")
+    parser.add_argument("--reference-bindings-sha256", help="Trusted SHA-256 pin for reviewed bindings")
     parser.add_argument(
         "--principal",
         required=True,
@@ -815,6 +928,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
         service = StandardsForgeService.open_read_only(Path(args.db), Path(args.store))
+        require(bool(args.tokenizer_artifact) == bool(args.tokenizer_sha256), "invalid_tokenizer", "Tokenizer artifact and SHA-256 must be supplied together.")
+        if args.tokenizer_artifact:
+            service.configure_tokenizer(args.tokenizer_artifact, args.tokenizer_sha256)
+        require(bool(args.reference_bindings) == bool(args.reference_bindings_sha256), "invalid_reference_bindings", "Reference artifact and SHA-256 must be supplied together.")
+        if args.reference_bindings:
+            service.configure_reference_bindings(args.reference_bindings, args.reference_bindings_sha256)
         server = create_mcp_server(service, args.principal, result_mode=args.result_mode)
     except StandardsForgeError as exc:
         print(_json({"ok": False, "error": exc.as_dict()}), file=sys.stderr)

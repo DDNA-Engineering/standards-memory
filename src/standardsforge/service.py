@@ -17,6 +17,7 @@ from .pack import open_validated_pack
 from .policy import authorize_install, load_policy
 from .query_cache import VersionedLRUCache
 from .store import LocalStore
+from .search_terms import POLICY as EXPANSION_POLICY, expand_terms
 
 
 _SEARCH_QUERY_MAX_CHARS = 4096
@@ -195,8 +196,28 @@ class StandardsForgeService:
 
     def _configure(self, store: LocalStore) -> None:
         self.store = store
+        self.token_counter = None
+        self.reference_bindings = None
         self._closure_cache = VersionedLRUCache("required-evidence-closure", "1", max_entries=256)
         self._search_cache = VersionedLRUCache("authorized-lexical-search", "3", max_entries=256)
+
+    def configure_tokenizer(self, source: str | Path, sha256: str) -> None:
+        from .tokenization import TokenCounter
+        self.token_counter = TokenCounter(source, sha256)
+
+    def configure_reference_bindings(self, source: str | Path, sha256: str) -> None:
+        from .reference_bindings import ReferenceBindings
+        self.reference_bindings = ReferenceBindings(source, sha256)
+
+    def follow_references(self, package_digest: str, record_id: str, principal_id: str,
+                          *, max_bytes: int | None = None) -> dict[str, Any]:
+        from .reference_bindings import follow_references
+        return follow_references(self, package_digest, record_id, principal_id, max_bytes=max_bytes)
+
+    def select_evidence(self, package_digest: str, record_id: str, principal_id: str,
+                        *, max_tokens: int | None = None, max_bytes: int | None = None) -> dict[str, Any]:
+        from .profile_selection import select_evidence
+        return select_evidence(self, package_digest, record_id, principal_id, max_tokens=max_tokens, max_bytes=max_bytes)
 
     @classmethod
     def open_read_only(cls, db_path: str | Path, object_root: str | Path) -> "StandardsForgeService":
@@ -1486,6 +1507,14 @@ class StandardsForgeService:
         self.store.authorized_package(principal_id, package_digest)
         return packet
 
+    def browse_records(self, package_digest: str, principal_id: str, *, relation: str = "all",
+                       record_id: str | None = None, kind: str | None = None,
+                       scope_prefix: str | None = None, limit: int = 50,
+                       cursor: str | None = None, max_bytes: int | None = None) -> dict[str, Any]:
+        from .navigation import browse_records
+        return browse_records(self, package_digest, principal_id, relation=relation, record_id=record_id,
+                              kind=kind, scope_prefix=scope_prefix, limit=limit, cursor=cursor, max_bytes=max_bytes)
+
     def _encode_cursor(self, payload: dict[str, Any]) -> str:
         raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
         signature = hmac.new(self.store.cursor_secret(), raw, hashlib.sha256).digest()
@@ -1993,9 +2022,9 @@ class StandardsForgeService:
         require(isinstance(query, str), "invalid_query", "Search query must be text.")
         require(
             isinstance(query_mode, str)
-            and query_mode in {"exact_phrase", "all_terms", "any_terms", "natural_language"},
+            and query_mode in {"exact_phrase", "all_terms", "any_terms", "natural_language", "concept_language"},
             "invalid_query_mode",
-            "Search query mode must be exact_phrase, all_terms, any_terms, or natural_language.",
+            "Search query mode must be exact_phrase, all_terms, any_terms, natural_language, or concept_language.",
             query_mode=query_mode,
         )
         query_bytes = query.encode("utf-8")
@@ -2057,20 +2086,21 @@ class StandardsForgeService:
                 "Natural-language search contains no effective engineering terms after fixed question scaffolding is removed.",
                 stop_word_policy="standardsforge-question-stopwords-v1",
             )
-            natural_tokens = [
-                _quote_fts_term(term, identifier_prefix=True) for term in effective_terms
-            ]
+            concept_groups = expand_terms(effective_terms) if query_mode == "concept_language" else [[term] for term in effective_terms]
+            natural_tokens = ["(" + " OR ".join(_quote_fts_term(term, identifier_prefix=True)
+                              for term in group) + ")" for group in concept_groups]
             fts_query = " AND ".join(natural_tokens)
             relaxed_fts_query = " OR ".join(natural_tokens)
             index_name = "natural"
-            ranker = "sqlite-fts5-row-local-length-normalized-natural-v1"
+            ranker = ("sqlite-fts5-row-local-distinct-term-coverage-natural-v2" if query_mode == "concept_language"
+                      else "sqlite-fts5-row-local-length-normalized-natural-v1")
             tokenizer = "porter_unicode61"
         query_interpretation = {
             "mode": query_mode,
             "normalized_query": " ".join(tokens),
             "parsed_terms": tokens,
         }
-        if query_mode == "natural_language":
+        if query_mode in {"natural_language", "concept_language"}:
             query_interpretation.update(
                 {
                     "effective_terms": effective_terms,
@@ -2082,13 +2112,15 @@ class StandardsForgeService:
                     "stop_word_policy": "standardsforge-question-stopwords-v1",
                 }
             )
+        if query_mode == "concept_language":
+            query_interpretation.update(expansion_policy=EXPANSION_POLICY, concept_groups=concept_groups)
         for _ in range(2):
             state = self.store.cache_state(principal_id)
             cache_key = self._search_cache.key(
                 {
                     "principal_sha256": hashlib.sha256(principal_id.encode("utf-8")).hexdigest(),
                     "fts_query": fts_query,
-                    "relaxed_fts_query": relaxed_fts_query if query_mode == "natural_language" else None,
+                    "relaxed_fts_query": relaxed_fts_query if query_mode in {"natural_language", "concept_language"} else None,
                     "query_mode": query_mode,
                     "index_name": index_name,
                     "limit": limit,
@@ -2103,7 +2135,7 @@ class StandardsForgeService:
                 if self.store.cache_state(principal_id) == state:
                     if requested_package_digest is not None:
                         self.store.authorized_package(principal_id, requested_package_digest)
-                    if query_mode == "natural_language":
+                    if query_mode in {"natural_language", "concept_language"}:
                         cached_interpretation = cached["query_interpretation"]
                         query_interpretation["attempted_strategies"] = cached_interpretation[
                             "attempted_strategies"
@@ -2127,8 +2159,9 @@ class StandardsForgeService:
                 requested_package_digest,
                 scope_prefix,
                 index_name,
+                natural_tokens if query_mode == "concept_language" else None,
             )
-            if query_mode == "natural_language":
+            if query_mode in {"natural_language", "concept_language"}:
                 attempted_strategies = ["stemmed_all_terms"]
                 selected_strategy = "stemmed_all_terms"
                 if not rows and relaxed_fts_query != fts_query:
@@ -2139,6 +2172,7 @@ class StandardsForgeService:
                         requested_package_digest,
                         scope_prefix,
                         index_name,
+                        natural_tokens if query_mode == "concept_language" else None,
                     )
                     attempted_strategies.append("stemmed_any_terms")
                     selected_strategy = "stemmed_any_terms"
@@ -2210,7 +2244,9 @@ class StandardsForgeService:
                     "Document identifiers remain an explicit list_documents and resolve_document workflow; lexical search never selects a package baseline.",
                 ],
             }
-            if query_mode == "natural_language" and query_interpretation["selected_strategy"] == "stemmed_any_terms":
+            if query_mode == "concept_language":
+                packet["limitations"].append("Disclosed local concept alternatives aid discovery only; they do not establish semantic or normative equivalence.")
+            if query_mode in {"natural_language", "concept_language"} and query_interpretation["selected_strategy"] == "stemmed_any_terms":
                 packet["limitations"].append(
                     "The natural-language strict match was empty, so the disclosed relaxed strategy returned records matching at least one effective term."
                 )

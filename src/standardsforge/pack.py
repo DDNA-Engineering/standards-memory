@@ -402,7 +402,7 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
     raw_records = _strict_object(_read_json(pack_root / "records.json"), {"schema_version", "records"}, "invalid_records", "records document")
     records_schema_version = raw_records.get("schema_version")
     require(
-        records_schema_version in {"0.1.0", "0.2.0"},
+        records_schema_version in {"0.1.0", "0.2.0", "0.3.0"},
         "unsupported_schema_version",
         "Unsupported records schema.",
     )
@@ -422,7 +422,7 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
         if records_schema_version == "0.1.0":
             require(isinstance(record.get("text"), str) and bool(record["text"]), "invalid_record", "text is required.")
         else:
-            require("text" not in record, "invalid_record", "Records schema 0.2.0 reconstructs page text from source byte offsets.")
+            require("text" not in record, "invalid_record", "Offset-backed records reconstruct text from source byte offsets.")
         require(record["edition_id"] == manifest["edition_id"], "edition_mismatch", "A record belongs to a different edition.", record_id=record["record_id"])
         require(
             record["kind"] in ({"clause", "note", "page"} | _STRUCTURAL_KINDS),
@@ -455,7 +455,7 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
             "Source text_start_byte and text_end_byte must be supplied together.",
         )
         if offset_fields:
-            require(record["kind"] == "page", "invalid_record", "Source text offsets are currently supported only for page records.")
+            require(record["kind"] == "page" or records_schema_version == "0.3.0", "invalid_record", "Structural source offsets require records schema 0.3.0.")
             require(text_fields == _SOURCE_TEXT_KEYS, "invalid_record", "Source text offsets require an inventoried text sidecar.")
         rel = _safe_relative_path(source["path"]).as_posix()
         require(rel.startswith("sources/"), "invalid_record", "Record sources must be under sources/.", record_id=record["record_id"])
@@ -501,16 +501,24 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
                 quote_text = quote_bytes.decode("utf-8")
             except UnicodeDecodeError as exc:
                 raise StandardsForgeError("invalid_record", "Source text byte offsets split UTF-8 text.", {"record_id": record["record_id"]}) from exc
-            if records_schema_version == "0.2.0":
+            if records_schema_version in {"0.2.0", "0.3.0"}:
                 record["text"] = quote_text
             require(quote_text == record["text"], "source_quote_missing", "Source text offsets do not reproduce the exact record text.", record_id=record["record_id"])
             require(_sha256(quote_bytes) == source["quote_sha256"], "invalid_record", "Source text offsets do not match the quote digest.", record_id=record["record_id"])
         else:
-            require(records_schema_version == "0.1.0", "invalid_record", "Records schema 0.2.0 requires exact source byte offsets.")
+            require(records_schema_version == "0.1.0", "invalid_record", "Offset-backed records require exact source byte offsets.")
             require(record["text"] in source_text, "source_quote_missing", "Exact record text is absent from its source.", record_id=record["record_id"])
         require(source["quote_sha256"] == _sha256(record["text"].encode("utf-8")), "invalid_record", "Quote digest does not match exact record text.", record_id=record["record_id"])
 
         structure = record.get("structure")
+        if records_schema_version == "0.3.0":
+            require(isinstance(structure, dict) and isinstance(structure.get("source_spans"), list)
+                    and len(structure["source_spans"]) == 1, "invalid_record", "Offset-backed structural records require one exact source span.")
+            span = structure["source_spans"][0]
+            require(isinstance(span, dict) and all(span.get(k) == source.get(v) for k, v in {
+                "path": "path", "sha256": "sha256", "text_path": "text_path", "text_sha256": "text_sha256",
+                "physical_page": "page", "start_byte": "text_start_byte", "end_byte": "text_end_byte", "quote_sha256": "quote_sha256"}.items()),
+                "invalid_record", "Structural offsets must match the exact source span.")
         if structure is not None:
             structure = _strict_object(structure, _STRUCTURE_KEYS, "invalid_record", "record structure")
             require(_STRUCTURE_REQUIRED_KEYS <= set(structure), "invalid_record", "Every required structure field is required.")
@@ -557,7 +565,9 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
                 if prior_span_key is not None and span_key[0] == prior_span_key[0]:
                     require(span_key[1] >= prior_span_key[2], "invalid_record", "Structural source spans cannot overlap.")
                 prior_span_key = span_key
-                span_bytes = pack_root.joinpath(*PurePosixPath(span_text_rel).parts).read_bytes()
+                if span_text_rel not in evidence_bytes_cache:
+                    evidence_bytes_cache[span_text_rel] = pack_root.joinpath(*PurePosixPath(span_text_rel).parts).read_bytes()
+                span_bytes = evidence_bytes_cache[span_text_rel]
                 require(span["end_byte"] <= len(span_bytes), "invalid_record", "Structural span exceeds its text sidecar.")
                 quote_bytes = span_bytes[span["start_byte"]:span["end_byte"]]
                 try:
@@ -642,7 +652,9 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
                     relationship_text_rel = _safe_relative_path(relationship_span["text_path"]).as_posix()
                     require(relationship_source_rel in inventory_by_path and relationship_text_rel in inventory_by_path, "invalid_record", "Relationship span files must be inventoried.")
                     require(relationship_span["sha256"] == inventory_by_path[relationship_source_rel].sha256 and relationship_span["text_sha256"] == inventory_by_path[relationship_text_rel].sha256, "invalid_record", "Relationship span file digests do not match the inventory.")
-                    relationship_bytes = pack_root.joinpath(*PurePosixPath(relationship_text_rel).parts).read_bytes()
+                    if relationship_text_rel not in evidence_bytes_cache:
+                        evidence_bytes_cache[relationship_text_rel] = pack_root.joinpath(*PurePosixPath(relationship_text_rel).parts).read_bytes()
+                    relationship_bytes = evidence_bytes_cache[relationship_text_rel]
                     require(type(relationship_span["start_byte"]) is int and type(relationship_span["end_byte"]) is int and 0 <= relationship_span["start_byte"] < relationship_span["end_byte"] <= len(relationship_bytes), "invalid_record", "Relationship span byte offsets are invalid.")
                     relationship_quote = relationship_bytes[relationship_span["start_byte"]:relationship_span["end_byte"]]
                     try:

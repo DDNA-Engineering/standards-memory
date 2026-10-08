@@ -1,5 +1,5 @@
 {
-  "contract_version": "0.4.0",
+  "contract_version": "0.6.0",
   "sdk_requirement": "mcp==2.2.0",
   "transport": "stdio",
   "principal_binding": "trusted_server_startup_configuration",
@@ -16,7 +16,7 @@
   "tools": [
     {
       "name": "search",
-      "description": "Discover authorized records by explicit local lexical mode: exact_phrase preserves token order and adjacency, all_terms requires every parsed term, any_terms accepts at least one, and natural_language uses bounded stemming with a disclosed one-step relaxation when its strict match is empty. Results are candidates and include identifier, edition_id, and package_digest for replay; they do not establish applicability, obligation completeness, or exact document identity; use resolve_document for an identifier and replay a selected evidence_selector through get_clause.",
+      "description": "Discover authorized records by explicit local lexical mode: exact_phrase preserves token order and adjacency, all_terms requires every parsed term, any_terms accepts at least one, and natural_language uses bounded stemming with a disclosed one-step relaxation when its strict match is empty. concept_language adds disclosed local discovery alternatives and distinct-concept ranking. Results are candidates and include identifier, edition_id, and package_digest for replay; they do not establish applicability, obligation completeness, or exact document identity; use resolve_document for an identifier and replay a selected evidence_selector through get_clause.",
       "arguments": [
         "query",
         "limit",
@@ -49,7 +49,8 @@
             "exact_phrase",
             "all_terms",
             "any_terms",
-            "natural_language"
+            "natural_language",
+            "concept_language"
           ],
           "default": "all_terms"
         }
@@ -248,6 +249,105 @@
           "description": "Optional positive response budget in UTF-8 bytes."
         }
       }
+    },
+    {
+      "name": "browse_records",
+      "description": "Browse source-verified installed records, including unclassified pages and automated outlines. Use all or roots without a record selector; children, parent, adjacent, outgoing and incoming require an exact record_id. Pagination is bound to the package, filters, principal and authorization snapshot. Replay returned evidence selectors for exact text and required context; navigation is not semantic completeness.",
+      "title": "Browse records and structural links",
+      "arguments": [
+        "package_digest",
+        "relation",
+        "record_id",
+        "kind",
+        "scope_prefix",
+        "limit",
+        "cursor",
+        "max_bytes"
+      ],
+      "optional_arguments": [
+        "relation",
+        "record_id",
+        "kind",
+        "scope_prefix",
+        "limit",
+        "cursor",
+        "max_bytes"
+      ],
+      "output_contract": "success-response.schema.json + record-navigation.schema.json",
+      "argument_schemas": {
+        "package_digest": {
+          "description": "Exact authorized package SHA-256 pin."
+        },
+        "relation": {
+          "description": "Structural navigation relation; all and roots need no anchor."
+        },
+        "record_id": {
+          "description": "Exact anchor record for children, parent, adjacent or link navigation."
+        },
+        "kind": {
+          "description": "Optional exact record kind."
+        },
+        "scope_prefix": {
+          "description": "Optional exact clause reference or dot-descendant scope."
+        },
+        "limit": {
+          "description": "Maximum records from 1 through 100."
+        },
+        "cursor": {
+          "description": "Signed continuation from the preceding page."
+        },
+        "max_bytes": {
+          "description": "Optional positive UTF-8 response byte budget."
+        }
+      }
+    },
+    {
+      "name": "select_evidence",
+      "description": "Retrieve one exact record with its required context and select the smallest lossless evidence profile. Use host-configured local token counts when available, otherwise exact JSON bytes. Limits cover the nested evidence packet; tool schemas, selection metadata and chat framing are excluded. A token budget requires the host to configure a pinned local tokenizer. No text is truncated.",
+      "title": "Select measured compact evidence",
+      "arguments": [
+        "package_digest",
+        "record_id",
+        "max_tokens",
+        "max_bytes"
+      ],
+      "argument_schemas": {
+        "package_digest": {
+          "description": "Exact authorized package SHA-256 pin."
+        },
+        "record_id": {
+          "description": "Exact record identity to retrieve with required context."
+        },
+        "max_tokens": {
+          "description": "Optional positive evidence-packet token budget; requires host-configured local tokenizer."
+        },
+        "max_bytes": {
+          "description": "Optional positive evidence-packet UTF-8 byte budget."
+        }
+      },
+      "output_contract": "success-response.schema.json + evidence-selection.schema.json"
+    },
+    {
+      "name": "follow_references",
+      "description": "Follow explicitly reviewed cross-standard references from one exact record using a trusted host-configured binding artifact. Every endpoint is pinned to its package, edition, record and quote and independently authorized and source-verified. Reviewer-selected navigation editions are not source-mandated editions or project baselines. Results include unresolved bindings and each target's required evidence; zero bindings does not establish reference completeness. No acquisition, automatic latest-edition selection or recursive traversal occurs.",
+      "title": "Follow reviewed cross-standard references",
+      "arguments": [
+        "package_digest",
+        "record_id",
+        "max_bytes"
+      ],
+      "argument_schemas": {
+        "package_digest": {
+          "description": "Exact authorized source package SHA-256 pin."
+        },
+        "record_id": {
+          "description": "Exact source record containing reviewed references."
+        },
+        "max_bytes": {
+          "description": "Optional positive UTF-8 byte budget for the complete result."
+        }
+      },
+      "output_contract": "success-response.schema.json + reference-navigation.schema.json"
     }
   ],
   "invariants": [

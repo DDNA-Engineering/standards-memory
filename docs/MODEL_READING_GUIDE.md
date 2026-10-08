@@ -2,7 +2,7 @@
 
 StandardsForge returns source-linked evidence. It does not decide whether a document applies to a project or whether a design complies. A model using the tools should follow this sequence.
 
-The published `v0.1.0a5` prepared archive exposes page-text packs and an automated, unreviewed MIL-STD-810H `outline-v1` pack. Later source-only outline and reviewer improvements are not in that archive or its PyPI wheel. A verified citation establishes an exact source match, not a reviewed interpretation or complete requirements graph.
+The published `v0.1.0a6` prepared archive contains 441 packages, including the automated MIL-STD-810H `outline-v3` and the separately qualified 1661 recovery packs. Unreleased navigation, measured profile selection and corpus-wide `outline-v4` work are described in [knowledge access](KNOWLEDGE_ACCESS.md). A verified citation establishes an exact source match, not a reviewed interpretation or complete requirements graph.
 
 ## Connect a prepared Windows distribution
 
@@ -37,15 +37,15 @@ The launcher fixes the principal to `local-user` and anchors the database and pa
 
 ## Connect a prepared Linux or macOS distribution
 
-Run `sh ./setup.sh` once in the extracted distribution to install the bundled core and corpus offline. POSIX MCP is a separate, explicit networked code channel: create an environment outside the prepared directory, then install `standardsforge[mcp]==0.1.0a5` from PyPI. PyPI does not contain or fetch the prepared corpus.
+Run `sh ./setup.sh` once in the extracted distribution to install the bundled core and corpus offline. POSIX MCP is a separate, explicit networked code channel: create an environment outside the prepared directory, then install `standardsforge[mcp]==0.1.0a6` from PyPI. PyPI does not contain or fetch the prepared corpus.
 
 Start the installed module with absolute paths to the distribution-local state:
 
 ```sh
 MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
-PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a5
+PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a6
 python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a5"
+"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a6"
 "$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
   --db "$PREPARED_ROOT/.standardsforge/memory.db" \
   --store "$PREPARED_ROOT/.standardsforge/objects" \
@@ -86,3 +86,5 @@ Keep the MCP environment outside the closed prepared directory. The network is n
 ## Answer boundary
 
 A defensible model answer identifies the exact edition and package pin, quotes or faithfully paraphrases retrieved evidence, includes governing context, names unresolved inputs, and separates source requirements from applicability or compliance judgment. If the evidence packet is incomplete for the question, the correct result is a bounded answer or abstention—not a silent inference.
+
+For external references, use `follow_references` only when the host configured a reviewed binding artifact. Inspect each binding's edition basis: a reviewer-selected navigation edition does not establish the issue required by a source or contract. Read both returned evidence packets; zero bindings and one-hop traversal do not imply complete dependency closure.

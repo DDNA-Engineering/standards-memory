@@ -78,7 +78,7 @@ def validate_repository_instances(
         )
         records = json.loads((pack_root / "records.json").read_text(encoding="utf-8"))
         records_schema = (
-            "records-v0.2.schema.json"
+            "records-v0.3.schema.json" if records.get("schema_version") == "0.3.0" else "records-v0.2.schema.json"
             if records.get("schema_version") == "0.2.0"
             else "records.schema.json"
         )

@@ -1,5 +1,5 @@
 {
-  "contract_version": "0.4.0",
+  "contract_version": "0.6.0",
   "read_operations": [
     {
       "name": "search",
@@ -9,7 +9,7 @@
       "optional_arguments": {
         "package_digest": "authorized immutable package pin",
         "scope_prefix": "exact clause reference or dot-delimited descendants",
-        "query_mode": "exact_phrase, all_terms, any_terms, or natural_language; defaults to all_terms"
+        "query_mode": "exact_phrase, all_terms, any_terms, natural_language, or concept_language; defaults to all_terms"
       },
       "query_limits": {
         "maximum_query_characters": 4096,
@@ -23,13 +23,14 @@
         "exact_phrase": "parsed terms must be adjacent and ordered",
         "all_terms": "every parsed term is required",
         "any_terms": "at least one parsed term is required",
-        "natural_language": "fixed stop words plus Porter stemming; strict all-terms first, then one disclosed any-terms fallback only when strict is empty"
+        "natural_language": "fixed stop words plus Porter stemming; strict all-terms first, then one disclosed any-terms fallback only when strict is empty",
+        "concept_language": "explicit versioned local alternatives plus distinct-concept ranking; expansion groups are disclosed, never normative equivalence"
       },
       "packet_fields": {
         "query_interpretation": "selected mode, normalized and parsed terms, plus effective terms, ignored terms, tokenizer, ranker, attempted strategies, and selected strategy for natural_language",
         "snippet_markers": {
-          "start": "⟦",
-          "end": "⟧"
+          "start": "\u27e6",
+          "end": "\u27e7"
         }
       },
       "result_fields": {
@@ -131,6 +132,40 @@
       "alignment_candidates": "non_authoritative_review_required",
       "dependency_traversal": "separate_before_and_after_required_graphs",
       "result_schema": "query-response.schema.json#/$defs/diffEditions"
+    },
+    {
+      "name": "browse_records",
+      "requires_principal": true,
+      "requires_package_pin": true,
+      "result_schema": "record-navigation.schema.json",
+      "optional_arguments": {
+        "relation": "all, roots, children, parent, adjacent, outgoing, incoming",
+        "record_id": "required exactly for anchored navigation",
+        "kind": "exact record kind",
+        "scope_prefix": "exact clause or dot descendants",
+        "limit": "1..100",
+        "cursor": "signed package, query, principal and authorization-bound continuation",
+        "max_bytes": "positive UTF-8 byte budget"
+      }
+    },
+    {
+      "name": "select_evidence",
+      "requires_principal": true,
+      "requires_package_pin": true,
+      "result_schema": "evidence-selection.schema.json",
+      "optional_arguments": {
+        "max_tokens": "positive exact nested-packet token budget; requires host-configured pinned local tokenizer",
+        "max_bytes": "positive nested-packet UTF-8 byte budget"
+      }
+    },
+    {
+      "name": "follow_references",
+      "requires_principal": true,
+      "requires_package_pin": true,
+      "result_schema": "reference-navigation.schema.json",
+      "optional_arguments": {
+        "max_bytes": "positive complete-result UTF-8 byte budget"
+      }
     }
   ],
   "admin_operations": [

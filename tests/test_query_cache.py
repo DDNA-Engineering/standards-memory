@@ -321,6 +321,26 @@ class QueryCacheAndBatchTests(unittest.TestCase):
             [(item["record_id"], item["score"]) for item in after["results"]],
         )
 
+    def test_explicit_concepts_disclose_expansion_and_remain_authorization_local(self) -> None:
+        first_digest = self.service.install_pack(PACK_V1, POLICY)["package_digest"]
+        connection = self.service.store.connect()
+        try:
+            connection.execute("UPDATE records SET text = ? WHERE package_digest = ? AND record_id = ?",
+                               ("Record the rationale and assumptions.", first_digest, "clause-4.2.1"))
+            connection.commit()
+        finally:
+            connection.close()
+        self.assertEqual([], self.service.search("justification", "local-user", query_mode="natural_language")["results"])
+        before = self.service.search("justification", "local-user", query_mode="concept_language")
+        self.assertEqual(["clause-4.2.1"], [item["record_id"] for item in before["results"]])
+        self.assertIn("rationale", before["query_interpretation"]["concept_groups"][0])
+        second = self.service.install_pack(ROOT / "examples/packs/fictional-adapter-v2", POLICY)["package_digest"]
+        self.service.revoke(second, "local-user")
+        after = self.service.search("justification", "local-user", query_mode="concept_language")
+        self.assertEqual(before["results"], after["results"])
+        self.service.revoke(first_digest, "local-user")
+        self.assertEqual([], self.service.search("justification", "local-user", query_mode="concept_language")["results"])
+
     def test_natural_language_retries_when_authorization_changes_between_strategies(self) -> None:
         digest = self.service.install_pack(PACK_V1, POLICY)["package_digest"]
         original_search = self.service.store.search

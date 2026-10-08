@@ -1,6 +1,6 @@
 # Query guide
 
-StandardsForge exposes seven read operations. Administration, acquisition, compilation, installation, revocation, and handoff export remain separate.
+The published a6 release exposes seven read operations. Unreleased source adds `browse-records` and `select-evidence`, described in [knowledge access and compression](../KNOWLEDGE_ACCESS.md). Administration, acquisition, compilation, installation, revocation, and handoff export remain separate.
 
 ## Operations
 
@@ -70,7 +70,7 @@ python .\run.py get-clause $pin '<clause-reference>' `
 
 The detailed profile remains the compatibility default. Compact and concise profiles reduce repeated structure without dropping exact evidence, citations, coverage, authorization, or expansion references. If a byte budget cannot hold required context, the operation fails instead of silently omitting evidence.
 
-In the published `v0.1.0a5` snapshot, a retrieved MIL-STD-810H outline record can have a verified physical-page citation while its derivation remains `automated_unreviewed` and `coverage.complete_for_requested_scope` remains `false`. These are independent fields: exact quote verification is not review, and a selected passage is not complete document interpretation. The [root quickstart](../../README.md#what-this-prepared-snapshot-can-answer-today) gives a concrete selector and selected response fields.
+In the published `v0.1.0a6` snapshot, a retrieved MIL-STD-810H outline record can have a verified physical-page citation while its derivation remains `automated_unreviewed` and `coverage.complete_for_requested_scope` remains `false`. These are independent fields: exact quote verification is not review, and a selected passage is not complete document interpretation. See the [release evidence](../RELEASE_0.1.0a6.md) for the qualified representations and their limits.
 
 ## Build context
 

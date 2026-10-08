@@ -208,7 +208,7 @@ class MCPAdapterTests(unittest.TestCase):
                     self.assertNotIn("record_id", tool.input_schema.get("required", []))
                 if tool.name == "search":
                     self.assertEqual(
-                        ["exact_phrase", "all_terms", "any_terms", "natural_language"],
+                        ["exact_phrase", "all_terms", "any_terms", "natural_language", "concept_language"],
                         tool.input_schema["properties"]["query_mode"]["enum"],
                     )
                     self.assertEqual(

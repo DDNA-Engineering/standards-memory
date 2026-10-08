@@ -709,6 +709,62 @@ class LocalStore:
         escaped = scope_prefix.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
         return scope_prefix, escaped + ".%"
 
+    def navigation_edges(self, package_digest: str, record_id: str, relation: str) -> list[dict[str, Any]]:
+        field = "source_record_id" if relation == "outgoing" else "target_record_id"
+        with self._connection() as connection:
+            return [dict(row) for row in connection.execute(
+                f"SELECT source_record_id, target_record_id, relationship, required FROM dependencies WHERE package_digest = ? AND {field} = ? ORDER BY source_record_id, target_record_id, relationship",
+                (package_digest, record_id))]
+
+    def navigation_page(self, package_digest: str, relation: str, anchor: Any,
+                        kind: str | None, scope_prefix: str | None,
+                        after: int, limit: int) -> tuple[list[sqlite3.Row], int]:
+        conditions, params = ["r.package_digest = ?"], [package_digest]
+        structure = json.loads(anchor["structure_json"]) if anchor is not None else {}
+        logical_id = structure.get("logical_id")
+        if relation == "roots":
+            conditions.append("json_extract(r.structure_json, '$.parent_logical_id') IS NULL")
+        elif relation in {"children", "parent"}:
+            field, value = (("parent_logical_id", logical_id) if relation == "children"
+                            else ("logical_id", structure.get("parent_logical_id")))
+            conditions.append(f"json_extract(r.structure_json, '$.{field}') = ?")
+            params.append(value)
+        elif relation == "adjacent":
+            conditions.append("""r.ordinal IN (
+                (SELECT MAX(ordinal) FROM records WHERE package_digest = ? AND ordinal < ?),
+                (SELECT MIN(ordinal) FROM records WHERE package_digest = ? AND ordinal > ?))""")
+            params.extend([package_digest, anchor["ordinal"], package_digest, anchor["ordinal"]])
+        elif relation == "outgoing":
+            targets = [edge["target_logical_id"] for edge in structure.get("relationships", [])
+                       if edge.get("target_status") == "resolved"]
+            conditions.append("""(r.record_id IN (SELECT target_record_id FROM dependencies
+                WHERE package_digest = ? AND source_record_id = ?) OR
+                json_extract(r.structure_json, '$.logical_id') IN (SELECT value FROM json_each(?)))""")
+            params.extend([package_digest, anchor["record_id"], json.dumps(targets)])
+        elif relation == "incoming":
+            conditions.append("""(r.record_id IN (SELECT source_record_id FROM dependencies
+                WHERE package_digest = ? AND target_record_id = ?) OR EXISTS (
+                SELECT 1 FROM json_each(r.structure_json, '$.relationships') AS edge
+                WHERE json_extract(edge.value, '$.target_status') = 'resolved'
+                AND json_extract(edge.value, '$.target_logical_id') = ?))""")
+            params.extend([package_digest, anchor["record_id"], logical_id])
+        if kind is not None:
+            conditions.append("r.kind = ?")
+            params.append(kind)
+        if scope_prefix is not None:
+            conditions.append("(r.clause_reference = ? OR r.clause_reference LIKE ? ESCAPE '\\')")
+            params.extend(self._scope_clause(scope_prefix))
+        where = " AND ".join(conditions)
+        try:
+            with self._connection() as connection:
+                connection.execute("BEGIN")
+                total = connection.execute(f"SELECT COUNT(*) FROM records r WHERE {where}", params).fetchone()[0]
+                rows = list(connection.execute(f"SELECT r.* FROM records r WHERE {where} AND r.ordinal > ? ORDER BY r.ordinal, r.record_id LIMIT ?",
+                                               [*params, after, limit]))
+                return rows, total
+        except sqlite3.Error as exc:
+            raise StandardsForgeError("storage_error", "Record navigation failed.") from exc
+
     def obligation_records(
         self,
         package_digest: str,
@@ -759,6 +815,7 @@ class LocalStore:
         package_digest: str | None = None,
         scope_prefix: str | None = None,
         index_name: str = "exact",
+        rank_terms: list[str] | None = None,
     ) -> list[dict[str, Any]]:
         require(
             index_name in {"exact", "natural"},
@@ -780,8 +837,18 @@ class LocalStore:
                 + 2.0 * ((length(highlight(records_fts, 3, '⟦', '⟧')) - length(r.heading)) / 2.0)
                 + ((length(highlight(records_fts, 4, '⟦', '⟧')) - length(r.text)) / 2.0)
             ) / (1.0 + length(r.heading) / 200.0 + length(r.text) / 1000.0)"""
+        rank_params: list[str] = []
+        if index_name == "natural" and rank_terms:
+            # Separate indexed membership tests count query concepts once each.
+            # No corpus-wide document frequencies: invisible documents cannot
+            # alter either visible scores or ordering.
+            membership = []
+            for term in dict.fromkeys(rank_terms):
+                membership.append("(r.rowid IN (SELECT rowid FROM records_natural_fts WHERE records_natural_fts MATCH ?))")
+                rank_params.append(term)
+            rank_expression = f"-100.0 * ({' + '.join(membership)}) + max(-9.0, ({rank_expression}))"
         filters = ""
-        params: list[Any] = [fts_query, principal_id]
+        params: list[Any] = [*rank_params, fts_query, principal_id]
         if package_digest is not None:
             filters += " AND p.package_digest = ?"
             params.append(package_digest)

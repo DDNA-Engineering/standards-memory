@@ -14,6 +14,15 @@ StandardsForge machine contracts are closed interfaces, not examples. Every sche
 
 ## Change log
 
+### 2026-10-08 — unreleased knowledge access
+
+- Query and success contracts 0.5.0 add record navigation and measured evidence selection; exact 0.4.0 schemas are retained. Concept discovery is a separate search mode, with disclosed vocabulary and ranking identity; existing lexical modes retain their behavior.
+- Record navigation 0.1.0 binds pagination to package, filters, principal and grants, verifies source evidence and reports structural traversal separately from semantic completeness.
+- Evidence selection and local tokenizer 0.1.0 describe pinned offline BPE measurement, exact measurement scope, lossless profile selection and explicit budget rejection. Existing evidence-profile contracts remain unchanged.
+- Content bundle 0.1.0 shares exact file blobs while preserving and revalidating every original package identity. It grants no installation or serving authority.
+- Offset-backed structural records 0.3.0 reconstruct one exact source span without duplicating its text in `records.json`. Existing 0.1.0/0.2.0 restrictions remain unchanged. Outline compiler 0.4.0 emits distinct `outline-v4` packages with case/punctuation-preserving logical identities and compact offset-backed records; older installed outline packages remain readable.
+- Corpus outline index 0.1.0 reports each source-bound compile result and explicitly excludes semantic qualification.
+
 ### 2026-09-22
 
 - Added `corpus-extraction-report.schema.json` for the multi-component DLA corpus report. The existing `extraction-report.schema.json` remains the single-PDF report contract; the two shapes are no longer conflated.
@@ -37,3 +46,5 @@ Future changes append a dated entry here in the same commit as the schema, gener
 The unpublished transcription 0.2.0 extension adds explicit `transcribed_text` and `reviewed_blank` page dispositions. Legacy 0.1.0 remains supported without the new field. A reviewed blank has exactly empty text, retained raster/review evidence, and no text record; it stays in the physical-page ledger. The unpublished real-suite semantic assertion shape now requires the full nullable statement and exact typed qualifier objects with span indices. Earlier partial semantic assertions are rejected and require explicit review/migration; historical results remain tied to their historical runtime. Source-only suites without semantic assertions remain valid.
 
 Prepared distribution 1.3 accepts an optional closed `state.qualified_packs` list binding each additional archive and exact suite/run paths to its pack identity. The combined trusted policy includes these packages; both setup profiles install them and replay their regression suites before readiness. Legacy manifests without the list retain their prior behavior.
+
+2026-10-08: query/success contracts 0.6.0 add `follow_references`; exact 0.5.0 copies remain versioned. New closed reference binding/navigation and answer suite/submission/adjudication/run contracts are 0.1.0. Reviewed structure compiler 0.7.0 permits direct annotations 0.6.0 to select the explicit source-PDF digest within a multi-component package, preserving the parent edition and the unreviewed status of other components.

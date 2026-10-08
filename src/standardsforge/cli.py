@@ -23,13 +23,46 @@ from .service import StandardsForgeService
 from .source_catalog import verify_source_set
 from .structure_compiler import compile_structured_page_pack_section, compile_structured_pdf_section, compile_reviewed_page_section
 from .transcription import compile_page_transcription
+from .bundle import build_bundle, verify_bundle, install_bundle
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="standardsforge", description="Offline-first standards evidence engine")
     parser.add_argument("--db", default=".standardsforge/memory.db", help="SQLite metadata database")
     parser.add_argument("--store", default=".standardsforge/objects", help="Immutable object directory")
+    parser.add_argument("--tokenizer-artifact", help="Explicit local tokenizer artifact for select-evidence")
+    parser.add_argument("--tokenizer-sha256", help="Trusted SHA-256 pin for the local tokenizer artifact")
+    parser.add_argument("--reference-bindings", help="Trusted local reviewed cross-standard binding artifact")
+    parser.add_argument("--reference-bindings-sha256", help="Trusted SHA-256 pin for reviewed bindings")
     commands = parser.add_subparsers(dest="command", required=True)
+
+    follow = commands.add_parser("follow-references", help="Read-only: follow explicitly reviewed exact cross-standard bindings")
+    follow.add_argument("package_digest")
+    follow.add_argument("record_id")
+    follow.add_argument("--principal", required=True)
+    follow.add_argument("--max-bytes", type=int)
+
+    answer_review = commands.add_parser("export-answer-review", help="Administrative: export a local human answer-review form with exact source evidence")
+    answer_review.add_argument("suite")
+    answer_review.add_argument("submission")
+    answer_review.add_argument("output")
+    answer_review.add_argument("--principal", required=True)
+    answer_qualify = commands.add_parser("qualify-answers", help="Administrative: validate source-bound answers and explicit reviewer judgments")
+    answer_qualify.add_argument("suite")
+    answer_qualify.add_argument("submission")
+    answer_qualify.add_argument("adjudication")
+    answer_qualify.add_argument("--principal", required=True)
+    answer_qualify.add_argument("--output", required=True)
+
+    tokenizer = commands.add_parser("export-tokenizer", help="Administrative: explicitly acquire and export a local tokenizer")
+    tokenizer.add_argument("encoding", choices=("cl100k_base", "o200k_base"))
+    tokenizer.add_argument("destination")
+    select = commands.add_parser("select-evidence", help="Read-only: select the smallest measured lossless evidence profile")
+    select.add_argument("package_digest")
+    select.add_argument("record_id")
+    select.add_argument("--principal", required=True)
+    select.add_argument("--max-tokens", type=int)
+    select.add_argument("--max-bytes", type=int)
 
     doctor = commands.add_parser("doctor", help="Read-only: diagnose local runtime and installed-state readiness")
     doctor.add_argument("--policy", help="Trusted local operator policy to compare with installed grants")
@@ -66,6 +99,15 @@ def _parser() -> argparse.ArgumentParser:
     archive.add_argument("source")
     archive.add_argument("destination")
     archive.add_argument("--compresslevel", type=int, choices=range(1, 10), default=6)
+
+    bundle = commands.add_parser("bundle-packs", help="Administrative: losslessly deduplicate explicit local packs into one data-only bundle")
+    bundle.add_argument("destination")
+    bundle.add_argument("sources", nargs="+")
+    verify_bundle_parser = commands.add_parser("verify-bundle", help="Verify every reconstructed package in a content bundle")
+    verify_bundle_parser.add_argument("source")
+    install_bundle_parser = commands.add_parser("install-bundle", help="Administrative: install a content bundle under trusted local policy")
+    install_bundle_parser.add_argument("source")
+    install_bundle_parser.add_argument("--policy", required=True)
 
     verify_sources = commands.add_parser(
         "verify-source-set", help="Administrative: verify local source PDFs against a tracked catalog"
@@ -233,6 +275,17 @@ def _parser() -> argparse.ArgumentParser:
     list_documents.add_argument("--cursor")
     list_documents.add_argument("--principal", required=True)
 
+    browse = commands.add_parser("browse-records", help="Read-only: browse source-verified records and structural links")
+    browse.add_argument("package_digest")
+    browse.add_argument("--principal", required=True)
+    browse.add_argument("--relation", choices=["all", "roots", "children", "parent", "adjacent", "outgoing", "incoming"], default="all")
+    browse.add_argument("--record-id")
+    browse.add_argument("--kind")
+    browse.add_argument("--scope-prefix")
+    browse.add_argument("--limit", type=int, default=50)
+    browse.add_argument("--cursor")
+    browse.add_argument("--max-bytes", type=int)
+
     get_clause = commands.add_parser("get-clause", help="Read-only: retrieve a pinned clause and required context")
     get_clause.add_argument("package_digest")
     get_clause.add_argument("clause_reference", nargs="?")
@@ -275,7 +328,7 @@ def _parser() -> argparse.ArgumentParser:
     search.add_argument("--scope-prefix")
     search.add_argument(
         "--query-mode",
-        choices=("exact_phrase", "all_terms", "any_terms", "natural_language"),
+        choices=("exact_phrase", "all_terms", "any_terms", "natural_language", "concept_language"),
         default="all_terms",
     )
 
@@ -286,6 +339,15 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def _run(args: argparse.Namespace) -> dict[str, Any]:
+    if args.command == "export-tokenizer":
+        from .tokenization import export_tokenizer
+        return export_tokenizer(args.encoding, args.destination)
+    if args.command == "bundle-packs":
+        return build_bundle(args.sources, args.destination)
+    if args.command == "verify-bundle":
+        return verify_bundle(args.source)
+    if args.command == "install-bundle":
+        return install_bundle(args.source, StandardsForgeService(args.db, args.store), args.policy)
     if args.command == "qualify-real":
         suite_path = Path(args.suite)
         require(suite_path.stat().st_size <= 16 * 1024 * 1024, "invalid_real_suite", "Suite exceeds 16 MiB.")
@@ -411,6 +473,31 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
         if args.command in {"install", "revoke", "verify-pack"}
         else StandardsForgeService.open_read_only(Path(args.db), Path(args.store))
     )
+    require(bool(args.tokenizer_artifact) == bool(args.tokenizer_sha256), "invalid_tokenizer", "Tokenizer artifact and SHA-256 must be supplied together.")
+    if args.tokenizer_artifact:
+        service.configure_tokenizer(args.tokenizer_artifact, args.tokenizer_sha256)
+    require(bool(args.reference_bindings) == bool(args.reference_bindings_sha256), "invalid_reference_bindings", "Reference artifact and SHA-256 must be supplied together.")
+    if args.reference_bindings:
+        service.configure_reference_bindings(args.reference_bindings, args.reference_bindings_sha256)
+    if args.command in {"export-answer-review", "qualify-answers"}:
+        from .answer_benchmark import run_answer_benchmark
+        from .answer_review_ui import export_answer_review
+        def read_document(path):
+            with Path(path).open("rb") as stream:
+                raw = stream.read(32 * 1024 * 1024 + 1)
+            require(len(raw) <= 32 * 1024 * 1024, "invalid_answer_benchmark", "Answer artifact exceeds the local input limit.")
+            return json.loads(raw)
+        suite, submission = read_document(args.suite), read_document(args.submission)
+        if args.command == "export-answer-review":
+            return export_answer_review(service, args.principal, suite, submission, args.output)
+        artifact = run_answer_benchmark(service, args.principal, suite, submission, read_document(args.adjudication))
+        write_artifact(args.output, artifact)
+        return artifact
+    if args.command == "follow-references":
+        return service.follow_references(args.package_digest, args.record_id, args.principal, max_bytes=args.max_bytes)
+    if args.command == "select-evidence":
+        return service.select_evidence(args.package_digest, args.record_id, args.principal,
+                                       max_tokens=args.max_tokens, max_bytes=args.max_bytes)
     if args.command == "verify-pack":
         return service.verify_pack(args.source)
     if args.command == "install":
@@ -419,6 +506,10 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
         return service.resolve_document(args.identifier, args.principal, args.edition, args.representation)
     if args.command == "list-documents":
         return service.list_documents(args.principal, args.identifier_prefix, args.limit, args.cursor)
+    if args.command == "browse-records":
+        return service.browse_records(args.package_digest, args.principal, relation=args.relation,
+                                      record_id=args.record_id, kind=args.kind, scope_prefix=args.scope_prefix,
+                                      limit=args.limit, cursor=args.cursor, max_bytes=args.max_bytes)
     if args.command == "get-clause":
         return service.get_clause(
             args.package_digest,
