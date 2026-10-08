@@ -29,6 +29,7 @@ from prepared_runtime import (  # noqa: E402
     _write_host_configuration,
     _venv_python,
     VENV_MARKER,
+    _run,
 )
 
 
@@ -44,6 +45,25 @@ class PreparedRuntimeTests(unittest.TestCase):
         self.assertFalse((self.root / ".venv").exists())
         self.assertFalse((self.root / ".standardsforge").exists())
         _check_mcp_profile("online")
+
+    def test_only_explicit_dependency_install_enables_package_index(self) -> None:
+        with patch("prepared_runtime.subprocess.run", return_value=subprocess.CompletedProcess([], 0)) as run:
+            _run(["python", "-m", "pip"], self.root)
+            self.assertEqual("1", run.call_args.kwargs["env"]["PIP_NO_INDEX"])
+            _run(["python", "-m", "pip"], self.root, dependency_network=True)
+            self.assertEqual("0", run.call_args.kwargs["env"]["PIP_NO_INDEX"])
+
+    def test_changed_bundle_cannot_retain_ready_receipt(self) -> None:
+        _, digest = validate_bundle(self.root)
+        state = self.root / ".standardsforge"
+        state.mkdir()
+        receipt = state / "prepared-distribution.json"
+        receipt.write_text(json.dumps({"bundle_manifest_sha256": digest}), encoding="utf-8")
+        (self.root / "setup.py").write_text("changed", encoding="utf-8")
+        with self.assertRaisesRegex(PreparedSetupError, "inventory validation failed"):
+            setup_prepared(self.root, quiet=True)
+        self.assertFalse(receipt.exists())
+        self.assertEqual({"bundle_manifest_sha256": digest}, json.loads((state / "prepared-setup-incomplete.json").read_text()))
 
     def test_generated_host_configs_round_trip_paths_with_spaces_and_unicode(self) -> None:
         root = self.root / "Prepared library ü"

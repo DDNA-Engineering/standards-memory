@@ -287,11 +287,14 @@ def _write_json_atomic(path: Path, value: dict[str, Any]) -> None:
     os.replace(temporary, path)
 
 
-def _run(command: list[str], root: Path, *, capture: bool = False) -> subprocess.CompletedProcess[str]:
+def _run(command: list[str], root: Path, *, capture: bool = False, dependency_network: bool = False) -> subprocess.CompletedProcess[str]:
+    environment = _clean_environment()
+    if dependency_network:
+        environment["PIP_NO_INDEX"] = "0"
     result = subprocess.run(
         command,
         cwd=root,
-        env=_clean_environment(),
+        env=environment,
         shell=False,
         text=True,
         stdout=subprocess.PIPE if capture else None,
@@ -412,7 +415,7 @@ def _prepare_mcp(root: Path, python: Path, wheel: Path, manifest: dict[str, Any]
     elif mode == "online":
         # Only this explicitly selected administrative path may resolve dependencies online.
         # The core code still comes from the verified bundled wheel, never another release.
-        _run([str(python), "-I", "-m", "pip", "install", "--disable-pip-version-check", f"{wheel}[mcp]"], root)
+        _run([str(python), "-I", "-m", "pip", "install", "--disable-pip-version-check", f"{wheel}[mcp]"], root, dependency_network=True)
     _run([str(python), "-I", "-m", "pip", "check"], root)
     _run([str(python), "-I", str(root / "smoke_mcp.py"), "--db", str(root / ".standardsforge/memory.db"),
           "--store", str(root / ".standardsforge/objects"), "--principal", "local-user",
@@ -424,7 +427,20 @@ def setup_prepared(root: Path, *, quiet: bool = False, mcp_mode: str | None = No
     _check_mcp_profile(mcp_mode)
     if not quiet:
         print("Checking the prepared library. First setup indexes the included packs and can take several minutes.", flush=True)
-    manifest, manifest_sha256 = validate_bundle(root)
+    try:
+        manifest, manifest_sha256 = validate_bundle(root)
+    except PreparedSetupError:
+        # Preserve the bundle ownership needed for a retry, but never retain readiness
+        # when the closed inventory no longer validates. Do not follow external state.
+        state = root / ".standardsforge"
+        receipt_path = root / RECEIPT_RELATIVE
+        if state.is_dir() and not _is_link_like(state) and receipt_path.is_file() and not _is_link_like(receipt_path):
+            receipt = _load_json(receipt_path, "prepared setup receipt")
+            previous_digest = receipt.get("bundle_manifest_sha256")
+            if isinstance(previous_digest, str) and HEX64.fullmatch(previous_digest):
+                _write_json_atomic(root / PARTIAL_RELATIVE, {"bundle_manifest_sha256": previous_digest})
+                receipt_path.unlink()
+        raise
     root = root.resolve(strict=True)
     state = root / ".standardsforge"
     venv_root = root / ".venv"
