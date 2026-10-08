@@ -81,10 +81,12 @@ Keep the MCP environment outside the closed prepared directory. The network is n
 - The word `shall` can indicate normative wording, but it does not establish that the clause applies to a particular project. Applicability comes from an approved external baseline, contract, tailoring record, or other authorized decision.
 - A test method describes how evidence may be produced; it is not automatically a product requirement. Keep requirement and verification evidence separate.
 - Do not infer table-cell or figure meaning when the returned representation declares captions or text only.
-- Cite the exact package, clause or record identity, physical source location, and exact text supporting an answer. State incomplete or unknown coverage instead of filling gaps from general knowledge.
+- Cite the standard, exact edition, clause when available, and physical PDF page in the answer. Keep full package and record identities in the underlying evidence or optional audit details. State incomplete or unknown coverage instead of filling gaps from general knowledge.
 
 ## Answer boundary
 
-A defensible model answer identifies the exact edition and package pin, quotes or faithfully paraphrases retrieved evidence, includes governing context, names unresolved inputs, and separates source requirements from applicability or compliance judgment. If the evidence packet is incomplete for the question, the correct result is a bounded answer or abstention—not a silent inference.
+A defensible model answer names the exact edition, quotes or faithfully paraphrases retrieved evidence, includes governing context, names unresolved inputs, and separates source requirements from applicability or compliance judgment. Preserve the package pin for replay without displaying it as the primary citation. If the evidence packet is incomplete for the question, the correct result is a bounded answer or abstention—not a silent inference.
+
+Use readable blockquotes and citations in the chat. A source attachment should open to passages, not JSON: the optional [skill reader](../plugins/standardsforge/skills/standardsforge/scripts/render_evidence.py) renders detailed retrieved packets as static HTML, with full audit data in closed disclosures. Keep material coverage and review limits visible. Offer original PDF pages only when the host has a confirmed source/page link or authorized preserved file; never invent a path or URL. Do not silently repair extraction errors inside a quote. This host-side presentation does not change MCP transport, source bytes or authorization.
 
 For external references, use `follow_references` only when the host configured a reviewed binding artifact. Inspect each binding's edition basis: a reviewer-selected navigation edition does not establish the issue required by a source or contract. Read both returned evidence packets; zero bindings and one-hop traversal do not imply complete dependency closure.

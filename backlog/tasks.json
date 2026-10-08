@@ -1111,6 +1111,17 @@
         "Document supported skill and plugin selectors, installation prerequisites and the distinct published/runtime feature sets without promising a universal custom slash command.",
         "Validate skill metadata, install and read back the plugin through Codex, verify skill discovery outside the checkout, and retrieve exact source evidence using the existing local MCP; missing connections and missing optional tools must remain explicit."
       ]
+    },
+    {
+      "task_id": "TASK-055",
+      "title": "Readable source evidence in model answers",
+      "status": "complete",
+      "requirements": ["SM-FR-024", "SM-FR-030"],
+      "acceptance": [
+        "Present exact passages with human-readable standard, edition, clause and physical-page citations; retain technical pins separately from the primary answer.",
+        "Ship a local skill reader that renders already-retrieved detailed evidence as escaped static HTML, preserves every returned record and coverage limit, and keeps raw audit data in optional details.",
+        "Demonstrate the reader with the installed electronics evidence, including preserved PDF page previews where locally available; never invent source links, repair text inside an exact quote, or imply project applicability."
+      ]
     }
   ]
 }
