@@ -1,0 +1,21 @@
+{
+  "name": "standardsforge",
+  "version": "0.1.0",
+  "description": "Answer defense engineering standards questions using an existing local StandardsForge MCP connection.",
+  "author": {
+    "name": "StandardsForge contributors"
+  },
+  "license": "Apache-2.0",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "StandardsForge",
+    "shortDescription": "Ask standards questions with exact source evidence",
+    "longDescription": "Search installed defense engineering standards, retrieve exact edition-bound evidence, and preserve governing conditions and review limits. Requires an operator-configured local StandardsForge MCP connection and installed corpus. This plugin supplies the question-answering skill; it does not install a runtime, download standards or grant access.",
+    "developerName": "StandardsForge contributors",
+    "category": "Productivity",
+    "capabilities": ["Read"],
+    "defaultPrompt": [
+      "Use StandardsForge to answer my standards question with exact editions, source pages and governing conditions."
+    ]
+  }
+}

@@ -47,7 +47,9 @@ Setup installs all **441 packages** offline, verifies integrity, and replays **5
 
 ## Connect a model
 
-StandardsForge exposes seven read-only tools over local stdio MCP. Your model host launches the server and queries the installed library.
+For a selectable **StandardsForge** entry, install the repository's [skill/plugin](docs/wiki/MODEL_INTEGRATION.md#select-standardsforge-in-your-chat) after connecting MCP. Use `$standardsforge:standardsforge` or the host's skill/plugin picker to ask a question. The plugin reuses your local library and preserves exact source evidence.
+
+The published a6 release exposes seven read-only tools over local stdio MCP. Your model host launches the server and queries the installed library.
 
 On **Windows x64 with CPython 3.12**, run these commands after core setup to enable the bundled offline MCP runtime and print its launcher path:
 
