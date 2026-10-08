@@ -85,6 +85,8 @@ Keep the MCP environment outside the closed prepared directory. The network is n
 
 ## Answer boundary
 
+A selected StandardsForge question uses installed evidence only by default. Retrieve exact MCP packets before answering; do not supplement gaps with web research, remembered standard text or unsupported design suggestions. Missing location-specific inputs, editions and referenced documents remain explicit gaps. Only an explicit request for external research widens that scope, and external findings must be attributed separately. The skill communicates this workflow; host tool permissions remain a separate integration responsibility.
+
 A defensible model answer names the exact edition, quotes or faithfully paraphrases retrieved evidence, includes governing context, names unresolved inputs, and separates source requirements from applicability or compliance judgment. Preserve the package pin for replay without displaying it as the primary citation. If the evidence packet is incomplete for the question, the correct result is a bounded answer or abstention—not a silent inference.
 
 Use readable blockquotes and citations in the chat. A source attachment should open to passages, not JSON: the optional [skill reader](../plugins/standardsforge/skills/standardsforge/scripts/render_evidence.py) renders detailed retrieved packets as static HTML, with full audit data in closed disclosures. Keep material coverage and review limits visible. Offer original PDF pages only when the host has a confirmed source/page link or authorized preserved file; never invent a path or URL. Do not silently repair extraction errors inside a quote. This host-side presentation does not change MCP transport, source bytes or authorization.

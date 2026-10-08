@@ -1122,6 +1122,17 @@
         "Ship a local skill reader that renders already-retrieved detailed evidence as escaped static HTML, preserves every returned record and coverage limit, and keeps raw audit data in optional details.",
         "Demonstrate the reader with the installed electronics evidence, including preserved PDF page previews where locally available; never invent source links, repair text inside an exact quote, or imply project applicability."
       ]
+    },
+    {
+      "task_id": "TASK-056",
+      "title": "Installed-library-only StandardsForge answers",
+      "status": "complete",
+      "requirements": ["SM-FR-024", "SM-FR-030"],
+      "acceptance": [
+        "Scope the selected skill and its default prompts to the installed library, require exact MCP evidence before answering, and prohibit unsolicited web or remembered-text supplementation.",
+        "Keep missing connections, empty search results, unavailable editions, external references and location-specific inputs as explicit gaps; permit external research only when the user requests it and keep its evidence separate.",
+        "Install the updated plugin and verify actual host discovery and local evidence retrieval; distinguish instruction and metadata verification from a new model-run behavioral result and from host-enforced web restrictions."
+      ]
     }
   ]
 }

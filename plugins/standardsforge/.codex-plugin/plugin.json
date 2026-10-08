@@ -1,7 +1,7 @@
 {
   "name": "standardsforge",
-  "version": "0.1.1",
-  "description": "Answer defense engineering standards questions using an existing local StandardsForge MCP connection.",
+  "version": "0.1.2",
+  "description": "Answer defense engineering standards questions from the installed StandardsForge database, with exact evidence and explicit gaps.",
   "author": {
     "name": "StandardsForge contributors"
   },
@@ -9,13 +9,13 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "StandardsForge",
-    "shortDescription": "Ask standards questions with exact source evidence",
-    "longDescription": "Search installed defense engineering standards, retrieve exact edition-bound evidence, and preserve governing conditions and review limits. Requires an operator-configured local StandardsForge MCP connection and installed corpus. This plugin supplies the question-answering skill; it does not install a runtime, download standards or grant access.",
+    "shortDescription": "Ask your installed standards library, without web research",
+    "longDescription": "Answer from installed defense engineering standards, retrieve exact edition-bound evidence, and report missing evidence without unsolicited web research. Requires an operator-configured local StandardsForge MCP connection and installed corpus. This plugin supplies workflow instructions; it does not install a runtime, download standards, grant access or disable host web tools.",
     "developerName": "StandardsForge contributors",
     "category": "Productivity",
     "capabilities": ["Read"],
     "defaultPrompt": [
-      "Use StandardsForge to answer my standards question with exact editions, source pages and governing conditions."
+      "Use $standardsforge:standardsforge with only my installed database; no web. Cite editions and readable source pages."
     ]
   }
 }

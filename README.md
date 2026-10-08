@@ -47,7 +47,7 @@ Setup installs all **441 packages** offline, verifies integrity, and replays **5
 
 ## Connect a model
 
-For a selectable **StandardsForge** entry, install the repository's [skill/plugin](docs/wiki/MODEL_INTEGRATION.md#select-standardsforge-in-your-chat) after connecting MCP. Use `$standardsforge:standardsforge` or the host's skill/plugin picker to ask a question. The plugin reuses your local library and preserves exact source evidence.
+For a selectable **StandardsForge** entry, install the repository's [skill/plugin](docs/wiki/MODEL_INTEGRATION.md#select-standardsforge-in-your-chat) after connecting MCP. Use `$standardsforge:standardsforge` or the host's skill/plugin picker to ask a question. The skill answers only from your installed library by default, preserves exact source evidence and reports gaps; external research requires an explicit request. Host tool permissions are configured separately.
 
 The published a6 release exposes seven read-only tools over local stdio MCP. Your model host launches the server and queries the installed library.
 
