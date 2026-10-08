@@ -2,6 +2,30 @@
 
 StandardsForge gives a model read-only, principal-bound access to the prepared local library. The model host launches the MCP process; StandardsForge does not call a model.
 
+## Select StandardsForge in your chat
+
+This repository includes a [StandardsForge plugin](../../plugins/standardsforge/.codex-plugin/plugin.json) and its [question-answering skill](../../plugins/standardsforge/skills/standardsforge/SKILL.md). Install the corpus and connect its MCP server using the platform instructions below first. If StandardsForge already answers through MCP, keep that connection.
+
+Install the selectable plugin from the repository marketplace with a current Codex CLI:
+
+```sh
+codex plugin marketplace add DDNA-Engineering/standards-memory --ref main
+codex plugin add standardsforge@standardsforge
+codex plugin list --marketplace standardsforge --json
+```
+
+For a local source checkout, replace the first command with `codex plugin marketplace add .` from the repository root. The marketplace stores only this small skill plugin in the plugin cache; it does not copy the repository's local corpus or database. The plugin reuses an existing `standardsforge` or `standardsforge-local` MCP connection. It has no bundled server, credentials, machine-specific paths, network fallback or installation hook. Installing it does not install or upgrade the runtime or standards content.
+
+Start a new chat after installation. In Codex CLI or the IDE extension, use `/skills` to select **StandardsForge**. Codex qualifies the skill name with its plugin name, so the explicit invocation is:
+
+```text
+$standardsforge:standardsforge What does the installed MIL-STD-25C say about general material notes? Include the exact edition, conditions and source pages.
+```
+
+In desktop surfaces that offer plugin mentions, type `@` and select **StandardsForge**. Supported Codex task views also offer **Sources -> Use plugins -> StandardsForge**. Select the installed entry in the picker; plain `@StandardsForge` text is not proof that the host selected it. If a local plugin is not visible, refresh the plugin list or restart the app. The exact selector depends on the host; this package does not register a universal `/standardsforge` command. See the host's [skill invocation](https://learn.chatgpt.com/docs/build-skills) and [plugin selection](https://help.openai.com/en/articles/20001256-plugins-in-chatgpt) documentation.
+
+The skill works with the seven core read tools in published a6 and uses `browse_records`, `select_evidence` and `follow_references` only when the installed runtime advertises them. Selecting the plugin never makes source-only features appear in an older runtime. Missing connections or optional capabilities are reported explicitly.
+
 ## Start with the prepared release on Windows
 
 On 64-bit Windows with CPython 3.12, download and extract the [prepared `v0.1.0a6` archive](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a6/standardsforge-ready-0.1.0a6.zip). Open PowerShell in the extracted directory and run:
@@ -30,6 +54,13 @@ Claude Code can register the identical process:
 ```powershell
 claude mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\standardsforge-mcp.ps1).Path
 claude mcp get standardsforge
+```
+
+For Codex, register the same prepared launcher:
+
+```powershell
+codex mcp add standardsforge -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\standardsforge-mcp.ps1).Path
+codex mcp get standardsforge
 ```
 
 After the host connects, ask: "Use StandardsForge to list installed MIL-STD-810 editions, find the low-pressure section, and retrieve exact source-linked evidence with page, package identity, and coverage limits." The host should offer seven StandardsForge read tools. Search is discovery; retrieve an exact record before relying on its text.
@@ -70,7 +101,7 @@ The command intentionally remains running when launched directly because the hos
 
 ## Exposed tools
 
-The server exposes exactly:
+Published a6 exposes these seven tools:
 
 - `search`
 - `list_documents`
@@ -79,6 +110,8 @@ The server exposes exactly:
 - `build_context`
 - `enumerate_obligations`
 - `diff_editions`
+
+The current source runtime additionally exposes `browse_records`, `select_evidence` and `follow_references`. Use the connected server's tool inventory as the authority for availability.
 
 It does not expose installation, pack verification, revocation, acquisition, compilation, HTTP, or a caller-selected principal.
 

@@ -1,0 +1,20 @@
+{
+  "name": "standardsforge",
+  "interface": {
+    "displayName": "StandardsForge"
+  },
+  "plugins": [
+    {
+      "name": "standardsforge",
+      "source": {
+        "source": "local",
+        "path": "./plugins/standardsforge"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

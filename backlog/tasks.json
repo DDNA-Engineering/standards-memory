@@ -1097,6 +1097,20 @@
         "Retain exact answers, cited source evidence, claim and qualifier judgments and raw metrics; reject missing cases, stale bindings and self-adjudication for independent status.",
         "Demonstrate evaluation with real source questions and explicit reviewer verdicts; preserve user-requested agent self-review as self_review, with independent human and corpus-wide quality claims remaining false."
       ]
+    },
+    {
+      "task_id": "TASK-054",
+      "title": "Selectable StandardsForge skill and local plugin",
+      "status": "complete",
+      "requirements": [
+        "SM-FR-024",
+        "SM-FR-030"
+      ],
+      "acceptance": [
+        "Ship a portable StandardsForge skill, UI metadata, plugin manifest and repository marketplace that reuse an operator-configured local MCP connection.",
+        "Document supported skill and plugin selectors, installation prerequisites and the distinct published/runtime feature sets without promising a universal custom slash command.",
+        "Validate skill metadata, install and read back the plugin through Codex, verify skill discovery outside the checkout, and retrieve exact source evidence using the existing local MCP; missing connections and missing optional tools must remain explicit."
+      ]
     }
   ]
 }
