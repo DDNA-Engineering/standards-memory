@@ -28,7 +28,7 @@ Issues = "https://github.com/DDNA-Engineering/standards-memory/issues"
 Source = "https://github.com/DDNA-Engineering/standards-memory"
 
 [project.optional-dependencies]
-mcp = ["mcp==2.2.0"]
+mcp = ["mcp==2.2.0", "PyJWT>=2.15.0,<3"]
 compiler = ["fonttools==4.65.0", "pypdf==6.19.0"]
 contract = ["jsonschema==4.26.0"]
 
