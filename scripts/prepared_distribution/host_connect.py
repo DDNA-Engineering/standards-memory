@@ -128,11 +128,10 @@ def _toml_document(original: str | None, command: str, arguments: list[str], pat
             skipping = False
         if not skipping:
             kept.append(line)
-    updated = "".join(kept)
-    if updated and not updated.endswith("\n"):
-        updated += "\n"
-    if updated.strip():
-        updated += "\n"
+    # Separate the appended table from the remaining content by exactly one blank line.
+    updated = "".join(kept).rstrip()
+    if updated:
+        updated += "\n\n"
     updated += (
         f"[mcp_servers.{SERVER_NAME}]\n"
         # JSON string escaping is also valid for TOML basic strings.

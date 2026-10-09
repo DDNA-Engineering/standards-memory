@@ -125,6 +125,7 @@ class ConnectHostTests(unittest.TestCase):
         self.assertEqual({"model": "small"}, parsed["profiles"]["fast"])
         self.assertEqual({"command": "other"}, parsed["mcp_servers"]["other"])
         self.assertEqual({"command": COMMAND, "args": ARGUMENTS}, parsed["mcp_servers"]["standardsforge"])
+        self.assertNotIn("\n\n\n", path.read_text(encoding="utf-8"))
         self.assertEqual("already_connected", connect_host("codex", COMMAND, ARGUMENTS, config_path=path, now=NOW)["status"])
 
     def test_toml_forms_that_cannot_be_rewritten_safely_fail_closed(self) -> None:
