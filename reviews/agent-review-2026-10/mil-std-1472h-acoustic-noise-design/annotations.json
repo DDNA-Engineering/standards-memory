@@ -1,0 +1,2005 @@
+{
+  "schema_version": "0.6.0",
+  "document_id": "MIL-STD-1472H NOT 1",
+  "edition_id": "dla:mil-std-ident:36903:composition:c66d36dbf80e317fbc5eed4ffac7247a1fec9e8c615a520d195ee5e90236e3f5",
+  "source_pdf_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+  "source_page_pack_digest": "6d4092d718dbf40571bac8ba1470f70f5c84554be679609a57df742eef856f90",
+  "compiler": {
+    "name": "verified_page_pack",
+    "version": "0.1.0"
+  },
+  "extraction_mode": "verified_page_text",
+  "text_encoding": "UTF-8",
+  "offset_convention": "half_open_utf8_byte_offsets_per_physical_page",
+  "review": {
+    "reviewer_id": "claude-code-agent-self-review-2026-10",
+    "reviewer_type": "agent",
+    "reviewed_at": "2026-10-09T00:00:00Z",
+    "method": "Agent self-review (Claude Code) of exact page-text spans from the a7 page-text package against the printed clause structure visible in the text layer; conditions, exceptions, tailoring instructions and applicability limits typed as qualifiers; permissions and recommendations kept separate from obligations; cross-document citations recorded as unresolved relationships; no visual PDF inspection.",
+    "tool": {
+      "name": "Claude Code agent session",
+      "version": "not recorded",
+      "configuration_sha256": null
+    },
+    "unresolved_issues": [
+      "Agent self-review only: the reviewing agent authored and checked these annotations; no human or independent review was performed.",
+      "Review used the exact verified pypdf layout text layer of the MIL-STD-1472H body component from the a7 corpus package; the separate notice component is not reviewed; PDF pages were not rendered or visually inspected, and this text layer splits many words (for example 'syste m', 's hall'), which are preserved verbatim.",
+      "Only the selected scope (1.1, 1.3 and 5.5.4 through 5.5.4.4.3.4.2) is reviewed; 5.5.4.4.4 onward (including Figure 34 exposure limits), the rest of section 5 and all other pages remain unreviewed.",
+      "Compound clauses are decomposed into derived child records whose identities are authored, not printed source numbering; obligation record counts are not atomic-requirement counts."
+    ],
+    "attestation": "extraction_review_not_project_applicability_or_approval"
+  },
+  "nodes": [
+    {
+      "logical_id": "1.1",
+      "kind": "clause",
+      "ordinal": 1,
+      "clause_reference": "1.1",
+      "heading": "1.1 Scope",
+      "statement_role": "governing_note",
+      "exact_text": "1.1  Scope\n.  T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+      "content_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59",
+      "source_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 146,
+          "end_byte": 156
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 195,
+          "end_byte": 295
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 296,
+          "end_byte": 339
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "applicability_statement",
+        "normativity": "normative",
+        "statement": {
+          "subject": "T his standard",
+          "action": "esta blishe s ge neral human e ngine ering design criteria",
+          "modality": "other",
+          "polarity": "affirmative",
+          "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+          "span_indices": [
+            1,
+            2
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "1.3",
+      "kind": "clause",
+      "ordinal": 2,
+      "clause_reference": "1.3",
+      "heading": "1.3 Application",
+      "statement_role": "governing_note",
+      "exact_text": "1.3  Application\n.  T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.  Unless otherwise stated in specific provisions, this standard applies to design of systems, subsystems,\nequip me nt, and fac ilitie s for use b y both me n and wo men.  W hile this sta ndard provides design criteria with respect\nto human capabilitie s and limitations, it is not intended to limit inno vation in the design o r selection of specific\nhard ware, so ftware, materials,  and processes.  T his standard should be tailored by the Government as part of the\ncontract.  If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+      "content_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3",
+      "source_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 776,
+          "end_byte": 792
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 832,
+          "end_byte": 936
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 937,
+          "end_byte": 1053
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 1054,
+          "end_byte": 1169
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 1170,
+          "end_byte": 1294
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 1295,
+          "end_byte": 1414
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 1415,
+          "end_byte": 1531
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 1532,
+          "end_byte": 1652
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 1653,
+          "end_byte": 1740
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "applicability_statement",
+        "normativity": "normative",
+        "statement": {
+          "subject": "T his standard",
+          "action": "is applicable to the design of all syste ms",
+          "modality": "other",
+          "polarity": "affirmative",
+          "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+          "span_indices": [
+            1,
+            2,
+            3
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "exception",
+            "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+            "span_indices": [
+              2,
+              3
+            ]
+          },
+          {
+            "kind": "exception",
+            "exact_text": "Unless otherwise stated in specific provisions",
+            "span_indices": [
+              3
+            ]
+          },
+          {
+            "kind": "source_applicability",
+            "exact_text": "for use b y both me n and wo men.",
+            "span_indices": [
+              4
+            ]
+          },
+          {
+            "kind": "tailoring_instruction",
+            "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+            "span_indices": [
+              6,
+              7
+            ]
+          },
+          {
+            "kind": "tailoring_instruction",
+            "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+            "span_indices": [
+              7,
+              8
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [
+          "The statement that the standard is not intended to limit innovation is retained in the exact text as informative context."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4",
+      "kind": "section",
+      "ordinal": 3,
+      "clause_reference": "5.5.4",
+      "heading": "5.5.4 Acoustical energy and noise",
+      "statement_role": "informative",
+      "exact_text": "5.5.4  Acoustical ener gy and noise.",
+      "content_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1242,
+          "end_byte": 1278
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      }
+    },
+    {
+      "logical_id": "5.5.4.1",
+      "kind": "clause",
+      "ordinal": 4,
+      "clause_reference": "5.5.4.1",
+      "heading": "5.5.4.1 General",
+      "statement_role": "obligation",
+      "exact_text": "5.5.4.1  General\n.  T he acoustic al enviro nme nt shall not cause injur y, fatigue, interfere with voice or other audio\ncommunications, or degrade system effectiveness.  Apart from environmental considerations (such as annoyance to\nthe co mmunity at lar ge which lie outside the scope of this document), the most critica l effe cts include noise -i nduced\nhearing i nj ur y and t he i mpact of si gnal co mpre hension on co mmunicatio ns, s urvivabili t y, a nd mi ssio n effecti vene ss\n(lethality).",
+      "content_sha256": "2c432f11bb780918d3b5eac18e1b32c60292a1d71fd9093405c9dc14f3e9b1d7",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1286,
+          "end_byte": 1302
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1342,
+          "end_byte": 1445
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1446,
+          "end_byte": 1557
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1558,
+          "end_byte": 1681
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1682,
+          "end_byte": 1813
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1814,
+          "end_byte": 1826
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "T he acoustic al enviro nme nt",
+          "action": "cause injur y, fatigue, interfere with voice or other audio\ncommunications, or degrade system effectiveness",
+          "modality": "shall",
+          "polarity": "negative",
+          "exact_text": "T he acoustic al enviro nme nt shall not cause injur y, fatigue, interfere with voice or other audio\ncommunications, or degrade system effectiveness.",
+          "span_indices": [
+            1,
+            2
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "exception",
+            "exact_text": "Apart from environmental considerations (such as annoyance to\nthe co mmunity at lar ge which lie outside the scope of this document)",
+            "span_indices": [
+              2,
+              3
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [
+          "The second sentence identifying the most critical effects is informative context retained in the exact text."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.2",
+      "kind": "clause",
+      "ordinal": 5,
+      "clause_reference": "5.5.4.2",
+      "heading": "5.5.4.2 Equipment design",
+      "statement_role": "obligation",
+      "exact_text": "5.5.4.2  Equipment design\n.  Equip me nt s hall not ge nerate noise in exce ss o f ma xi mum allo wable levels in\naccordance with MIL-ST D-1474.",
+      "content_sha256": "56547364fa7c4f1d689d0ed14a0c8fab232b1497dfac8fe4752a097c91f86792",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1834,
+          "end_byte": 1859
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1898,
+          "end_byte": 1985
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1986,
+          "end_byte": 2016
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Equip me nt",
+          "action": "ge nerate noise in exce ss o f ma xi mum allo wable levels",
+          "modality": "other",
+          "polarity": "negative",
+          "exact_text": "Equip me nt s hall not ge nerate noise in exce ss o f ma xi mum allo wable levels in\naccordance with MIL-ST D-1474.",
+          "span_indices": [
+            1,
+            2
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [
+          "The extracted text layer splits the printed modal verb as 's hall'; modality is recorded as 'other' because the contract requires the modal token verbatim. The PDF was not visually inspected."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.3",
+      "kind": "clause",
+      "ordinal": 6,
+      "clause_reference": "5.5.4.3",
+      "heading": "5.5.4.3 Total system compliance",
+      "statement_role": "governing_note",
+      "exact_text": "5.5.4.3  Total syste m co mplia nce.  T otal system noise shall be in accordance with MIL-STD-1474.  T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment s hall not eliminate\nthe require me nt that the total syste m confor m to the criteria herein.",
+      "content_sha256": "70241c37ff002de9c20778ca06da88936226d5fb0b2b1b70b5f78dd9131f9dd7",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2024,
+          "end_byte": 2134
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2135,
+          "end_byte": 2159
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2170,
+          "end_byte": 2263
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2264,
+          "end_byte": 2337
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": null,
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [
+          "The clause's two directives are reviewed separately as derived child records."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.3/total-system-noise",
+      "kind": "paragraph",
+      "ordinal": 7,
+      "clause_reference": "5.5.4.3.derived-total-system-noise",
+      "heading": "5.5.4.3: total system noise per MIL-STD-1474",
+      "statement_role": "obligation",
+      "exact_text": "T otal system noise shall be in accordance with MIL-STD-1474.",
+      "content_sha256": "4d2fe9cfca68ca7cea8f95b746860204d7df3e66ef661c4c29185753747f1eda",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2062,
+          "end_byte": 2123
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.3",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "T otal system noise",
+          "action": "be in accordance with MIL-STD-1474",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "T otal system noise shall be in accordance with MIL-STD-1474.",
+          "span_indices": [
+            0
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.3/gfe-no-relief",
+      "kind": "paragraph",
+      "ordinal": 8,
+      "clause_reference": "5.5.4.3.derived-gfe-no-relief",
+      "heading": "5.5.4.3: GFE components do not eliminate total-system conformance",
+      "statement_role": "obligation",
+      "exact_text": "T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment s hall not eliminate\nthe require me nt that the total syste m confor m to the criteria herein.",
+      "content_sha256": "8891c10a5c583974e887726479acc6068be5ad2ed76464fc640e9cfb8779b11c",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2125,
+          "end_byte": 2134
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2135,
+          "end_byte": 2159
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2170,
+          "end_byte": 2263
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2264,
+          "end_byte": 2337
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.3",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment",
+          "action": "eliminate\nthe require me nt that the total syste m confor m to the criteria herein",
+          "modality": "other",
+          "polarity": "negative",
+          "exact_text": "T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment s hall not eliminate\nthe require me nt that the total syste m confor m to the criteria herein.",
+          "span_indices": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "contributes to the overall noise may be Government-furni shed equip ment",
+            "span_indices": [
+              2
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [
+          "The extracted text layer splits the printed modal verb as 's hall'; modality is recorded as 'other' because the contract requires the modal token verbatim. The PDF was not visually inspected."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.4",
+      "kind": "section",
+      "ordinal": 9,
+      "clause_reference": "5.5.4.4",
+      "heading": "5.5.4.4 Hazardous noise",
+      "statement_role": "informative",
+      "exact_text": "5.5.4.4  Hazardous noise.",
+      "content_sha256": "fb484e8e1263858e77224b8257e1abc6ef0866f012e06aed98bcdb6574b222c3",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2345,
+          "end_byte": 2370
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4"
+    },
+    {
+      "logical_id": "5.5.4.4.1",
+      "kind": "clause",
+      "ordinal": 10,
+      "clause_reference": "5.5.4.4.1",
+      "heading": "5.5.4.4.1 Allowable limits",
+      "statement_role": "obligation",
+      "exact_text": "5.5.4.4.1  Allo wable limits.  E nviro nme nt s and conditions i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis s hall be evaluated in accordance with MI L-ST D-1474 and the hearing conservation\npolicy o f the procuring activity.",
+      "content_sha256": "1e4ab01d001aa5d95c6c008f6fbb8b7bf02f222a73ac6283404da5ed1a7d1bbf",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2378,
+          "end_byte": 2474
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2485,
+          "end_byte": 2499
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2591,
+          "end_byte": 2594
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2595,
+          "end_byte": 2710
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2711,
+          "end_byte": 2745
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "E nviro nme nt s and conditions",
+          "action": "be evaluated in accordance with MI L-ST D-1474",
+          "modality": "other",
+          "polarity": "affirmative",
+          "exact_text": "E nviro nme nt s and conditions i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis s hall be evaluated in accordance with MI L-ST D-1474 and the hearing conservation\npolicy o f the procuring activity.",
+          "span_indices": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis",
+            "span_indices": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        ],
+        "quantities": [
+          {
+            "raw": "85 dBA",
+            "value": "85",
+            "unit": "dBA",
+            "tolerance": null,
+            "span_indices": [
+              1
+            ]
+          },
+          {
+            "raw": "140\ndBP",
+            "value": "140",
+            "unit": "dBP",
+            "tolerance": null,
+            "span_indices": [
+              1,
+              2
+            ]
+          }
+        ],
+        "unresolved_issues": [
+          "The extracted text layer splits the printed modal verb as 's hall'; modality is recorded as 'other' because the contract requires the modal token verbatim. The PDF was not visually inspected."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.4.2",
+      "kind": "clause",
+      "ordinal": 11,
+      "clause_reference": "5.5.4.4.2",
+      "heading": "5.5.4.4.2 Workstations",
+      "statement_role": "informative",
+      "exact_text": "5.5.4.4.2  Workstations.  To reduce personnel noise exposure, controls, displays, and workstations required to\nmo nitor equip ment sho uld be located in separate spaces that are acoustically isolated fro m the noise sources.",
+      "content_sha256": "cfe3077cea11b1340fb83c3543b9388abfed330e69d9a769375767739652195f",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2753,
+          "end_byte": 2863
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2864,
+          "end_byte": 2977
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "prose",
+        "normativity": "informative",
+        "statement": {
+          "subject": "controls, displays, and workstations required to\nmo nitor equip ment",
+          "action": "be located in separate spaces",
+          "modality": "other",
+          "polarity": "affirmative",
+          "exact_text": "controls, displays, and workstations required to\nmo nitor equip ment sho uld be located in separate spaces that are acoustically isolated fro m the noise sources.",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "To reduce personnel noise exposure,",
+            "span_indices": [
+              0
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [
+          "Recommendation printed as 'should' but rendered 'sho uld' by the text layer; recorded as modality 'other' and not classified as an obligation."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.4.3",
+      "kind": "section",
+      "ordinal": 12,
+      "clause_reference": "5.5.4.4.3",
+      "heading": "5.5.4.4.3 Hearing protection",
+      "statement_role": "informative",
+      "exact_text": "5.5.4.4.3  Hearing protection.",
+      "content_sha256": "850bf37eccc185c1a34b8d95faa6fba08a282b51521c56daffa43d6c4b10a37d",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2985,
+          "end_byte": 3015
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4"
+    },
+    {
+      "logical_id": "5.5.4.4.3.1",
+      "kind": "clause",
+      "ordinal": 13,
+      "clause_reference": "5.5.4.4.3.1",
+      "heading": "5.5.4.4.3.1 Compatibility with hearing protection",
+      "statement_role": "governing_note",
+      "exact_text": "5.5.4.4.3.1  Compatibility with hearing protection\n.  T he system shall be co mpatible with personal hearing\nprotection worn within the co ntext of  mission performance  and as specified by the procuring activity (see 6.2).  If\npersonal hearing protection devices are authorized for the design, the system design shall accommodate the wearing\no f personal hearing protection devices within the co ntext of mission activities.",
+      "content_sha256": "6c862863ba05a9cf244004746110b79976796e862f9948cc41a19319703196ad",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3023,
+          "end_byte": 3073
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3113,
+          "end_byte": 3170
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3171,
+          "end_byte": 3289
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3290,
+          "end_byte": 3404
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3405,
+          "end_byte": 3487
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4.3",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": null,
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [
+          "The clause's two directives are reviewed separately as derived child records."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.4.3.1/compatible-with-hearing-protection",
+      "kind": "paragraph",
+      "ordinal": 14,
+      "clause_reference": "5.5.4.4.3.1.derived-compatible-with-hearing-protection",
+      "heading": "5.5.4.4.3.1: system compatible with personal hearing protection",
+      "statement_role": "obligation",
+      "exact_text": "T he system shall be co mpatible with personal hearing\nprotection worn within the co ntext of  mission performance  and as specified by the procuring activity (see 6.2).",
+      "content_sha256": "9f1999be43c7827f9a732292532ea077326efeb7e40bc132f3aadb1e790f5233",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3116,
+          "end_byte": 3170
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3171,
+          "end_byte": 3285
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4.3.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "T he system",
+          "action": "be co mpatible with personal hearing\nprotection",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "T he system shall be co mpatible with personal hearing\nprotection worn within the co ntext of  mission performance  and as specified by the procuring activity (see 6.2).",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "worn within the co ntext of  mission performance  and as specified by the procuring activity",
+            "span_indices": [
+              1
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.4.3.1/accommodate-wearing",
+      "kind": "paragraph",
+      "ordinal": 15,
+      "clause_reference": "5.5.4.4.3.1.derived-accommodate-wearing",
+      "heading": "5.5.4.4.3.1: design accommodates wearing of authorized hearing protection",
+      "statement_role": "obligation",
+      "exact_text": "If\npersonal hearing protection devices are authorized for the design, the system design shall accommodate the wearing\no f personal hearing protection devices within the co ntext of mission activities.",
+      "content_sha256": "7e0f5fbf93adcbf0ab01f634b17fa9974e8176ba3f1dbe63beb93fa203a05108",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3287,
+          "end_byte": 3289
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3290,
+          "end_byte": 3404
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3405,
+          "end_byte": 3487
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4.3.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "the system design",
+          "action": "accommodate the wearing",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "If\npersonal hearing protection devices are authorized for the design, the system design shall accommodate the wearing\no f personal hearing protection devices within the co ntext of mission activities.",
+          "span_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "If\npersonal hearing protection devices are authorized for the design,",
+            "span_indices": [
+              0,
+              1
+            ]
+          },
+          {
+            "kind": "condition",
+            "exact_text": "within the co ntext of mission activities.",
+            "span_indices": [
+              2
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.4.3.2",
+      "kind": "clause",
+      "ordinal": 16,
+      "clause_reference": "5.5.4.4.3.2",
+      "heading": "5.5.4.4.3.2 Hearing protection device performance",
+      "statement_role": "obligation",
+      "exact_text": "5.5.4.4.3.2  Hearing protection device perfor mance.  Personal heari\nng protection devices shall reduce noise at\nthe ear reference point to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+      "content_sha256": "af8cacef1b52d62c7d58465d1c9ee5ccc67536e118d571c381c0995d7a770aca",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3495,
+          "end_byte": 3563
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3638,
+          "end_byte": 3681
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3682,
+          "end_byte": 3710
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3721,
+          "end_byte": 3726
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3746,
+          "end_byte": 3782
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3792,
+          "end_byte": 3808
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4.3",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Personal heari\nng protection devices",
+          "action": "reduce noise at\nthe ear reference point",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Personal heari\nng protection devices shall reduce noise at\nthe ear reference point to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+          "span_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "acceptance_criterion",
+            "exact_text": "to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+            "span_indices": [
+              2,
+              3,
+              4,
+              5
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.4.3.3",
+      "kind": "clause",
+      "ordinal": 17,
+      "clause_reference": "5.5.4.4.3.3",
+      "heading": "5.5.4.4.3.3 Selection of hearing protector",
+      "statement_role": "obligation",
+      "exact_text": "5.5.4.4.3.3  Selection of hearing protector\n.  T he selection of hearing protection shall be based on noise level,\nduration of expos ure, and mission requirements (such as co mmunicatio ns, so und localization, and co mfort).",
+      "content_sha256": "e5f1f8ca6a5659d608bd8dbb9bff36b5b4bc226503e60ba0670fc94cf25c1b58",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3816,
+          "end_byte": 3859
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3899,
+          "end_byte": 3969
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3970,
+          "end_byte": 4080
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4.3",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "T he selection of hearing protection",
+          "action": "be based on noise level",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "T he selection of hearing protection shall be based on noise level,\nduration of expos ure, and mission requirements (such as co mmunicatio ns, so und localization, and co mfort).",
+          "span_indices": [
+            1,
+            2
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.4.3.4",
+      "kind": "section",
+      "ordinal": 18,
+      "clause_reference": "5.5.4.4.3.4",
+      "heading": "5.5.4.4.3.4 Communications",
+      "statement_role": "informative",
+      "exact_text": "5.5.4.4.3.4  Communications\n.",
+      "content_sha256": "1424c5be9736816d19b5d7a1c5f48a312ca7bb01096e5231df9428864eab56c5",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4088,
+          "end_byte": 4115
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4155,
+          "end_byte": 4156
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4.3"
+    },
+    {
+      "logical_id": "5.5.4.4.3.4.1",
+      "kind": "clause",
+      "ordinal": 19,
+      "clause_reference": "5.5.4.4.3.4.1",
+      "heading": "5.5.4.4.3.4.1 Communication headsets",
+      "statement_role": "governing_note",
+      "exact_text": "5.5.4.4.3.4.1\nCommunication headsets.  Co mmunicat ion hea dsets, incl uding t hose ha vi ng active noi se\ncancelling, may be used if their noise reduction properties have been characterized in accor dance with the same\nstandards used to characterize hearing protectors.",
+      "content_sha256": "4ad297e82dce9c204b5c54d2935f545ba02672ac3f7908ae1c16e6481eda6812",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4164,
+          "end_byte": 4177
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4200,
+          "end_byte": 4292
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4293,
+          "end_byte": 4405
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4406,
+          "end_byte": 4456
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4.3.4",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Co mmunicat ion hea dsets",
+          "action": "be used",
+          "modality": "may",
+          "polarity": "affirmative",
+          "exact_text": "Co mmunicat ion hea dsets, incl uding t hose ha vi ng active noi se\ncancelling, may be used if their noise reduction properties have been characterized in accor dance with the same\nstandards used to characterize hearing protectors.",
+          "span_indices": [
+            1,
+            2,
+            3
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "if their noise reduction properties have been characterized in accor dance with the same\nstandards used to characterize hearing protectors.",
+            "span_indices": [
+              2,
+              3
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [
+          "Permission ('may'), not classified as an obligation."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.5.4.4.3.4.2",
+      "kind": "clause",
+      "ordinal": 20,
+      "clause_reference": "5.5.4.4.3.4.2",
+      "heading": "5.5.4.4.3.4.2 Communication through earplugs",
+      "statement_role": "obligation",
+      "exact_text": "5.5.4.4.3.4.2\nCommunication  through earplugs.  Where both earplugs and co mmunicatio ns are required,\ncommunication signal must be able to pass through earplugs\n.",
+      "content_sha256": "1fa013ff2567b76df664a5f3228ded36ee015026da992e8da8fd4709fcf2d53e",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4464,
+          "end_byte": 4477
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4500,
+          "end_byte": 4588
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4589,
+          "end_byte": 4647
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4667,
+          "end_byte": 4668
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.5.4.4.3.4",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "communication signal",
+          "action": "be able to pass through earplugs",
+          "modality": "must",
+          "polarity": "affirmative",
+          "exact_text": "communication signal must be able to pass through earplugs\n.",
+          "span_indices": [
+            2,
+            3
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "Where both earplugs and co mmunicatio ns are required,",
+            "span_indices": [
+              1
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "source_logical_id": "1.3",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 776,
+          "end_byte": 792
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 146,
+          "end_byte": 156
+        }
+      ],
+      "target_logical_id": "1.1"
+    },
+    {
+      "source_logical_id": "1.3",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 1054,
+          "end_byte": 1064
+        }
+      ],
+      "target_reference": "JSSG-2010 crew systems (joint service specification guide; not in the a7 MIL-STD page-text corpus)"
+    },
+    {
+      "source_logical_id": "5.5.4",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1242,
+          "end_byte": 1278
+        },
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 776,
+          "end_byte": 792
+        }
+      ],
+      "target_logical_id": "1.3"
+    },
+    {
+      "source_logical_id": "5.5.4.1",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1286,
+          "end_byte": 1302
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1242,
+          "end_byte": 1278
+        }
+      ],
+      "target_logical_id": "5.5.4"
+    },
+    {
+      "source_logical_id": "5.5.4.2",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1834,
+          "end_byte": 1859
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1242,
+          "end_byte": 1278
+        }
+      ],
+      "target_logical_id": "5.5.4"
+    },
+    {
+      "source_logical_id": "5.5.4.3",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2024,
+          "end_byte": 2134
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1242,
+          "end_byte": 1278
+        }
+      ],
+      "target_logical_id": "5.5.4"
+    },
+    {
+      "source_logical_id": "5.5.4.3/total-system-noise",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2062,
+          "end_byte": 2123
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2024,
+          "end_byte": 2134
+        }
+      ],
+      "target_logical_id": "5.5.4.3"
+    },
+    {
+      "source_logical_id": "5.5.4.3/gfe-no-relief",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2125,
+          "end_byte": 2134
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2024,
+          "end_byte": 2134
+        }
+      ],
+      "target_logical_id": "5.5.4.3"
+    },
+    {
+      "source_logical_id": "5.5.4.4",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2345,
+          "end_byte": 2370
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 1242,
+          "end_byte": 1278
+        }
+      ],
+      "target_logical_id": "5.5.4"
+    },
+    {
+      "source_logical_id": "5.5.4.4.1",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2378,
+          "end_byte": 2474
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2345,
+          "end_byte": 2370
+        }
+      ],
+      "target_logical_id": "5.5.4.4"
+    },
+    {
+      "source_logical_id": "5.5.4.4.2",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2753,
+          "end_byte": 2863
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2345,
+          "end_byte": 2370
+        }
+      ],
+      "target_logical_id": "5.5.4.4"
+    },
+    {
+      "source_logical_id": "5.5.4.4.3",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2985,
+          "end_byte": 3015
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2345,
+          "end_byte": 2370
+        }
+      ],
+      "target_logical_id": "5.5.4.4"
+    },
+    {
+      "source_logical_id": "5.5.4.4.3.1",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3023,
+          "end_byte": 3073
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2985,
+          "end_byte": 3015
+        }
+      ],
+      "target_logical_id": "5.5.4.4.3"
+    },
+    {
+      "source_logical_id": "5.5.4.4.3.1/compatible-with-hearing-protection",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3116,
+          "end_byte": 3170
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3023,
+          "end_byte": 3073
+        }
+      ],
+      "target_logical_id": "5.5.4.4.3.1"
+    },
+    {
+      "source_logical_id": "5.5.4.4.3.1/accommodate-wearing",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3287,
+          "end_byte": 3289
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3023,
+          "end_byte": 3073
+        }
+      ],
+      "target_logical_id": "5.5.4.4.3.1"
+    },
+    {
+      "source_logical_id": "5.5.4.4.3.2",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3495,
+          "end_byte": 3563
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2985,
+          "end_byte": 3015
+        }
+      ],
+      "target_logical_id": "5.5.4.4.3"
+    },
+    {
+      "source_logical_id": "5.5.4.4.3.3",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3816,
+          "end_byte": 3859
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2985,
+          "end_byte": 3015
+        }
+      ],
+      "target_logical_id": "5.5.4.4.3"
+    },
+    {
+      "source_logical_id": "5.5.4.4.3.4",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4088,
+          "end_byte": 4115
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2985,
+          "end_byte": 3015
+        }
+      ],
+      "target_logical_id": "5.5.4.4.3"
+    },
+    {
+      "source_logical_id": "5.5.4.4.3.4.1",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4164,
+          "end_byte": 4177
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4088,
+          "end_byte": 4115
+        }
+      ],
+      "target_logical_id": "5.5.4.4.3.4"
+    },
+    {
+      "source_logical_id": "5.5.4.4.3.4.2",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4464,
+          "end_byte": 4477
+        },
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4088,
+          "end_byte": 4115
+        }
+      ],
+      "target_logical_id": "5.5.4.4.3.4"
+    },
+    {
+      "source_logical_id": "5.5.4.2",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2002,
+          "end_byte": 2016
+        }
+      ],
+      "target_reference": "MIL-STD-1474 (no revision cited; see reviewed cross-package binding)"
+    },
+    {
+      "source_logical_id": "5.5.4.3/total-system-noise",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2110,
+          "end_byte": 2123
+        }
+      ],
+      "target_reference": "MIL-STD-1474 (no revision cited; see reviewed cross-package binding)"
+    },
+    {
+      "source_logical_id": "5.5.4.4.1",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 2667,
+          "end_byte": 2681
+        }
+      ],
+      "target_reference": "MIL-STD-1474 (no revision cited; see reviewed cross-package binding)"
+    },
+    {
+      "source_logical_id": "5.5.4.4.3.1/compatible-with-hearing-protection",
+      "relationship_type": "references",
+      "target_status": "out_of_scope",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 3275,
+          "end_byte": 3285
+        }
+      ],
+      "target_reference": "MIL-STD-1472H 6.2 acquisition requirements (outside the reviewed scope)"
+    }
+  ],
+  "unsupported_regions": [
+    {
+      "region_id": "page-0018-unreviewed-01",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 110,
+          "end_byte": 124
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0018-unreviewed-02",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 125,
+          "end_byte": 135
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0018-unreviewed-03",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 350,
+          "end_byte": 765
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0018-unreviewed-04",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 1751,
+          "end_byte": 6172
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0018-unreviewed-05",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 6370,
+          "end_byte": 6382
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0018-unreviewed-06",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 6529,
+          "end_byte": 6589
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0018-unreviewed-07",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 18,
+          "page_text_sha256": "645408718329faaf7a6cf455bc26a3ba992db49432240e4f0ca895cb31ebc65f",
+          "start_byte": 6718,
+          "end_byte": 6971
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0182-unreviewed-01",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 78,
+          "end_byte": 92
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0182-unreviewed-02",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 100,
+          "end_byte": 1234
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0182-unreviewed-03",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 182,
+          "page_text_sha256": "73b882294453590af239cf01c0c9861145305efb12a7458ada47cd7ff0d5d2c2",
+          "start_byte": 4758,
+          "end_byte": 4979
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    }
+  ]
+}
