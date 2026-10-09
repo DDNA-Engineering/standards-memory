@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import shutil
+import sqlite3
 import sys
 import tempfile
 import unittest
@@ -28,7 +29,7 @@ from standardsforge.handoff import (  # noqa: E402
     validate_handoff_bundle,
 )
 from standardsforge.service import StandardsForgeService  # noqa: E402
-from standardsforge.store import LocalStore  # noqa: E402
+from standardsforge.store import SCHEMA_VERSION, LocalStore  # noqa: E402
 from validate_contracts import (  # noqa: E402
     check_schema_documents,
     load_schemas,
@@ -312,6 +313,109 @@ class EngineeringHandoffTests(unittest.TestCase):
         self.assertEqual("standardsforge_source_first_handoff_bundle", result["artifact_type"])
         self.assertEqual("candidate_unapproved", result["status"])
         validate_handoff_bundle(output)
+
+    def test_unresolved_structural_relationships_reach_bundle_and_reader(self) -> None:
+        span = {
+            "path": "sources/example-spec-100a.txt",
+            "sha256": "b" * 64,
+            "text_path": "sources/example-spec-100a.txt",
+            "text_sha256": "b" * 64,
+            "physical_page": 1,
+            "start_byte": 0,
+            "end_byte": 10,
+            "quote_sha256": "d" * 64,
+        }
+
+        def relationship(kind: str, status: str, **target: object) -> dict:
+            return {
+                "relationship": kind,
+                "target_status": status,
+                "target_logical_id": target.get("logical_id"),
+                "target_locator": target.get("locator"),
+                "candidate_logical_ids": list(target.get("candidates", [])),
+                "required": status == "resolved",
+                "method": "review",
+                "review_status": "agent_reviewed",
+                "evidence_spans": [span],
+            }
+
+        original = StandardsForgeService.get_clause
+
+        def with_structure(service, *args, **kwargs):
+            packet = original(service, *args, **kwargs)
+            packet["evidence"][0]["structure"] = {
+                "logical_id": "example:spec-100:4.2.1",
+                "content_sha256": "d" * 64,
+                "parent_logical_id": None,
+                "ordinal": 1,
+                "source_spans": [span],
+                "relationships": [
+                    relationship("governed_by", "resolved", logical_id="example:spec-100:note"),
+                    relationship("references", "unresolved", locator="Annex Z"),
+                    relationship("references", "out_of_scope", locator="MIL-STD-810H Method 506.6"),
+                    relationship("qualifies", "ambiguous", candidates=["example:a", "example:b"]),
+                ],
+            }
+            return packet
+
+        with patch.object(StandardsForgeService, "get_clause", new=with_structure):
+            first, _ = self._export("unresolved-one")
+            second, _ = self._export("unresolved-two")
+        for name in ("evidence-handoff.json", "reader.html", "manifest.json"):
+            self.assertEqual((first / name).read_bytes(), (second / name).read_bytes())
+        validate_handoff_bundle(first)
+
+        handoff = json.loads((first / "evidence-handoff.json").read_text(encoding="utf-8"))
+        source = "source_record_id: clause-4.2.1; source_logical_id: example:spec-100:4.2.1"
+        expected = [
+            f"relationship qualifies target_status: ambiguous ({source}; candidate_logical_ids: example:a, example:b)",
+            f"relationship references target_status: out_of_scope ({source}; target_locator: MIL-STD-810H Method 506.6)",
+            f"relationship references target_status: unresolved ({source}; target_locator: Annex Z)",
+        ]
+        self.assertEqual(expected, handoff["unresolved_evidence_issues"])
+        self.assertFalse(any("governed_by" in issue for issue in handoff["unresolved_evidence_issues"]))
+
+        reader = (first / "reader.html").read_text(encoding="utf-8")
+        limits_panel = reader.split("<h2>Coverage and limits</h2>", 1)[1].split("</section>", 1)[0]
+        for issue in expected:
+            self.assertIn(issue, limits_panel)
+
+    def test_export_opens_existing_state_read_only_without_creating_or_migrating(self) -> None:
+        missing_db = self.base / "absent" / "memory.db"
+        missing_store = self.base / "absent-objects"
+        output = self.base / "never-written"
+        with self.assertRaises(StandardsForgeError) as caught:
+            export_engineering_handoff(
+                missing_db,
+                missing_store,
+                self.package_digest,
+                "local-user",
+                self.candidate,
+                output,
+                record_id="clause-4.2.1",
+            )
+        self.assertEqual("store_not_initialized", caught.exception.code)
+        for path in (missing_db.parent, missing_store, output):
+            self.assertFalse(path.exists(), path)
+
+        with sqlite3.connect(self.db) as connection:
+            connection.execute(
+                "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
+                (str(SCHEMA_VERSION - 1),),
+            )
+        connection.close()
+        before = self.db.read_bytes()
+        with self.assertRaises(StandardsForgeError) as caught:
+            self._export("old-schema")
+        self.assertEqual("schema_migration_required", caught.exception.code)
+        self.assertEqual(before, self.db.read_bytes())
+        self.assertFalse((self.base / "old-schema").exists())
+        with sqlite3.connect(self.db) as connection:
+            version = connection.execute(
+                "SELECT value FROM metadata WHERE key = 'schema_version'"
+            ).fetchone()[0]
+        connection.close()
+        self.assertEqual(str(SCHEMA_VERSION - 1), version)
 
 
 if __name__ == "__main__":

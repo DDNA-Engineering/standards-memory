@@ -18,7 +18,7 @@ flowchart LR
     Verify --> Evidence["Return evidence + coverage + limits"]
 ```
 
-Query paths do not download documents, execute pack content, call a model, or grant access from imported rights claims. Published a6 includes automated `outline-v3` and bounded reviewed 1661 recovery. The [unreleased knowledge-access work](../KNOWLEDGE_ACCESS.md) adds corpus-wide automated `outline-v4`, structural navigation and measured profile selection. Automated outlines remain distinct from a reviewed obligation graph.
+Query paths do not download documents, execute pack content, call a model, or grant access from imported rights claims. The published a7 prepared library retains the a6 content baseline: automated `outline-v3` and bounded reviewed 1661 recovery. The a7 runtime adds [structural navigation, measured profile selection](../KNOWLEDGE_ACCESS.md), reviewed-reference navigation and original PDF delivery. Corpus-wide automated outline compilation (`outline-v4`, now compiler 0.5.0 `outline-v5`) exists in source but its packages are unpublished. Automated outlines remain distinct from a reviewed obligation graph.
 
 ## Evidence layers
 

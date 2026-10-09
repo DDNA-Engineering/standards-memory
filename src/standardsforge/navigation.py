@@ -18,14 +18,16 @@ def browse_records(service: Any, package_digest: str, principal_id: str, *,
                    kind: str | None = None, scope_prefix: str | None = None,
                    limit: int = 50, cursor: str | None = None,
                    max_bytes: int | None = None) -> dict[str, Any]:
-    from .service import _RequestVerificationContext
+    from .service import _RequestVerificationContext, _utf8_text
 
     service._validate_package_digest(package_digest)
     require(relation in RELATIONS, "invalid_relation", "Unsupported navigation relation.")
     require(type(limit) is int and 1 <= limit <= 100, "invalid_limit", "Record limit must be from 1 to 100.")
     for name, value in (("record_id", record_id), ("kind", kind), ("scope_prefix", scope_prefix)):
-        require(value is None or isinstance(value, str) and 0 < len(value) <= 512 and bool(value.strip()),
-                "invalid_selector", f"{name} must be bounded nonempty text when supplied.")
+        require(value is None or _utf8_text(value) and 0 < len(value) <= 512 and bool(value.strip()),
+                "invalid_selector", f"{name} must be bounded nonempty UTF-8 text when supplied.")
+    # Scope matches search and enumerate_obligations: surrounding whitespace is not part of the prefix.
+    scope_prefix = None if scope_prefix is None else scope_prefix.strip()
     require(kind is None or re.fullmatch(r"[a-z_]{1,64}", kind) is not None,
             "invalid_kind", "Record kind must be a lowercase kind identifier.")
     require((record_id is None) == (relation in {"all", "roots"}), "invalid_selector",

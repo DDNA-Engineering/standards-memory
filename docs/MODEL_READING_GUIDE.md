@@ -2,13 +2,13 @@
 
 StandardsForge returns source-linked evidence. It does not decide whether a document applies to a project or whether a design complies. A model using the tools should follow this sequence.
 
-The published `v0.1.0a6` prepared archive contains 441 packages, including the automated MIL-STD-810H `outline-v3` and the separately qualified 1661 recovery packs. Unreleased navigation, measured profile selection and corpus-wide `outline-v4` work are described in [knowledge access](KNOWLEDGE_ACCESS.md). A verified citation establishes an exact source match, not a reviewed interpretation or complete requirements graph.
+The published `v0.1.0a7` prepared archive contains 441 packages, including the automated MIL-STD-810H `outline-v3` and the separately qualified 1661 recovery packs; its content baseline is unchanged from a6. The a7 runtime exposes eleven read tools, including structural navigation, measured evidence selection, reviewed-reference navigation and original PDF delivery; see [knowledge access](KNOWLEDGE_ACCESS.md). Corpus-wide `outline-v4` packages remain unpublished. A verified citation establishes an exact source match, not a reviewed interpretation or complete requirements graph.
 
 ## Connect a prepared Windows distribution
 
-On 64-bit Windows with CPython 3.12, run `setup.ps1` once from the extracted distribution. The setup verifies the archive manifest, installs the bundled core and exact hash-locked MCP dependency wheelhouse without network access, installs every bundled pack, and performs a real MCP stdio smoke test. Then configure the model host with an absolute launcher path so startup does not depend on the host's working directory.
+On 64-bit Windows with CPython 3.12, double-click `setup.cmd` (or run `setup.ps1`) once from the extracted distribution. The setup verifies the archive manifest, installs the bundled core and exact hash-locked MCP dependency wheelhouse without network access, installs every bundled pack, and performs a real MCP stdio smoke test. It then writes `.standardsforge/mcp-config.json` and `.standardsforge/codex-mcp.toml` with absolute paths that launch `.venv\Scripts\python.exe -I run_mcp.py`; merge the generated entry into the model host so startup does not depend on the host's working directory.
 
-Claude Desktop and Cursor use the same `mcpServers` shape (Cursor stores it in `.cursor/mcp.json`):
+The optional `standardsforge-mcp.ps1` wrapper remains available for existing Windows host conventions. Claude Desktop and Cursor use the same `mcpServers` shape (Cursor stores it in `.cursor/mcp.json`):
 
 ```json
 {
@@ -37,32 +37,26 @@ The launcher fixes the principal to `local-user` and anchors the database and pa
 
 ## Connect a prepared Linux or macOS distribution
 
-Run `sh ./setup.sh` once in the extracted distribution to install the bundled core and corpus offline. POSIX MCP is a separate, explicit networked code channel: create an environment outside the prepared directory, then install `standardsforge[mcp]==0.1.0a6` from PyPI. PyPI does not contain or fetch the prepared corpus.
-
-Start the installed module with absolute paths to the distribution-local state:
+With CPython 3.11+ and `venv`, run this once in the extracted distribution:
 
 ```sh
-MCP_VENV=/absolute/path/to/standardsforge-mcp-venv
-PREPARED_ROOT=/absolute/path/to/standardsforge-ready-0.1.0a6
-python3 -m venv "$MCP_VENV"
-"$MCP_VENV/bin/python" -m pip install "standardsforge[mcp]==0.1.0a6"
-"$MCP_VENV/bin/python" -I -m standardsforge.mcp_server \
-  --db "$PREPARED_ROOT/.standardsforge/memory.db" \
-  --store "$PREPARED_ROOT/.standardsforge/objects" \
-  --principal local-user \
-  --result-mode structured_only
+sh ./setup.sh --mcp-online
 ```
 
-Keep the MCP environment outside the closed prepared directory. The network is needed for the PyPI code/dependency install, not for corpus setup or query. Model-host configuration must preserve the absolute database, object-store, and principal arguments above.
+The bundled core wheel and corpus install offline. Only this explicit option downloads the MCP dependencies, into the distribution-owned `.venv`; PyPI does not contain or fetch the prepared corpus. Setup makes a real stdio query, then writes `.standardsforge/mcp-config.json` and `.standardsforge/codex-mcp.toml` with absolute paths that launch `.venv/bin/python -I run_mcp.py`. Merge the generated entry into the model host. The launcher fixes the principal and distribution-local state and rejects overrides. `sh ./setup.sh` without the option remains offline and terminal-only. See the [prepared library guide](wiki/PREPARED_LIBRARY.md) and [model integration](wiki/MODEL_INTEGRATION.md#connect-your-model-host).
+
+The prepared launcher configures no reviewed reference bindings or tokenizer: `follow_references` returns `reference_bindings_not_configured` and token-budgeted `select_evidence` returns `tokenizer_unavailable`. See [known limitations](RELEASE_0.1.0a7.md#known-limitations).
 
 ## Required tool sequence
 
 1. If the exact installed identifier is unknown, call `list_documents`; treat its authorized inventory and declared coverage as discovery, not applicability or baseline approval.
-2. Resolve the exact document identifier, edition, and representation. Keep the returned package digest as the immutable pin for the rest of the task.
-3. Use `search` only to discover candidate records. Prefer `natural_language` for a prose question and inspect its disclosed effective terms and selected strict or relaxed strategy. Each hit carries its identifier, edition ID, and package digest, but search rank is not applicability, normative status, or complete coverage. Use document inventory and exact resolution for identifiers.
-4. Replay a selected result's evidence selector through `get_clause`, or use `build_context` for multiple selected records. Base answers on exact retrieved text and returned required context, not the search snippet.
+2. Resolve the exact document identifier, edition, and representation with `resolve_document`. Keep the returned package digest as the immutable pin for the rest of the task.
+3. Use `search` only to discover candidate records. Prefer `natural_language` for a prose question and inspect its disclosed effective terms and selected strict or relaxed strategy; use `concept_language` when wording differs and treat its disclosed alternatives as discovery hints. Each hit carries its identifier, edition ID, and package digest, but search rank is not applicability, normative status, or complete coverage. Use `browse_records` for roots, children, parents, adjacent records and incoming or outgoing links, including unclassified records.
+4. Replay a selected result's evidence selector through `get_clause`, use `build_context` for multiple selected records, or use `select_evidence` for one record's smallest measured lossless packet. Base answers on exact retrieved text and returned required context, not the search snippet.
 5. Read coverage, derivation status, relationships, citations, and limitations before answering. Preserve unresolved dependencies and unsupported regions.
 6. Use `enumerate_obligations` only for packs that explicitly classify obligations. Zero returned rows does not mean zero requirements when classification or source interpretation is incomplete.
+7. Use `follow_references` only when the host configured a reviewed binding artifact, and `diff_editions` only for an explicit comparison of installed editions.
+8. Call `get_source_pdfs` for each distinct cited package and link the returned verified local PDFs; report `no_pdf_sources` or a verification failure instead of guessing a path.
 
 ## Representation meaning
 

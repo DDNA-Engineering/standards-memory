@@ -2,7 +2,7 @@
 
 These workflows rebuild or refresh artifacts. They are not required to use the prepared offline library.
 
-The published `v0.1.0a5` asset is frozen: it carries the 7,788-record `outline-v1` pack. This checkout's later `outline-v3` and reviewer workflows are source-only until a newly versioned distribution passes the full qualification and publication gates. Do not rebuild or overwrite `0.1.0a5` from later source.
+Published assets are frozen. The current `v0.1.0a7` prepared archive carries the a6 content baseline: 438 page-text packs, the 8,319-record `outline-v3` pack and two MIL-STD-1661 recovery packs. The earlier `v0.1.0a5` asset carries the 7,788-record `outline-v1` pack. Corpus-wide `outline-v4`/`outline-v5` packages and later reviewer outputs are source-only until a newly versioned distribution passes the full qualification and publication gates. Do not rebuild or overwrite any published version from later source.
 
 Run them from the repository root in an isolated environment. Source acquisition and generated corpus state live under ignored `.standardsforge/` paths.
 
@@ -181,4 +181,4 @@ Do not add acquired PDFs or generated packs to Git. Distribution Statement A doe
 See [validation and releases](VALIDATION_AND_RELEASES.md) before publishing anything.
 
 
-For the unified a6 prepared release, pass `--recovery-directory` with the qualified 1661 supplement to `build_prepared_distribution.py`. The builder revalidates both recovery packs, trusted policies, complete real-suite results against the bundled wheel, membership in the source corpus, and semantic coverage. Both portable and Windows MCP setup install the recovery packs and replay all three suites before readiness. Prepared-release acceptance supports an explicit draft-candidate run before public publication.
+For the unified prepared release (a6 and later), pass `--recovery-directory` with the qualified 1661 supplement to `build_prepared_distribution.py`. The builder revalidates both recovery packs, trusted policies, complete real-suite results against the bundled wheel, membership in the source corpus, and semantic coverage. Both portable and Windows MCP setup install the recovery packs and replay all three suites before readiness. Prepared-release acceptance supports an explicit draft-candidate run before public publication.

@@ -65,7 +65,7 @@ def _parser() -> argparse.ArgumentParser:
     select.add_argument("--max-bytes", type=int)
 
     doctor = commands.add_parser("doctor", help="Read-only: diagnose local runtime and installed-state readiness")
-    doctor.add_argument("--policy", help="Trusted local operator policy to compare with installed grants")
+    doctor.add_argument("--policy", action="append", help="Trusted local operator policy to compare with installed grants; repeat when the principal holds grants from several policies")
     doctor.add_argument("--principal", help="Principal whose active grants must be ready")
     doctor.add_argument("--full-integrity", action="store_true", help="Validate every installed package instead of one deterministic package")
     doctor.add_argument("--require-mcp", action="store_true", help="Treat the optional MCP dependency as required")
@@ -343,6 +343,18 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def _run(args: argparse.Namespace) -> dict[str, Any]:
+    principal = getattr(args, "principal", None)
+    if principal is not None and args.command != "doctor":
+        # Policies and grants keep principals byte-exact; doctor reports this as a check instead.
+        require(
+            bool(principal.strip()) and principal == principal.strip(),
+            "invalid_principal",
+            "The principal must be non-empty without leading or trailing whitespace.",
+        )
+        try:
+            principal.encode("utf-8")
+        except UnicodeEncodeError as exc:
+            raise StandardsForgeError("invalid_principal", "The principal must be encodable UTF-8 text.") from exc
     if args.command == "export-tokenizer":
         from .tokenization import export_tokenizer
         return export_tokenizer(args.encoding, args.destination)
@@ -472,9 +484,11 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
             clause_reference=args.clause_reference,
             record_id=args.record_id,
         )
+    if args.command == "verify-pack":
+        return StandardsForgeService.verify_pack(args.source)
     service = (
         StandardsForgeService(Path(args.db), Path(args.store))
-        if args.command in {"install", "revoke", "verify-pack"}
+        if args.command in {"install", "revoke"}
         else StandardsForgeService.open_read_only(Path(args.db), Path(args.store))
     )
     require(bool(args.tokenizer_artifact) == bool(args.tokenizer_sha256), "invalid_tokenizer", "Tokenizer artifact and SHA-256 must be supplied together.")
@@ -502,8 +516,6 @@ def _run(args: argparse.Namespace) -> dict[str, Any]:
     if args.command == "select-evidence":
         return service.select_evidence(args.package_digest, args.record_id, args.principal,
                                        max_tokens=args.max_tokens, max_bytes=args.max_bytes)
-    if args.command == "verify-pack":
-        return service.verify_pack(args.source)
     if args.command == "install":
         return service.install_pack(args.source, args.policy)
     if args.command == "resolve":

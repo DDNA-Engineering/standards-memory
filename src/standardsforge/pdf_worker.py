@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
+import io
 import json
 import os
 import re
@@ -94,12 +94,27 @@ def _load_request(path: Path) -> tuple[dict[str, Any], ParserLimits, str]:
     return request, limits, sha256_bytes(raw)
 
 
-def _source_digest(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as source:
-        while chunk := source.read(1024 * 1024):
-            digest.update(chunk)
-    return digest.hexdigest()
+def _read_verified_source(path: Path, source: dict[str, Any], limits: ParserLimits) -> bytes:
+    """Read the source once and verify its identity on the bytes in memory.
+
+    The parser consumes exactly these bytes, so a writer that replaces the
+    file after verification cannot change what is parsed.
+    """
+    try:
+        if not path.is_file() or path.is_symlink():
+            raise WorkerFailure("parser_source_changed", "source_verify")
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0)
+        descriptor = os.open(path, flags)
+        with os.fdopen(descriptor, "rb") as handle:
+            size = os.fstat(handle.fileno()).st_size
+            if size != source["bytes"] or size > limits.source_bytes:
+                raise WorkerFailure("parser_source_changed", "source_verify")
+            data = handle.read(limits.source_bytes + 1)
+    except OSError as exc:
+        raise WorkerFailure("parser_source_changed", "source_verify") from exc
+    if len(data) != source["bytes"] or len(data) > limits.source_bytes or sha256_bytes(data) != source["sha256"]:
+        raise WorkerFailure("parser_source_changed", "source_verify")
+    return data
 
 
 def _write_error(output: Path, failure: WorkerFailure) -> None:
@@ -126,18 +141,7 @@ def _extract(request_path: Path, source_path: Path, output: Path) -> None:
         raise WorkerFailure("parser_protocol_error", "startup")
     _apply_posix_limits(limits)
     source = request["source"]
-    try:
-        stat = source_path.stat()
-    except OSError as exc:
-        raise WorkerFailure("parser_source_changed", "source_verify") from exc
-    if (
-        not source_path.is_file()
-        or source_path.is_symlink()
-        or stat.st_size != source["bytes"]
-        or stat.st_size > limits.source_bytes
-        or _source_digest(source_path) != source["sha256"]
-    ):
-        raise WorkerFailure("parser_source_changed", "source_verify")
+    source_data = _read_verified_source(source_path, source, limits)
 
     try:
         import fontTools
@@ -147,7 +151,9 @@ def _extract(request_path: Path, source_path: Path, output: Path) -> None:
     if pypdf.__version__ != PYPDF_VERSION or fontTools.__version__ != FONTTOOLS_VERSION:
         raise WorkerFailure("unsupported_compiler_dependency", "startup")
     try:
-        reader = pypdf.PdfReader(source_path, strict=True)
+        reader = pypdf.PdfReader(io.BytesIO(source_data), strict=True)
+    except MemoryError as exc:
+        raise WorkerFailure("parser_memory_limit_exceeded", "reader") from exc
     except Exception as exc:
         raise WorkerFailure("invalid_pdf", "reader") from exc
     encryption_status = "not_encrypted"
@@ -156,6 +162,8 @@ def _extract(request_path: Path, source_path: Path, output: Path) -> None:
             raise WorkerFailure("encrypted_pdf", "reader")
         try:
             decrypted = reader.decrypt("")
+        except MemoryError as exc:
+            raise WorkerFailure("parser_memory_limit_exceeded", "reader") from exc
         except Exception as exc:
             raise WorkerFailure("encrypted_pdf", "reader") from exc
         if not decrypted:
@@ -163,6 +171,8 @@ def _extract(request_path: Path, source_path: Path, output: Path) -> None:
         encryption_status = "empty_password_decrypted_for_extraction"
     try:
         page_count = len(reader.pages)
+    except MemoryError as exc:
+        raise WorkerFailure("parser_memory_limit_exceeded", "metadata") from exc
     except Exception as exc:
         raise WorkerFailure("invalid_pdf", "metadata") from exc
     if page_count < 1 or page_count > limits.pages:

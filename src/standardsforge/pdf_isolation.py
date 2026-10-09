@@ -11,7 +11,7 @@ import sys
 import sysconfig
 import tempfile
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator
 
@@ -37,6 +37,10 @@ class ParsedPage:
     content_stream_bytes: int
     text_characters: int
     text_layer_status: str
+    # The exact page bytes the parent validated against ``sha256``. Callers
+    # must consume these instead of re-reading ``path`` so that the bytes
+    # they compile are the bytes that were verified.
+    data: bytes = field(default=b"", repr=False, compare=False)
 
 
 @dataclass(frozen=True)
@@ -61,6 +65,16 @@ _WORKER_ERROR_MESSAGES = {
     "parser_output_limit_exceeded": "The parser worker exceeded an output limit.",
 }
 
+_ENCRYPTION_STATUSES = {
+    "reject": frozenset({"not_encrypted"}),
+    "empty_password_only": frozenset({"not_encrypted", "empty_password_decrypted_for_extraction"}),
+}
+
+# Evaluated once so tests can exercise the Windows control flow on any host
+# without changing ``os.name`` for unrelated modules.
+_IS_WINDOWS = os.name == "nt"
+_STARTUP_ABORT_SECONDS = 10
+
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -82,18 +96,108 @@ def _is_regular_unlinked(path: Path) -> bool:
     return not bool(attributes & reparse)
 
 
+def _read_bounded(path: Path, limit: int) -> bytes | None:
+    """Read a regular, non-symlink file of at most ``limit`` bytes.
+
+    The size is checked on the opened descriptor before any content is read,
+    and the read itself is bounded, so an oversized or growing file can never
+    be loaded into parent memory. Returns ``None`` when the file is unsafe,
+    missing, or larger than ``limit``.
+    """
+    if not _is_regular_unlinked(path):
+        return None
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0)
+    try:
+        descriptor = os.open(path, flags)
+    except OSError:
+        return None
+    try:
+        value = os.fstat(descriptor)
+        if not stat.S_ISREG(value.st_mode) or value.st_size > limit:
+            return None
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
+            data = handle.read(limit + 1)
+    except OSError:
+        return None
+    finally:
+        os.close(descriptor)
+    if len(data) > limit:
+        return None
+    return data
+
+
+def _kill_group(process: subprocess.Popen[bytes]) -> None:
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass  # The group is already empty.
+    except PermissionError:
+        # macOS reports EPERM for a group holding only zombies. A live member
+        # under this user's identity is always signalable, and the worker has
+        # no privilege to change identity, so nothing can survive here.
+        pass
+
+
 def _kill_process(process: subprocess.Popen[bytes], job: object | None) -> None:
-    if os.name == "nt":
+    """Kill the worker and every process left in its isolation boundary.
+
+    On POSIX the worker leads its own session, so the process group is
+    signalled even when the leader has already exited: a descendant forked by
+    a compromised parser must not outlive the call or touch the output
+    directory after the parent validates it.
+    """
+    if _IS_WINDOWS:
         if job is not None:
             job.terminate()
         else:
             process.kill()
     else:
-        try:
-            os.killpg(process.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
+        _kill_group(process)
     process.wait()
+
+
+def _abort_startup(process: subprocess.Popen[bytes], job: object | None) -> None:
+    """Stop a worker whose limits could not be installed.
+
+    The worker blocks on stdin until the parent releases it. If the Windows
+    Job Object was created but assignment failed, terminating the job is a
+    no-op, so the process itself is killed and stdin is closed so the worker
+    can never wait forever on its start byte.
+    """
+    try:
+        if process.stdin is not None:
+            process.stdin.close()
+    except OSError:
+        pass
+    if _IS_WINDOWS:
+        if job is not None:
+            try:
+                job.terminate()
+            except OSError:
+                pass
+        try:
+            process.kill()
+        except OSError:
+            pass
+    else:
+        _kill_group(process)
+    try:
+        process.wait(timeout=_STARTUP_ABORT_SECONDS)
+    except subprocess.TimeoutExpired:
+        pass
+
+
+def _dependency_roots() -> list[str]:
+    roots: list[str] = []
+    paths = sysconfig.get_paths()
+    for name in ("purelib", "platlib"):
+        value = paths.get(name)
+        if not value:
+            continue
+        resolved = str(Path(value).resolve())
+        if resolved not in roots:
+            roots.append(resolved)
+    return roots
 
 
 def _start_worker(
@@ -103,10 +207,13 @@ def _start_worker(
     limits: ParserLimits,
 ) -> tuple[subprocess.Popen[bytes], object | None]:
     package_root = Path(__file__).resolve().parents[1]
-    dependency_root = Path(sysconfig.get_path("purelib")).resolve()
+    # Both purelib and platlib are needed: platform wheels such as fontTools
+    # install into platlib, which differs from purelib on some layouts.
+    dependency_roots = _dependency_roots()
     bootstrap = (
         "import runpy,sys;"
-        "sys.path[:0]=[sys.argv.pop(1),sys.argv.pop(1)];"
+        "n=int(sys.argv.pop(1));"
+        "sys.path[:0]=[sys.argv.pop(1) for _ in range(n)];"
         "runpy.run_module('standardsforge.pdf_worker',run_name='__main__')"
     )
     # Windows virtual-environment launchers may create a second interpreter
@@ -115,7 +222,7 @@ def _start_worker(
     # the worker independent of user site packages and .pth startup hooks.
     executable = (
         str(Path(getattr(sys, "_base_executable", sys.executable)).resolve())
-        if os.name == "nt"
+        if _IS_WINDOWS
         else sys.executable
     )
     command = [
@@ -124,8 +231,9 @@ def _start_worker(
         "-S",
         "-c",
         bootstrap,
+        str(1 + len(dependency_roots)),
         str(package_root),
-        str(dependency_root),
+        *dependency_roots,
         "--request",
         str(request_path),
         "--source",
@@ -133,7 +241,7 @@ def _start_worker(
         "--output",
         str(output),
     ]
-    creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0) if os.name == "nt" else 0
+    creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0) if _IS_WINDOWS else 0
     process = subprocess.Popen(
         command,
         stdin=subprocess.PIPE,
@@ -141,11 +249,11 @@ def _start_worker(
         stderr=subprocess.DEVNULL,
         shell=False,
         creationflags=creationflags,
-        start_new_session=os.name != "nt",
+        start_new_session=not _IS_WINDOWS,
     )
     job = None
     try:
-        if os.name == "nt":
+        if _IS_WINDOWS:
             from ._windows_job import WindowsJob
 
             job = WindowsJob(limits.process_memory_bytes, limits.cpu_seconds)
@@ -156,7 +264,7 @@ def _start_worker(
         process.stdin.close()
         return process, job
     except Exception as exc:
-        _kill_process(process, job)
+        _abort_startup(process, job)
         if job is not None:
             job.close()
         raise StandardsForgeError(
@@ -167,12 +275,12 @@ def _start_worker(
 
 
 def _load_error(output: Path) -> StandardsForgeError | None:
-    error_path = output / "error.json"
-    if not _is_regular_unlinked(error_path) or error_path.stat().st_size > WORKER_ERROR_BYTES:
+    raw = _read_bounded(output / "error.json", WORKER_ERROR_BYTES)
+    if raw is None:
         return None
     try:
-        value = json.loads(error_path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        value = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
         return None
     if (
         not isinstance(value, dict)
@@ -194,13 +302,12 @@ def _validate_output(
     request_digest: str,
     limits: ParserLimits,
 ) -> ParsedPDF:
-    result_path = output / "result.json"
-    if not _is_regular_unlinked(result_path) or result_path.stat().st_size > limits.result_bytes:
+    raw = _read_bounded(output / "result.json", limits.result_bytes)
+    if raw is None:
         raise StandardsForgeError("parser_protocol_error", "The parser worker result is missing or oversized.")
     try:
-        raw = result_path.read_bytes()
         result = json.loads(raw.decode("utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise StandardsForgeError("parser_protocol_error", "The parser worker result is invalid JSON.") from exc
     if canonical_json_bytes(result) != raw or not isinstance(result, dict) or set(result) != {
         "protocol", "limit_policy", "request_sha256", "source_sha256", "page_count",
@@ -214,6 +321,8 @@ def _validate_output(
         or result["source_sha256"] != request["source"]["sha256"]
         or result["page_count"] != request["source"]["expected_pages"]
         or result["normalization"] != request["parser"]["normalization"]
+        or not isinstance(result["encryption_status"], str)
+        or result["encryption_status"] not in _ENCRYPTION_STATUSES[request["parser"]["encryption_policy"]]
         or not isinstance(result["pages"], list)
         or len(result["pages"]) != result["page_count"]
     ):
@@ -234,7 +343,20 @@ def _validate_output(
         if name in expected_names or not _is_regular_unlinked(page_path):
             raise StandardsForgeError("parser_protocol_error", "A parser page file is missing or unsafe.")
         expected_names.add(name)
-        data = page_path.read_bytes()
+        declared = item["bytes"]
+        if type(declared) is not int or not 0 <= declared <= limits.page_text_bytes:
+            raise StandardsForgeError("parser_protocol_error", "Parser page bytes do not match their result record.")
+        try:
+            on_disk = page_path.stat().st_size
+        except OSError as exc:
+            raise StandardsForgeError("parser_protocol_error", "A parser page file is missing or unsafe.") from exc
+        if on_disk != declared:
+            raise StandardsForgeError("parser_protocol_error", "Parser page bytes do not match their result record.")
+        if aggregate + declared > limits.aggregate_text_bytes:
+            raise StandardsForgeError("parser_output_limit_exceeded", "The parser aggregate output exceeds its limit.")
+        data = _read_bounded(page_path, declared)
+        if data is None:
+            raise StandardsForgeError("parser_protocol_error", "A parser page file is missing, unsafe, or oversized.")
         try:
             decoded = data.decode("utf-8")
         except UnicodeDecodeError as exc:
@@ -250,9 +372,7 @@ def _validate_output(
         ):
             raise StandardsForgeError("parser_protocol_error", "Parser page bytes do not match their result record.")
         aggregate += len(data)
-        pages.append(ParsedPage(ordinal, page_path, len(data), item["sha256"], item["content_stream_bytes"], item["text_characters"], item["text_layer_status"]))
-    if aggregate > limits.aggregate_text_bytes:
-        raise StandardsForgeError("parser_output_limit_exceeded", "The parser aggregate output exceeds its limit.")
+        pages.append(ParsedPage(ordinal, page_path, len(data), item["sha256"], item["content_stream_bytes"], item["text_characters"], item["text_layer_status"], data))
     try:
         children = list(output.iterdir())
     except OSError as exc:
@@ -300,11 +420,15 @@ def isolated_pdf_pages(
                     "The parser worker exceeded its wall-time limit.",
                     {"limit_seconds": limits.wall_seconds, "limit_policy": LIMIT_POLICY_VERSION},
                 ) from exc
+            # The leader has exited; kill anything still in its process group
+            # (or Job Object) before any output is read, so no descendant can
+            # mutate the output after it is validated.
+            _kill_process(process, job)
             if return_code != 0:
                 failure = _load_error(output)
                 if failure is not None:
                     raise failure
-                if os.name != "nt" and return_code == -getattr(signal, "SIGXCPU", 24):
+                if not _IS_WINDOWS and return_code == -getattr(signal, "SIGXCPU", 24):
                     raise StandardsForgeError("parser_cpu_limit_exceeded", "The parser worker exceeded its CPU limit.")
                 raise StandardsForgeError(
                     "parser_worker_terminated",
@@ -312,9 +436,8 @@ def isolated_pdf_pages(
                     {"termination_reason": "resource_limit_or_crash", "limit_policy": LIMIT_POLICY_VERSION},
                 )
             parsed = _validate_output(output, request, request_digest, limits)
-            yield parsed
         finally:
-            if process.poll() is None:
-                _kill_process(process, job)
+            _kill_process(process, job)
             if job is not None:
                 job.close()
+        yield parsed

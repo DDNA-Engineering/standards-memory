@@ -113,7 +113,7 @@ Both paths generate host configuration with the actual absolute paths and prove 
 
 The prepared library is a fixed acquisition snapshot completed September 21, 2026 against the DLA ASSIST dataset marked updated September 18, 2026. The complete 438-pack inventory is in the [root README](../../README.md#complete-prepared-library-snapshot).
 
-The published archive contains 438 page-text packs from 912 verified PDFs, plus a separate automated, unreviewed 8,319-record MIL-STD-810H `outline-v3` pack. Later source-only outline and reviewer changes are not part of this frozen release. Its included `CONTENT-NOTICE.md` is frozen with that archive; the [source template](../../scripts/prepared_distribution/CONTENT-NOTICE.md) describes the notice for future builds and must not be mistaken for an update to the published asset.
+The published a7 archive contains 441 packages: 438 page-text packs from 912 verified PDFs, a separate automated, unreviewed 8,319-record MIL-STD-810H `outline-v3` pack, and two bounded MIL-STD-1661 recovery packs. This content baseline is unchanged from a6. Later source-only outline (`outline-v4`, `outline-v5`) and reviewer changes are not part of this frozen release. Its included `CONTENT-NOTICE.md` is frozen with that archive; the [source template](../../scripts/prepared_distribution/CONTENT-NOTICE.md) describes the notice for future builds and must not be mistaken for an update to the published asset.
 
 The prepared set contains every selected publicly exposed current component for those packs. Twenty-five packs are explicitly partial because their current DLA composition also includes restricted components. Restricted bytes and restricted-only records are not included.
 
@@ -121,6 +121,6 @@ Snapshot currentness does not establish a project's approved baseline, and publi
 
 ## Next steps
 
-- Learn the seven evidence operations in the [query guide](QUERY_GUIDE.md).
+- Learn the eleven evidence operations in the [query guide](QUERY_GUIDE.md).
 - Connect a local model using [MCP](MODEL_INTEGRATION.md).
 - Read the [architecture and trust boundaries](ARCHITECTURE_AND_TRUST.md).

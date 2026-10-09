@@ -1,10 +1,10 @@
 # Reviewed references and answer qualification
 
-These are local, unreleased changes after a6. The published wheel and prepared library are unchanged.
+The runtime and contracts described here were published in [0.1.0a7](RELEASE_0.1.0a7.md). The reviewed packs, `reference-bindings.json` and answer-review artifacts in the dated local evidence below remain local and unpublished; the a7 prepared library does not include them, so its launcher returns `reference_bindings_not_configured` for `follow_references` (see [known limitations](RELEASE_0.1.0a7.md#known-limitations)).
 
 ## Exact cross-standard navigation
 
-The tenth source query, `follow_references`, reads an explicitly configured, SHA-256-pinned local binding artifact. Each reviewed occurrence binds the source package, edition, record, quote and UTF-8 reference span to an exact target package, edition, record and quote, or records an unresolved target. The artifact records the reviewer and the edition-selection rationale. Its schema is [reference-bindings](../contracts/reference-bindings.schema.json).
+The tenth read operation, `follow_references` (one of eleven in a7, alongside `get_source_pdfs`), reads an explicitly configured, SHA-256-pinned local binding artifact. Each reviewed occurrence binds the source package, edition, record, quote and UTF-8 reference span to an exact target package, edition, record and quote, or records an unresolved target. The artifact records the reviewer and the edition-selection rationale. Its schema is [reference-bindings](../contracts/reference-bindings.schema.json).
 
 ```powershell
 standardsforge --reference-bindings reviewed-links.json --reference-bindings-sha256 <sha256> follow-references <source-package-sha256> <source-record-id> --principal local-user
@@ -29,9 +29,9 @@ The local form starts entirely unreviewed and sends no data. Enter a reviewer id
 
 The answer author or suite author cannot claim to be a separate reviewer under the same identity. Distinct identity strings are still provenance claims, not authenticated identity or proof of a blinded holdout. The run retains the raw suite, answers, judgments, evidence, metrics and runtime digest. A supported full-answer judgment, passing criteria and all required citations are necessary for a passing case. Missing judgments, unassessed criteria, stale submissions and changed source access cannot produce a passing result.
 
-## Local evidence from 2026-10-08
+## Local evidence from 2026-10-08 (historical record)
 
-Generated evidence is under `build/review-closure-2026-10-08/`. It is not a published release.
+Generated evidence is under `build/review-closure-2026-10-08/`. It is not a published release. The statements below record that pre-a7 local snapshot.
 
 | Selected source | New reviewed records | Classified obligations | Pages with reviewed spans |
 |---|---:|---:|---:|

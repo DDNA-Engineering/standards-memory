@@ -15,7 +15,7 @@ from .errors import StandardsForgeError, require
 from .pack import open_validated_pack, validate_pack_directory
 
 
-OUTLINE_COMPILER_VERSION = "0.4.0"
+OUTLINE_COMPILER_VERSION = "0.5.0"
 _METHOD = re.compile(
     r"(?mi)^[^\S\r\n]*(?P<label>M\s*E\s*T\s*H\s*O\s*D\s+(?P<method_number>\d+(?:\.\d+)*))[^\S\r\n]*(?:\r?\n|$)"
 )
@@ -240,6 +240,8 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
             current_context_by_component: dict[str, str] = {}
             current_parent_by_component: dict[str, str | None] = {}
             part_root_by_context: dict[tuple[str, str], str] = {}
+            # The METHOD, APPENDIX or PART node that opened each (component, context).
+            enclosing_root_by_context: dict[tuple[str, str], str] = {}
             unsupported_pages = 0
             unsupported_regions = 0
             detected = {key: 0 for key in ("method", "appendix", "part", "section", "clause", "list_item", "note", "table", "figure")}
@@ -417,9 +419,13 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
                     elif match_type == "numbered":
                         parts = label.split(".")
                         parent_reference = ".".join(parts[:-1])
-                        parent = node_by_scoped_reference.get((component, context, parent_reference)) if parent_reference else current_parent
-                        if parent is None:
-                            parent = part_root_by_context.get((component, context))
+                        if parent_reference:
+                            parent = node_by_scoped_reference.get((component, context, parent_reference))
+                            if parent is None:
+                                parent = part_root_by_context.get((component, context))
+                        else:
+                            # A top-level section is a sibling of earlier sections, never their child.
+                            parent = enclosing_root_by_context.get((component, context))
                         kind = "section" if len(parts) == 1 else "clause"
                         detected[kind] += 1
                     elif match_type == "list_item":
@@ -449,6 +455,8 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
                     )
                     if match_type == "part":
                         part_root_by_context[(component, context)] = logical_id
+                    if match_type in {"appendix", "part"} or match_type == "method" and kind == "section":
+                        enclosing_root_by_context[(component, context)] = logical_id
                     if match_type in {"appendix", "part", "numbered"} or match_type == "method" and kind == "section":
                         current_parent = logical_id
                         current_parent_by_component[component] = logical_id
@@ -488,7 +496,7 @@ def compile_derived_outline_pack(source_pack: str | Path, output_directory: str 
             }
             manifest = {
                 "schema_version": "0.1.0",
-                "pack_id": f"derived.{base.manifest['pack_id']}.outline-v4",
+                "pack_id": f"derived.{base.manifest['pack_id']}.outline-v5",
                 "document_family_id": base.manifest["document_family_id"],
                 "edition_id": base.manifest["edition_id"],
                 "publisher": base.manifest["publisher"],

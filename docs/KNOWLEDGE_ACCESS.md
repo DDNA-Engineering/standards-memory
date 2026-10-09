@@ -1,6 +1,8 @@
 # Knowledge access and compression
 
-These features are **unreleased source changes after 0.1.0a6**. The published a6 wheel and prepared distribution retain their existing seven-operation interface. Install this checkout to use the new operations; no new release is asserted.
+These runtime features were published in **0.1.0a7**, which exposes eleven read operations; see the [a7 release evidence](RELEASE_0.1.0a7.md). The a7 prepared content baseline is unchanged from a6: the corpus-wide `outline-v4` packages and the content bundle described below are not published artifacts.
+
+**Prepared-install limitation:** the prepared a7 launcher configures no tokenizer or reviewed reference bindings, and neither is bundled. There, `select_evidence` token budgets return `tokenizer_unavailable` (byte budgets work) and `follow_references` returns `reference_bindings_not_configured`. See [known limitations](RELEASE_0.1.0a7.md#known-limitations).
 
 ## Navigate before retrieving
 
@@ -73,4 +75,4 @@ python scripts/compile_corpus_outlines.py .standardsforge/corpus/mil-std-current
 
 This restartable administrative command checks every source archive, compiles the existing deterministic outline representation and verifies source/compiler binding before reusing an output. Its `outlines.json` reports every success or failure. New outlines remain automated and unreviewed; unsupported regions, tables, figures and cross-page continuity retain their declared limitations. Explicit source-bound semantic review is still required before classifying requirements or resolving their conditions and exceptions.
 
-The current compiler emits `outline-v4` with case/punctuation-preserving identities and records 0.3.0. Structural text is stored once in the exact source sidecar and reconstructed from a verified byte range. The original PDF, text, quote hash, physical page and structural span remain intact. This also permits large outlines to remain within the existing JSON size limit. Published `outline-v3` identities and packages are retained unchanged.
+Outline compiler 0.4.0 emitted `outline-v4` with case/punctuation-preserving identities and records 0.3.0. The current compiler, 0.5.0, emits `outline-v5` with the same identities and record format; it parents each top-level numbered section by its enclosing METHOD, APPENDIX or PART root instead of the preceding clause. No `outline-v5` corpus has been compiled or qualified yet. Structural text is stored once in the exact source sidecar and reconstructed from a verified byte range. The original PDF, text, quote hash, physical page and structural span remain intact. This also permits large outlines to remain within the existing JSON size limit. Published `outline-v3` identities and packages are retained unchanged.

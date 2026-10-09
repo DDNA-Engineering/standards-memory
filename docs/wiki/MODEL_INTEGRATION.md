@@ -81,6 +81,8 @@ codex mcp add standardsforge -- "$PWD/.venv/bin/python" -I "$PWD/run_mcp.py"
 
 Ask the host to list installed MIL-STD-810 editions, find the low-pressure section and retrieve exact source evidence and its original PDF. The connected a7 server advertises eleven tools. Search results are candidates; retrieve an exact record before relying on its text.
 
+The prepared launcher passes no reviewed reference bindings or tokenizer configuration and accepts no overrides; the archive bundles neither. In a prepared a7 installation, `follow_references` returns `reference_bindings_not_configured` and `select_evidence` with `max_tokens` returns `tokenizer_unavailable`; byte budgets work. See [known limitations](../RELEASE_0.1.0a7.md#known-limitations).
+
 ## Upgrade or troubleshoot
 
 Extract upgrades into a new directory, run setup, replace only the StandardsForge host entry with the new generated one, then restart the connection. Do not copy an old `.venv` or database into the new archive. Keep the prior install until the new one works.
@@ -112,7 +114,6 @@ The a7 release exposes these eleven tools:
 - `build_context`
 - `enumerate_obligations`
 - `diff_editions`
-
 - `browse_records`
 - `select_evidence`
 - `follow_references`

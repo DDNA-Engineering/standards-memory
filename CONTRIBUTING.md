@@ -38,7 +38,7 @@ Windows PowerShell:
 py -3 -m venv .venv
 $Python = Join-Path $PWD '.venv\Scripts\python.exe'
 & $Python -m pip install --upgrade pip
-& $Python -m pip install -e '.[mcp,compiler,contract]'
+& $Python -m pip install -e '.[mcp,compiler,contract,tokens]'
 & $Python -m pip check
 $env:PYTHONPATH = Join-Path $PWD 'src'
 ```

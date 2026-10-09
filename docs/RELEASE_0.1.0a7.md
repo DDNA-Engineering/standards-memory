@@ -12,7 +12,7 @@ The [PyPI code package](https://pypi.org/project/standardsforge/0.1.0a7/) instal
 
 One portable setup implementation replaces the duplicate Windows installation path. Setup validates bundle ownership, source identity and installed evidence before readiness; failed inventory or runtime revalidation invalidates the old ready receipt. CLI and MCP launchers no longer perform implicit installation. The MCP launcher validates bundle-bound readiness and accepts no caller overrides.
 
-The runtime includes eleven read-only operations, including structural browsing, measured evidence selection, reviewed-reference navigation and original source PDF delivery. Query paths retain local authorization and source verification.
+The runtime includes eleven read-only operations, including structural browsing, measured evidence selection, reviewed-reference navigation and original source PDF delivery. Query paths retain local authorization and source verification. In the prepared distribution, reviewed-reference navigation and token budgets are unavailable without further host configuration; see [known limitations](#known-limitations).
 
 ## Published identities
 
@@ -38,3 +38,11 @@ The prepared archive embeds the exact Linux-built PyPI wheel and its source/buil
 The prepared content baseline is unchanged from a6: 438 acquisition-pinned page packs from 912 PDFs (35,218 page-text records across 35,235 physical pages), the automated 8,319-record MIL-STD-810H outline-v3 and two bounded MIL-STD-1661 recovery packs, totaling 441 packages. Additional representations preserve the same original source documents.
 
 This remains an alpha release. Upgrading the runtime does not add outline-v4 or establish corpus-wide semantic review, visual completeness, applicability, compliance or independent human approval. The broader source-bound semantic review task remains open. Historical edition selection, restricted components and unresolved context remain explicit in the evidence.
+
+## Known limitations
+
+Recorded 2026-10-09 after publication. The published identities and observed validation above are unchanged.
+
+- The prepared MCP launcher (`run_mcp.py`) starts the server with only its database, object store, principal and result mode. It passes no `--reference-bindings` or `--tokenizer-*` options and accepts no overrides, and the archive contains no reviewed reference-binding artifact. In a prepared installation, `follow_references` therefore returns `reference_bindings_not_configured`; reviewed-reference navigation needs a separately configured source or PyPI runtime with a trusted, digest-pinned binding artifact. No reviewed binding artifact is published.
+- In the same installation, `select_evidence` works with byte budgets or no budget, but a `max_tokens` budget returns `tokenizer_unavailable`. Neither setup profile installs the optional `tokens` extra, and no tokenizer artifact is bundled.
+- Both error codes were observed on 2026-10-09 through the CLI of the exact release source (`0ece950`), started without binding or tokenizer options, against the fictional example pack. They were not separately exercised through the extracted prepared archive or its MCP launcher. The release acceptance above exercised the eleven-tool inventory, search, resolution, evidence retrieval and `get_source_pdfs`, not `follow_references` or token-budget selection.

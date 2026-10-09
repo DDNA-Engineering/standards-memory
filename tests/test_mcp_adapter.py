@@ -1,18 +1,23 @@
 from __future__ import annotations
 
 import asyncio
+import copy
+import io
 import json
 import os
 import socket
+import sqlite3
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 from mcp import Client, StdioServerParameters  # noqa: E402
 from mcp.server._otel import OpenTelemetryMiddleware  # noqa: E402
@@ -25,8 +30,11 @@ from standardsforge.mcp_server import (  # noqa: E402
     MCP_TOOL_NAMES,
     MCP_TOOL_TITLES,
     create_mcp_server,
+    main as mcp_main,
 )
 from standardsforge.service import StandardsForgeService  # noqa: E402
+import validate_contracts  # noqa: E402
+from validate_contracts import check_schema_documents, load_schemas, validate_with_schema  # noqa: E402
 
 
 PACK_V1 = ROOT / "examples" / "packs" / "fictional-adapter-v1"
@@ -143,6 +151,131 @@ class QuerySelectorAdapterTests(unittest.TestCase):
             response_profile=None,
             record_id="record-421",
         )
+
+
+class StrictArgumentAdapterTests(unittest.TestCase):
+    DIGEST = "a" * 64
+
+    def _call_all(self, server, cases):
+        results = []
+
+        async def scenario() -> None:
+            async with Client(server, raise_exceptions=True) as client:
+                for name, arguments in cases:
+                    results.append(await client.call_tool(name, arguments))
+
+        _run_with_socket_creation_denied(scenario())
+        return results
+
+    def test_type_violations_and_extra_arguments_return_typed_envelope_without_service_calls(self) -> None:
+        service = Mock()
+        cases = [
+            ("search", {"query": "x", "limit": True}, ["limit"]),
+            ("search", {"query": "x", "limit": "5"}, ["limit"]),
+            ("search", {"query": "x", "limit": 5.0}, ["limit"]),
+            ("search", {"query": 5}, ["query"]),
+            ("search", {"query": "x", "query_mode": "fuzzy"}, ["query_mode"]),
+            ("search", {"query": "x", "principal_id": "admin", "principal": "admin"}, ["principal", "principal_id"]),
+            ("search", {}, ["query"]),
+            ("list_documents", {"limit": False}, ["limit"]),
+            ("list_documents", {"result_mode": "structured_only"}, ["result_mode"]),
+            ("resolve_document", {"identifier": ["EXAMPLE-SPEC-100"]}, ["identifier"]),
+            ("get_clause", {"package_digest": self.DIGEST, "record_id": "r", "max_bytes": True}, ["max_bytes"]),
+            ("get_clause", {"package_digest": 123, "record_id": "r"}, ["package_digest"]),
+            ("build_context", {"package_digest": self.DIGEST, "clause_references": "4.2"}, ["clause_references"]),
+            ("build_context", {"package_digest": self.DIGEST, "clause_references": '["4.2.1"]'}, ["clause_references"]),
+            ("enumerate_obligations", {"package_digest": self.DIGEST, "limit": "50"}, ["limit"]),
+            ("diff_editions", {"from_package_digest": self.DIGEST, "to_package_digest": self.DIGEST, "max_bytes": 1.5}, ["max_bytes"]),
+            ("browse_records", {"package_digest": self.DIGEST, "limit": True}, ["limit"]),
+            ("browse_records", {"package_digest": self.DIGEST, "relation": "siblings"}, ["relation"]),
+            ("select_evidence", {"package_digest": self.DIGEST, "record_id": "r", "max_tokens": 10.0}, ["max_tokens"]),
+            ("follow_references", {"package_digest": self.DIGEST, "record_id": "r", "principal_id": "admin"}, ["principal_id"]),
+            ("get_source_pdfs", {"package_digest": self.DIGEST, "path": "/etc/passwd"}, ["path"]),
+        ]
+        envelopes = []
+        for result_mode in ("text_and_structured", "structured_only"):
+            server = create_mcp_server(service, "local-user", result_mode=result_mode)
+            results = self._call_all(server, [(name, arguments) for name, arguments, _ in cases])
+            for (name, arguments, fields), result in zip(cases, results):
+                with self.subTest(result_mode=result_mode, tool=name, arguments=arguments):
+                    self.assertTrue(result.is_error)
+                    self.assertIsNone(result.structured_content)
+                    payload = _text_payload(result)
+                    self.assertEqual({"ok", "error"}, set(payload))
+                    self.assertFalse(payload["ok"])
+                    self.assertEqual("invalid_argument", payload["error"]["code"])
+                    self.assertEqual(name, payload["error"]["details"]["tool"])
+                    self.assertEqual(fields, payload["error"]["details"]["fields"])
+                    self.assertNotIn("admin", result.content[0].text)
+                    self.assertNotIn("passwd", result.content[0].text)
+            envelopes.append([_text_payload(result) for result in results])
+        self.assertEqual(envelopes[0], envelopes[1])
+        self.assertEqual([], service.method_calls)
+
+        schemas = load_schemas()
+        registry = check_schema_documents(schemas)
+        validate_with_schema(schemas, registry, "error-response.schema.json", envelopes[0][0])
+
+    def test_valid_strings_are_passed_verbatim_and_never_json_pre_parsed(self) -> None:
+        service = Mock()
+        service.get_clause.side_effect = StandardsForgeError("not_found", "No authorized resource matches the request.")
+        service.build_context.side_effect = StandardsForgeError("not_found", "No authorized resource matches the request.")
+        server = create_mcp_server(service, "local-user")
+        results = self._call_all(
+            server,
+            [
+                ("get_clause", {"package_digest": self.DIGEST, "clause_reference": '["4.2.1"]', "record_id": "null"}),
+                ("build_context", {"package_digest": self.DIGEST, "clause_references": ["4.2.1"], "max_bytes": 10}),
+            ],
+        )
+        self.assertEqual(["not_found", "not_found"], [_text_payload(item)["error"]["code"] for item in results])
+        service.get_clause.assert_called_once_with(
+            self.DIGEST,
+            '["4.2.1"]',
+            "local-user",
+            max_bytes=None,
+            response_profile=None,
+            record_id="null",
+        )
+        service.build_context.assert_called_once_with(
+            self.DIGEST, ["4.2.1"], "local-user", max_bytes=10, response_profile=None
+        )
+
+    def test_unknown_tool_and_invalid_service_output_are_typed_envelopes(self) -> None:
+        service = Mock()
+        service.search.return_value = {"operation": "search"}
+        server = create_mcp_server(service, "local-user")
+        with self.assertLogs("standardsforge.mcp_server", level="ERROR"):
+            unknown, malformed = self._call_all(
+                server, [("install_pack", {"source": "x"}), ("search", {"query": "x"})]
+            )
+        self.assertTrue(unknown.is_error)
+        self.assertEqual("unsupported_operation", _text_payload(unknown)["error"]["code"])
+        self.assertTrue(malformed.is_error)
+        self.assertEqual(
+            {"ok": False, "error": {"code": "internal_error", "message": "The operation failed unexpectedly; no partial success is asserted."}},
+            _text_payload(malformed),
+        )
+
+    def test_advertised_schemas_are_closed_and_strict(self) -> None:
+        server = create_mcp_server(Mock(), "local-user")
+
+        async def scenario():
+            async with Client(server, raise_exceptions=True) as client:
+                return await client.list_tools()
+
+        listed = asyncio.run(scenario())
+        for tool in listed.tools:
+            self.assertIs(False, tool.input_schema.get("additionalProperties"), tool.name)
+            for argument, schema in tool.input_schema["properties"].items():
+                self.assertNotIn("number", json.dumps(schema), (tool.name, argument))
+
+    def test_padded_startup_principal_is_rejected_not_stripped(self) -> None:
+        for principal in (" local-user", "local-user ", "local-user\n", " ", "", "local\ud800user", "\udfff"):
+            with self.subTest(principal=principal):
+                with self.assertRaises(StandardsForgeError) as caught:
+                    create_mcp_server(Mock(), principal)
+                self.assertEqual("invalid_principal", caught.exception.code)
 
 
 class MCPAdapterTests(unittest.TestCase):
@@ -470,10 +603,9 @@ class MCPAdapterTests(unittest.TestCase):
                     "search",
                     {"query": "axial load", "principal_id": "local-user"},
                 )
-                if search_result.is_error:
-                    self.assertNotIn(secret_principal, search_result.content[0].text)
-                else:
-                    self.assertEqual([], search_result.structured_content["result"]["results"])
+                self.assertTrue(search_result.is_error)
+                self.assertNotIn(secret_principal, search_result.content[0].text)
+                self.assertEqual("invalid_argument", _text_payload(search_result)["error"]["code"])
 
                 denied = await client.call_tool(
                     "get_clause",
@@ -485,6 +617,95 @@ class MCPAdapterTests(unittest.TestCase):
                 self.assertNotIn(secret_principal, denied.content[0].text)
 
         asyncio.run(scenario())
+
+    def test_registered_tools_match_contracts_exactly(self) -> None:
+        server = create_mcp_server(self.service, "local-user")
+
+        async def scenario():
+            async with Client(server, raise_exceptions=True) as client:
+                return await client.list_tools()
+
+        listed = [(tool.name, tool.input_schema) for tool in asyncio.run(scenario()).tools]
+        self.assertEqual([], validate_contracts.mcp_tool_contract_problems(listed))
+        self.assertEqual("matched", validate_contracts.validate_mcp_tool_contracts()["status"])
+
+        original_load = validate_contracts.load_json
+
+        def drifted(mutate):
+            def load(relative):
+                document = copy.deepcopy(original_load(relative))
+                mutate(relative, document)
+                return document
+
+            with patch.object(validate_contracts, "load_json", side_effect=load):
+                return validate_contracts.mcp_tool_contract_problems(listed)
+
+        def tool(document, name):
+            return next(item for item in document["tools"] if item["name"] == name)
+
+        def operation(document, name):
+            return next(item for item in document["read_operations"] if item["name"] == name)
+
+        mutations = {
+            "default": lambda rel, doc: rel.endswith("mcp-tools.json")
+            and tool(doc, "search")["argument_schemas"]["limit"].update(default=50),
+            "enum": lambda rel, doc: rel.endswith("mcp-tools.json")
+            and tool(doc, "browse_records")["argument_schemas"]["relation"]["enum"].pop(),
+            "optional": lambda rel, doc: rel.endswith("mcp-tools.json")
+            and tool(doc, "enumerate_obligations")["optional_arguments"].remove("cursor"),
+            "required": lambda rel, doc: rel.endswith("mcp-tools.json")
+            and tool(doc, "get_clause")["optional_arguments"].append("package_digest"),
+            "read_operation": lambda rel, doc: rel.endswith("query-operations.json")
+            and doc["read_operations"].remove(operation(doc, "get_source_pdfs")),
+            "operation_optional": lambda rel, doc: rel.endswith("query-operations.json")
+            and operation(doc, "search")["optional_arguments"].pop("limit"),
+        }
+        for label, mutate in mutations.items():
+            with self.subTest(drift=label):
+                self.assertTrue(drifted(mutate))
+
+    def test_migrated_v1_unknown_statement_role_passes_mcp_output_validation(self) -> None:
+        legacy = json.dumps(
+            {"statement_role": "unknown", "method": "legacy_unknown", "review_status": "unreviewed"},
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        with sqlite3.connect(self.db_path) as connection:
+            connection.execute(
+                "UPDATE records SET derivation_json = ?, statement_role = 'unknown' WHERE package_digest = ?",
+                (legacy, self.first_digest),
+            )
+        connection.close()
+        read_only = StandardsForgeService.open_read_only(self.db_path, self.object_root)
+        expected = read_only.diff_editions(self.first_digest, self.second_digest, "local-user")
+        server = create_mcp_server(read_only, "local-user")
+
+        async def scenario() -> None:
+            async with Client(server, raise_exceptions=True) as client:
+                result = await client.call_tool(
+                    "diff_editions",
+                    {"from_package_digest": self.first_digest, "to_package_digest": self.second_digest},
+                )
+            self.assertFalse(result.is_error, result.content)
+            self.assertEqual({"ok": True, "result": expected}, result.structured_content)
+            roles = {
+                change["before"]["derivation"]["statement_role"]
+                for change in result.structured_content["result"]["changes"]
+                if "before" in change
+            }
+            self.assertEqual({"unknown"}, roles)
+
+        _run_with_socket_creation_denied(scenario())
+
+    def test_server_main_rejects_padded_principal_at_startup(self) -> None:
+        stderr = io.StringIO()
+        with redirect_stderr(stderr), patch("standardsforge.mcp_server.MCPServer.run") as run:
+            code = mcp_main(
+                ["--db", str(self.db_path), "--store", str(self.object_root), "--principal", "local-user "]
+            )
+        self.assertEqual(2, code)
+        run.assert_not_called()
+        self.assertEqual("invalid_principal", json.loads(stderr.getvalue())["error"]["code"])
 
     def test_search_term_overflow_is_a_typed_mcp_error(self) -> None:
         server = create_mcp_server(self.service, "local-user")

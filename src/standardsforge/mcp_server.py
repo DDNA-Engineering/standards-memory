@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import sys
 from pathlib import Path
 from typing import Annotated, Any, Callable, Literal, Sequence
 
 from mcp.server import MCPServer
 from mcp.server._otel import OpenTelemetryMiddleware
+from mcp.server.mcpserver.exceptions import ToolError, UnexpectedToolError
+from mcp.server.mcpserver.utilities.func_metadata import ArgModelBase, FuncMetadata
 from mcp.types import CallToolResult, TextContent, ToolAnnotations
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, ValidationError
 from typing_extensions import NotRequired, TypedDict
 
 from . import __version__
@@ -279,7 +282,8 @@ class _DiffSourceChecks(_ClosedTypedDict):
 
 
 class _DiffRecordDerivation(_ClosedTypedDict):
-    statement_role: Literal["obligation", "governing_note", "informative", "unclassified"]
+    # "unknown" is written by the store's schema-v1 migration for legacy records.
+    statement_role: Literal["obligation", "governing_note", "informative", "unclassified", "unknown"]
     method: str
     review_status: str
 
@@ -669,6 +673,14 @@ MCPResultMode = Literal["text_and_structured", "structured_only"]
 SourcePdfsToolResult = Annotated[CallToolResult, _SourcePdfsSuccess]
 
 
+def _utf8_encodable(value: str) -> bool:
+    try:
+        value.encode("utf-8")
+    except UnicodeEncodeError:
+        return False
+    return True
+
+
 def _json(payload: dict[str, Any]) -> str:
     return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
@@ -704,6 +716,103 @@ def _invoke(
     )
 
 
+_LOGGER = logging.getLogger(__name__)
+
+
+def _error_result(code: str, message: str, details: dict[str, Any] | None = None) -> CallToolResult:
+    error: dict[str, Any] = {"code": code, "message": message}
+    if details:
+        error["details"] = details
+    return CallToolResult(
+        content=[TextContent(type="text", text=_json({"ok": False, "error": error}))],
+        is_error=True,
+    )
+
+
+def _argument_error(tool_name: str, exc: ValidationError) -> CallToolResult:
+    # Field locations and error types only: rejected values are caller data.
+    errors = sorted(
+        {
+            (".".join(str(part) for part in item["loc"]) or "arguments", str(item["type"]))
+            for item in exc.errors(include_url=False, include_input=False, include_context=False)
+        }
+    )
+    return _error_result(
+        "invalid_argument",
+        "Tool arguments do not match the declared input schema; no operation was performed.",
+        {
+            "tool": tool_name,
+            "fields": sorted({field for field, _ in errors}),
+            "errors": [{"field": field, "type": kind} for field, kind in errors],
+        },
+    )
+
+
+class _StrictFuncMetadata(FuncMetadata):
+    """Validate raw tool arguments without the SDK's lenient JSON-string pre-parsing."""
+
+    def pre_parse_json(self, data: dict[str, Any]) -> dict[str, Any]:
+        return dict(data)
+
+
+def _strict_argument_model(model: type[ArgModelBase]) -> type[ArgModelBase]:
+    class StrictArguments(model):  # type: ignore[misc, valid-type]
+        # No bool/str/float coercion to integers and no undeclared arguments, so a
+        # caller can never smuggle a principal or other selector into a tool call.
+        model_config = ConfigDict(strict=True, extra="forbid", title=model.__name__)
+
+    return StrictArguments
+
+
+def _enforce_strict_arguments(server: MCPServer[Any]) -> None:
+    """Replace each registered tool's lenient argument model with a strict, closed one.
+
+    The advertised input schema is regenerated from the strict model, so it gains
+    ``additionalProperties: false`` and stays identical to what is enforced.
+    """
+
+    for tool in server._tool_manager.list_tools():
+        metadata = tool.fn_metadata
+        strict_model = _strict_argument_model(metadata.arg_model)
+        tool.fn_metadata = _StrictFuncMetadata(
+            arg_model=strict_model,
+            output_schema=metadata.output_schema,
+            output_model=metadata.output_model,
+            wrap_output=metadata.wrap_output,
+        )
+        tool.parameters = strict_model.model_json_schema(by_alias=True)
+
+
+class _StandardsForgeMCPServer(MCPServer[Any]):
+    """MCP server whose every tool failure is a typed JSON error envelope."""
+
+    async def call_tool(
+        self, name: str, arguments: dict[str, Any], context: Any = None
+    ) -> Any:
+        try:
+            return await super().call_tool(name, arguments, context)
+        except UnexpectedToolError:
+            _LOGGER.exception("Tool %r raised an unexpected exception", name)
+            return _error_result(
+                "internal_error",
+                "The operation failed unexpectedly; no partial success is asserted.",
+            )
+        except ToolError as exc:
+            if isinstance(exc.__cause__, ValidationError):
+                return _argument_error(name, exc.__cause__)
+            if self._tool_manager.get_tool(name) is None:
+                return _error_result(
+                    "unsupported_operation",
+                    "The requested tool is not exposed by this read-only server.",
+                    {"tool": name},
+                )
+            _LOGGER.exception("Tool %r failed", name)
+            return _error_result(
+                "internal_error",
+                "The operation failed unexpectedly; no partial success is asserted.",
+            )
+
+
 def _disable_telemetry(server: MCPServer[Any]) -> None:
     """Remove the pinned SDK's provisional tracing middleware.
 
@@ -728,14 +837,25 @@ def create_mcp_server(
         "invalid_principal",
         "A non-empty startup principal is required.",
     )
+    # Policies and grants store principals byte-exact; never strip one into another identity.
+    require(
+        principal_id == principal_id.strip(),
+        "invalid_principal",
+        "The startup principal must not have leading or trailing whitespace.",
+    )
+    require(
+        _utf8_encodable(principal_id),
+        "invalid_principal",
+        "The startup principal must be encodable UTF-8 text.",
+    )
     require(
         result_mode in ("text_and_structured", "structured_only"),
         "invalid_result_mode",
         "The MCP result mode is unsupported.",
         result_mode=result_mode,
     )
-    bound_principal = principal_id.strip()
-    server: MCPServer[Any] = MCPServer(
+    bound_principal = principal_id
+    server: MCPServer[Any] = _StandardsForgeMCPServer(
         "standardsforge",
         description="Read-only, offline access to locally authorized standards evidence.",
         instructions=MCP_SERVER_INSTRUCTIONS,
@@ -927,6 +1047,7 @@ def create_mcp_server(
     ) -> SourcePdfsToolResult:
         return _invoke(lambda: service.get_source_pdfs(package_digest, bound_principal), result_mode=result_mode)
 
+    _enforce_strict_arguments(server)
     return server
 
 

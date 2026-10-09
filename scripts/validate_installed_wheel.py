@@ -83,6 +83,25 @@ def _wheel_source_paths(source_files: list[dict[str, object]]) -> list[str]:
     return [str(item["path"]) for item in source_files if item["path"] not in excluded]
 
 
+def _stage_clean_sources(base: Path, wheel_source_paths: list[str], count: int) -> list[Path]:
+    """Copy the wheel inputs into ``count`` separate, never-built source trees.
+
+    ``pip wheel`` builds in-tree and leaves ``build/`` and ``*.egg-info``
+    behind, so reusing one tree would make every build after the first an
+    incremental build rather than a clean one.
+    """
+    sources: list[Path] = []
+    for build_number in range(1, count + 1):
+        source = base / f"source-{build_number}"
+        source.mkdir()
+        for relative in wheel_source_paths:
+            destination = source / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / relative, destination)
+        sources.append(source)
+    return sources
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Build twice, verify, install, and optionally retain a reproducible core wheel."
@@ -107,12 +126,7 @@ def main() -> int:
         clean_env["PIP_DISABLE_PIP_VERSION_CHECK"] = "1"
         source_files = _source_inventory()
         wheel_source_paths = _wheel_source_paths(source_files)
-        source = base / "source"
-        source.mkdir()
-        for relative in wheel_source_paths:
-            destination = source / relative
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(ROOT / relative, destination)
+        sources = _stage_clean_sources(base, wheel_source_paths, 2)
 
         builder_environment = base / "builder"
         venv.EnvBuilder(with_pip=True, clear=True).create(builder_environment)
@@ -159,7 +173,7 @@ def main() -> int:
             raise RuntimeError("The isolated builder did not load the locked setuptools version.")
 
         wheels: list[Path] = []
-        for build_number in (1, 2):
+        for build_number, source in enumerate(sources, start=1):
             wheelhouse = base / f"wheelhouse-{build_number}"
             wheelhouse.mkdir()
             _run(

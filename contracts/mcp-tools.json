@@ -35,7 +35,8 @@
           "description": "Search text; parsed locally and never sent to a network service."
         },
         "limit": {
-          "description": "Maximum records to return, from 1 through 100."
+          "description": "Maximum records to return, from 1 through 100.",
+          "default": 20
         },
         "package_digest": {
           "description": "Optional exact authorized package SHA-256 pin."
@@ -78,7 +79,8 @@
           "description": "Optional normalized document-identifier prefix filter."
         },
         "limit": {
-          "description": "Maximum documents to return, from 1 through 100."
+          "description": "Maximum documents to return, from 1 through 100.",
+          "default": 50
         },
         "cursor": {
           "description": "Optional opaque signed cursor from the preceding page."
@@ -208,6 +210,12 @@
         "cursor",
         "max_bytes"
       ],
+      "optional_arguments": [
+        "scope_prefix",
+        "limit",
+        "cursor",
+        "max_bytes"
+      ],
       "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/enumerateObligations",
       "title": "Enumerate classified obligations",
       "argument_schemas": {
@@ -218,7 +226,8 @@
           "description": "Optional exact clause reference or dot-delimited descendant scope."
         },
         "limit": {
-          "description": "Maximum obligations to return, from 1 through 100."
+          "description": "Maximum obligations to return, from 1 through 100.",
+          "default": 50
         },
         "cursor": {
           "description": "Optional opaque signed cursor from the preceding page."
@@ -234,6 +243,9 @@
       "arguments": [
         "from_package_digest",
         "to_package_digest",
+        "max_bytes"
+      ],
+      "optional_arguments": [
         "max_bytes"
       ],
       "output_contract": "success-response.schema.json + query-response.schema.json#/$defs/diffEditions",
@@ -279,7 +291,17 @@
           "description": "Exact authorized package SHA-256 pin."
         },
         "relation": {
-          "description": "Structural navigation relation; all and roots need no anchor."
+          "description": "Structural navigation relation; all and roots need no anchor.",
+          "enum": [
+            "all",
+            "roots",
+            "children",
+            "parent",
+            "adjacent",
+            "outgoing",
+            "incoming"
+          ],
+          "default": "all"
         },
         "record_id": {
           "description": "Exact anchor record for children, parent, adjacent or link navigation."
@@ -291,7 +313,8 @@
           "description": "Optional exact clause reference or dot-descendant scope."
         },
         "limit": {
-          "description": "Maximum records from 1 through 100."
+          "description": "Maximum records from 1 through 100.",
+          "default": 50
         },
         "cursor": {
           "description": "Signed continuation from the preceding page."
@@ -308,6 +331,10 @@
       "arguments": [
         "package_digest",
         "record_id",
+        "max_tokens",
+        "max_bytes"
+      ],
+      "optional_arguments": [
         "max_tokens",
         "max_bytes"
       ],
@@ -336,6 +363,9 @@
         "record_id",
         "max_bytes"
       ],
+      "optional_arguments": [
+        "max_bytes"
+      ],
       "argument_schemas": {
         "package_digest": {
           "description": "Exact authorized source package SHA-256 pin."
@@ -356,6 +386,7 @@
       "arguments": [
         "package_digest"
       ],
+      "optional_arguments": [],
       "argument_schemas": {
         "package_digest": {
           "description": "Exact authorized package SHA-256 pin."
@@ -366,12 +397,14 @@
   ],
   "invariants": [
     "no principal or authorization selector is accepted from a tool caller",
+    "the startup principal is used byte-exact; a principal with leading or trailing whitespace is rejected at startup with invalid_principal",
     "list_documents and resolve_document candidates expose only actively authorized packages",
     "no administrative operation is exposed",
     "every tool is marked read-only and closed-world",
     "successful calls use the same typed envelope as the CLI",
     "server startup result_mode defaults to text_and_structured; structured_only omits successful-call text content while preserving structuredContent",
     "anticipated failures are MCP error results carrying a typed JSON error envelope",
+    "tool arguments are strictly typed and closed: booleans, strings and floats are never coerced to integers, JSON-encoded strings are never pre-parsed, and undeclared arguments are rejected; argument failures are MCP error results carrying the typed envelope with code invalid_argument and no operation is performed",
     "the adapter creates no network listener and has no network or model fallback",
     "get_clause accepts a clause reference, canonical record ID, or a pair that resolves to the same record",
     "omitting response_profile preserves detailed JSON; compact_evidence_v1 and concise_evidence_v1 are opt-in",

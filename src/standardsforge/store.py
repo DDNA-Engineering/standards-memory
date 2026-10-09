@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import errno
 import hashlib
 import json
 import os
@@ -10,8 +11,9 @@ import tempfile
 import time
 from contextlib import contextmanager
 from datetime import UTC, datetime
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePath, PurePosixPath, PureWindowsPath
 from typing import Any, Iterator
+from urllib.parse import quote
 
 from .errors import StandardsForgeError, require
 from .identity import normalize_identifier
@@ -20,6 +22,29 @@ from .pack import validate_pack_directory
 
 
 SCHEMA_VERSION = 5
+# A rename onto an existing nonempty directory reports one of these on POSIX.
+_RENAME_COLLISION_ERRNOS = frozenset({errno.EEXIST, errno.ENOTEMPTY})
+
+
+def read_only_database_uri(path: PurePath) -> str:
+    """Return a read-only SQLite URI for an absolute POSIX, drive-letter or UNC path.
+
+    ``Path.as_uri`` renders UNC paths as ``file://server/share/...``, which
+    SQLite rejects as a non-local authority; SQLite instead accepts an empty
+    authority followed by the ``//server/share`` path. Every path byte other
+    than ``/`` (and a Windows drive colon) is percent-encoded as UTF-8 so
+    spaces, ``?``, ``#``, ``%`` and non-ASCII names cannot alter the URI.
+    """
+
+    if not path.is_absolute():
+        raise ValueError("A relative path cannot be expressed as a SQLite file URI.")
+    if isinstance(path, PureWindowsPath) and len(path.drive) == 2 and path.drive[1] == ":":
+        tail = path.as_posix()[len(path.drive):]
+        location = "/" + path.drive + quote(tail, safe="/")
+    else:
+        # POSIX paths begin with one slash; Windows UNC and device paths with two.
+        location = quote(path.as_posix(), safe="/")
+    return "file://" + location + "?mode=ro"
 
 
 class LocalStore:
@@ -49,7 +74,7 @@ class LocalStore:
 
     def connect(self) -> sqlite3.Connection:
         if self.read_only:
-            connection = sqlite3.connect(self.db_path.as_uri() + "?mode=ro", uri=True)
+            connection = sqlite3.connect(read_only_database_uri(self.db_path), uri=True)
             connection.execute("PRAGMA query_only = ON")
         else:
             connection = sqlite3.connect(self.db_path)
@@ -308,15 +333,16 @@ class LocalStore:
                 try:
                     os.replace(staging, destination)
                     break
-                except FileExistsError:
-                    existing = validate_pack_directory(destination)
-                    require(existing.package_digest == pack.package_digest, "object_store_conflict", "Concurrent object install conflicted.")
-                    break
-                except PermissionError as exc:
-                    if destination.exists():
+                except OSError as exc:
+                    collided = isinstance(exc, FileExistsError) or exc.errno in _RENAME_COLLISION_ERRNOS
+                    if collided or (isinstance(exc, PermissionError) and destination.exists()):
+                        # A concurrent installer activated first; reuse it only if identical.
+                        require(not destination.is_symlink(), "object_store_conflict", "The object directory cannot be a symbolic link.")
                         existing = validate_pack_directory(destination)
                         require(existing.package_digest == pack.package_digest, "object_store_conflict", "Concurrent object install conflicted.")
                         break
+                    if not isinstance(exc, PermissionError):
+                        raise
                     if attempt == 5:
                         raise StandardsForgeError(
                             "object_store_activation_failed",
@@ -704,10 +730,18 @@ class LocalStore:
                 )
             )
 
-    @staticmethod
-    def _scope_clause(scope_prefix: str) -> tuple[str, str]:
-        escaped = scope_prefix.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-        return scope_prefix, escaped + ".%"
+    _SCOPE_SQL = "({column} = ? OR substr({column}, 1, ?) = ?)"
+
+    @classmethod
+    def _scope_clause(cls, scope_prefix: str, column: str = "clause_reference") -> tuple[str, list[Any]]:
+        """Exact, case-sensitive match of a scope or any dotted descendant.
+
+        LIKE is ASCII case-insensitive and treats ``%``/``_`` as wildcards; a
+        character-length substring comparison has no metacharacters at all.
+        """
+
+        descendant = scope_prefix + "."
+        return cls._SCOPE_SQL.format(column=column), [scope_prefix, len(descendant), descendant]
 
     def navigation_edges(self, package_digest: str, record_id: str, relation: str) -> list[dict[str, Any]]:
         field = "source_record_id" if relation == "outgoing" else "target_record_id"
@@ -752,8 +786,9 @@ class LocalStore:
             conditions.append("r.kind = ?")
             params.append(kind)
         if scope_prefix is not None:
-            conditions.append("(r.clause_reference = ? OR r.clause_reference LIKE ? ESCAPE '\\')")
-            params.extend(self._scope_clause(scope_prefix))
+            clause, scope_params = self._scope_clause(scope_prefix, "r.clause_reference")
+            conditions.append(clause)
+            params.extend(scope_params)
         where = " AND ".join(conditions)
         try:
             with self._connection() as connection:
@@ -778,9 +813,9 @@ class LocalStore:
         """
         params: list[Any] = [package_digest, after_ordinal]
         if scope_prefix is not None:
-            exact, descendant = self._scope_clause(scope_prefix)
-            sql += " AND (clause_reference = ? OR clause_reference LIKE ? ESCAPE '\\')"
-            params.extend([exact, descendant])
+            clause, scope_params = self._scope_clause(scope_prefix)
+            sql += " AND " + clause
+            params.extend(scope_params)
         sql += " ORDER BY ordinal, record_id LIMIT ?"
         params.append(limit)
         with self._connection() as connection:
@@ -790,9 +825,9 @@ class LocalStore:
         sql = "SELECT COUNT(*) AS count FROM records WHERE package_digest = ? AND statement_role = 'obligation'"
         params: list[Any] = [package_digest]
         if scope_prefix is not None:
-            exact, descendant = self._scope_clause(scope_prefix)
-            sql += " AND (clause_reference = ? OR clause_reference LIKE ? ESCAPE '\\')"
-            params.extend([exact, descendant])
+            clause, scope_params = self._scope_clause(scope_prefix)
+            sql += " AND " + clause
+            params.extend(scope_params)
         with self._connection() as connection:
             row = connection.execute(sql, params).fetchone()
         return int(row["count"])
@@ -853,9 +888,9 @@ class LocalStore:
             filters += " AND p.package_digest = ?"
             params.append(package_digest)
         if scope_prefix is not None:
-            exact, descendant = self._scope_clause(scope_prefix)
-            filters += " AND (r.clause_reference = ? OR r.clause_reference LIKE ? ESCAPE '\\')"
-            params.extend([exact, descendant])
+            clause, scope_params = self._scope_clause(scope_prefix, "r.clause_reference")
+            filters += " AND " + clause
+            params.extend(scope_params)
         params.append(limit)
         try:
             with self._connection() as connection:

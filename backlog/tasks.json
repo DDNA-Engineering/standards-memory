@@ -794,7 +794,7 @@
     {
       "task_id": "TASK-035",
       "title": "Cross-platform prepared core and trusted package channel",
-      "status": "active",
+      "status": "complete",
       "requirements": [
         "SM-FR-018",
         "SM-FR-025",
@@ -1165,6 +1165,29 @@
         "Use one portable setup implementation for offline core, locked Windows MCP and explicitly networked MCP dependencies; generate absolute host configuration after a real stdio smoke.",
         "Keep default setup offline, reject incompatible offline MCP profiles before mutation, recheck existing readiness on reruns and reject launcher overrides or failed setup readiness.",
         "Publish a new version with the current eleven read tools, refreshed installation documentation, exact runtime-bound corpus qualification, native install acceptance and public artifact verification."
+      ]
+    },
+    {
+      "task_id": "TASK-060",
+      "title": "Close verified correctness review gaps",
+      "status": "in_progress",
+      "requirements": ["SM-FR-008", "SM-FR-010", "SM-FR-018", "SM-FR-019", "SM-FR-022", "SM-FR-052", "SM-FR-065", "SM-FR-067", "SM-FR-069", "SM-FR-075"],
+      "acceptance": [
+        "Report unresolved relationships in exported engineering handoffs rather than omitting them.",
+        "Doctor reports not ready when installed grants fall outside every supplied trusted local policy, and accepts several policies for principals granted by more than one.",
+        "MCP tool arguments are strictly typed; invalid arguments return typed errors.",
+        "A contract/tool drift test fails when the operation or MCP tool contracts disagree with the implemented read operations.",
+        "Scope prefixes match case-sensitively and only as an exact clause reference or dot-descendant.",
+        "Clause references select records exactly.",
+        "Bundle and archive decompression is bounded before content is accepted.",
+        "Pack member paths are validated as safe on Windows as well as POSIX.",
+        "Corpus output reuse is bound to the exact source digest.",
+        "Evidence spans that do not reference source evidence are rejected.",
+        "Annotation compilation is bound to its exact inputs.",
+        "Outline top-level sections are parented to their enclosing root.",
+        "PDF worker process groups are cleaned up, and source hashing uses a single read of the source bytes.",
+        "Prepared setup can be retried after failure and decodes subprocess output as UTF-8.",
+        "Every fix lands with its negative cases, and no runtime behavior is claimed before it is observed."
       ]
     }
   ]

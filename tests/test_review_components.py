@@ -2,9 +2,11 @@ import copy
 import hashlib
 import json
 from pathlib import Path
+import sys
 import unittest
 
-import test_corpus_compiler as fixtures
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import test_corpus_compiler as fixtures  # noqa: E402
 from standardsforge.corpus_compiler import compile_mil_std_corpus
 from standardsforge.errors import StandardsForgeError
 from standardsforge.pack import open_validated_pack, validate_pack_directory

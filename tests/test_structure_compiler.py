@@ -22,6 +22,22 @@ from standardsforge.errors import StandardsForgeError  # noqa: E402
 from standardsforge.pack import validate_pack_directory  # noqa: E402
 from standardsforge.service import StandardsForgeService  # noqa: E402
 from standardsforge.structure_compiler import compile_structured_pdf_section  # noqa: E402
+import standardsforge.structure_compiler as structure_compiler_module  # noqa: E402
+
+
+def _tampering_isolation(real):
+    """Wrap isolated_pdf_pages so every page file is overwritten after validation."""
+
+    from contextlib import contextmanager
+
+    @contextmanager
+    def wrapper(*args, **kwargs):
+        with real(*args, **kwargs) as parsed:
+            for page in parsed.pages:
+                page.path.write_bytes(b"TAMPERED AFTER VALIDATION")
+            yield parsed
+
+    return wrapper
 
 
 class StructureCompilerTests(unittest.TestCase):
@@ -443,6 +459,18 @@ class StructureCompilerTests(unittest.TestCase):
                         self.root / name,
                     )
                 self.assertEqual("invalid_structure_annotations", caught.exception.code)
+
+    def test_page_sidecars_use_validated_bytes_not_mutated_page_files(self) -> None:
+        from unittest.mock import patch
+
+        output = self.root / "tamper-structured"
+        with patch.object(structure_compiler_module, "isolated_pdf_pages", _tampering_isolation(structure_compiler_module.isolated_pdf_pages)):
+            compile_structured_pdf_section(self.catalog_path, self.document["document_id"], self.sources, self.annotations_path, output)
+        validate_pack_directory(output)
+        pages = sorted(output.glob("sources/pages/*.txt"))
+        self.assertTrue(pages)
+        for page in pages:
+            self.assertNotIn(b"TAMPERED", page.read_bytes())
 
     def test_compiles_installs_and_retrieves_source_spanned_tree(self) -> None:
         output = self.root / "structured"

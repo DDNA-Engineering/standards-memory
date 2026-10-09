@@ -177,6 +177,32 @@ class OutlineReviewTests(unittest.TestCase):
             compile_structured_page_pack_section(self.base, self.outline, self.annotations_path, self.root / "rejected")
         self.assertFalse((self.root / "rejected").exists())
 
+    def test_compiler_rejects_node_edited_after_promotion(self) -> None:
+        exported = self._export()
+        self._write_decision(self._decision(exported["draft_sha256"]))
+        promote_outline_review(self.draft_path, self.decision_path, self.outline, self.base, self.annotations_path)
+        promoted = json.loads(self.annotations_path.read_text(encoding="utf-8"))
+
+        def retarget(node: dict) -> None:
+            node.update(logical_id="attacker:arbitrary-id", kind="definition", statement_role="obligation",
+                        clause_reference="9.9.9", heading="Not the reviewed heading")
+
+        def respan(node: dict) -> None:
+            node["source_spans"][0]["page_text_sha256"] = "0" * 64
+
+        for label, edit in (("identity", retarget), ("span", respan)):
+            with self.subTest(edit=label):
+                annotations = copy.deepcopy(promoted)
+                edit(annotations["nodes"][0])
+                edited = self.root / f"edited-{label}.json"
+                edited.write_text(json.dumps(annotations), encoding="utf-8")
+                output = self.root / f"edited-{label}-out"
+                with self.assertRaises(StandardsForgeError) as caught:
+                    compile_structured_page_pack_section(self.base, self.outline, edited, output)
+                self.assertEqual("structure_identity_mismatch", caught.exception.code)
+                self.assertFalse(output.exists())
+        compile_structured_page_pack_section(self.base, self.outline, self.annotations_path, self.root / "unedited-out")
+
     def test_parameterized_ambiguous_numbered_evidence_requires_explicit_kind_and_reference(self) -> None:
         from tests.test_outline_compiler import OutlineCompilerTests
 

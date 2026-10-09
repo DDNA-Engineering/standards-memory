@@ -239,7 +239,7 @@ class OutlineCompilerTests(unittest.TestCase):
             second = compile_derived_outline_pack(fixture.base_pack, fixture.root / "caption-second")
             self.assertEqual(first["package_digest"], second["package_digest"])
             with open_validated_pack(fixture.root / "caption-first") as pack:
-                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v4"))
+                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v5"))
                 captions = [record for record in pack.records if record["kind"] in {"table", "figure"}]
                 references = {record["clause_reference"].split(":")[-1] for record in captions}
                 self.assertEqual({
@@ -317,7 +317,7 @@ class OutlineCompilerTests(unittest.TestCase):
             second = compile_derived_outline_pack(fixture.base_pack, fixture.root / "part-second")
             self.assertEqual(first["package_digest"], second["package_digest"])
             with open_validated_pack(fixture.root / "part-first") as pack:
-                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v4"))
+                self.assertTrue(pack.manifest["pack_id"].endswith(".outline-v5"))
                 part = next(record for record in pack.records if record["clause_reference"].endswith(":PART-THREE"))
                 self.assertEqual("section", part["kind"])
                 self.assertIsNone(part["structure"]["parent_logical_id"])
@@ -335,6 +335,82 @@ class OutlineCompilerTests(unittest.TestCase):
         self.assertFalse(any(item["type"] == "part" for item in _candidate_matches("PART THREE – WORLD CLIMATIC REGIONS\nCONTENTS\n")))
         self.assertFalse(any(item["type"] == "part" for item in _candidate_matches("PART THREE – WORLD CLIMATIC REGIONS\n1.1  Purpose ........ 5\n")))
 
+    def _compiled_parents(self, page_text: str) -> dict[str, str | None]:
+        """Map "context/reference" of each candidate to its parent's "context/reference"."""
+
+        class ParentFixture(OutlineCompilerTests):
+            def _write_base_page_pack(self) -> None:
+                self.page_text = page_text
+                super()._write_base_page_pack()
+
+        fixture = ParentFixture(methodName="test_compiles_installs_resolves_and_retrieves_unreviewed_outline_offline")
+        fixture.setUp()
+        self.addCleanup(fixture.tearDown)
+        target = fixture.root / "parent-outline"
+        report = compile_derived_outline_pack(fixture.base_pack, target)
+        self.assertEqual("0.5.0", json.loads((target / "derived-outline-report.json").read_text(encoding="utf-8"))["compiler"]["version"])
+        self.assertTrue(report["pack_id"].endswith(".outline-v5"))
+        pack = validate_pack_directory(target)
+        by_logical_id = {record["structure"]["logical_id"]: record for record in pack.records}
+
+        def label(record: dict | None) -> str | None:
+            if record is None:
+                return None
+            _, _, context, reference = record["clause_reference"].split(":", 3)
+            return f"{context}/{reference}"
+
+        return {
+            label(record): label(by_logical_id.get(record["structure"]["parent_logical_id"]))
+            for record in pack.records
+            if record["kind"] != "unsupported_region"
+        }
+
+    def test_top_level_section_is_not_parented_by_previous_clause(self) -> None:
+        parents = self._compiled_parents(
+            "1  SCOPE\n1.1  Purpose of this thing\nSome text.\n2  APPLICABLE DOCUMENTS\nMore text.\n2.1  General\nText.\n"
+        )
+        self.assertEqual(
+            {"document/1": None, "document/1.1": "document/1", "document/2": None, "document/2.1": "document/2"},
+            parents,
+        )
+
+    def test_top_level_section_inside_method_or_appendix_uses_enclosing_root(self) -> None:
+        parents = self._compiled_parents(
+            "METHOD 500.6\n1  SCOPE\n1.1  Purpose\n1.1.1  Detail\n2  TAILORING\n2.1  Guidance\n"
+            "APPENDIX A\n1  APPENDIX SCOPE\n1.1  Appendix purpose\n2  APPENDIX TERMS\n"
+        )
+        method, appendix = "METHOD-500.6/METHOD 500.6", "APPENDIX-A/APPENDIX A"
+        self.assertEqual(
+            {
+                method: None,
+                "METHOD-500.6/1": method,
+                "METHOD-500.6/1.1": "METHOD-500.6/1",
+                "METHOD-500.6/1.1.1": "METHOD-500.6/1.1",
+                "METHOD-500.6/2": method,
+                "METHOD-500.6/2.1": "METHOD-500.6/2",
+                appendix: None,
+                "APPENDIX-A/1": appendix,
+                "APPENDIX-A/1.1": "APPENDIX-A/1",
+                "APPENDIX-A/2": appendix,
+            },
+            parents,
+        )
+
+    def test_top_level_section_inside_part_uses_part_root(self) -> None:
+        parents = self._compiled_parents(
+            "P  AR T  THREE – WORLD CLIMATIC REGIONS – GUIDANCE\n1.1  Purpose\n1.2  Organization\n2  REGIONS\n2.1  Hot\n"
+        )
+        part = "PART-THREE/PART-THREE"
+        self.assertEqual(
+            {part: None, "PART-THREE/1.1": part, "PART-THREE/1.2": part, "PART-THREE/2": part, "PART-THREE/2.1": "PART-THREE/2"},
+            parents,
+        )
+
+    def test_dotted_label_without_parent_keeps_existing_fallback(self) -> None:
+        parents = self._compiled_parents("METHOD 528.1\n3.2  Orphan clause.\n4  Next section\n")
+        # A dotted label with no recorded parent still falls back to a PART root only.
+        self.assertIsNone(parents["METHOD-528.1/3.2"])
+        self.assertEqual("METHOD-528.1/METHOD 528.1", parents["METHOD-528.1/4"])
 
 if __name__ == "__main__":
     unittest.main()

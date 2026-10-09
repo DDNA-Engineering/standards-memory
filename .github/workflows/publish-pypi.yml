@@ -101,15 +101,18 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
-          import glob, pathlib, subprocess, sys
+          import glob, hashlib, pathlib, re, subprocess, sys
           wheels = glob.glob("dist/publish/*.whl")
           if len(wheels) != 1:
               raise SystemExit("expected exactly one wheel")
+          expected = pathlib.Path("dist/wheel.sha256").read_text(encoding="ascii").strip()
+          actual = hashlib.sha256(pathlib.Path(wheels[0]).read_bytes()).hexdigest()
+          if re.fullmatch(r"[0-9a-f]{64}", expected) is None or actual != expected:
+              raise SystemExit(f"downloaded wheel digest {actual} does not match the build digest {expected!r}")
           subprocess.run([sys.executable, "-m", "pip", "install", "--disable-pip-version-check", "--no-index", "--no-deps", "--force-reinstall", wheels[0]], check=True)
           subprocess.run([sys.executable, "-I", "-m", "standardsforge", "--help"], check=True)
           from standardsforge import __version__
-          expected = pathlib.Path("dist/wheel.sha256").read_text(encoding="ascii").strip()
-          if __version__ != pathlib.Path(wheels[0]).name.split("-")[1] or len(expected) != 64:
+          if __version__ != pathlib.Path(wheels[0]).name.split("-")[1]:
               raise SystemExit("installed wheel identity is invalid")
           PY
 
@@ -127,6 +130,19 @@ jobs:
         with:
           name: pypi-candidate-${{ github.sha }}
           path: dist
+      - name: Verify the candidate wheel is the exact built and natively installed wheel
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob, hashlib, pathlib, re
+          wheels = glob.glob("dist/publish/*.whl")
+          if len(wheels) != 1:
+              raise SystemExit("expected exactly one wheel")
+          expected = pathlib.Path("dist/wheel.sha256").read_text(encoding="ascii").strip()
+          actual = hashlib.sha256(pathlib.Path(wheels[0]).read_bytes()).hexdigest()
+          if re.fullmatch(r"[0-9a-f]{64}", expected) is None or actual != expected:
+              raise SystemExit(f"candidate wheel digest {actual} does not match the build digest {expected!r}")
+          PY
       - name: Publish exact candidate with OIDC trusted publishing
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
         with:

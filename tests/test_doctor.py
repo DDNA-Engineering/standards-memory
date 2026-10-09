@@ -218,6 +218,130 @@ class DoctorTests(unittest.TestCase):
         mismatches = next(detail["value"] for detail in grant["details"] if detail["name"] == "grant_mismatches")
         self.assertIn(f"{selected}:grant_revoked", mismatches)
 
+    def test_active_grant_outside_narrowed_policy_fails_readiness(self) -> None:
+        narrowed = json.loads(POLICY.read_text(encoding="utf-8"))
+        narrowed["policy_id"] = "narrowed"
+        narrowed["allowed_pack_ids"] = ["example.vehicle-adapter.2.0"]
+        narrowed_path = self.base / "narrowed-policy.json"
+        narrowed_path.write_text(json.dumps(narrowed), encoding="utf-8")
+        temp = tempfile.TemporaryDirectory(prefix="standardsforge-doctor-narrowed-")
+        self.addCleanup(temp.cleanup)
+        db, objects = Path(temp.name) / "memory.db", Path(temp.name) / "objects"
+        service = StandardsForgeService(db, objects)
+        outside = service.install_pack(PACKS[0], POLICY)["package_digest"]
+        service.install_pack(PACKS[1], narrowed_path)
+
+        report = run_doctor(db, objects, policy_path=narrowed_path, principal_id="local-user")
+        DOCTOR_VALIDATOR.validate(report)
+        self.assertFalse(report["ready"])
+        grant = next(item for item in report["checks"] if item["check_id"] == "authorization.grants")
+        details = {detail["name"]: detail["value"] for detail in grant["details"]}
+        self.assertEqual(("fail", "grants_outside_policy"), (grant["status"], grant["code"]))
+        self.assertEqual([outside], details["grants_outside_policy"])
+        self.assertEqual(1, details["unrelated_active_grant_count"])
+        self.assertEqual(1, details["matching_grant_count"])
+        self.assertEqual([], details["grant_mismatches"])
+        self.assertNotIn("matches the current trusted policy", grant["message"])
+        # The still-active grant is genuinely served, which is why readiness must fail.
+        served = StandardsForgeService.open_read_only(db, objects).get_clause(outside, "4.2.1", "local-user")
+        self.assertEqual("example.vehicle-adapter.1.0", served["package"]["pack_id"])
+
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            code = main(
+                [
+                    "--db", str(db),
+                    "--store", str(objects),
+                    "doctor",
+                    "--policy", str(narrowed_path),
+                    "--principal", "local-user",
+                ]
+            )
+        self.assertEqual(3, code)
+        self.assertEqual("", stderr.getvalue())
+
+        service.revoke(outside, "local-user")
+        revoked = run_doctor(db, objects, policy_path=narrowed_path, principal_id="local-user")
+        self.assertTrue(revoked["ready"])
+        grant = next(item for item in revoked["checks"] if item["check_id"] == "authorization.grants")
+        self.assertEqual("principal_grants_ready", grant["code"])
+        details = {detail["name"]: detail["value"] for detail in grant["details"]}
+        self.assertEqual([], details["grants_outside_policy"])
+
+    def test_grants_from_several_one_pack_policies_are_ready_only_with_every_policy(self) -> None:
+        base = json.loads(POLICY.read_text(encoding="utf-8"))
+        paths = []
+        for index, pack_id in enumerate(("example.vehicle-adapter.1.0", "example.vehicle-adapter.2.0"), start=1):
+            path = self.base / f"one-pack-{index}.json"
+            path.write_text(json.dumps({**base, "policy_id": f"one-pack-{index}", "allowed_pack_ids": [pack_id]}), encoding="utf-8")
+            paths.append(path)
+        temp = tempfile.TemporaryDirectory(prefix="standardsforge-doctor-multi-")
+        self.addCleanup(temp.cleanup)
+        db, objects = Path(temp.name) / "memory.db", Path(temp.name) / "objects"
+        service = StandardsForgeService(db, objects)
+        first = service.install_pack(PACKS[0], paths[0])["package_digest"]
+        service.install_pack(PACKS[1], paths[1])
+
+        single = run_doctor(db, objects, policy_path=paths[0], principal_id="local-user")
+        DOCTOR_VALIDATOR.validate(single)
+        self.assertFalse(single["ready"])
+        checks = {item["check_id"]: item for item in single["checks"]}
+        self.assertEqual("grants_outside_policy", checks["authorization.grants"]["code"])
+
+        both = run_doctor(db, objects, policy_path=paths, principal_id="local-user")
+        DOCTOR_VALIDATOR.validate(both)
+        self.assertTrue(both["ready"])
+        checks = {item["check_id"]: item for item in both["checks"]}
+        policy_details = {detail["name"]: detail["value"] for detail in checks["authorization.policy"]["details"]}
+        self.assertEqual(["one-pack-1", "one-pack-2"], policy_details["policy_ids"])
+        grant_details = {detail["name"]: detail["value"] for detail in checks["authorization.grants"]["details"]}
+        self.assertEqual(2, grant_details["matching_grant_count"])
+
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            code = main(
+                [
+                    "--db", str(db), "--store", str(objects), "doctor",
+                    "--policy", str(paths[0]), "--policy", str(paths[1]),
+                    "--principal", "local-user",
+                ]
+            )
+        self.assertEqual(0, code, stdout.getvalue())
+
+        # A grant must match the policy that issued it, not merely any policy naming the pack.
+        swapped = self.base / "swapped.json"
+        swapped.write_text(json.dumps({**base, "policy_id": "one-pack-3", "allowed_pack_ids": ["example.vehicle-adapter.1.0"]}), encoding="utf-8")
+        mismatch = run_doctor(db, objects, policy_path=[swapped, paths[1]], principal_id="local-user")
+        self.assertFalse(mismatch["ready"])
+        grant_details = {
+            detail["name"]: detail["value"]
+            for detail in next(item for item in mismatch["checks"] if item["check_id"] == "authorization.grants")["details"]
+        }
+        self.assertEqual([f"{first}:policy_id"], grant_details["grant_mismatches"])
+
+        conflict = self.base / "conflict.json"
+        conflict.write_text(json.dumps({**base, "policy_id": "one-pack-1", "allowed_pack_ids": ["example.vehicle-adapter.2.0"]}), encoding="utf-8")
+        conflicted = run_doctor(db, objects, policy_path=[paths[0], conflict], principal_id="local-user")
+        DOCTOR_VALIDATOR.validate(conflicted)
+        self.assertFalse(conflicted["ready"])
+        checks = {item["check_id"]: item for item in conflicted["checks"]}
+        self.assertEqual("policy_conflict", checks["authorization.policy"]["code"])
+
+    def test_padded_principal_is_reported_not_stripped(self) -> None:
+        for principal in (" local-user", "local-user ", "local-user\n", "local\ud800user"):
+            with self.subTest(principal=principal):
+                report = self._run(principal=principal)
+                DOCTOR_VALIDATOR.validate(report)
+                self.assertFalse(report["ready"])
+                self.assertIsNone(report["request"]["principal_id"])
+                checks = {item["check_id"]: item for item in report["checks"]}
+                self.assertEqual("principal_invalid", checks["authorization.policy"]["code"])
+                self.assertEqual("principal_invalid", checks["authorization.grants"]["code"])
+                self.assertEqual("not_checked", report["query_smoke"]["status"])
+        unselected = run_doctor(self.db, self.objects, policy_path=POLICY)
+        checks = {item["check_id"]: item for item in unselected["checks"]}
+        self.assertEqual("principal_not_selected", checks["authorization.policy"]["code"])
+
     def test_cli_uses_completed_not_ready_exit_without_error_envelope(self) -> None:
         ready_stdout, ready_stderr = io.StringIO(), io.StringIO()
         with redirect_stdout(ready_stdout), redirect_stderr(ready_stderr):
