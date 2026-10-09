@@ -1,14 +1,18 @@
 # Validation report
 
-## October 8 unpublished a6 gap closure
+## Current status — 0.1.0a7 (recorded 2026-10-09)
 
-See [gap-closure evidence](docs/GAP_CLOSURE_2026-10-08.md) for the unchanged-record integrity fix, non-mutating query startup, 438-pack physical-page ledger, eleven-case real 810H regression gate, and current-source prepared candidate. Full-corpus semantic and visual qualification and public publication remain outstanding. Historical validation below retains its original scope and identities.
+The current published release is `v0.1.0a7`, with eleven read operations through the CLI and stdio MCP. Its exact identities, observed CI, native prepared acceptance, PyPI publication, public readback and [known limitations](docs/RELEASE_0.1.0a7.md#known-limitations) are in the [a7 release evidence](docs/RELEASE_0.1.0a7.md). Everything below is the dated record from earlier snapshots (through the a6 publication) and retains its original scope, identities and status wording.
 
-Date: 2026-09-22
+## October 8 a6 gap closure (historical; published in a6)
+
+See [gap-closure evidence](https://github.com/DDNA-Engineering/standards-memory/blob/ea57a737ca90255c17d011c32814cd19abbd3cc3/docs/GAP_CLOSURE_2026-10-08.md) (commit `ea57a73`; the current file of that name was later replaced by the knowledge-access record) for the unchanged-record integrity fix, non-mutating query startup, 438-pack physical-page ledger, eleven-case real 810H regression gate, and current-source prepared candidate. Full-corpus semantic and visual qualification and public publication remain outstanding. Historical validation below retains its original scope and identities.
+
+Date: 2026-09-22 (historical record)
 
 Scope: `TASK-001` through `TASK-040` deterministic local evidence engine, authorization-safe installed-document discovery, stdio MCP adapter with model-facing MIL-STD reading guidance and operation-specific output schemas, official-source integrity boundary, PDF/derived-outline/reviewed-structure/corpus compilers, bounded reviewed semantic packets and procedure ordering, explicit lexical discovery modes, conservative edition-alignment candidates and side-qualified transitive dependency impacts, content-bound offline synthetic qualification, non-mutating portable readiness diagnosis, honest coverage, concise responses, exact page/structure spans, source-linked scoped discovery, executable response contracts and versioned generated-artifact schemas, dependency-complete CI, reproducible core-wheel acceptance and build provenance, a deterministic synthetic starter, a source-first engineering handoff, offline-verifiable release evidence, process-isolated PDF parsing, lossless storage/wire compression, policy-bound installation of the downloaded local MIL-STD corpus, acquisition-pinned prepared-distribution scope, an offline model-ready prepared runtime, bounded exact-outline review shards, complete method-numbered outline caption identities, reviewer-mediated recovery of ambiguous numbered evidence, and source-evidenced PART body scoping
 
-Repository state at validation: local uncommitted development working tree
+Repository state at validation: local uncommitted development working tree (as of 2026-09-22)
 
 ## TASK-040 issue #8 PART scope (local acceptance)
 
@@ -299,11 +303,11 @@ The single-PDF compiler rejects encrypted PDFs; the DLA corpus compiler addition
 
 The local database is schema version 5. Tested v1/v2/v3-to-v5 migrations add explicit derivation/statement-role/structure fields where needed, and the tested v4-to-v5 migration rebuilds the exact and natural-language FTS5 external-content projections and their triggers. Legacy derivations remain `unknown`/`unreviewed`; migrations never invent obligation classifications or structure. Installation is content-addressed and metadata activation is transactional. To roll back a development instance, stop using the local CLI and remove only its explicitly selected database/object directory. Grant revocation provides immediate logical denial without deleting evidence bytes.
 
-## Limitations
+## Limitations (2026-09-22 record)
 
 - Real PDF text layers are compiled and source-linked. One reviewed structural section and one synthetic reviewed semantic packet are qualified, but document-wide visual reading order, tables, figures, OCR, semantic clauses, dependencies, and obligation classification are not qualified.
-- The seven read operations are implemented in the local library, CLI, and stdio MCP adapter; no HTTP transport is implemented, and a hosted multi-tenant service is not a product target.
-- A one-record static source-first reader and deterministic CycloneDX release SBOMs are implemented. There is no corpus-wide interactive reader, persistent background compilation service, model adapter, broad performance benchmark, configured runtime tokenizer, or locally observed signed release artifact.
+- The seven read operations are implemented in the local library, CLI, and stdio MCP adapter; no HTTP transport is implemented, and a hosted multi-tenant service is not a product target. *(Superseded: a7 implements eleven read operations; HTTP remains unimplemented.)*
+- A one-record static source-first reader and deterministic CycloneDX release SBOMs are implemented. There is no corpus-wide interactive reader, persistent background compilation service, model adapter, broad performance benchmark, configured runtime tokenizer, or locally observed signed release artifact. *(Superseded in part: a7 supports an explicitly host-configured, SHA-256-pinned local tokenizer for `select-evidence`; the prepared a7 distribution configures none.)*
 - Exact quote presence is not proof of PDF fidelity, and returned evidence is not an applicability, compliance, or human approval decision.
 
 ## October 8 scan-recovery follow-up

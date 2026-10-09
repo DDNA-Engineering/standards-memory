@@ -2,6 +2,8 @@
 
 The missing-text gap is closed for this source through separate, source-bound recovery packages. All 18 physical pages were rendered and inspected, transcribed, compiled, installed, and queried. The old page package and corpus snapshot remain immutable. This is an unpublished local recovery supplement, not a replacement of the earlier prepared archive.
 
+Status note (2026-10-09): both recovery packs were subsequently included in the unified [a6 prepared release](RELEASE_0.1.0a6.md) and retained unchanged in [a7](RELEASE_0.1.0a7.md). The rest of this document is the historical record of the local supplement and its own byte identities.
+
 ## Root cause and recovery
 
 The original PDF is a scan. PDFium finds only the publisher download footer in its native text layer. The pinned pypdf layout parser fails on an inline RunLengthDecode image on page 2 (`EI stream not found`). The older compiler's one-record/17-missing-page result therefore understated the problem: the standard's body text had not been recovered on any of the 18 pages.

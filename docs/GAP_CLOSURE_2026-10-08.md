@@ -1,6 +1,6 @@
 # Knowledge access gap closure — 2026-10-08
 
-Status: local, uncommitted, unpublished source changes after a6. The released a6 artifacts remain unchanged. Usage is documented in [knowledge access and compression](KNOWLEDGE_ACCESS.md).
+Status (historical, as of 2026-10-08): local, uncommitted, unpublished source changes after a6. The runtime changes were later committed and published in [0.1.0a7](RELEASE_0.1.0a7.md); the corpus-wide `outline-v4` packages and the 441-pack content bundle measured here were not published, and the a7 prepared content baseline is unchanged from a6. This record otherwise retains its original scope. It replaced an earlier a6 gap-closure record of the same name, preserved at [commit `ea57a73`](https://github.com/DDNA-Engineering/standards-memory/blob/ea57a737ca90255c17d011c32814cd19abbd3cc3/docs/GAP_CLOSURE_2026-10-08.md). Usage is documented in [knowledge access and compression](KNOWLEDGE_ACCESS.md).
 
 ## Implemented and observed
 
@@ -28,6 +28,6 @@ Local raw evidence is retained under `build/knowledge-audit-2026-10-08/`: `outli
 
 ## Remaining qualification
 
-These changes do **not** establish corpus-wide semantic completeness. The new outlines remain unclassified. Subsequent local work adds 31 reviewed records across four more standards, exact reviewed cross-standard navigation, and a 12-question human answer-review packet; see [review and reference qualification](REVIEW_AND_REFERENCE_QUALIFICATION.md). Tables, figures, cross-page conditions and exceptions still require broader source-level review. Unresolved references are not silently promoted. The wheel and 211-test results above describe the earlier compression/navigation snapshot, not these subsequent changes.
+These changes do **not** establish corpus-wide semantic completeness. The new outlines remain unclassified. Subsequent local work adds 31 reviewed records across four more standards, exact reviewed cross-standard navigation, and a 12-question answer-review packet that was then agent self-reviewed (`independence_claim: self_review`; no human or separate-reviewer judgment); see [review and reference qualification](REVIEW_AND_REFERENCE_QUALIFICATION.md). Tables, figures, cross-page conditions and exceptions still require broader source-level review. Unresolved references are not silently promoted. The wheel and 211-test results above describe the earlier compression/navigation snapshot, not these subsequent changes.
 
-Independent held-out questions and reviewed model answers are still needed to establish broad retrieval/answer quality. No exhaustive codec or retrieval comparison establishes global optimality. Native CI and publication of these source changes have not occurred.
+Independent held-out questions and reviewed model answers are still needed to establish broad retrieval/answer quality. No exhaustive codec or retrieval comparison establishes global optimality. As of this record, native CI and publication of these source changes had not occurred; the runtime was later published in a7 (see status above).

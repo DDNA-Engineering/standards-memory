@@ -21,6 +21,8 @@ Search a precompiled MIL-STD library from your terminal or model host. The **441
 
 The a7 runtime includes **eleven read-only model tools**, including original PDF delivery, structural browsing, evidence selection and reviewed-reference navigation. The prepared library retains the qualified 441-package source baseline. See [knowledge access](docs/KNOWLEDGE_ACCESS.md) for representation and coverage limits.
 
+**Prepared-install limitation:** the prepared a7 launcher configures no reviewed reference bindings or tokenizer, and none are bundled. There, `follow_references` returns `reference_bindings_not_configured` and `select_evidence` token budgets return `tokenizer_unavailable`; byte budgets work. See [known limitations](docs/RELEASE_0.1.0a7.md#known-limitations).
+
 <a id="use-the-prepared-library-with-your-model"></a>
 
 ## Install and connect your model

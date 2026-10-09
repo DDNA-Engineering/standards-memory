@@ -2,7 +2,9 @@
 
 Validation evidence must state exactly what ran and what it proves. Local source checks, installed-wheel acceptance, protected CI, publication, anonymous download, clean extraction, and end-user acceptance are separate facts.
 
-The current [`v0.1.0a6` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a6) publishes the unified 441-package library and the exact PyPI code wheel. All four native prepared-install jobs passed, including first/repeat Windows offline MCP setup; anonymous download and fresh installed CLI checks also passed. See [the a6 release record](../RELEASE_0.1.0a6.md) for immutable identities, the 52-case qualification boundary, and separate CI/publication evidence.
+The current [`v0.1.0a7` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a7) publishes the eleven-tool runtime, one-command setup with generated host configuration, the unchanged 441-package library and the exact PyPI code wheel. Native prepared acceptance passed first/repeated core and MCP setup on Windows, Ubuntu, Intel macOS and Apple silicon macOS; trusted PyPI publication, anonymous download and fresh installed CLI checks also passed. See [the a7 release record](../RELEASE_0.1.0a7.md) for immutable identities, observed validation and [known limitations](../RELEASE_0.1.0a7.md#known-limitations).
+
+The earlier [`v0.1.0a6` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a6) first published the unified 441-package library with seven read tools. See [the a6 release record](../RELEASE_0.1.0a6.md) for its identities, the 52-case qualification boundary, and separate CI/publication evidence.
 
 The earlier published [`v0.1.0a5` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a5) is a frozen artifact, not the latest checkout. Later source commit `5cc82cd` passed the [protected cross-platform CI matrix and wheel/starter attestation job](https://github.com/DDNA-Engineering/standards-memory/actions/runs/35795549605), but that result does not republish or attest the prepared ZIP or PyPI wheel and does not establish real-document semantic or visual acceptance.
 
@@ -12,7 +14,7 @@ From an isolated environment at the repository root:
 
 ```powershell
 $env:PYTHONPATH = Join-Path $PWD 'src'
-python -m pip install -e ".[mcp,compiler,contract]"
+python -m pip install -e ".[mcp,compiler,contract,tokens]"
 python -m pip check
 python scripts/validate_contracts.py
 python -m unittest discover -s tests -v
