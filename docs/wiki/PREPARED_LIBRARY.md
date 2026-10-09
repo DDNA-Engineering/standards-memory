@@ -1,6 +1,6 @@
 # Prepared offline library
 
-The published [StandardsForge `v0.1.0a7` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a7) is the normal end-user path. It already contains the dependency-free StandardsForge wheel, compressed MIL-STD packs from the recorded public-source acquisition snapshot, exact local policies, setup and launcher scripts, and recorded provenance. Users do not reacquire PDFs or compile the corpus.
+The [StandardsForge `v0.1.0a8` release](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a8) is the normal end-user path. It already contains the dependency-free StandardsForge wheel, compressed MIL-STD packs from the recorded public-source acquisition snapshot, exact local policies, setup and launcher scripts, and recorded provenance. Users do not reacquire PDFs or compile the corpus.
 
 The GitHub prepared release and the PyPI project are separate channels. The prepared release carries the rights-qualified corpus and supports an offline core setup. PyPI carries independently built StandardsForge code only; it does not bundle, fetch, or authorize standards content.
 
@@ -115,7 +115,7 @@ Both paths generate host configuration with the actual absolute paths, install t
 
 The prepared library is a fixed acquisition snapshot completed September 21, 2026 against the DLA ASSIST dataset marked updated September 18, 2026. The complete 438-pack inventory is in the [root README](../../README.md#complete-prepared-library-snapshot).
 
-The published a7 archive contains 441 packages: 438 page-text packs from 912 verified PDFs, a separate automated, unreviewed 8,319-record MIL-STD-810H `outline-v3` pack, and two bounded MIL-STD-1661 recovery packs. This content baseline is unchanged from a6. Later source-only outline (`outline-v4`, `outline-v5`) and reviewer changes are not part of this frozen release. Its included `CONTENT-NOTICE.md` is frozen with that archive; the [source template](../../scripts/prepared_distribution/CONTENT-NOTICE.md) describes the notice for future builds and must not be mistaken for an update to the published asset.
+The a8 archive contains 447 packages: 438 page-text packs from 912 verified PDFs, a separate automated, unreviewed 8,319-record MIL-STD-810H `outline-v3` pack, two bounded MIL-STD-1661 recovery packs, and six bounded agent-reviewed requirement scopes with 23 reviewed cross-standard references ([review record](../AGENT_REVIEW_2026-10.md)). The source baseline is unchanged from a6 and a7, which contain 441 packages. Later source-only outline (`outline-v4`, `outline-v5`) and reviewer changes are not part of this frozen release. Its included `CONTENT-NOTICE.md` is frozen with that archive; the [source template](../../scripts/prepared_distribution/CONTENT-NOTICE.md) describes the notice for future builds and must not be mistaken for an update to the published asset.
 
 The prepared set contains every selected publicly exposed current component for those packs. Twenty-five packs are explicitly partial because their current DLA composition also includes restricted components. Restricted bytes and restricted-only records are not included.
 

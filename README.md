@@ -6,12 +6,12 @@
 
 **Defense engineering standards, ready for offline search.**
 
-Search a precompiled MIL-STD library from your terminal or model host. The **441-package release** preserves exact source evidence, edition identities, and review status in a local library.
+Search a precompiled MIL-STD library from your terminal or model host. The **447-package release** preserves exact source evidence, edition identities, and review status in a local library.
 
 [![Release: 0.1.0a8 alpha](https://img.shields.io/badge/release-0.1.0a8_alpha-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a8)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
 [![Queries: offline](https://img.shields.io/badge/queries-offline-253247?style=flat-square)](docs/wiki/ARCHITECTURE_AND_TRUST.md)
-[![Library: 441 packages](https://img.shields.io/badge/library-441_packages-EA6A23?style=flat-square)](#what-is-included)
+[![Library: 447 packages](https://img.shields.io/badge/library-447_packages-EA6A23?style=flat-square)](#what-is-included)
 
 [Download library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a8/standardsforge-ready-0.1.0a8.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a8/standardsforge-ready-0.1.0a8.zip.sha256) · [Install CLI](#install-the-code-cli-only) · [Release evidence](docs/RELEASE_0.1.0a8.md) · [Documentation](docs/wiki/README.md)
 
@@ -19,9 +19,9 @@ Search a precompiled MIL-STD library from your terminal or model host. The **441
 
 ---
 
-The a7 runtime includes **eleven read-only model tools**, including original PDF delivery, structural browsing, evidence selection and reviewed-reference navigation. The prepared library retains the qualified 441-package source baseline. See [knowledge access](docs/KNOWLEDGE_ACCESS.md) for representation and coverage limits.
+The runtime includes **eleven read-only model tools**, including original PDF delivery, structural browsing, evidence selection and reviewed-reference navigation. The a8 library keeps the qualified 441-package source baseline and adds six bounded, **agent-reviewed** requirement scopes (MIL-STD-882E, 461H, 464D, 704F, 1474E and 1472H) with 23 reviewed cross-standard references. See [knowledge access](docs/KNOWLEDGE_ACCESS.md) for representation and coverage limits.
 
-**Prepared-install limitation:** the prepared a7 launcher configures no reviewed reference bindings or tokenizer, and none are bundled. There, `follow_references` returns `reference_bindings_not_configured` and `select_evidence` token budgets return `tokenizer_unavailable`; byte budgets work. See [known limitations](docs/RELEASE_0.1.0a7.md#known-limitations).
+**Review status:** the six reviewed scopes are agent self-review of extracted page text, not human or independent review, and they cover 40,830 of 7,289,021 text bytes in those six documents. Everything else remains unreviewed page text or automated outline. Reviewed references resolve only between those scopes; other citations are reported as unresolved. See the [review record](docs/AGENT_REVIEW_2026-10.md).
 
 <a id="use-the-prepared-library-with-your-model"></a>
 
@@ -69,7 +69,7 @@ python setup.py
 python run.py search "environmental testing" --principal local-user --query-mode natural_language --limit 5
 ```
 
-Use `python3` on Linux/macOS. Core setup never uses a package index. Token budgets for `select_evidence` need the model-connection setup above; byte budgets always work. Setup verifies all **441 packages** and replays **52 bounded real-document checks** before reporting readiness. Repeat the same setup command to revalidate. For an upgrade, extract the new version into a new folder and use its generated host configuration; keep the old folder until the new connection works.
+Use `python3` on Linux/macOS. Core setup never uses a package index. Token budgets for `select_evidence` need the model-connection setup above; byte budgets always work. Setup verifies all **447 packages** and replays **294 bounded real-document checks** before reporting readiness. Repeat the same setup command to revalidate. For an upgrade, extract the new version into a new folder and use its generated host configuration; keep the old folder until the new connection works.
 
 ## Install the code CLI only
 
@@ -82,20 +82,21 @@ The [PyPI package](https://pypi.org/project/standardsforge/0.1.0a8/) contains th
 
 ## What is included
 
-The **October 8, 2026 a7 release** contains:
+The **0.1.0a8 release** contains:
 
 | Content | Packages | Scope |
 |---|---:|---|
 | MIL-STD source library | 438 | 912 verified PDFs; 35,218 page-text records across 35,235 physical pages |
 | MIL-STD-810H outline-v3 | 1 | 8,319 automated, unreviewed structural records |
 | MIL-STD-1661 scan recovery | 2 | 18 transcribed pages with raster evidence and 41 semantic records, including five separate 4.2.4 directives; bounded agent review |
-| **Total** | **441** | Additional representations preserve the same source documents |
+| Agent-reviewed requirement scopes | 6 | 232 records (123 obligation records) from bounded sections of MIL-STD-882E, 461H, 464D, 704F, 1474E and 1472H, plus 23 reviewed cross-standard references; agent self-review |
+| **Total** | **447** | Additional representations preserve the same source documents |
 
-The archive also includes the dependency-free core wheel, one-command setup, CLI/MCP launchers, generated host configuration, local policies, checksums, build provenance, qualification records, and the Windows offline MCP dependencies. New runtime tools operate on this existing evidence; corpus-wide semantic review and newer outline representations are separate work.
+The archive also includes the dependency-free core wheel, one-command setup, CLI/MCP launchers, generated host configuration, local policies, checksums, build provenance, qualification records, the Windows offline MCP dependencies for Python 3.11–3.13, and the pinned `o200k_base` token counter. Corpus-wide semantic review and newer outline representations are separate work.
 
 ## Validation and evidence limits
 
-Release acceptance covers first and repeated installation on **Windows, Linux, Intel macOS, and Apple silicon macOS**, source CI, 52 bounded real-document cases, MCP connectivity and public artifact identity. See the [a7 release evidence](docs/RELEASE_0.1.0a7.md) for observed results, exact hashes and qualification scope.
+Before publication, release acceptance must cover first and repeated installation on **Windows (Python 3.11, 3.12 and 3.13), Linux, Intel macOS, and Apple silicon macOS**, source CI, 294 bounded real-document cases, MCP connectivity with token-budgeted selection, and public artifact identity. See the [a8 release record](docs/RELEASE_0.1.0a8.md) for what has been observed so far, exact hashes and qualification scope.
 
 This is an **alpha release**. Source-linked page text, automated outlines, and reviewed records retain their distinct coverage and review status. The bounded checks do not establish corpus-wide visual or semantic completeness or globally optimal compression. Applicability, project baselines, and compliance decisions remain with the responsible engineering authorities.
 

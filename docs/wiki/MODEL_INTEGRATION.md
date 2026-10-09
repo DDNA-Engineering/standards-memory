@@ -16,7 +16,7 @@ codex plugin list --marketplace standardsforge --json
 
 For a local source checkout, replace the first command with `codex plugin marketplace add .` from the repository root. The marketplace stores only this small skill plugin in the plugin cache; it does not copy the repository's local corpus or database. The plugin reuses an existing `standardsforge` or `standardsforge-local` MCP connection. It has no bundled MCP server, credentials, machine-specific paths, network fallback or installation hook. Installing it does not install or upgrade the runtime or standards content.
 
-Plugin 0.1.4 includes original PDF links in standards answers. The a7 runtime supplies `get_source_pdfs` and all eleven read tools. Upgrade by installing the a7 prepared archive into a new folder, then use its generated host configuration and restart the MCP connection. Updating the plugin alone does not update the runtime.
+Plugin 0.1.4 includes original PDF links in standards answers. The a7 and later runtimes supply `get_source_pdfs` and all eleven read tools. Upgrade by installing the newest prepared archive into a new folder, then use its generated host configuration and restart the MCP connection. Updating the plugin alone does not update the runtime.
 
 Start a new chat after installation. In Codex CLI or the IDE extension, use `/skills` to select **StandardsForge**. Codex qualifies the skill name with its plugin name, so the explicit invocation is:
 
@@ -99,7 +99,7 @@ codex mcp add standardsforge -- "$PWD/.venv/bin/python" -I "$PWD/run_mcp.py"
 
 Ask the host to list installed MIL-STD-810 editions, find the low-pressure section and retrieve exact source evidence and its original PDF. The connected a7 server advertises eleven tools. Search results are candidates; retrieve an exact record before relying on its text.
 
-The prepared launcher passes no reviewed reference bindings or tokenizer configuration and accepts no overrides; the archive bundles neither. In a prepared a7 installation, `follow_references` returns `reference_bindings_not_configured` and `select_evidence` with `max_tokens` returns `tokenizer_unavailable`; byte budgets work. See [known limitations](../RELEASE_0.1.0a7.md#known-limitations).
+From a8, the prepared launcher passes the bundled, hash-pinned `o200k_base` tokenizer and the bundled agent-reviewed reference bindings, and still accepts no overrides. `select_evidence` with `max_tokens` therefore works, and `follow_references` follows the 23 reviewed references among the six reviewed scopes; records outside those scopes have no reviewed bindings. A changed tokenizer or binding file stops the server from starting. In a prepared a7 installation, `follow_references` returns `reference_bindings_not_configured` and `select_evidence` with `max_tokens` returns `tokenizer_unavailable`; see [a7 known limitations](../RELEASE_0.1.0a7.md#known-limitations).
 
 ## Upgrade or troubleshoot
 

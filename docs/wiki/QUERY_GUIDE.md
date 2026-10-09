@@ -1,6 +1,6 @@
 # Query guide
 
-The published `0.1.0a7` release exposes eleven read operations through the CLI and the stdio MCP adapter. [Knowledge access and compression](../KNOWLEDGE_ACCESS.md) and [reviewed references](../REVIEW_AND_REFERENCE_QUALIFICATION.md) describe the four operations added after a6. Administration, acquisition, compilation, installation, revocation, and handoff export remain separate.
+The `0.1.0a7` and later releases expose eleven read operations through the CLI and the stdio MCP adapter. [Knowledge access and compression](../KNOWLEDGE_ACCESS.md) and [reviewed references](../REVIEW_AND_REFERENCE_QUALIFICATION.md) describe the four operations added after a6. Administration, acquisition, compilation, installation, revocation, and handoff export remain separate.
 
 ## Operations
 
