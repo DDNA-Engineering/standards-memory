@@ -345,7 +345,10 @@ class PDFIsolationHardeningTests(unittest.TestCase):
 
         def popen(*args, **kwargs):
             process = real_popen(*args, **kwargs)
-            process._handle = 0  # the Windows handle attribute read by job.assign
+            if not hasattr(process, "_handle"):
+                # Simulated Windows on POSIX: give job.assign the handle attribute it reads.
+                # On real Windows the genuine handle must stay intact for kill/wait.
+                process._handle = 0
             started.append(process)
             return process
 

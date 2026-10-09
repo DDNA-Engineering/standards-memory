@@ -5,6 +5,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -15,6 +16,33 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import validate_installed_wheel as wheel_build  # noqa: E402
 
+
+
+def _workflow_steps(text: str) -> dict[tuple[str, str], str]:
+    """Map (job, step name) to the step's text for this repository's two-space workflow layout."""
+
+    steps: dict[tuple[str, str], str] = {}
+    job = None
+    current = None
+    in_jobs = False
+    for line in text.splitlines():
+        if line == "jobs:":
+            in_jobs = True
+            continue
+        job_match = re.fullmatch(r"  ([A-Za-z0-9_-]+):", line) if in_jobs else None
+        if job_match:
+            job, current = job_match.group(1), None
+            continue
+        step_match = re.fullmatch(r"      - name: (.+)", line)
+        if step_match and job is not None:
+            current = (job, step_match.group(1).strip())
+            steps[current] = ""
+            continue
+        if re.match(r"      - ", line):
+            current = None
+        if current is not None:
+            steps[current] += line + "\n"
+    return steps
 
 class WheelBuildTests(unittest.TestCase):
     def test_source_inventory_excludes_generated_egg_info(self) -> None:
@@ -46,8 +74,9 @@ class WheelBuildTests(unittest.TestCase):
             root = Path(temporary) / "repo"
             package = root / "src" / "standardsforge"
             package.mkdir(parents=True)
-            (package / "__init__.py").write_text("VERSION = 'test'\n", encoding="utf-8")
-            (root / "pyproject.toml").write_text("[project]\n", encoding="utf-8")
+            # Exact bytes: write_text would emit CRLF on Windows.
+            (package / "__init__.py").write_bytes(b"VERSION = 'test'\n")
+            (root / "pyproject.toml").write_bytes(b"[project]\n")
             base = Path(temporary) / "base"
             base.mkdir()
             with patch.object(wheel_build, "ROOT", root):
@@ -74,24 +103,18 @@ class WheelBuildTests(unittest.TestCase):
         self.assertIn("_stage_clean_sources(base, wheel_source_paths, 2)", source)
 
     def test_publish_workflow_compares_the_wheel_digest_with_the_wheel(self) -> None:
-        import yaml
-
-        workflow = yaml.safe_load((ROOT / ".github" / "workflows" / "publish-pypi.yml").read_text(encoding="utf-8"))
-        publish_steps = workflow["jobs"]["publish"]["steps"]
-        names = [step.get("name", step.get("uses", "")) for step in publish_steps]
-        verify_index = next(index for index, name in enumerate(names) if name.startswith("Verify the candidate wheel"))
-        publish_index = next(index for index, name in enumerate(names) if name.startswith("Publish exact candidate"))
-        self.assertLess(verify_index, publish_index)
-        native = next(
-            step["run"] for step in workflow["jobs"]["native-install"]["steps"]
-            if step.get("name", "").startswith("Install and exercise")
-        )
+        steps = _workflow_steps((ROOT / ".github" / "workflows" / "publish-pypi.yml").read_text(encoding="utf-8"))
+        publish_names = [name for job, name in steps if job == "publish"]
+        verify_name = next(name for name in publish_names if name.startswith("Verify the candidate wheel"))
+        publish_name = next(name for name in publish_names if name.startswith("Publish exact candidate"))
+        self.assertLess(publish_names.index(verify_name), publish_names.index(publish_name))
+        native_name = next(name for job, name in steps if job == "native-install" and name.startswith("Install and exercise"))
         scripts = {
-            "publish": publish_steps[verify_index]["run"],
-            "native-install": native,
+            "publish": steps[("publish", verify_name)],
+            "native-install": steps[("native-install", native_name)],
         }
         for job, run in scripts.items():
-            script = re.search(r"<<'PY'\n(.*?)\n\s*PY\s*$", run, re.S).group(1)
+            script = textwrap.dedent(re.search(r"<<'PY'\n(.*?)\n\s*PY\s*$", run, re.S).group(1))
             # Only the digest gate is exercised; stop before installation side effects.
             gate = script.split("subprocess.run(", 1)[0] if job == "native-install" else script
             with self.subTest(job=job), tempfile.TemporaryDirectory(prefix="standardsforge-publish-gate-") as temporary:

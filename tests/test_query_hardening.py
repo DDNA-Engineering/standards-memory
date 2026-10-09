@@ -244,6 +244,10 @@ class ConcurrentObjectActivationTests(_ServiceFixture):
         self.assertEqual([], list((other / "objects").iterdir()))
 
 
+# "?" must be percent-encoded in a URI but is not a valid Windows file-name character.
+_QUESTION = "" if os.name == "nt" else "?"
+
+
 class ReadOnlyDatabaseUriTests(unittest.TestCase):
     def test_posix_drive_and_unc_paths(self) -> None:
         cases = [
@@ -263,7 +267,7 @@ class ReadOnlyDatabaseUriTests(unittest.TestCase):
 
     def test_round_trip_opens_read_only_database_with_special_characters(self) -> None:
         with tempfile.TemporaryDirectory(prefix="standardsforge-uri-") as temp:
-            directory = Path(temp) / "store dir #1 ?x %41 ünï"
+            directory = Path(temp) / f"store dir #1 {_QUESTION}x %41 ünï"
             directory.mkdir()
             path = directory / "memory db#ü.sqlite"
             with closing(sqlite3.connect(path)) as writer, writer:
@@ -277,7 +281,7 @@ class ReadOnlyDatabaseUriTests(unittest.TestCase):
 
     def test_read_only_service_opens_store_under_special_path(self) -> None:
         with tempfile.TemporaryDirectory(prefix="standardsforge-uri-") as temp:
-            base = Path(temp) / "sf #state ?ü"
+            base = Path(temp) / f"sf #state {_QUESTION}ü"
             digest = StandardsForgeService(base / "memory.db", base / "objects").install_pack(PACK_V1, POLICY)["package_digest"]
             service = StandardsForgeService.open_read_only(base / "memory.db", base / "objects")
             self.assertEqual("clause-4.2.1", service.get_clause(digest, "4.2.1", PRINCIPAL)["evidence"][0]["record_id"])

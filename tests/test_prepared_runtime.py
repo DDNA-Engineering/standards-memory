@@ -351,9 +351,13 @@ class _FakeEnvBuilder:
 class PreparedRecoveryTests(unittest.TestCase):
     """Interrupted or failed setup must stay recoverable and never strand .venv."""
 
-    setUp = PreparedRuntimeTests.setUp
     tearDown = PreparedRuntimeTests.tearDown
     _write_manifest = PreparedRuntimeTests._write_manifest
+
+    def setUp(self) -> None:
+        PreparedRuntimeTests.setUp(self)
+        # Setup resolves its root; compare against the same path (macOS /var -> /private/var).
+        self.root = self.root.resolve()
 
     def _partial_install(self) -> tuple[str, Path, Path]:
         _, digest = validate_bundle(self.root)
