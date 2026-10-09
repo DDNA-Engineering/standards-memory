@@ -266,6 +266,82 @@ class DistributionScopeTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "missing locked packages"):
                 _validate_mcp_wheelhouse(wheelhouse, {"3.12": requirements})
 
+    def test_reviewed_supplement_is_bound_to_corpus_runtime_and_bindings(self) -> None:
+        from contextlib import contextmanager
+
+        runtime_sources = {"service.py": "1" * 64}
+        runtime_digest = distribution_module.digest(runtime_sources)
+        with tempfile.TemporaryDirectory(prefix="standardsforge-reviewed-supplement-") as temporary:
+            root = Path(temporary)
+            for name in ("packs", "policies", "qualification"):
+                (root / name).mkdir()
+            pack = SimpleNamespace(package_digest="c" * 64, manifest={"pack_id": "reviewed.pack", "edition_id": "edition"})
+            supplement = {"packs": [{"slug": "mil-std-882e", "pack_id": "reviewed.pack", "package_digest": "c" * 64,
+                                     "source_package_digest": "a" * 64}]}
+            suite = {"suite": {"package_digest": "c" * 64, "edition_id": "edition"}}
+            run = {"run": {"gate": {"passed": True}, "runtime_source_sha256": runtime_digest}}
+
+            def write() -> None:
+                (root / "supplement.json").write_text(json.dumps(supplement), encoding="utf-8")
+                (root / "qualification" / "mil-std-882e-suite.json").write_text(json.dumps(suite), encoding="utf-8")
+                (root / "qualification" / "mil-std-882e-run.json").write_text(json.dumps(run), encoding="utf-8")
+
+            @contextmanager
+            def opened(_archive: Path):
+                yield pack
+
+            def validate(included: set[str] | None = None):
+                with patch.object(distribution_module, "validate_run"), patch.object(distribution_module, "_validate_policy"), \
+                        patch.object(distribution_module, "open_validated_pack", opened):
+                    return distribution_module._validate_reviewed_supplement(
+                        root, {"a" * 64}, runtime_sources, set(included or {"d" * 64}))
+
+            write()
+            qualified, payloads, reference = validate()
+            self.assertEqual("packs/reviewed/mil-std-882e.zip", qualified[0]["path"])
+            self.assertEqual("qualification/reviewed/mil-std-882e-run.json", qualified[0]["run_path"])
+            self.assertEqual(3, len(payloads))
+            self.assertIsNone(reference)
+            with self.assertRaisesRegex(ValueError, "duplicates an included package"):
+                validate({"c" * 64})
+
+            for change, message in (
+                (lambda: supplement["packs"][0].update(source_package_digest="b" * 64), "not an included corpus package"),
+                (lambda: supplement["packs"][0].update(slug="Bad Slug"), "unique lowercase"),
+                (lambda: supplement["packs"].append(dict(supplement["packs"][0])), "unique lowercase"),
+                (lambda: run["run"].update(runtime_source_sha256="0" * 64), "exact pack and wheel runtime"),
+                (lambda: run["run"]["gate"].update(passed=False), "exact pack and wheel runtime"),
+                (lambda: supplement["packs"][0].update(package_digest="e" * 64), "identity differs"),
+            ):
+                baseline = (copy.deepcopy(supplement), copy.deepcopy(run))
+                change()
+                write()
+                with self.assertRaisesRegex(ValueError, message):
+                    validate()
+                supplement, run = baseline
+            write()
+
+            bindings_path = root / "reference-bindings.json"
+            bindings = {"schema_version": "0.1.0", "binding_set": {"bindings": []}}
+            bindings_path.write_text(json.dumps(bindings), encoding="utf-8")
+            class Accepting:
+                @staticmethod
+                def check_schema(_schema): return None
+                def __init__(self, _schema): pass
+                def validate(self, _instance): return None
+            with patch.object(distribution_module, "validator_for", return_value=Accepting):
+                with self.assertRaisesRegex(ValueError, "differ from the reviewed supplement"):
+                    validate()
+                supplement["reference_bindings"] = {"path": "reference-bindings.json", "sha256": distribution_module._sha256(bindings_path)}
+                write()
+                self.assertEqual(bindings_path, validate()[2][0])
+                bindings["binding_set"]["bindings"] = [{"target": {"package_digest": "f" * 64}}]
+                bindings_path.write_text(json.dumps(bindings), encoding="utf-8")
+                supplement["reference_bindings"]["sha256"] = distribution_module._sha256(bindings_path)
+                write()
+                with self.assertRaisesRegex(ValueError, "not in this distribution"):
+                    validate()
+
     def test_prepared_mcp_launcher_rejects_all_overrides(self) -> None:
         launcher = (
             ROOT / "scripts" / "prepared_distribution" / "standardsforge-mcp.ps1"

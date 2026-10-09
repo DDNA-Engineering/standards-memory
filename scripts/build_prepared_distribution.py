@@ -734,7 +734,8 @@ def _validate_reviewed_supplement(
         validator_class.check_schema(schema)
         validator_class(schema).validate(bindings)
         bindings_sha256 = _sha256(bindings_path)
-        if supplement.get("reference_bindings_sha256") != bindings_sha256:
+        declared = supplement.get("reference_bindings")
+        if not isinstance(declared, dict) or declared.get("path") != "reference-bindings.json" or declared.get("sha256") != bindings_sha256:
             raise ValueError("Reference bindings differ from the reviewed supplement.")
 
         def package_digests(value: object) -> set[str]:
