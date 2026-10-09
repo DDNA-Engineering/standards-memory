@@ -19,11 +19,11 @@ New: six agent-reviewed packs for bounded requirement sections of MIL-STD-882E, 
 
 ## Local candidate identities
 
-Built 2026-10-09 on Linux (CPython 3.13) with `scripts/rebuild_prepared_release.py` from the published a7 archive (SHA-256 `8555fcafa683c60186575193c7cc504331ca6d49c5d64b76bda431b83b1bda9b`) and the reviewed supplement. Two independent rebuilds produced the same bytes. These are local candidate identities, not published assets; re-record them if anything is rebuilt.
+Built 2026-10-09 on Linux (CPython 3.13) with `scripts/rebuild_prepared_release.py` from the published a7 archive (SHA-256 `8555fcafa683c60186575193c7cc504331ca6d49c5d64b76bda431b83b1bda9b`) and the reviewed supplement. Two independent rebuilds of the preceding candidate (`1202166c12754adb22ac8182a4e905001ad4effc0f8636653db921ab8935ef87`, which differed only in `verify_mcp_environment.py`) produced the same bytes; this final candidate was built once from commit `75e312f`. These are local candidate identities, not published assets; re-record them if anything is rebuilt.
 
 | Artifact | Bytes | SHA-256 |
 |---|---:|---|
-| `standardsforge-ready-0.1.0a8.zip` | 1,129,980,850 | `1202166c12754adb22ac8182a4e905001ad4effc0f8636653db921ab8935ef87` |
+| `standardsforge-ready-0.1.0a8.zip` | 1,129,980,981 | `902dfbb45b669fb23caaae5010d850fa3a3252342f18bcdfc58de6e52e054b2a` |
 | `standardsforge-0.1.0a8-py3-none-any.whl` (embedded) | 217,923 | `bef6391ba4cb8d568d383431062ed3ee60d4ae39328f737fbd75603d0209e92c` |
 | `tokenizer/o200k_base.json` | 4,414,372 | `6c41d106375d7d241ee4fef5775478e49263a1719f5b9e623b4fd75cc8178dd2` |
 | `references/reference-bindings.json` | — | `051f756fec1c4a2542fc67275b084aeb687eda396265330314d41f377ef776d3` |
@@ -37,10 +37,11 @@ All of the following ran locally on Linux x86_64 with CPython 3.13 on 2026-10-09
 - 368 unit and integration tests passed; contract validation passed (64 schema documents, 56 requirements, 30 validated instances).
 - The core wheel built twice byte-identically and passed the installed-wheel smoke outside the checkout.
 - The rebuild re-ran every real-document suite against the new wheel in a fresh environment and store: 52 existing and 242 new cases, all passing.
-- Installation of the exact candidate archive into a path containing spaces and `ü`, with `.DS_Store` and `._setup.py` present, using `sh setup.sh --mcp-online --connect cursor --connect codex`: ready in 139 s, including full-integrity doctor, all 294 cases, and an MCP smoke over stdio that made a token-budgeted `select_evidence` call and followed a bundled reviewed reference to its target. Cursor's file was created; Codex's existing `config.toml` kept its other settings and was backed up byte for byte. A repeat run reported `already_ready` and `already_connected` in 39 s.
+- Installation of the preceding candidate archive (identical except `verify_mcp_environment.py`, which only the Windows offline profile runs) into a path containing spaces and `ü`, with `.DS_Store` and `._setup.py` present, using `sh setup.sh --mcp-online --connect cursor --connect codex`: ready in 139 s, including full-integrity doctor, all 294 cases, and an MCP smoke over stdio that made a token-budgeted `select_evidence` call and followed a bundled reviewed reference to its target. Cursor's file was created; Codex's existing `config.toml` kept its other settings and was backed up byte for byte. A repeat run reported `already_ready` and `already_connected` in 39 s.
 - An earlier build, which differed only in the blank line `--connect codex` leaves before its table, also passed with a Cursor connect and a Codex update of an existing a7 entry. There, `select-evidence --max-tokens 2000` through `run.py` measured all three profiles in `o200k_base` tokens, and `follow-references` from MIL-STD-1474E 4.1 returned MIL-STD-882E 4.3.4. An added `my-notes.txt` was rejected with its name.
 - Installed footprint: 1.13 GB extracted, 1.81 GB index and object store, 0.08 GB environment.
-- Not observed: native Windows (any Python version), macOS, the offline Windows MCP locks, Claude Desktop configuration, CI on this branch, and publication.
+- CI on this branch (run 37946552288, commit `e2766be`) passed the new offline MCP and locked-tokenizer validation natively on Windows with CPython 3.12 and 3.13, and portable-core checks on Intel and Apple silicon macOS with 3.11–3.13. Windows 3.11 failed because its venv bootstraps `setuptools`; fixed in `75e312f`.
+- Not observed: the prepared archive on native Windows or macOS (that is the acceptance workflow), Claude Desktop configuration, and publication.
 
 ## Publication steps (maintainer)
 
