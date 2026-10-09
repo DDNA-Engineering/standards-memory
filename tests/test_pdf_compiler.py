@@ -21,8 +21,24 @@ from standardsforge.compiler import compile_pdf_to_pack  # noqa: E402
 from standardsforge.errors import StandardsForgeError  # noqa: E402
 from standardsforge.pack import validate_pack_directory  # noqa: E402
 from standardsforge.pack import open_validated_pack, write_pack_archive  # noqa: E402
+import standardsforge.compiler as compiler_module  # noqa: E402
 import standardsforge.service as service_module  # noqa: E402
 from standardsforge.service import StandardsForgeService  # noqa: E402
+
+
+def _tampering_isolation(real):
+    """Wrap isolated_pdf_pages so every page file is overwritten after validation."""
+
+    from contextlib import contextmanager
+
+    @contextmanager
+    def wrapper(*args, **kwargs):
+        with real(*args, **kwargs) as parsed:
+            for page in parsed.pages:
+                page.path.write_bytes(b"TAMPERED AFTER VALIDATION")
+            yield parsed
+
+    return wrapper
 
 
 class PDFCompilerTests(unittest.TestCase):
@@ -179,6 +195,17 @@ class PDFCompilerTests(unittest.TestCase):
         with self.assertRaises(StandardsForgeError) as caught:
             service.get_clause(digest, "pdf-page:0001", "local-compiler-test")
         self.assertEqual("source_integrity_failure", caught.exception.code)
+
+    def test_sidecar_uses_validated_page_bytes_not_mutated_page_files(self) -> None:
+        output = self.root / "tamper-compiled"
+        with patch.object(compiler_module, "isolated_pdf_pages", _tampering_isolation(compiler_module.isolated_pdf_pages)):
+            compile_pdf_to_pack(self.catalog_path, "MIL-STD-TEST", self.sources, output)
+        pack = validate_pack_directory(output)
+        sidecar = next(output.glob("sources/*.extracted.txt")).read_bytes()
+        self.assertNotIn(b"TAMPERED", sidecar)
+        record = pack.records[0]
+        self.assertIn("Synthetic environmental requirement", record["text"])
+        self.assertEqual(record["source"]["quote_sha256"], hashlib.sha256(record["text"].encode("utf-8")).hexdigest())
 
     def test_rejects_page_offsets_outside_the_text_sidecar(self) -> None:
         output = self.root / "invalid-offsets"

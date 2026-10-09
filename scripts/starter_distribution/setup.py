@@ -356,22 +356,30 @@ def _clean_environment() -> dict[str, str]:
     return environment
 
 
-def _run(command: list[str], *, cwd: Path, expected: set[int] = {0}) -> subprocess.CompletedProcess[str]:
+def _run(command: list[str], *, cwd: Path, expected: set[int] = {0}, utf8_stdout: bool = False) -> subprocess.CompletedProcess[str]:
     result = subprocess.run(
         command,
         cwd=cwd,
         env=_clean_environment(),
-        text=True,
-        encoding="utf-8",
-        errors="strict",
         capture_output=True,
         shell=False,
     )
+    # Tool output such as pip's follows the locale (an ANSI code page on Windows);
+    # it is diagnostic only. The StandardsForge CLI always writes UTF-8 JSON, which
+    # is decoded strictly where it is interpreted.
+    stderr = result.stderr.decode("utf-8", errors="replace")
     if result.returncode not in expected:
         raise StarterSetupError(
-            f"Starter command failed with exit {result.returncode}: {' '.join(command[:4])}\n{result.stderr.strip()}"
+            f"Starter command failed with exit {result.returncode}: {' '.join(command[:4])}\n{stderr.strip()}"
         )
-    return result
+    if utf8_stdout:
+        try:
+            stdout = result.stdout.decode("utf-8", errors="strict")
+        except UnicodeDecodeError as exc:
+            raise StarterSetupError(f"Starter command output is not valid UTF-8: {' '.join(command[:4])}") from exc
+    else:
+        stdout = result.stdout.decode("utf-8", errors="replace")
+    return subprocess.CompletedProcess(result.args, result.returncode, stdout, stderr)
 
 
 def _run_cli(python: Path, root: Path, manifest: dict[str, Any], arguments: list[str], expected: set[int] = {0}) -> subprocess.CompletedProcess[str]:
@@ -380,6 +388,7 @@ def _run_cli(python: Path, root: Path, manifest: dict[str, Any], arguments: list
         [str(python), "-I", "-m", "standardsforge", "--db", str(state / "memory.db"), "--store", str(state / "objects"), *arguments],
         cwd=root,
         expected=expected,
+        utf8_stdout=True,
     )
 
 

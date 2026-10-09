@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import lzma
 import os
 import stat
+import struct
 import tempfile
 import zipfile
+import zlib
 from contextlib import contextmanager
 from datetime import date, datetime
 from pathlib import Path, PurePosixPath
@@ -21,6 +24,18 @@ MAX_TOTAL_BYTES = 512 * 1024 * 1024
 MAX_JSON_BYTES = 32 * 1024 * 1024
 ALLOWED_SUFFIXES = {".json", ".txt", ".md", ".pdf", ".png"}
 REQUIRED_FILES = {"manifest.json", "rights.json", "records.json"}
+# Archive members are decompressed in bounded chunks and never past their declared size.
+ZIP_MEMBER_CHUNK_BYTES = 64 * 1024
+_ZIP_LOCAL_HEADER = struct.Struct("<4s2B4HL2L2H")
+_ZIP_ENCRYPTION_FLAGS = 0x1 | 0x40 | 0x2000
+_ZIP_ERRORS = (
+    zipfile.BadZipFile, zipfile.LargeZipFile, OSError, EOFError, RuntimeError, NotImplementedError,
+    ValueError, struct.error, zlib.error, lzma.LZMAError,
+)
+_WINDOWS_RESERVED_NAMES = {
+    "CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$",
+    *(f"{device}{suffix}" for device in ("COM", "LPT") for suffix in (*"123456789", "\u00b9", "\u00b2", "\u00b3")),
+}
 
 _MANIFEST_KEYS = {
     "schema_version",
@@ -175,13 +190,178 @@ def _file_sha256(path: Path) -> str:
         raise StandardsForgeError("invalid_pack_path", "An inventoried file could not be read.", {"path": path.name}) from exc
 
 
-def _safe_relative_path(value: str) -> PurePosixPath:
+def _portable_relative_path(value: str) -> PurePosixPath:
+    """Return a relative path whose every part is an ordinary name on POSIX and Windows."""
+
     require(isinstance(value, str) and bool(value), "invalid_pack_path", "Pack paths must be non-empty strings.")
-    path = PurePosixPath(value.replace("\\", "/"))
+    normalized = value.replace("\\", "/")
+    path = PurePosixPath(normalized)
     require(not path.is_absolute(), "invalid_pack_path", "Absolute paths are forbidden in a pack.", path=value)
-    require(".." not in path.parts, "invalid_pack_path", "Parent traversal is forbidden in a pack.", path=value)
+    parts = normalized.split("/")
+    require(".." not in parts, "invalid_pack_path", "Parent traversal is forbidden in a pack.", path=value)
+    for part in parts:
+        # Empty parts (UNC "//server" or "a//b"), "." and trailing dots or spaces
+        # are rewritten by Windows, so the same name could reach a different file.
+        require(bool(part) and not part.endswith((".", " ")), "invalid_pack_path", "Pack path parts must be non-empty canonical names.", path=value)
+        # Drive letters ("C:x", "D:/x") and NTFS alternate data streams ("a.txt:s").
+        require(":" not in part, "invalid_pack_path", "Drive and stream separators are forbidden in a pack.", path=value)
+        require(not set(part) & set('<>"|?*'), "invalid_pack_path", "Characters invalid in Windows file names are forbidden in a pack.", path=value)
+        require(all(ord(character) >= 32 for character in part), "invalid_pack_path", "Control characters are forbidden in a pack path.", path=value)
+        require(
+            part.split(".", 1)[0].rstrip(" ").upper() not in _WINDOWS_RESERVED_NAMES,
+            "invalid_pack_path",
+            "Reserved device names are forbidden in a pack.",
+            path=value,
+        )
+    return path
+
+
+def _safe_relative_path(value: str) -> PurePosixPath:
+    path = _portable_relative_path(value)
     require(path.suffix.lower() in ALLOWED_SUFFIXES, "executable_pack_content", "Pack file type is not data-only.", path=value)
     return path
+
+
+def iter_zip_member(
+    archive: zipfile.ZipFile,
+    info: zipfile.ZipInfo,
+    *,
+    limit: int,
+    methods: set[int],
+    limit_code: str,
+    invalid_code: str,
+) -> Iterator[bytes]:
+    """Yield one member's exact bytes, decompressing at most one bounded chunk at a time.
+
+    The compressed stream is read directly from the local header so that no
+    library decompressor can expand an entire member in memory. Output is
+    rejected as soon as it exceeds the declared size, and the declared size,
+    CRC and end of the compressed stream must all agree.
+    """
+
+    name = info.filename
+    require(info.compress_type in methods, invalid_code, "Unsupported archive member compression.", path=name)
+    require(not info.flag_bits & _ZIP_ENCRYPTION_FLAGS, invalid_code, "Encrypted archive members are unsupported.", path=name)
+    require(0 <= info.file_size <= limit, limit_code, "Archive member exceeds its size bound.", path=name)
+    if info.compress_type == zipfile.ZIP_STORED:
+        require(info.compress_size == info.file_size, invalid_code, "Stored archive member sizes disagree.", path=name)
+    produced = 0
+    crc = 0
+    try:
+        stream = archive.fp
+        require(stream is not None, invalid_code, "The archive is closed.", path=name)
+        stream.seek(info.header_offset)
+        header = stream.read(_ZIP_LOCAL_HEADER.size)
+        require(len(header) == _ZIP_LOCAL_HEADER.size, invalid_code, "Archive member header is truncated.", path=name)
+        fields = _ZIP_LOCAL_HEADER.unpack(header)
+        signature, flags, method, name_length, extra_length = fields[0], fields[3], fields[4], fields[10], fields[11]
+        encoded_name = stream.read(name_length)
+        try:
+            expected_name = info.orig_filename.encode("utf-8" if info.flag_bits & 0x800 else "cp437")
+        except UnicodeEncodeError:
+            expected_name = None
+        require(
+            signature == b"PK\x03\x04" and method == info.compress_type
+            and not flags & _ZIP_ENCRYPTION_FLAGS and encoded_name == expected_name,
+            invalid_code,
+            "Archive member local header disagrees with the central directory.",
+            path=name,
+        )
+        position = info.header_offset + _ZIP_LOCAL_HEADER.size + name_length + extra_length
+        remaining = info.compress_size
+
+        def compressed_chunks() -> Iterator[bytes]:
+            nonlocal position, remaining
+            while remaining > 0:
+                stream.seek(position)
+                chunk = stream.read(min(ZIP_MEMBER_CHUNK_BYTES, remaining))
+                require(bool(chunk), invalid_code, "Archive member data is truncated.", path=name)
+                position += len(chunk)
+                remaining -= len(chunk)
+                yield chunk
+
+        def accept(data: bytes) -> bytes:
+            nonlocal produced, crc
+            produced += len(data)
+            require(produced <= info.file_size, limit_code, "Archive member expands beyond its declared size.", path=name)
+            crc = zlib.crc32(data, crc)
+            return data
+
+        if info.compress_type == zipfile.ZIP_STORED:
+            for chunk in compressed_chunks():
+                yield accept(chunk)
+        elif info.compress_type == zipfile.ZIP_DEFLATED and info.compress_size == 0:
+            # Some writers store an empty member as a zero-length deflate stream.
+            require(info.file_size == 0, invalid_code, "Archive member compressed data is incomplete.", path=name)
+        elif info.compress_type == zipfile.ZIP_DEFLATED:
+            inflater = zlib.decompressobj(-zlib.MAX_WBITS)
+            for chunk in compressed_chunks():
+                require(not inflater.eof, invalid_code, "Archive member has trailing compressed data.", path=name)
+                data = chunk
+                while data and not inflater.eof:
+                    output = inflater.decompress(data, ZIP_MEMBER_CHUNK_BYTES)
+                    data = inflater.unconsumed_tail
+                    if output:
+                        yield accept(output)
+                require(not data and not inflater.unused_data, invalid_code, "Archive member has trailing compressed data.", path=name)
+            while not inflater.eof:
+                output = inflater.decompress(b"", ZIP_MEMBER_CHUNK_BYTES)
+                if not output:
+                    break
+                yield accept(output)
+            require(inflater.eof, invalid_code, "Archive member compressed data is incomplete.", path=name)
+        elif info.compress_type == zipfile.ZIP_LZMA:
+            chunks = compressed_chunks()
+            prefix = b""
+            while len(prefix) < 4 or len(prefix) < 4 + int.from_bytes(prefix[2:4], "little"):
+                chunk = next(chunks, b"")
+                require(bool(chunk), invalid_code, "Archive member LZMA header is truncated.", path=name)
+                prefix += chunk
+                require(len(prefix) < 4 or int.from_bytes(prefix[2:4], "little") == 5, invalid_code, "Unsupported LZMA properties.", path=name)
+            decompressor = lzma.LZMADecompressor(
+                lzma.FORMAT_RAW,
+                filters=[lzma._decode_filter_properties(lzma.FILTER_LZMA1, prefix[4:9])],  # type: ignore[attr-defined]
+            )
+            pending: bytes | None = prefix[9:]
+            while pending is not None:
+                require(not decompressor.eof or not pending, invalid_code, "Archive member has trailing compressed data.", path=name)
+                if not decompressor.eof:
+                    output = decompressor.decompress(pending, ZIP_MEMBER_CHUNK_BYTES)
+                    if output:
+                        yield accept(output)
+                    while not decompressor.eof and not decompressor.needs_input:
+                        output = decompressor.decompress(b"", ZIP_MEMBER_CHUNK_BYTES)
+                        if output:
+                            yield accept(output)
+                    require(not decompressor.unused_data, invalid_code, "Archive member has trailing compressed data.", path=name)
+                pending = next(chunks, None)
+        else:  # pragma: no cover - guarded by the method allowlist
+            raise StandardsForgeError(invalid_code, "Unsupported archive member compression.", {"path": name})
+    except StandardsForgeError:
+        raise
+    except _ZIP_ERRORS as exc:
+        raise StandardsForgeError(invalid_code, "An archive member could not be decompressed.", {"path": name}) from exc
+    require(
+        produced == info.file_size and crc == info.CRC,
+        invalid_code,
+        "Archive member size or CRC does not match the central directory.",
+        path=name,
+    )
+
+
+def _is_source_text_sidecar(text_rel: str, source_rel: str) -> bool:
+    """Apply the record source text rule to a span's text file.
+
+    As for record sources, a non-PDF source under sources/ is its own exact
+    text, while a PDF source must cite a separate non-PDF text sidecar under
+    sources/. Contract files such as rights.json are never evidence text.
+    """
+
+    if not source_rel.startswith("sources/") or not text_rel.startswith("sources/"):
+        return False
+    if PurePosixPath(source_rel).suffix.lower() != ".pdf":
+        return text_rel == source_rel
+    return text_rel != source_rel and PurePosixPath(text_rel).suffix.lower() != ".pdf"
 
 
 def _read_json(path: Path) -> Any:
@@ -206,8 +386,8 @@ def _span_indices(value: Any, span_count: int, label: str) -> list[int]:
     require(
         isinstance(value, list)
         and value
-        and len(value) == len(set(value))
         and all(type(index) is int and 0 <= index < span_count for index in value)
+        and len(value) == len(set(value))
         and value == sorted(value),
         "invalid_record",
         f"{label} span indices are invalid.",
@@ -230,11 +410,11 @@ def _validate_semantic_record(
         "requirement_candidate", "governing_condition", "exception", "applicability_statement",
         "definition", "table_header", "table_row", "table_footnote", "note", "prose",
     }
-    require(semantics["content_role"] in content_roles, "invalid_record", "Unsupported semantic content role.")
-    require(semantics["normativity"] in {"normative", "informative", "mixed", "unclassified"}, "invalid_record", "Unsupported semantic normativity.")
+    require(isinstance(semantics["content_role"], str) and semantics["content_role"] in content_roles, "invalid_record", "Unsupported semantic content role.")
+    require(isinstance(semantics["normativity"], str) and semantics["normativity"] in {"normative", "informative", "mixed", "unclassified"}, "invalid_record", "Unsupported semantic normativity.")
     require(semantics["project_applicability"] == "not_decided", "invalid_record", "Semantic evidence cannot decide project applicability.")
     issues = semantics["unresolved_issues"]
-    require(isinstance(issues, list) and len(issues) == len(set(issues)) and all(isinstance(item, str) and item for item in issues), "invalid_record", "Semantic unresolved issues are invalid.")
+    require(isinstance(issues, list) and all(isinstance(item, str) and item for item in issues) and len(issues) == len(set(issues)), "invalid_record", "Semantic unresolved issues are invalid.")
 
     def selected_text(indices: list[int]) -> str:
         return "\n".join(span_fragments[index] for index in indices)
@@ -253,6 +433,11 @@ def _validate_semantic_record(
         require(statement["subject"].casefold() in statement_lower and statement["action"].casefold() in statement_lower, "invalid_record", "Semantic statement subject or action is absent from exact text.")
         if statement["modality"] != "other":
             require(statement["modality"] in statement_lower.split(), "invalid_record", "Semantic statement modality is absent from exact text.")
+    require(
+        all(isinstance(semantics[key], list) for key in ("qualifiers", "quantities")),
+        "invalid_record",
+        "Semantic qualifiers and quantities must be lists.",
+    )
     for qualifier in semantics["qualifiers"]:
         qualifier = _strict_object(qualifier, {"kind", "exact_text", "span_indices"}, "invalid_record", "semantic qualifier")
         require(set(qualifier) == {"kind", "exact_text", "span_indices"}, "invalid_record", "Every semantic qualifier field is required.")
@@ -305,7 +490,7 @@ def _validate_review_event(
         configuration_sha256 = tool["configuration_sha256"]
         require(configuration_sha256 is None or isinstance(configuration_sha256, str) and len(configuration_sha256) == 64 and all(character in "0123456789abcdef" for character in configuration_sha256), "invalid_record", "Review tool configuration digest is invalid.")
     issues = review["unresolved_issues"]
-    require(isinstance(issues, list) and len(issues) == len(set(issues)) and all(isinstance(item, str) and item for item in issues), "invalid_record", "Review unresolved issues are invalid.")
+    require(isinstance(issues, list) and all(isinstance(item, str) and item for item in issues) and len(issues) == len(set(issues)), "invalid_record", "Review unresolved issues are invalid.")
     require(review["attestation"] == "extraction_review_not_project_applicability_or_approval", "invalid_record", "Review event cannot assert project applicability or approval.")
     return review
 
@@ -361,6 +546,16 @@ def _validate_inventory(root: Path) -> tuple[tuple[InventoryEntry, ...], str]:
 
 
 def validate_pack_directory(root: str | Path) -> ValidatedPack:
+    try:
+        return _validate_pack_directory(root)
+    except StandardsForgeError:
+        raise
+    except (TypeError, KeyError, AttributeError, IndexError, ValueError, RecursionError, OSError) as exc:
+        # Untrusted pack JSON of an unexpected shape fails closed with a typed error.
+        raise StandardsForgeError("invalid_pack", "The pack contains malformed structured data.") from exc
+
+
+def _validate_pack_directory(root: str | Path) -> ValidatedPack:
     pack_root = Path(root).resolve()
     require(pack_root.is_dir(), "pack_not_found", "The pack directory does not exist.")
     symlinks = [path.relative_to(pack_root).as_posix() for path in pack_root.rglob("*") if path.is_symlink()]
@@ -415,6 +610,8 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
     logical_ids: set[str] = set()
     evidence_text_cache: dict[str, str] = {}
     evidence_bytes_cache: dict[str, bytes] = {}
+    record_source_paths: set[str] = set()
+    relationship_source_paths: set[str] = set()
     for record in raw_records["records"]:
         record = dict(_strict_object(record, _RECORD_KEYS, "invalid_record", "record"))
         for key in ("record_id", "edition_id", "kind", "clause_reference", "heading"):
@@ -461,6 +658,7 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
         require(rel.startswith("sources/"), "invalid_record", "Record sources must be under sources/.", record_id=record["record_id"])
         require(rel in inventory_by_path, "invalid_record", "The record source is not inventoried.", record_id=record["record_id"])
         require(source["sha256"] == inventory_by_path[rel].sha256, "invalid_record", "The record source digest does not match the inventory.", record_id=record["record_id"])
+        record_source_paths.add(rel)
         require(type(source["page"]) is int and source["page"] >= 1, "invalid_record", "Source page must be a positive integer.")
         require(isinstance(source["locator"], str) and source["locator"], "invalid_record", "Source locator is required.")
         evidence_rel = rel
@@ -510,6 +708,18 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
             require(record["text"] in source_text, "source_quote_missing", "Exact record text is absent from its source.", record_id=record["record_id"])
         require(source["quote_sha256"] == _sha256(record["text"].encode("utf-8")), "invalid_record", "Quote digest does not match exact record text.", record_id=record["record_id"])
 
+        derivation = _strict_object(record.get("derivation"), _DERIVATION_KEYS, "invalid_record", "record derivation")
+        require(set(derivation) == _DERIVATION_KEYS, "invalid_record", "Every derivation field is required.")
+        require(
+            isinstance(derivation["statement_role"], str)
+            and derivation["statement_role"] in {"obligation", "governing_note", "informative", "unclassified"},
+            "invalid_record",
+            "Unsupported statement role.",
+            record_id=record["record_id"],
+        )
+        for key in ("method", "review_status"):
+            require(isinstance(derivation[key], str) and derivation[key], "invalid_record", f"Derivation {key} is required.")
+
         structure = record.get("structure")
         if records_schema_version == "0.3.0":
             require(isinstance(structure, dict) and isinstance(structure.get("source_spans"), list)
@@ -556,6 +766,8 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
                 span_source_rel = _safe_relative_path(span["path"]).as_posix()
                 span_text_rel = _safe_relative_path(span["text_path"]).as_posix()
                 require(span_source_rel in inventory_by_path and span_text_rel in inventory_by_path, "invalid_record", "Structural span files must be inventoried.")
+                require(span_source_rel == rel, "invalid_record", "Structural spans must cite the record's own source.", logical_id=logical_id)
+                require(_is_source_text_sidecar(span_text_rel, rel), "invalid_record", "Structural span text must be the source text or its text sidecar under sources/.", logical_id=logical_id)
                 require(span["sha256"] == inventory_by_path[span_source_rel].sha256, "invalid_record", "Structural span source digest does not match the inventory.")
                 require(span["text_sha256"] == inventory_by_path[span_text_rel].sha256, "invalid_record", "Structural span text digest does not match the inventory.")
                 require(type(span["physical_page"]) is int and span["physical_page"] >= 1, "invalid_record", "Structural span page must be positive.")
@@ -614,7 +826,7 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
                 _validate_semantic_record(
                     semantics,
                     record_text=record["text"],
-                    statement_role=record["derivation"]["statement_role"],
+                    statement_role=derivation["statement_role"],
                     kind=record["kind"],
                     span_fragments=span_fragments,
                 )
@@ -651,6 +863,10 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
                     relationship_source_rel = _safe_relative_path(relationship_span["path"]).as_posix()
                     relationship_text_rel = _safe_relative_path(relationship_span["text_path"]).as_posix()
                     require(relationship_source_rel in inventory_by_path and relationship_text_rel in inventory_by_path, "invalid_record", "Relationship span files must be inventoried.")
+                    # Evidence may cite this record's source or another record source in the same pack.
+                    require(relationship_source_rel.startswith("sources/"), "invalid_record", "Relationship spans must cite a record source under sources/.", logical_id=logical_id)
+                    require(_is_source_text_sidecar(relationship_text_rel, relationship_source_rel), "invalid_record", "Relationship span text must be the source text or its text sidecar under sources/.", logical_id=logical_id)
+                    relationship_source_paths.add(relationship_source_rel)
                     require(relationship_span["sha256"] == inventory_by_path[relationship_source_rel].sha256 and relationship_span["text_sha256"] == inventory_by_path[relationship_text_rel].sha256, "invalid_record", "Relationship span file digests do not match the inventory.")
                     if relationship_text_rel not in evidence_bytes_cache:
                         evidence_bytes_cache[relationship_text_rel] = pack_root.joinpath(*PurePosixPath(relationship_text_rel).parts).read_bytes()
@@ -676,17 +892,6 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
                     require(isinstance(relationship["candidate_logical_ids"], list) and len(relationship["candidate_logical_ids"]) >= 2 and all(isinstance(value, str) and value for value in relationship["candidate_logical_ids"]), "invalid_record", "Ambiguous structural relationships require candidate logical IDs.")
                     require(not relationship["required"], "invalid_record", "Ambiguous structural relationships cannot be required evidence dependencies.")
 
-        derivation = _strict_object(record.get("derivation"), _DERIVATION_KEYS, "invalid_record", "record derivation")
-        require(set(derivation) == _DERIVATION_KEYS, "invalid_record", "Every derivation field is required.")
-        require(
-            derivation["statement_role"] in {"obligation", "governing_note", "informative", "unclassified"},
-            "invalid_record",
-            "Unsupported statement role.",
-            record_id=record["record_id"],
-        )
-        for key in ("method", "review_status"):
-            require(isinstance(derivation[key], str) and derivation[key], "invalid_record", f"Derivation {key} is required.")
-
         deps = record.get("dependencies")
         require(isinstance(deps, list), "invalid_record", "dependencies must be a list.")
         for dep in deps:
@@ -697,6 +902,12 @@ def validate_pack_directory(root: str | Path) -> ValidatedPack:
             require(type(dep["required"]) is bool, "invalid_record", "Dependency required must be boolean.")
         records.append(record)
 
+    require(
+        relationship_source_paths <= record_source_paths,
+        "invalid_record",
+        "Relationship evidence must cite a record source in this pack.",
+        paths=sorted(relationship_source_paths - record_source_paths),
+    )
     for record in records:
         for dep in record["dependencies"]:
             require(dep["target_record_id"] in record_ids, "unresolved_dependency", "A record dependency is unresolved.", record_id=record["record_id"], target=dep["target_record_id"])
@@ -757,13 +968,7 @@ def _validate_zip_member(info: zipfile.ZipInfo) -> tuple[PurePosixPath, bool]:
     raw_name = info.filename.rstrip("/") if is_directory else info.filename
     require(bool(raw_name), "invalid_pack_path", "Empty archive paths are forbidden.")
     if is_directory:
-        path = PurePosixPath(raw_name.replace("\\", "/"))
-        require(
-            not path.is_absolute() and ".." not in path.parts,
-            "invalid_pack_path",
-            "Unsafe archive directory path.",
-            path=info.filename,
-        )
+        path = _portable_relative_path(raw_name)
     else:
         path = _safe_relative_path(raw_name)
     mode = info.external_attr >> 16
@@ -851,9 +1056,17 @@ def open_validated_pack(source: str | Path) -> Iterator[ValidatedPack]:
                         output.mkdir(parents=True, exist_ok=True)
                         continue
                     output.parent.mkdir(parents=True, exist_ok=True)
-                    with archive.open(info, "r") as reader, output.open("xb") as writer:
-                        while chunk := reader.read(1024 * 1024):
+                    # write_pack_archive emits DEFLATE only; other methods are not pack transport.
+                    with output.open("xb") as writer:
+                        for chunk in iter_zip_member(
+                            archive,
+                            info,
+                            limit=MAX_TOTAL_BYTES,
+                            methods={zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED},
+                            limit_code="pack_limit_exceeded",
+                            invalid_code="invalid_pack_archive",
+                        ):
                             writer.write(chunk)
-        except (zipfile.BadZipFile, OSError) as exc:
+        except _ZIP_ERRORS as exc:
             raise StandardsForgeError("invalid_pack_archive", "The pack archive is invalid.") from exc
         yield validate_pack_directory(target)

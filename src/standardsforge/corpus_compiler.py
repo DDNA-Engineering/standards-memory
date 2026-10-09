@@ -320,7 +320,7 @@ def _compile_component(
                 extracted_pages.append(
                     {
                         "physical_page": page.physical_page,
-                        "text_path": page.path,
+                        "text_bytes": page.data,
                         "text_sha256": page.sha256,
                         "marker": f"[[PDF_COMPONENT_{component_key}_PAGE_{page.physical_page:04d}]]",
                     }
@@ -334,8 +334,7 @@ def _compile_component(
                 sidecar.write(extracted["marker"].encode("utf-8"))
                 sidecar.write(b"\n")
                 extracted["text_start_byte"] = sidecar.tell()
-                with extracted["text_path"].open("rb") as page_text:
-                    shutil.copyfileobj(page_text, sidecar, 1024 * 1024)
+                sidecar.write(extracted["text_bytes"])
                 extracted["text_end_byte"] = sidecar.tell()
                 sidecar.write(
                     f"\n[[END_PDF_COMPONENT_{component_key}_PAGE_{extracted['physical_page']:04d}]]".encode("utf-8")
@@ -595,10 +594,23 @@ def _validated_archive_entry(
         extracted_page_records = 0
         pages_without_text_records = 0
         expected_source_pages: dict[str, int] = {}
+        expected_source_sha256: dict[str, str] = {}
+        inventory_by_path = {item.path: item for item in pack.inventory}
         for component, reported in zip(downloaded, report_components, strict=True):
             component_key = _component_key(component)
             source_path = f"sources/{component_key}.pdf"
             expected_source_pages[source_path] = component["page_count"]
+            expected_source_sha256[source_path] = component["sha256"]
+            archived_source = inventory_by_path.get(source_path)
+            # A reused archive must still carry the exact acquired PDF, not only claim it in metadata.
+            require(
+                archived_source is not None
+                and archived_source.sha256 == component["sha256"]
+                and archived_source.bytes == component["byte_length"],
+                "corpus_archive_mismatch",
+                "A corpus archive source PDF does not match the acquisition component digest.",
+                path=source_path,
+            )
             expected_source = {
                 "path": source_path,
                 "sha256": component["sha256"],
@@ -642,12 +654,18 @@ def _validated_archive_entry(
                 record_item.get("edition_id") == expected_edition_id
                 and record_item.get("derivation", {}).get("statement_role") == "unclassified"
                 and record_item.get("source", {}).get("path") in expected_source_pages
+                and record_item["source"].get("sha256") == expected_source_sha256[record_item["source"]["path"]]
                 and type(record_item.get("source", {}).get("page")) is int
                 and 1 <= record_item["source"]["page"] <= expected_source_pages[record_item["source"]["path"]]
                 for record_item in pack.records
             ),
             "corpus_archive_mismatch",
             "A corpus archive has records inconsistent with the current unclassified page representation.",
+        )
+        require(
+            {item.path for item in pack.inventory if PurePosixPath(item.path).suffix.lower() == ".pdf"} == set(expected_source_pages),
+            "corpus_archive_mismatch",
+            "A corpus archive carries source PDFs outside the acquisition composition.",
         )
         require(
             report.get("downloaded_component_count") == len(downloaded)
@@ -911,7 +929,15 @@ def install_compiled_corpus(
             "A corpus archive digest changed after compilation.",
             path=relative,
         )
-        result = service.install_pack(archive_path, policy_path)
+        # Bind the index identity to the exact validated bytes before any install or grant.
+        with open_validated_pack(archive_path) as pack:
+            require(
+                pack.package_digest == entry.get("package_digest") and pack.manifest["pack_id"] == entry.get("pack_id"),
+                "corpus_archive_mismatch",
+                "A corpus archive package identity does not match its index.",
+                path=relative,
+            )
+            result = service.install_pack(pack.root, policy_path)
         require(
             result["package_digest"] == entry.get("package_digest") and result["pack_id"] == entry.get("pack_id"),
             "corpus_archive_mismatch",

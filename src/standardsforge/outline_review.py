@@ -118,6 +118,57 @@ def _validate_reviewed_node(base: Any, draft: dict[str, Any], node: dict[str, An
     require("\n".join(fragments) == node.get("exact_text"), "outline_review_stale", "The reviewed exact text is not the cited source text.")
 
 
+def _check_reviewed_node_binding(draft: dict[str, Any], node: Any) -> None:
+    """Invariants every promoted node keeps relative to its exact replayed proposal."""
+
+    proposed = draft["proposed_node"]
+    require(isinstance(proposed, dict) and isinstance(node, dict) and set(node) <= _REVIEW_NODE_KEYS, "invalid_outline_review", "The reviewed node fields are invalid.")
+    require(node.get("logical_id") == proposed.get("logical_id"), "outline_review_stale", "The decision changed the candidate logical identity.")
+    if draft["schema_version"] == "0.2.0":
+        require(node.get("kind") != "unsupported_region" and node.get("kind") != proposed.get("kind"), "invalid_outline_review", "Pending numeric evidence requires an explicit reviewed structural kind.")
+        require(node.get("clause_reference") != proposed.get("clause_reference"), "invalid_outline_review", "Pending numeric evidence requires a reviewed clause reference, not its unsupported-region locator.")
+
+
+def verify_promoted_annotation(annotations: dict[str, Any], draft: dict[str, Any], draft_sha256: str, base: Any) -> None:
+    """Recheck a 0.4.0 annotation against its replayed proposal exactly as promotion did.
+
+    Promotion copies every header field from the draft and admits one reviewed
+    node under the same identity and exact-span rules; an annotation edited
+    after promotion must not compile under the proposal's digest.
+    """
+
+    expected = {
+        "schema_version": "0.4.0",
+        "document_id": draft["document_id"],
+        "edition_id": draft["edition_id"],
+        "source_pdf_sha256": draft["source_pdf_sha256"],
+        "source_page_pack_digest": draft["source_page_pack_digest"],
+        "outline_package_digest": draft["outline_package_digest"],
+        "candidate_record_id": draft["candidate_record_id"],
+        "candidate_content_sha256": draft["candidate_content_sha256"],
+        "proposal_sha256": draft_sha256,
+        "compiler": draft["compiler"],
+        "extraction_mode": draft["extraction_mode"],
+        "text_encoding": draft["text_encoding"],
+        "offset_convention": draft["offset_convention"],
+        "relationships": [],
+        "unsupported_regions": [],
+    }
+    mismatched = sorted(key for key, value in expected.items() if annotations.get(key) != value)
+    require(not mismatched, "structure_identity_mismatch", "The reviewed annotation does not bind the exact outline proposal.", fields=mismatched)
+    nodes = annotations.get("nodes")
+    require(isinstance(nodes, list) and len(nodes) == 1, "structure_identity_mismatch", "A promoted annotation carries exactly one reviewed node.")
+    try:
+        _check_reviewed_node_binding(draft, nodes[0])
+        _validate_reviewed_node(base, draft, nodes[0])
+    except StandardsForgeError as exc:
+        raise StandardsForgeError(
+            "structure_identity_mismatch",
+            "The reviewed node does not match its replayed outline proposal.",
+            {"reason": exc.code, "logical_id": draft["proposed_node"].get("logical_id")},
+        ) from exc
+
+
 def export_outline_review_draft(
     outline_pack: str | Path,
     source_page_pack: str | Path,
@@ -276,13 +327,8 @@ def promote_outline_review(
         replay = Path(temporary) / "draft.json"
         export_outline_review_draft(outline_pack, source_page_pack, draft["candidate_record_id"], replay)
         require(replay.read_bytes() == Path(draft_path).read_bytes(), "outline_review_stale", "The draft no longer matches the exact source outline candidate.")
-    proposed = draft["proposed_node"]
     node = decision["node"]
-    require(isinstance(proposed, dict) and isinstance(node, dict) and set(node) <= _REVIEW_NODE_KEYS, "invalid_outline_review", "The reviewed node fields are invalid.")
-    require(node.get("logical_id") == proposed.get("logical_id"), "outline_review_stale", "The decision changed the candidate logical identity.")
-    if draft["schema_version"] == "0.2.0":
-        require(node.get("kind") != "unsupported_region" and node.get("kind") != proposed.get("kind"), "invalid_outline_review", "Pending numeric evidence requires an explicit reviewed structural kind.")
-        require(node.get("clause_reference") != proposed.get("clause_reference"), "invalid_outline_review", "Pending numeric evidence requires a reviewed clause reference, not its unsupported-region locator.")
+    _check_reviewed_node_binding(draft, node)
     require(isinstance(decision["review"], dict), "invalid_outline_review", "Explicit review provenance is required.")
     with open_validated_pack(source_page_pack) as base:
         _validate_reviewed_node(base, draft, node)

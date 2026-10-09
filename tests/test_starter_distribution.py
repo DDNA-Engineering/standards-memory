@@ -393,5 +393,35 @@ class StarterDistributionTests(unittest.TestCase):
             extra.unlink()
 
 
+class StarterCommandEncodingTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.setup = _load_module(ROOT / "scripts" / "starter_distribution" / "setup.py", "starter_setup_encoding")
+        self.temporary = tempfile.TemporaryDirectory(prefix="standardsforge-starter-encoding-")
+        self.root = Path(self.temporary.name) / "José starter"
+        self.root.mkdir()
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
+    def _child(self, stdout: bytes, code: int = 0) -> list[str]:
+        return [sys.executable, "-I", "-c", f"import sys; sys.stdout.buffer.write({stdout!r}); sys.stderr.buffer.write({stdout!r}); raise SystemExit({code})"]
+
+    def test_locale_encoded_tool_output_does_not_crash_setup(self) -> None:
+        # pip on Windows writes paths in the ANSI code page, not UTF-8.
+        legacy = f"Processing {self.root}".encode("cp1252")
+        result = self.setup._run(self._child(legacy), cwd=self.root)
+        self.assertIn("Processing", result.stdout)
+        with self.assertRaises(self.setup.StarterSetupError) as failed:
+            self.setup._run(self._child(legacy, 1), cwd=self.root)
+        self.assertIn("exit 1", str(failed.exception))
+
+    def test_cli_output_is_decoded_as_strict_utf8(self) -> None:
+        payload = json.dumps({"ok": True, "result": {"path": str(self.root)}}, ensure_ascii=False).encode("utf-8")
+        result = self.setup._run(self._child(payload), cwd=self.root, utf8_stdout=True)
+        self.assertEqual({"path": str(self.root)}, self.setup._json_result(result, "doctor"))
+        with self.assertRaisesRegex(self.setup.StarterSetupError, "not valid UTF-8"):
+            self.setup._run(self._child(str(self.root).encode("cp1252")), cwd=self.root, utf8_stdout=True)
+
+
 if __name__ == "__main__":
     unittest.main()

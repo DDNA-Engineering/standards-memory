@@ -101,6 +101,7 @@ def compile_pdf_to_pack(
             pdf_relative = f"sources/{document['local_filename']}"
             pdf_target = sources / document["local_filename"]
             shutil.copyfile(source_path, pdf_target)
+            require(_file_sha256(pdf_target) == document["sha256"], "source_hash_mismatch", "A copied source digest changed.")
 
             text_filename = f"{Path(document['local_filename']).stem}.extracted.txt"
             text_relative = f"sources/{text_filename}"
@@ -125,7 +126,7 @@ def compile_pdf_to_pack(
                     extracted_pages.append(
                         {
                             "physical_page": page.physical_page,
-                            "text_path": page.path,
+                            "text_bytes": page.data,
                             "text_sha256": page.sha256,
                             "marker": f"[[PDF_PAGE_{page.physical_page:04d}]]",
                         }
@@ -140,8 +141,7 @@ def compile_pdf_to_pack(
                     sidecar.write(extracted["marker"].encode("utf-8"))
                     sidecar.write(b"\n")
                     extracted["text_start_byte"] = sidecar.tell()
-                    with extracted["text_path"].open("rb") as page_text:
-                        shutil.copyfileobj(page_text, sidecar, 1024 * 1024)
+                    sidecar.write(extracted["text_bytes"])
                     extracted["text_end_byte"] = sidecar.tell()
                     sidecar.write(f"\n[[END_PDF_PAGE_{extracted['physical_page']:04d}]]".encode("utf-8"))
                 sidecar.write(b"\n")

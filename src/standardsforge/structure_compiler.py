@@ -459,7 +459,7 @@ def compile_structured_page_pack_section(
     require(annotations["schema_version"] in {"0.4.0", "0.5.0"}, "invalid_structure_annotations", "Pack compilation requires structure annotations 0.4.0 or 0.5.0.")
     if annotations["schema_version"] == "0.4.0":
         require(shard_directory is None and decisions_directory is None, "invalid_structure_annotations", "Single-candidate compilation does not accept shard inputs.")
-        from .outline_review import export_outline_review_draft
+        from .outline_review import export_outline_review_draft, verify_promoted_annotation
 
         with tempfile.TemporaryDirectory(prefix="standardsforge-proposal-verify-") as temporary:
             replay = Path(temporary) / "draft.json"
@@ -471,6 +471,9 @@ def compile_structured_page_pack_section(
                 and annotations["candidate_content_sha256"] == draft["candidate_content_sha256"],
                 "structure_identity_mismatch", "The reviewed annotation does not bind the exact outline proposal.",
             )
+            # The proposal digest alone does not bind the node: replay promotion's node checks.
+            with open_validated_pack(source_page_pack) as base:
+                verify_promoted_annotation(annotations, draft, exported["draft_sha256"], base)
     else:
         require(shard_directory is not None and decisions_directory is not None, "invalid_structure_annotations", "Shard compilation requires the exact shard and decision directories.")
         from .review_shard import merge_outline_review_shard
@@ -593,7 +596,7 @@ def _compile_structured_section(
                     require(physical_page <= page_count, "invalid_structure_annotations", "A structural node references a page outside the source PDF.", physical_page=physical_page)
                     parsed_page = parsed_by_page[physical_page]
                     require(parsed_page.text_layer_status == "extracted", "pdf_text_layer_empty", "A structural source page has no extractable text layer.", page=physical_page)
-                    page_bytes = parsed_page.path.read_bytes()
+                    page_bytes = parsed_page.data
                     relative = f"sources/pages/physical-{physical_page:04d}.txt"
                     staging.joinpath(*PurePosixPath(relative).parts).write_bytes(page_bytes)
                     pages[physical_page] = (relative, parsed_page.sha256, page_bytes)

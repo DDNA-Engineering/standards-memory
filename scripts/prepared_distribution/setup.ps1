@@ -2,10 +2,12 @@ $ErrorActionPreference = 'Stop'
 if ($args.Count -ne 0) { throw 'Use setup.py --help for portable setup options.' }
 $Probe = "import platform,sys; raise SystemExit(0 if sys.implementation.name == 'cpython' and sys.version_info[:2] == (3,12) and platform.machine().lower() in {'amd64','x86_64'} else 1)"
 $Candidates = @()
-$Existing = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
-if (Test-Path -LiteralPath $Existing -PathType Leaf) { $Candidates += ,@($Existing) }
+# Prefer a system interpreter: setup may need to replace .venv, and Windows cannot
+# delete an interpreter that is running. The prepared .venv is only a last resort.
 if (Get-Command py -ErrorAction SilentlyContinue) { $Candidates += ,@('py', '-3.12') }
 if (Get-Command python -ErrorAction SilentlyContinue) { $Candidates += ,@('python') }
+$Existing = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
+if (Test-Path -LiteralPath $Existing -PathType Leaf) { $Candidates += ,@($Existing) }
 foreach ($Candidate in $Candidates) {
     $Executable = $Candidate[0]
     $Prefix = @($Candidate | Select-Object -Skip 1)

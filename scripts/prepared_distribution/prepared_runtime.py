@@ -20,6 +20,7 @@ MANIFEST_NAME = "bundle-manifest.json"
 RECEIPT_RELATIVE = ".standardsforge/prepared-distribution.json"
 PARTIAL_RELATIVE = ".standardsforge/prepared-setup-incomplete.json"
 VENV_MARKER = ".standardsforge-prepared-venv.json"
+DISCARDED_VENV = ".discarded-venv"
 RUNTIME_ROOTS = {".standardsforge", ".venv"}
 HEX64 = re.compile(r"[0-9a-f]{64}")
 
@@ -291,19 +292,30 @@ def _run(command: list[str], root: Path, *, capture: bool = False, dependency_ne
     environment = _clean_environment()
     if dependency_network:
         environment["PIP_NO_INDEX"] = "0"
+    # Capture bytes and decode explicitly: the CLI writes UTF-8 regardless of the
+    # locale, so a Windows ANSI code page must not be used to decode its output.
     result = subprocess.run(
         command,
         cwd=root,
         env=environment,
         shell=False,
-        text=True,
         stdout=subprocess.PIPE if capture else None,
         stderr=subprocess.PIPE if capture else None,
     )
+    stdout: str | None = None
+    stderr: str | None = None
+    if capture:
+        # stderr is diagnostic only; never let an undecodable traceback hide the failure.
+        stderr = (result.stderr or b"").decode("utf-8", errors="replace")
     if result.returncode != 0:
-        detail = result.stderr.strip() if capture and result.stderr else ""
+        detail = stderr.strip() if stderr else ""
         raise PreparedSetupError(f"Prepared command failed ({result.returncode}): {detail}")
-    return result
+    if capture:
+        try:
+            stdout = (result.stdout or b"").decode("utf-8", errors="strict")
+        except UnicodeDecodeError as exc:
+            raise PreparedSetupError("Prepared command output is not valid UTF-8; setup cannot interpret it.") from exc
+    return subprocess.CompletedProcess(result.args, result.returncode, stdout, stderr)
 
 
 def _cli(python: Path, root: Path, arguments: list[str], *, capture: bool = False) -> subprocess.CompletedProcess[str]:
@@ -422,6 +434,74 @@ def _prepare_mcp(root: Path, python: Path, wheel: Path, manifest: dict[str, Any]
           "--query", "environmental testing"], root)
 
 
+def _is_disposable_state(state: Path) -> bool:
+    """True for a state directory interrupted before its ownership marker landed."""
+    if _is_link_like(state) or not state.is_dir():
+        return False
+    try:
+        names = {child.name for child in state.iterdir()}
+    except OSError:
+        return False
+    return names <= {f".{Path(PARTIAL_RELATIVE).name}.tmp"}
+
+
+def _running_from(environment_root: Path) -> bool:
+    try:
+        return Path(sys.prefix).resolve() == environment_root.resolve()
+    except OSError:
+        return False
+
+
+def _discard_owned_venv(venv_root: Path, state: Path) -> None:
+    """Move an owned .venv into owned state atomically, then delete it.
+
+    The rename either happens entirely or not at all, so the virtual
+    environment never loses its ownership marker while it is still named
+    ``.venv``. Deleting the moved tree afterwards can fail or be interrupted;
+    the remains live inside state that still carries the partial-setup
+    marker, so the next run can finish the cleanup.
+    """
+    discarded = state / DISCARDED_VENV
+    if discarded.exists() or _is_link_like(discarded):
+        _require_no_links_tree(discarded, "Discarded prepared .venv")
+        _remove_owned_tree(discarded, venv_root)
+    try:
+        os.rename(venv_root, discarded)
+    except OSError as exc:
+        raise PreparedSetupError(
+            f"Setup could not replace the incomplete virtual environment {venv_root} ({exc}). "
+            "Close any program that is using it, such as a model host running the StandardsForge MCP server, "
+            f"then run setup again. If this keeps failing, delete the directory {venv_root} and run setup again."
+        ) from exc
+    _remove_owned_tree(discarded, venv_root)
+
+
+def _remove_owned_tree(path: Path, reported: Path) -> None:
+    try:
+        shutil.rmtree(path)
+    except OSError as exc:
+        raise PreparedSetupError(
+            f"Setup could not delete the incomplete prepared files in {path} ({exc}). "
+            f"Close any program that is using {reported}, then run setup again; setup will finish the cleanup."
+        ) from exc
+
+
+def _clear_partial_state(state: Path, partial_path: Path) -> None:
+    """Empty owned partial state, keeping its ownership marker until last."""
+    for child in sorted(state.iterdir()):
+        if child == partial_path:
+            continue
+        if child.is_dir() and not _is_link_like(child):
+            _remove_owned_tree(child, child)
+        else:
+            try:
+                child.unlink()
+            except OSError as exc:
+                raise PreparedSetupError(
+                    f"Setup could not delete {child} ({exc}). Close any program that is using it, then run setup again."
+                ) from exc
+
+
 def setup_prepared(root: Path, *, quiet: bool = False, mcp_mode: str | None = None) -> dict[str, Any]:
     _require(sys.implementation.name == "cpython" and sys.version_info >= (3, 11), "CPython 3.11 or newer is required.")
     _check_mcp_profile(mcp_mode)
@@ -449,34 +529,59 @@ def setup_prepared(root: Path, *, quiet: bool = False, mcp_mode: str | None = No
     existing_ready = receipt_path.is_file()
     existing_receipt: dict[str, Any] | None = None
     recovering_partial = False
-    if state.exists() and not existing_ready:
-        partial = _load_json(partial_path, "partial setup marker") if partial_path.is_file() else None
-        _require(partial == {"bundle_manifest_sha256": manifest_sha256}, "Existing prepared state is not owned by a recoverable setup.")
+    if (state.exists() or _is_link_like(state)) and not existing_ready and not _is_disposable_state(state):
+        partial = _load_json(partial_path, "partial setup marker") if partial_path.is_file() and not _is_link_like(partial_path) else None
+        _require(
+            partial == {"bundle_manifest_sha256": manifest_sha256},
+            f"Existing prepared state {state} is not owned by a recoverable setup of this bundle, so setup will not change it. "
+            f"If it was left by an earlier StandardsForge setup, delete the directory {state} and run setup again.",
+        )
         _require_no_links_tree(state, "Prepared partial state")
-        shutil.rmtree(state)
         recovering_partial = True
     elif existing_ready:
         existing_receipt = validate_receipt(root, manifest, manifest_sha256)
 
+    # Decide ownership of every existing runtime path before anything is deleted.
     marker_path = venv_root / VENV_MARKER
-    if venv_root.exists():
-        if not marker_path.is_file() and recovering_partial:
-            _require_no_links_tree(venv_root, "Prepared partial .venv")
-            shutil.rmtree(venv_root)
-        else:
+    discard_venv = False
+    if venv_root.exists() or _is_link_like(venv_root):
+        _require(not _is_link_like(venv_root), f"Existing {venv_root} is a symbolic link or junction; setup will not use or change it.")
+        if marker_path.is_file() and not _is_link_like(marker_path):
             marker = _load_json(marker_path, "prepared virtual-environment marker")
-            _require(marker == {"bundle_manifest_sha256": manifest_sha256}, "Existing .venv is not owned by this prepared bundle.")
-            _remove_posix_venv_lib64_alias(venv_root)
-            _require_no_links_tree(venv_root, "Prepared .venv")
-            if recovering_partial:
-                shutil.rmtree(venv_root)
+            _require(
+                marker == {"bundle_manifest_sha256": manifest_sha256},
+                f"Existing {venv_root} is not owned by this prepared bundle, so setup will not change it. "
+                f"If it was created by another StandardsForge bundle, delete the directory {venv_root} and run setup again.",
+            )
+        else:
+            # Without its marker a .venv is ours only while the partial-setup
+            # marker proves that this bundle's interrupted setup created it.
+            _require(
+                recovering_partial,
+                f"Existing {venv_root} has no StandardsForge ownership marker, so setup will not use, change, or delete it. "
+                f"If it was left by an interrupted StandardsForge setup, delete the directory {venv_root} and run setup again; "
+                "otherwise move it out of the prepared library folder.",
+            )
+        discard_venv = recovering_partial
+        if discard_venv:
+            _require(
+                not _running_from(venv_root),
+                f"Setup is running from {venv_root}, which it must replace. Run setup with the system Python instead "
+                "(for example `py -3.12 setup.py --mcp` on Windows or `python3 setup.py` elsewhere).",
+            )
+        _remove_posix_venv_lib64_alias(venv_root)
+        _require_no_links_tree(venv_root, "Prepared .venv")
+    if recovering_partial:
+        if discard_venv:
+            _discard_owned_venv(venv_root, state)
+        _clear_partial_state(state, partial_path)
     if existing_ready:
         # A failed revalidation must not leave an old ready receipt usable by launchers.
         _write_json_atomic(partial_path, {"bundle_manifest_sha256": manifest_sha256})
         receipt_path.unlink()
     if not venv_root.exists():
         if not existing_ready:
-            state.mkdir()
+            state.mkdir(exist_ok=True)
             _write_json_atomic(partial_path, {"bundle_manifest_sha256": manifest_sha256})
         venv_root.mkdir()
         _write_json_atomic(marker_path, {"bundle_manifest_sha256": manifest_sha256})
@@ -489,8 +594,8 @@ def setup_prepared(root: Path, *, quiet: bool = False, mcp_mode: str | None = No
     _run([str(python), "-I", "-m", "pip", "install", "--disable-pip-version-check", "--no-index", "--no-deps", "--force-reinstall", str(wheel)], root)
 
     if not existing_ready:
-        if not state.exists():
-            state.mkdir()
+        if not partial_path.is_file():
+            state.mkdir(exist_ok=True)
             _write_json_atomic(partial_path, {"bundle_manifest_sha256": manifest_sha256})
         policy = root / "policies/prepared-local.json"
         _cli(python, root, ["install-corpus", str(root / "corpus/corpus.json"), "--policy", str(policy)])

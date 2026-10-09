@@ -29,6 +29,21 @@ import standardsforge.store as store_module  # noqa: E402
 import standardsforge.corpus_compiler as corpus_compiler_module  # noqa: E402
 
 
+def _tampering_isolation(real):
+    """Wrap isolated_pdf_pages so every page file is overwritten after validation."""
+
+    from contextlib import contextmanager
+
+    @contextmanager
+    def wrapper(*args, **kwargs):
+        with real(*args, **kwargs) as parsed:
+            for page in parsed.pages:
+                page.path.write_bytes(b"TAMPERED AFTER VALIDATION")
+            yield parsed
+
+    return wrapper
+
+
 class CorpusCompilerTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -318,6 +333,79 @@ class CorpusCompilerTests(unittest.TestCase):
         self.assertEqual("corpus_compile_incomplete", caught.exception.code)
         index = json.loads((output / "corpus.json").read_text(encoding="utf-8"))
         self.assertEqual("corpus_archive_mismatch", index["failures"][0]["code"])
+
+    def test_sidecar_uses_validated_page_bytes_not_mutated_page_files(self) -> None:
+        output = self.root / "tamper-corpus"
+        with patch.object(corpus_compiler_module, "isolated_pdf_pages", _tampering_isolation(corpus_compiler_module.isolated_pdf_pages)):
+            compile_mil_std_corpus(self.manifest_path, self.sources, output)
+        archive = next((output / "packs").glob("*.zip"))
+        with open_validated_pack(archive) as pack:
+            sidecars = [entry.path for entry in pack.inventory if entry.path.endswith(".extracted.txt")]
+            self.assertTrue(sidecars)
+            for relative in sidecars:
+                self.assertNotIn(b"TAMPERED", (pack.root / relative).read_bytes())
+            self.assertTrue(any("Public current component evidence" in record["text"] for record in pack.records))
+
+    def test_rejects_reused_archive_whose_source_pdf_differs_from_acquisition(self) -> None:
+        import shutil
+        from standardsforge.pack import write_pack_archive
+
+        output = self.root / "forged-corpus"
+        compile_mil_std_corpus(self.manifest_path, self.sources, output)
+        archive = next((output / "packs").glob("*.zip"))
+        (output / "corpus.json").unlink()
+        work = self.root / "forged-pack"
+        with open_validated_pack(archive) as pack:
+            shutil.copytree(pack.root, work)
+        forged_pdf = self.root / "forged.pdf"
+        self._write_pdf(forged_pdf, "Completely different forged evidence text.")
+        forged_bytes = forged_pdf.read_bytes()
+        forged_sha256 = hashlib.sha256(forged_bytes).hexdigest()
+        next(path for path in (work / "sources").iterdir() if path.suffix == ".pdf").write_bytes(forged_bytes)
+        records = json.loads((work / "records.json").read_text(encoding="utf-8"))
+        for record in records["records"]:
+            record["source"]["sha256"] = forged_sha256
+        (work / "records.json").write_text(json.dumps(records), encoding="utf-8")
+        inventory = json.loads((work / "inventory.json").read_text(encoding="utf-8"))
+        for entry in inventory["files"]:
+            data = (work / entry["path"]).read_bytes()
+            entry.update(sha256=hashlib.sha256(data).hexdigest(), bytes=len(data))
+        (work / "inventory.json").write_text(json.dumps(inventory), encoding="utf-8")
+        archive.unlink()
+        # The forged archive is internally valid; only the acquisition digest can expose it.
+        write_pack_archive(work, archive)
+
+        with self.assertRaises(StandardsForgeError) as caught:
+            compile_mil_std_corpus(self.manifest_path, self.sources, output)
+        self.assertEqual("corpus_compile_incomplete", caught.exception.code)
+        index = json.loads((output / "corpus.json").read_text(encoding="utf-8"))
+        self.assertEqual([], index["entries"])
+        self.assertEqual("corpus_archive_mismatch", index["failures"][0]["code"])
+
+    def test_install_rejects_index_identity_mismatch_before_any_install(self) -> None:
+        output = self.root / "mismatch-corpus"
+        compile_mil_std_corpus(self.manifest_path, self.sources, output)
+        index_path = output / "corpus.json"
+        original = json.loads(index_path.read_text(encoding="utf-8"))
+        policy = self.root / "mismatch-policy.json"
+        write_corpus_policy(index_path, policy, "corpus-test-user")
+        for field, value in (("package_digest", "0" * 64), ("pack_id", "other.pack")):
+            with self.subTest(field=field):
+                index = json.loads(json.dumps(original))
+                index["entries"][0][field] = value
+                index_path.write_text(json.dumps(index), encoding="utf-8")
+                database = self.root / f"{field}.db"
+                with patch.object(
+                    StandardsForgeService, "install_pack", side_effect=AssertionError("install attempted")
+                ), self.assertRaises(StandardsForgeError) as caught:
+                    install_compiled_corpus(index_path, policy, database, self.root / f"{field}-objects")
+                self.assertEqual("corpus_archive_mismatch", caught.exception.code)
+                self.assertEqual(
+                    [],
+                    store_module.LocalStore(database, self.root / f"{field}-objects").active_grants_for_pack_ids(
+                        "corpus-test-user", [original["entries"][0]["pack_id"]]
+                    ),
+                )
 
     def test_install_reconciles_obsolete_grant_for_same_pack_identity(self) -> None:
         first_output = self.root / "first-corpus"

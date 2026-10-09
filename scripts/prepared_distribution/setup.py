@@ -22,3 +22,7 @@ if __name__ == "__main__":
     except (PreparedSetupError, OSError) as exc:
         print(json.dumps({"ok": False, "error": {"code": "prepared_setup_failed", "message": str(exc)}}), file=sys.stderr)
         raise SystemExit(1)
+    except UnicodeError as exc:
+        message = f"Prepared setup could not decode command output as UTF-8 ({exc}). Run setup again; if it repeats, report this message."
+        print(json.dumps({"ok": False, "error": {"code": "prepared_setup_failed", "message": message}}), file=sys.stderr)
+        raise SystemExit(1)

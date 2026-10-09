@@ -16,10 +16,16 @@ from typing import Any, Iterator
 
 from .errors import StandardsForgeError, require
 from .pack import (MAX_FILES, MAX_JSON_BYTES, MAX_TOTAL_BYTES, _safe_relative_path,
-                   open_validated_pack, validate_pack_directory)
+                   iter_zip_member, open_validated_pack, validate_pack_directory)
 
 FORMAT = "standardsforge-content-bundle-v1"
 _DIGEST = re.compile(r"[a-f0-9]{64}")
+_METHODS = {zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED, zipfile.ZIP_LZMA}
+
+
+def _member_chunks(archive: zipfile.ZipFile, name: str, limit: int) -> Iterator[bytes]:
+    return iter_zip_member(archive, archive.getinfo(name), limit=limit, methods=_METHODS,
+                           limit_code="bundle_limit_exceeded", invalid_code="invalid_bundle")
 
 
 def _info(name: str, method: int) -> zipfile.ZipInfo:
@@ -101,7 +107,7 @@ def _open(source: str | Path) -> Iterator[tuple[zipfile.ZipFile, dict[str, Any]]
                 require(info.file_size <= MAX_TOTAL_BYTES, "bundle_limit_exceeded", "Bundle blob exceeds pack limits.")
             require("bundle.json" in names and archive.getinfo("bundle.json").file_size <= MAX_JSON_BYTES,
                     "invalid_bundle", "Missing or oversized bundle manifest.")
-            manifest = json.loads(archive.read("bundle.json"))
+            manifest = json.loads(b"".join(_member_chunks(archive, "bundle.json", MAX_JSON_BYTES)))
             require(isinstance(manifest, dict) and set(manifest) == {"schema_version", "format", "packs"}
                     and manifest["schema_version"] == "0.1.0" and manifest["format"] == FORMAT,
                     "invalid_bundle", "Unsupported bundle manifest.")
@@ -142,13 +148,13 @@ def _materialize(archive: zipfile.ZipFile, entry: dict[str, Any]) -> Iterator[Pa
     with tempfile.TemporaryDirectory(prefix="standardsforge-bundle-pack-") as temporary:
         root = Path(temporary)
         for file in entry["files"]:
-            target = root / file["path"]
+            # Join the validated parts, never the raw manifest string.
+            target = root.joinpath(*_safe_relative_path(file["path"]).parts)
             target.parent.mkdir(parents=True, exist_ok=True)
             digest, count = hashlib.sha256(), 0
-            with archive.open("blobs/" + file["sha256"]) as reader, target.open("xb") as writer:
-                while chunk := reader.read(1024 * 1024):
+            with target.open("xb") as writer:
+                for chunk in _member_chunks(archive, "blobs/" + file["sha256"], file["bytes"]):
                     count += len(chunk)
-                    require(count <= file["bytes"], "invalid_bundle", "Blob exceeded its declared size.")
                     digest.update(chunk)
                     writer.write(chunk)
             require(count == file["bytes"] and digest.hexdigest() == file["sha256"], "invalid_bundle", "Blob digest or size mismatch.")

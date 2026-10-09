@@ -12,15 +12,21 @@ from http.cookiejar import CookieJar
 from pathlib import Path
 from typing import Any, Callable
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
-from urllib.request import HTTPCookieProcessor, Request, build_opener
+from urllib.parse import urlencode, urlsplit
+from urllib.request import HTTPCookieProcessor, HTTPRedirectHandler, Request, build_opener
 
 from .errors import StandardsForgeError, require
+from .pdf_protocol import DEFAULT_LIMITS
 
 
 QUICK_SEARCH_URL = "https://quicksearch.dla.mil/qsSearch.aspx"
 DETAIL_URL = "https://quicksearch.dla.mil/qsDocDetails.aspx?ident_number={ident_number}"
 IMAGE_URL = "https://quicksearch.dla.mil/ImageRedirector.aspx?token={token}"
+# Requests and redirects may only reach the official publisher host over HTTPS.
+OFFICIAL_SOURCE_HOSTS = frozenset({"quicksearch.dla.mil"})
+# A downloaded PDF can never exceed what the isolated parser accepts.
+MAX_SOURCE_DOWNLOAD_BYTES = DEFAULT_LIMITS.source_bytes
+MAX_SOURCE_PAGE_BYTES = 32 * 1024 * 1024
 _USER_AGENT = "Mozilla/5.0 (compatible; StandardsForge/0.1; official-public-document-acquisition)"
 _TOKEN = re.compile(r"ImageRedirector\.aspx\?token=(\d+\.\d+)", re.IGNORECASE)
 _IDENT = re.compile(r"ident_number=(\d+)", re.IGNORECASE)
@@ -130,13 +136,53 @@ def _safe_name(value: str, *, maximum: int = 72) -> str:
     return (cleaned or "document")[:maximum]
 
 
+def _official_url(url: str) -> bool:
+    try:
+        parts = urlsplit(url)
+        port = parts.port
+    except ValueError:
+        return False
+    return (
+        parts.scheme == "https"
+        and parts.hostname in OFFICIAL_SOURCE_HOSTS
+        and port in {None, 443}
+        and parts.username is None
+        and parts.password is None
+    )
+
+
+def _require_official_url(url: str, code: str = "source_redirect_rejected") -> None:
+    require(_official_url(url), code, "Acquisition may only reach the official HTTPS source host.", host=urlsplit(url).hostname)
+
+
+class _OfficialRedirectHandler(HTTPRedirectHandler):
+    """Follow redirects only to the same HTTPS scheme on an allowlisted official host."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[no-untyped-def]
+        _require_official_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def _read_bounded(response: Any, limit: int) -> bytes:
+    declared = response.headers.get("Content-Length") if getattr(response, "headers", None) is not None else None
+    if declared is not None and declared.strip().isdigit():
+        require(int(declared) <= limit, "source_limit_exceeded", "The official source response exceeds its byte limit.")
+    chunks: list[bytes] = []
+    total = 0
+    while chunk := response.read(min(1024 * 1024, limit + 1 - total)):
+        total += len(chunk)
+        require(total <= limit, "source_limit_exceeded", "The official source response exceeds its byte limit.")
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
 @dataclass
 class _HttpClient:
     delay_seconds: float
     retries: int = 4
 
     def __post_init__(self) -> None:
-        self._opener = build_opener(HTTPCookieProcessor(CookieJar()))
+        self._opener = build_opener(HTTPCookieProcessor(CookieJar()), _OfficialRedirectHandler())
         self._last_request = 0.0
 
     def _throttle(self) -> None:
@@ -145,6 +191,7 @@ class _HttpClient:
             time.sleep(remaining)
 
     def open(self, url: str, *, data: bytes | None = None, referer: str | None = None):
+        _require_official_url(url, "source_url_rejected")
         headers = {"User-Agent": _USER_AGENT, "Accept": "text/html,application/pdf;q=0.9,*/*;q=0.8"}
         if referer:
             headers["Referer"] = referer
@@ -153,6 +200,9 @@ class _HttpClient:
             try:
                 response = self._opener.open(Request(url, data=data, headers=headers), timeout=90)
                 self._last_request = time.monotonic()
+                if not _official_url(response.geturl()):
+                    response.close()
+                    _require_official_url(response.geturl())
                 return response
             except (HTTPError, URLError, TimeoutError, OSError) as exc:
                 self._last_request = time.monotonic()
@@ -168,7 +218,7 @@ class _HttpClient:
     def text(self, url: str, *, fields: dict[str, str] | None = None, referer: str | None = None) -> str:
         data = urlencode(fields).encode("ascii") if fields is not None else None
         with self.open(url, data=data, referer=referer) as response:
-            payload = response.read()
+            payload = _read_bounded(response, MAX_SOURCE_PAGE_BYTES)
             charset = response.headers.get_content_charset() or "utf-8"
         return payload.decode(charset, errors="replace")
 
@@ -374,11 +424,15 @@ def _download_component(
         download_url = f"https://quicksearch.dla.mil/WMX/Default.aspx?token={public_token}"
         response = client.open(download_url, referer=redirector_url)
         try:
+            declared = response.headers.get("Content-Length") if getattr(response, "headers", None) is not None else None
+            if declared is not None and declared.strip().isdigit():
+                require(int(declared) <= MAX_SOURCE_DOWNLOAD_BYTES, "source_limit_exceeded", "The official PDF exceeds the source byte limit.")
             with temporary.open("wb") as stream:
                 while chunk := response.read(1024 * 1024):
+                    length += len(chunk)
+                    require(length <= MAX_SOURCE_DOWNLOAD_BYTES, "source_limit_exceeded", "The official PDF exceeds the source byte limit.")
                     stream.write(chunk)
                     digest.update(chunk)
-                    length += len(chunk)
         finally:
             response.close()
         with temporary.open("rb") as stream:

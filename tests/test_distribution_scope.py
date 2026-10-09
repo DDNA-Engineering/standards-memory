@@ -260,6 +260,14 @@ class DistributionScopeTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertNotIn("$Python -m ", setup)
         self.assertIn("(Join-Path $PSScriptRoot 'setup.py') --mcp", setup)
+        # Setup may replace .venv; Windows cannot delete a running interpreter,
+        # so the prepared environment is only the last-resort interpreter.
+        self.assertLess(setup.index("'py', '-3.12'"), setup.index("$Candidates += ,@($Existing)"))
+        self.assertLess(setup.index("@('python')"), setup.index("$Candidates += ,@($Existing)"))
+        posix_launcher = (
+            ROOT / "scripts" / "prepared_distribution" / "standardsforge.sh"
+        ).read_text(encoding="utf-8")
+        self.assertIn('exec python3 -I "$SCRIPT_DIR/run.py" "$@"', posix_launcher)
 
     def test_prepared_environment_must_match_exact_lock(self) -> None:
         with tempfile.TemporaryDirectory(prefix="standardsforge-mcp-environment-test-") as temporary:

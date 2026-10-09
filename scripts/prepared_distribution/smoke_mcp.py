@@ -24,7 +24,7 @@ EXPECTED_TOOLS = [
 
 
 async def _smoke(db: str, store: str, principal: str, query: str, launcher: str | None = None) -> None:
-    parameters = StdioServerParameters(
+    direct = StdioServerParameters(
         command=sys.executable,
         args=[
             "-I",
@@ -40,8 +40,13 @@ async def _smoke(db: str, store: str, principal: str, query: str, launcher: str 
             "structured_only",
         ],
     )
+    await _smoke_server(direct, query)
     if launcher is not None:
-        parameters = StdioServerParameters(command=sys.executable, args=["-I", launcher])
+        # The launcher is qualified in addition to, never instead of, the direct server.
+        await _smoke_server(StdioServerParameters(command=sys.executable, args=["-I", launcher]), query)
+
+
+async def _smoke_server(parameters: StdioServerParameters, query: str) -> None:
     async with Client(parameters, raise_exceptions=True) as client:
         tools = await client.list_tools()
         if [tool.name for tool in tools.tools] != EXPECTED_TOOLS:

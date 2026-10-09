@@ -4,6 +4,7 @@ import hashlib
 import copy
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -320,17 +321,227 @@ class PreparedRuntimeTests(unittest.TestCase):
             "from pathlib import Path\nPath('unverified-setup-executed').write_text('bad')\n",
             encoding="utf-8",
         )
-        result = subprocess.run(
-            [sys.executable, "-B", str(self.root / "run.py"), "--help"],
-            cwd=self.root,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=False,
+        # -I is what standardsforge.sh and the PowerShell launchers use; run.py must
+        # still find its adjacent helper without the script directory on sys.path.
+        for flag in ("-B", "-I"):
+            result = subprocess.run(
+                [sys.executable, flag, str(self.root / "run.py"), "--help"],
+                cwd=self.root,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=False,
+            )
+            self.assertEqual(1, result.returncode, result.stderr)
+            self.assertIn("prepared_bundle_invalid", result.stderr)
+            self.assertFalse(sentinel.exists())
+
+
+
+class _FakeEnvBuilder:
+    def __init__(self, *args, **kwargs) -> None:
+        pass
+
+    def create(self, root) -> None:
+        python = _venv_python(Path(root))
+        python.parent.mkdir(parents=True, exist_ok=True)
+        python.write_bytes(b"fresh interpreter")
+
+
+class PreparedRecoveryTests(unittest.TestCase):
+    """Interrupted or failed setup must stay recoverable and never strand .venv."""
+
+    setUp = PreparedRuntimeTests.setUp
+    tearDown = PreparedRuntimeTests.tearDown
+    _write_manifest = PreparedRuntimeTests._write_manifest
+
+    def _partial_install(self) -> tuple[str, Path, Path]:
+        _, digest = validate_bundle(self.root)
+        state = self.root / ".standardsforge"
+        state.mkdir()
+        (state / "prepared-setup-incomplete.json").write_text(json.dumps({"bundle_manifest_sha256": digest}), encoding="utf-8")
+        (state / "memory.db").write_bytes(b"half-built")
+        venv_root = self.root / ".venv"
+        python = _venv_python(venv_root)
+        python.parent.mkdir(parents=True)
+        python.write_bytes(b"old interpreter")
+        (venv_root / VENV_MARKER).write_text(json.dumps({"bundle_manifest_sha256": digest}), encoding="utf-8")
+        return digest, state, venv_root
+
+    def _setup_until_install(self) -> None:
+        with (
+            patch("prepared_runtime.venv.EnvBuilder", _FakeEnvBuilder),
+            patch("prepared_runtime._run", side_effect=PreparedSetupError("stopped at wheel install")),
+        ):
+            with self.assertRaisesRegex(PreparedSetupError, "stopped at wheel install"):
+                setup_prepared(self.root, quiet=True)
+
+    def _assert_recovered(self, digest: str) -> None:
+        state = self.root / ".standardsforge"
+        venv_root = self.root / ".venv"
+        self.assertEqual({"bundle_manifest_sha256": digest}, json.loads((state / "prepared-setup-incomplete.json").read_text()))
+        self.assertEqual({"bundle_manifest_sha256": digest}, json.loads((venv_root / VENV_MARKER).read_text()))
+        self.assertEqual(b"fresh interpreter", _venv_python(venv_root).read_bytes())
+        self.assertFalse((state / "memory.db").exists())
+        self.assertFalse((state / ".discarded-venv").exists())
+
+    def test_locked_venv_keeps_both_ownership_markers_and_retry_recovers(self) -> None:
+        digest, state, venv_root = self._partial_install()
+        real_rename = os.rename
+
+        def locked(source, target, *args, **kwargs):
+            if Path(source) == venv_root:
+                raise PermissionError(13, "Access is denied", str(_venv_python(venv_root)))
+            return real_rename(source, target, *args, **kwargs)
+
+        with patch("prepared_runtime.os.rename", side_effect=locked):
+            with self.assertRaisesRegex(PreparedSetupError, "delete the directory .*\\.venv") as failed:
+                setup_prepared(self.root, quiet=True)
+        self.assertIn(str(venv_root), str(failed.exception))
+        self.assertTrue((venv_root / VENV_MARKER).is_file())
+        self.assertTrue((state / "prepared-setup-incomplete.json").is_file())
+        self.assertTrue((state / "memory.db").is_file())
+
+        self._setup_until_install()
+        self._assert_recovered(digest)
+
+    def test_failed_delete_after_move_is_finished_by_the_next_run(self) -> None:
+        digest, state, venv_root = self._partial_install()
+        real_rmtree = shutil.rmtree
+
+        def stuck(path, *args, **kwargs):
+            if Path(path).name == ".discarded-venv":
+                (Path(path) / VENV_MARKER).unlink()
+                raise PermissionError(13, "Access is denied", str(path))
+            return real_rmtree(path, *args, **kwargs)
+
+        with patch("prepared_runtime.shutil.rmtree", side_effect=stuck):
+            with self.assertRaisesRegex(PreparedSetupError, "run setup again"):
+                setup_prepared(self.root, quiet=True)
+        self.assertFalse(venv_root.exists())
+        self.assertTrue((state / "prepared-setup-incomplete.json").is_file())
+
+        self._setup_until_install()
+        self._assert_recovered(digest)
+
+    def test_interruption_at_any_recovery_step_remains_recoverable(self) -> None:
+        import prepared_runtime as runtime_module
+
+        injections = [
+            (runtime_module.os, "rename", 1),
+            (runtime_module.shutil, "rmtree", 1),
+            (runtime_module.shutil, "rmtree", 2),
+            (runtime_module, "_write_json_atomic", 1),
+            (runtime_module, "_write_json_atomic", 2),
+            (Path, "unlink", 1),
+            (Path, "mkdir", 1),
+            (Path, "mkdir", 2),
+        ]
+        for owner, attribute, interrupted_call in injections:
+            with self.subTest(target=f"{getattr(owner, '__name__', owner)}.{attribute}", call=interrupted_call):
+                shutil.rmtree(self.root / ".standardsforge", ignore_errors=True)
+                shutil.rmtree(self.root / ".venv", ignore_errors=True)
+                digest, _, _ = self._partial_install()
+                real = getattr(owner, attribute)
+                calls = {"count": 0}
+
+                def interrupt(*args, **kwargs):
+                    calls["count"] += 1
+                    if calls["count"] == interrupted_call:
+                        raise KeyboardInterrupt
+                    return real(*args, **kwargs)
+
+                with (
+                    patch.object(owner, attribute, side_effect=interrupt, autospec=owner is Path),
+                    patch("prepared_runtime.venv.EnvBuilder", _FakeEnvBuilder),
+                    patch("prepared_runtime._run", side_effect=PreparedSetupError("stopped at wheel install")),
+                ):
+                    try:
+                        setup_prepared(self.root, quiet=True)
+                    except (KeyboardInterrupt, PreparedSetupError):
+                        pass
+                self.assertGreaterEqual(calls["count"], 1)
+                self._setup_until_install()
+                self._assert_recovered(digest)
+
+    def test_unmarked_venv_without_partial_state_gets_actionable_message_and_is_kept(self) -> None:
+        venv_root = self.root / ".venv"
+        python = _venv_python(venv_root)
+        python.parent.mkdir(parents=True)
+        python.write_bytes(b"someone else's interpreter")
+        with self.assertRaisesRegex(PreparedSetupError, "no StandardsForge ownership marker") as failed:
+            setup_prepared(self.root, quiet=True)
+        self.assertIn(f"delete the directory {venv_root}", str(failed.exception))
+        self.assertEqual(b"someone else's interpreter", python.read_bytes())
+        self.assertFalse((self.root / ".standardsforge").exists())
+
+    def test_unowned_state_is_not_deleted_and_names_the_directory(self) -> None:
+        state = self.root / ".standardsforge"
+        state.mkdir()
+        (state / "memory.db").write_bytes(b"unknown")
+        with self.assertRaisesRegex(PreparedSetupError, "not owned by a recoverable setup") as failed:
+            setup_prepared(self.root, quiet=True)
+        self.assertIn(str(state), str(failed.exception))
+        self.assertTrue((state / "memory.db").is_file())
+
+    def test_empty_state_from_interrupted_first_setup_is_recoverable(self) -> None:
+        _, digest = validate_bundle(self.root)
+        (self.root / ".standardsforge").mkdir()
+        self._setup_until_install()
+        self.assertEqual(
+            {"bundle_manifest_sha256": digest},
+            json.loads((self.root / ".standardsforge/prepared-setup-incomplete.json").read_text()),
         )
-        self.assertEqual(1, result.returncode)
-        self.assertIn("prepared_bundle_invalid", result.stderr)
-        self.assertFalse(sentinel.exists())
+        self.assertTrue((self.root / ".venv" / VENV_MARKER).is_file())
+
+    def test_recovery_refuses_to_delete_the_running_interpreter_environment(self) -> None:
+        _, state, venv_root = self._partial_install()
+        with patch("prepared_runtime.sys.prefix", str(venv_root)):
+            with self.assertRaisesRegex(PreparedSetupError, "Run setup with the system Python"):
+                setup_prepared(self.root, quiet=True)
+        self.assertEqual(b"old interpreter", _venv_python(venv_root).read_bytes())
+        self.assertTrue((venv_root / VENV_MARKER).is_file())
+        self.assertTrue((state / "memory.db").is_file())
+
+    def test_differently_owned_venv_is_never_deleted_during_recovery(self) -> None:
+        _, state, venv_root = self._partial_install()
+        (venv_root / VENV_MARKER).write_text(json.dumps({"bundle_manifest_sha256": "f" * 64}), encoding="utf-8")
+        with self.assertRaisesRegex(PreparedSetupError, "not owned by this prepared bundle"):
+            setup_prepared(self.root, quiet=True)
+        self.assertTrue(_venv_python(venv_root).is_file())
+        self.assertTrue((state / "memory.db").is_file())
+
+
+class PreparedOutputEncodingTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory(prefix="standardsforge-prepared-encoding-")
+        self.root = Path(self.temporary.name) / "Łč prepared"
+        self.root.mkdir()
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
+    def _child(self, payload: bytes) -> list[str]:
+        return [sys.executable, "-I", "-c", f"import sys; sys.stdout.buffer.write({payload!r})"]
+
+    def test_utf8_cli_output_is_decoded_under_a_legacy_locale(self) -> None:
+        database = str(self.root / ".standardsforge" / "memory.db")
+        payload = (json.dumps({"ok": True, "result": {"path": database}}, ensure_ascii=False) + "\n").encode("utf-8")
+        with (
+            patch("subprocess._text_encoding", return_value="cp1252"),
+            patch("locale.getpreferredencoding", return_value="cp1252"),
+        ):
+            result = _run(self._child(payload), self.root, capture=True)
+        self.assertEqual({"path": database}, _parse_cli_success(result, "doctor"))
+
+    def test_invalid_utf8_output_is_a_typed_setup_error(self) -> None:
+        with self.assertRaisesRegex(PreparedSetupError, "not valid UTF-8"):
+            _run(self._child(b'{"ok": true, "result": {"path": "\xa3\xe8"}}\n'), self.root, capture=True)
+
+    def test_failed_command_with_undecodable_stderr_still_reports_failure(self) -> None:
+        command = [sys.executable, "-I", "-c", "import sys; sys.stderr.buffer.write(b'\\xa3 failed'); raise SystemExit(3)"]
+        with self.assertRaisesRegex(PreparedSetupError, r"failed \(3\).*failed"):
+            _run(command, self.root, capture=True)
 
 
 if __name__ == "__main__":
