@@ -380,12 +380,15 @@ class DistributionScopeTests(unittest.TestCase):
                 ("pip", "25.0"),
             ]
             verify_environment(requirements, "0.1.0a1", expected)
-            with self.assertRaisesRegex(RuntimeError, "differs from"):
-                verify_environment(
-                    requirements,
-                    "0.1.0a1",
-                    [*expected, ("injected-package", "1.0")],
-                )
+            # CPython 3.11 venvs also bootstrap setuptools from ensurepip.
+            verify_environment(requirements, "0.1.0a1", [*expected, ("setuptools", "65.5.0")])
+            for extra in ("injected-package", "wheel"):
+                with self.assertRaisesRegex(RuntimeError, "differs from"):
+                    verify_environment(
+                        requirements,
+                        "0.1.0a1",
+                        [*expected, (extra, "1.0")],
+                    )
             with self.assertRaisesRegex(RuntimeError, "differs from"):
                 verify_environment(
                     requirements,
