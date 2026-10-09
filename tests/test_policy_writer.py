@@ -78,6 +78,46 @@ class PackPolicyWriterTests(unittest.TestCase):
         self.assertEqual("write_pack_policy", result["operation"])
         self.assertTrue(policy_path.is_file())
 
+    def test_cli_rejects_padded_principal_instead_of_stripping_it(self) -> None:
+        for principal in (" model-user", "model-user ", "model-user\t"):
+            with self.subTest(principal=principal):
+                policy_path = self.root / "padded-policy.json"
+                args = cli_parser().parse_args(
+                    [
+                        "write-pack-policy",
+                        str(PACK),
+                        str(policy_path),
+                        "--principal",
+                        principal,
+                        "--content-class",
+                        "synthetic",
+                    ]
+                )
+                with self.assertRaises(StandardsForgeError) as caught:
+                    cli_run(args)
+                self.assertEqual("invalid_principal", caught.exception.code)
+                self.assertFalse(policy_path.exists())
+
+
+    def test_library_writer_and_loader_reject_padded_or_unencodable_principal(self) -> None:
+        for principal in (" model-user", "model-user ", "model-user\n", "model\ud800user"):
+            with self.subTest(principal=principal):
+                policy_path = self.root / "library-policy.json"
+                with self.assertRaises(StandardsForgeError) as caught:
+                    write_pack_policy(PACK, policy_path, principal, "synthetic")
+                self.assertEqual("invalid_principal", caught.exception.code)
+                self.assertFalse(policy_path.exists())
+
+        written = self.root / "written.json"
+        write_pack_policy(PACK, written, "model-user", "synthetic")
+        raw = json.loads(written.read_text(encoding="utf-8"))
+        for principal in ("model-user ", " model-user"):
+            with self.subTest(loaded=principal):
+                padded = self.root / "padded-loaded.json"
+                padded.write_text(json.dumps({**raw, "principal_id": principal}), encoding="utf-8")
+                with self.assertRaises(StandardsForgeError) as caught:
+                    load_policy(padded)
+                self.assertEqual("invalid_policy", caught.exception.code)
 
 if __name__ == "__main__":
     unittest.main()

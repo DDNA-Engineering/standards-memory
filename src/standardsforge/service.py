@@ -80,6 +80,24 @@ def _natural_language_terms(tokens: list[str]) -> tuple[list[str], list[str]]:
     return retained, ignored
 
 
+def _utf8_text(value: Any) -> bool:
+    """True for text that UTF-8 can encode; lone surrogates cannot reach SQLite or digests."""
+
+    if not isinstance(value, str):
+        return False
+    try:
+        value.encode("utf-8")
+    except UnicodeEncodeError:
+        return False
+    return True
+
+
+def _searchable_token(token: str) -> bool:
+    # FTS5 unicode61 keeps only letter/number (and private-use) characters in
+    # tokens; a token without one becomes an empty phrase that matches nothing.
+    return any(character.isalnum() for character in token)
+
+
 def _decode_utf8(data: bytes) -> str:
     return data.decode("utf-8")
 
@@ -795,7 +813,8 @@ class StandardsForgeService:
             )
         return packet
 
-    def verify_pack(self, source: str | Path) -> dict[str, Any]:
+    @staticmethod
+    def verify_pack(source: str | Path) -> dict[str, Any]:
         with open_validated_pack(source) as pack:
             return {
                 "valid": True,
@@ -845,7 +864,7 @@ class StandardsForgeService:
         """List only document packages currently authorized for one bound principal."""
 
         require(type(limit) is int and 1 <= limit <= 100, "invalid_limit", "Document limit must be from 1 to 100.")
-        normalized_prefix = None if identifier_prefix is None else normalize_identifier(identifier_prefix)
+        normalized_prefix = None if identifier_prefix is None else normalize_identifier(identifier_prefix, prefix=True)
         rows, visibility_fingerprint = self._authorized_document_snapshot(principal_id)
         if normalized_prefix is not None:
             rows = [row for row in rows if row["normalized_identifier"].startswith(normalized_prefix)]
@@ -996,6 +1015,8 @@ class StandardsForgeService:
         representation: str | None = None,
     ) -> dict[str, Any]:
         normalized = normalize_identifier(identifier)
+        require(edition_id is None or _utf8_text(edition_id) and bool(edition_id), "invalid_selector",
+                "edition_id must be nonempty UTF-8 text when supplied.")
         before_visibility = self.store.cache_state(principal_id)["visibility_fingerprint"]
         rows = self.store.authorized_packages(principal_id, normalized, edition_id)
         if representation is not None:
@@ -1413,12 +1434,12 @@ class StandardsForgeService:
         require(isinstance(principal_id, str) and bool(principal_id), "invalid_principal", "A trusted principal is required.")
         if clause_reference is not None:
             require(
-                isinstance(clause_reference, str) and bool(clause_reference.strip()),
+                _utf8_text(clause_reference) and bool(clause_reference.strip()),
                 "invalid_clause_reference",
-                "A clause reference must be non-empty text.",
+                "A clause reference must be non-empty UTF-8 text.",
             )
         if record_id is not None:
-            require(isinstance(record_id, str) and bool(record_id), "invalid_record_id", "A record ID must be non-empty text.")
+            require(_utf8_text(record_id) and bool(record_id), "invalid_record_id", "A record ID must be non-empty UTF-8 text.")
         require(
             clause_reference is not None or record_id is not None,
             "invalid_record_selector",
@@ -1439,9 +1460,10 @@ class StandardsForgeService:
             traversal_status="not_requested",
         )
         root = Path(package["object_path"])
-        ordered_rows, relationships = self._evidence_graph(package_digest, [clause_reference.strip()])
+        # Clause references are matched exactly as stored: "4.2.1" and "4.2.1 " are distinct records.
+        ordered_rows, relationships = self._evidence_graph(package_digest, [clause_reference])
         if record_id is not None:
-            root_row = next((row for row in ordered_rows if row["clause_reference"] == clause_reference.strip()), None)
+            root_row = next((row for row in ordered_rows if row["clause_reference"] == clause_reference), None)
             require(
                 root_row is not None and root_row["record_id"] == record_id,
                 "record_selector_mismatch",
@@ -1492,11 +1514,11 @@ class StandardsForgeService:
         require(
             isinstance(clause_references, list)
             and 1 <= len(clause_references) <= 64
-            and all(isinstance(value, str) and value.strip() for value in clause_references),
+            and all(_utf8_text(value) and value.strip() for value in clause_references),
             "invalid_clause_reference",
             "build_context requires from 1 to 64 clause references.",
         )
-        requested = list(dict.fromkeys(value.strip() for value in clause_references))
+        requested = list(dict.fromkeys(clause_references))
         package = self.store.authorized_package(principal_id, package_digest)
         declared_coverage = self._declared_coverage(package)
         coverage_dimensions = self._coverage_dimensions(
@@ -2054,7 +2076,7 @@ class StandardsForgeService:
         query_mode: str = "all_terms",
     ) -> dict[str, Any]:
         require(type(limit) is int and 1 <= limit <= 100, "invalid_limit", "Search limit must be from 1 to 100.")
-        require(isinstance(query, str), "invalid_query", "Search query must be text.")
+        require(_utf8_text(query), "invalid_query", "Search query must be UTF-8 text.")
         require(
             isinstance(query_mode, str)
             and query_mode in {"exact_phrase", "all_terms", "any_terms", "natural_language", "concept_language"},
@@ -2078,9 +2100,11 @@ class StandardsForgeService:
             self._validate_package_digest(requested_package_digest)
             self.store.authorized_package(principal_id, requested_package_digest)
         if scope_prefix is not None:
-            require(isinstance(scope_prefix, str) and bool(scope_prefix.strip()), "invalid_scope", "Search scope must be non-empty text.")
+            require(_utf8_text(scope_prefix) and bool(scope_prefix.strip()), "invalid_scope", "Search scope must be non-empty UTF-8 text.")
             scope_prefix = scope_prefix.strip()
-        tokens = re.findall(r"[\w./-]+", query, flags=re.UNICODE)
+        # Punctuation-only runs ("/", "-", "_") are separators, not terms: they
+        # would become empty FTS phrases that match nothing or force relaxation.
+        tokens = [token for token in re.findall(r"[\w./-]+", query, flags=re.UNICODE) if _searchable_token(token)]
         require(tokens, "invalid_query", "Search query contains no searchable terms.")
         require(
             len(tokens) <= _SEARCH_TERM_MAX_COUNT,

@@ -108,9 +108,15 @@ class SourcePdfTests(unittest.TestCase):
                 response = await client.call_tool('get_source_pdfs', {'package_digest': self.digest})
                 self.assertFalse(response.is_error)
                 self.assertEqual(expected, response.structured_content['result'])
+                # Caller-supplied paths or principals are undeclared arguments: rejected, never used.
                 response = await client.call_tool('get_source_pdfs', {
                     'package_digest': self.digest, 'path': str(self.root), 'principal_id': 'other-user'})
-                self.assertEqual(expected, response.structured_content['result'])
+                self.assertTrue(response.is_error)
+                self.assertIsNone(response.structured_content)
+                error = json.loads(response.content[0].text)['error']
+                self.assertEqual('invalid_argument', error['code'])
+                self.assertEqual(['path', 'principal_id'], error['details']['fields'])
+                self.assertNotIn(str(self.root), response.content[0].text)
                 self.admin.revoke(self.digest, 'local-user')
                 response = await client.call_tool('get_source_pdfs', {'package_digest': self.digest})
                 self.assertTrue(response.is_error)

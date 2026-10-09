@@ -118,6 +118,91 @@ def validate_repository_instances(
     return validated
 
 
+def _schema_enum(schema: dict[str, Any]) -> list[Any] | None:
+    if "enum" in schema:
+        return list(schema["enum"])
+    for member in schema.get("anyOf", []):
+        if isinstance(member, dict) and "enum" in member:
+            return list(member["enum"])
+    return None
+
+
+def mcp_tool_contract_problems(listed_tools: list[tuple[str, dict[str, Any]]]) -> list[str]:
+    """Compare SDK-advertised MCP tool input schemas with the checked-in contracts.
+
+    ``listed_tools`` is the registered (name, inputSchema) sequence in listing order.
+    Every argument list, required/optional split, default and enum must match
+    contracts/mcp-tools.json exactly, and the tool names must equal the
+    query-operations.json read operations.
+    """
+
+    mcp_contract = load_json("contracts/mcp-tools.json")
+    query_contract = load_json("contracts/query-operations.json")
+    contract_tools = {item["name"]: item for item in mcp_contract["tools"]}
+    read_operations = {item["name"]: item for item in query_contract["read_operations"]}
+    names = [name for name, _ in listed_tools]
+    problems: list[str] = []
+    if [item["name"] for item in mcp_contract["tools"]] != names:
+        problems.append(f"mcp-tools.json tools {sorted(contract_tools)} != registered {names}")
+    if len(read_operations) != len(query_contract["read_operations"]) or set(read_operations) != set(names):
+        problems.append(f"query-operations.json read_operations {sorted(read_operations)} != registered {sorted(names)}")
+    for name, schema in listed_tools:
+        contract = contract_tools.get(name)
+        if contract is None:
+            continue
+        properties: dict[str, Any] = schema.get("properties", {})
+        required = list(schema.get("required", []))
+        optional = [argument for argument in properties if argument not in required]
+        if schema.get("additionalProperties") is not False:
+            problems.append(f"{name}: input schema must reject undeclared arguments")
+        if contract.get("arguments") != list(properties):
+            problems.append(f"{name}: arguments {contract.get('arguments')} != advertised {list(properties)}")
+        if contract.get("optional_arguments") != optional:
+            problems.append(f"{name}: optional_arguments {contract.get('optional_arguments')} != advertised {optional}")
+        argument_schemas = contract.get("argument_schemas", {})
+        if set(argument_schemas) != set(properties):
+            problems.append(f"{name}: argument_schemas {sorted(argument_schemas)} != advertised {sorted(properties)}")
+        for argument, advertised in properties.items():
+            declared = argument_schemas.get(argument, {})
+            if declared.get("description") != advertised.get("description"):
+                problems.append(f"{name}.{argument}: description differs from the advertised schema")
+            if argument in required:
+                if "default" in advertised or "default" in declared:
+                    problems.append(f"{name}.{argument}: a required argument cannot declare a default")
+            elif declared.get("default") != advertised.get("default"):
+                problems.append(
+                    f"{name}.{argument}: default {declared.get('default')!r} != advertised {advertised.get('default')!r}"
+                )
+            if declared.get("enum") != _schema_enum(advertised):
+                problems.append(
+                    f"{name}.{argument}: enum {declared.get('enum')!r} != advertised {_schema_enum(advertised)!r}"
+                )
+        operation = read_operations.get(name)
+        if operation is not None:
+            declared_optional = sorted(operation.get("optional_arguments", {}))
+            if declared_optional != sorted(optional):
+                problems.append(
+                    f"{name}: query-operations optional_arguments {declared_optional} != advertised {sorted(optional)}"
+                )
+    return problems
+
+
+def validate_mcp_tool_contracts() -> dict[str, Any]:
+    try:
+        import asyncio
+
+        from standardsforge.mcp_server import create_mcp_server
+    except ImportError:
+        return {"status": "not_checked", "reason": "mcp_sdk_unavailable"}
+    # Listing tools never touches the service; no store is opened or created.
+    server = create_mcp_server(object(), "contract-validation")  # type: ignore[arg-type]
+    listed = asyncio.run(server.list_tools())
+    problems = mcp_tool_contract_problems([(tool.name, tool.input_schema) for tool in listed])
+    if problems:
+        raise SystemExit("MCP tool contract drift:\n" + "\n".join(problems))
+    return {"status": "matched", "tools": [tool.name for tool in listed]}
+
+
 def _error_envelope(operation: Any) -> dict[str, Any]:
     try:
         operation()
@@ -778,6 +863,7 @@ def main() -> int:
     ]
     response_contracts = validate_actual_query_contracts(schemas, registry)
     semantic_contracts = validate_semantic_contracts(schemas, registry)
+    mcp_tool_contracts = validate_mcp_tool_contracts()
     output = {
         "ok": True,
         "task_ids": [task["task_id"] for task in tasks["tasks"]],
@@ -786,6 +872,7 @@ def main() -> int:
         "validated_contract_instances": validated_instances,
         "response_contracts": response_contracts,
         "semantic_contracts": semantic_contracts,
+        "mcp_tool_contracts": mcp_tool_contracts,
         "packs": packs,
         "policy_fingerprint": policy.fingerprint,
         "source_catalogs": [

@@ -7,6 +7,7 @@
       "requires_package_pin": false,
       "result_schema": "query-response.schema.json#/$defs/search",
       "optional_arguments": {
+        "limit": "1..100; defaults to 20",
         "package_digest": "authorized immutable package pin",
         "scope_prefix": "exact clause reference or dot-delimited descendants",
         "query_mode": "exact_phrase, all_terms, any_terms, natural_language, or concept_language; defaults to all_terms"
@@ -49,7 +50,7 @@
       "result_schema": "query-response.schema.json#/$defs/listDocuments",
       "optional_arguments": {
         "identifier_prefix": "normalized identifier prefix",
-        "limit": "page size from 1 to 100",
+        "limit": "page size from 1 to 100; defaults to 50",
         "cursor": "signed principal, prefix, visibility, and position-bound continuation"
       },
       "result_fields": {
@@ -83,8 +84,19 @@
       ],
       "accepted_record_kinds": [
         "clause",
+        "definition",
+        "document",
+        "figure",
+        "list",
+        "list_item",
         "note",
-        "page"
+        "page",
+        "paragraph",
+        "section",
+        "table",
+        "table_cell",
+        "table_row",
+        "unsupported_region"
       ],
       "selector": {
         "at_least_one": [
@@ -99,7 +111,8 @@
         "response_profile": [
           "compact_evidence_v1",
           "concise_evidence_v1"
-        ]
+        ],
+        "max_bytes": "positive UTF-8 byte budget"
       }
     },
     {
@@ -115,14 +128,21 @@
         "response_profile": [
           "compact_evidence_v1",
           "concise_evidence_v1"
-        ]
+        ],
+        "max_bytes": "positive UTF-8 byte budget"
       }
     },
     {
       "name": "enumerate_obligations",
       "requires_principal": true,
       "requires_package_pin": true,
-      "result_schema": "query-response.schema.json#/$defs/enumerateObligations"
+      "result_schema": "query-response.schema.json#/$defs/enumerateObligations",
+      "optional_arguments": {
+        "scope_prefix": "exact clause reference or dot-delimited descendants",
+        "limit": "1..100; defaults to 50",
+        "cursor": "signed package, scope, principal, policy and expiry-bound continuation",
+        "max_bytes": "positive UTF-8 byte budget"
+      }
     },
     {
       "name": "diff_editions",
@@ -131,7 +151,10 @@
       "identity_authority": "exact_record_id",
       "alignment_candidates": "non_authoritative_review_required",
       "dependency_traversal": "separate_before_and_after_required_graphs",
-      "result_schema": "query-response.schema.json#/$defs/diffEditions"
+      "result_schema": "query-response.schema.json#/$defs/diffEditions",
+      "optional_arguments": {
+        "max_bytes": "positive UTF-8 byte budget"
+      }
     },
     {
       "name": "browse_records",
@@ -139,11 +162,11 @@
       "requires_package_pin": true,
       "result_schema": "record-navigation.schema.json",
       "optional_arguments": {
-        "relation": "all, roots, children, parent, adjacent, outgoing, incoming",
+        "relation": "all, roots, children, parent, adjacent, outgoing, incoming; defaults to all",
         "record_id": "required exactly for anchored navigation",
         "kind": "exact record kind",
         "scope_prefix": "exact clause or dot descendants",
-        "limit": "1..100",
+        "limit": "1..100; defaults to 50",
         "cursor": "signed package, query, principal and authorization-bound continuation",
         "max_bytes": "positive UTF-8 byte budget"
       }
@@ -166,6 +189,12 @@
       "optional_arguments": {
         "max_bytes": "positive complete-result UTF-8 byte budget"
       }
+    },
+    {
+      "name": "get_source_pdfs",
+      "requires_principal": true,
+      "requires_package_pin": true,
+      "result_schema": "source-pdfs.schema.json"
     }
   ],
   "admin_operations": [

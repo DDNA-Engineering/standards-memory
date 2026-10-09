@@ -9,14 +9,14 @@ import re
 import sqlite3
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 from . import __version__
 from .errors import StandardsForgeError
 from .pack import validate_pack_directory
 from .policy import load_policy
 from .service import StandardsForgeService
-from .store import SCHEMA_VERSION
+from .store import SCHEMA_VERSION, read_only_database_uri
 
 
 _REQUIRED_TABLES = {
@@ -57,12 +57,20 @@ def _check(
 
 
 def _readonly_connection(path: Path) -> sqlite3.Connection:
-    connection = sqlite3.connect(path.as_uri() + "?mode=ro", uri=True)
+    connection = sqlite3.connect(read_only_database_uri(path), uri=True)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA query_only = ON")
     connection.execute("PRAGMA foreign_keys = ON")
     connection.execute("PRAGMA busy_timeout = 5000")
     return connection
+
+
+def _utf8_encodable(value: str) -> bool:
+    try:
+        value.encode("utf-8")
+    except UnicodeEncodeError:
+        return False
+    return True
 
 
 def _fts5_available() -> bool:
@@ -94,7 +102,7 @@ def run_doctor(
     db_path: str | Path,
     object_root: str | Path,
     *,
-    policy_path: str | Path | None = None,
+    policy_path: str | Path | Sequence[str | Path] | None = None,
     principal_id: str | None = None,
     full_integrity: bool = False,
     require_mcp: bool = False,
@@ -280,9 +288,25 @@ def run_doctor(
         )
     )
 
-    effective_principal = principal_id.strip() if isinstance(principal_id, str) and principal_id.strip() else None
-    policy = None
+    # Policies and grants keep principals byte-exact, so a padded principal is rejected
+    # rather than silently stripped into a different identity.
+    principal_supplied = principal_id is not None
+    principal_valid = (
+        isinstance(principal_id, str)
+        and bool(principal_id)
+        and principal_id == principal_id.strip()
+        and _utf8_encodable(principal_id)
+    )
+    effective_principal = principal_id if principal_valid else None
+    principal_missing_code = "principal_invalid" if principal_supplied else "principal_not_selected"
     if policy_path is None:
+        policy_paths: list[str | Path] = []
+    elif isinstance(policy_path, (str, Path)):
+        policy_paths = [policy_path]
+    else:
+        policy_paths = list(policy_path)
+    policies: list[Any] = []
+    if not policy_paths:
         checks.append(
             _check(
                 "authorization.policy",
@@ -293,31 +317,63 @@ def run_doctor(
             )
         )
     else:
-        try:
-            policy = load_policy(policy_path)
-        except StandardsForgeError as exc:
-            checks.append(_check("authorization.policy", "required", "fail", exc.code, "The supplied trusted policy is invalid."))
+        # A principal may hold grants from several trusted policies (for example one-pack
+        # policies); readiness is judged against every supplied policy together.
+        failure: StandardsForgeError | None = None
+        for item in policy_paths:
+            try:
+                policies.append(load_policy(item))
+            except StandardsForgeError as exc:
+                failure = failure or exc
+        fingerprints_by_id: dict[str, set[str]] = {}
+        for loaded in policies:
+            fingerprints_by_id.setdefault(loaded.policy_id, set()).add(loaded.fingerprint)
+        conflicting_ids = sorted(key for key, values in fingerprints_by_id.items() if len(values) > 1)
+        if failure is not None:
+            policies = []
+            checks.append(_check("authorization.policy", "required", "fail", failure.code, "A supplied trusted policy is invalid."))
+        elif conflicting_ids:
+            policies = []
+            checks.append(
+                _check(
+                    "authorization.policy",
+                    "required",
+                    "fail",
+                    "policy_conflict",
+                    "Supplied trusted policies reuse one policy_id with different contents.",
+                    conflicting_policy_ids=conflicting_ids,
+                )
+            )
         else:
-            policy_ok = effective_principal is not None and effective_principal == policy.principal_id and policy.allow_serve
+            unique = {(loaded.policy_id, loaded.fingerprint): loaded for loaded in policies}
+            policies = [unique[key] for key in sorted(unique)]
             code = "policy_valid"
             if effective_principal is None:
-                code = "principal_not_selected"
-            elif effective_principal != policy.principal_id:
+                code = principal_missing_code
+            elif any(effective_principal != loaded.principal_id for loaded in policies):
                 code = "policy_principal_mismatch"
-            elif not policy.allow_serve:
+            elif not all(loaded.allow_serve for loaded in policies):
                 code = "policy_serve_denied"
+            policy_ok = code == "policy_valid"
+            identity: dict[str, Any] = {}
+            if len(policies) == 1:
+                identity = {
+                    "policy_principal": policies[0].principal_id,
+                    "policy_id": policies[0].policy_id,
+                    "policy_fingerprint": policies[0].fingerprint,
+                    "allow_serve": policies[0].allow_serve,
+                }
             checks.append(
                 _check(
                     "authorization.policy",
                     "required",
                     "pass" if policy_ok else "fail",
                     code,
-                    "The supplied policy is valid, principal-bound, and permits serving." if policy_ok else "The supplied policy does not establish serving authority for the selected principal.",
+                    "Every supplied policy is valid, principal-bound, and permits serving." if policy_ok else "The supplied policies do not establish serving authority for the selected principal.",
                     selected_principal=effective_principal,
-                    policy_principal=policy.principal_id,
-                    policy_id=policy.policy_id,
-                    policy_fingerprint=policy.fingerprint,
-                    allow_serve=policy.allow_serve,
+                    **identity,
+                    policy_ids=[loaded.policy_id for loaded in policies],
+                    policy_fingerprints=[loaded.fingerprint for loaded in policies],
                 )
             )
 
@@ -329,34 +385,49 @@ def run_doctor(
     package_by_digest = {str(row["package_digest"]): row for row in package_rows}
     matching_grants: list[sqlite3.Row] = []
     grant_mismatches: list[str] = []
-    if database_usable and effective_principal is not None and policy is not None:
+    grants_outside_policy: list[str] = []
+    if database_usable and effective_principal is not None and policies:
+        allowed_pack_ids = frozenset().union(*(loaded.allowed_pack_ids for loaded in policies))
+        # An active serving grant on a package no supplied policy allows is still served
+        # by the query path, so it must block readiness.
+        grants_outside_policy = sorted(
+            str(row["package_digest"])
+            for row in principal_grants
+            if str(row["package_digest"]) not in package_by_digest
+            or package_by_digest[str(row["package_digest"])]["pack_id"] not in allowed_pack_ids
+        )
         principal_grants_by_digest = {
             str(row["package_digest"]): row
             for row in grant_rows
             if row["principal_id"] == effective_principal
         }
-        policy_scope_packages = [
-            row for row in package_rows if row["pack_id"] in policy.allowed_pack_ids
-        ]
-        for package in policy_scope_packages:
+        for package in (row for row in package_rows if row["pack_id"] in allowed_pack_ids):
             digest = str(package["package_digest"])
             grant = principal_grants_by_digest.get(digest)
+            scope_policies = [loaded for loaded in policies if package["pack_id"] in loaded.allowed_pack_ids]
             mismatch_codes: list[str] = []
+            granting = None
             if grant is None:
                 mismatch_codes.append("grant_missing")
             else:
                 if int(grant["can_serve"]) != 1 or grant["revoked_at"] is not None:
                     mismatch_codes.append("grant_revoked")
-                if grant["policy_id"] != policy.policy_id:
+                same_id = [loaded for loaded in scope_policies if loaded.policy_id == grant["policy_id"]]
+                if not same_id:
                     mismatch_codes.append("policy_id")
-                if grant["policy_fingerprint"] != policy.fingerprint:
-                    mismatch_codes.append("policy_fingerprint")
+                else:
+                    granting = next((loaded for loaded in same_id if loaded.fingerprint == grant["policy_fingerprint"]), None)
+                    if granting is None:
+                        mismatch_codes.append("policy_fingerprint")
             try:
                 content_class = json.loads(package["rights_json"])["content_class"]
             except (KeyError, TypeError, json.JSONDecodeError):
                 mismatch_codes.append("rights_invalid")
             else:
-                if content_class not in policy.allowed_content_classes:
+                classes = granting.allowed_content_classes if granting is not None else frozenset().union(
+                    *(loaded.allowed_content_classes for loaded in scope_policies)
+                )
+                if content_class not in classes:
                     mismatch_codes.append("content_class_not_allowed")
             if mismatch_codes:
                 grant_mismatches.extend(f"{digest}:{code}" for code in mismatch_codes)
@@ -366,9 +437,11 @@ def run_doctor(
     if not database_usable:
         grant_status, grant_code = "not_checked", "database_unavailable"
     elif effective_principal is None:
-        grant_status, grant_code = "fail", "principal_not_selected"
-    elif policy is None:
+        grant_status, grant_code = "fail", principal_missing_code
+    elif not policies:
         grant_status, grant_code = "not_checked", "policy_unavailable"
+    elif grants_outside_policy:
+        grant_status, grant_code = "fail", "grants_outside_policy"
     elif matching_grants and not grant_mismatches:
         grant_status, grant_code = "pass", "principal_grants_ready"
     else:
@@ -379,13 +452,20 @@ def run_doctor(
             "required",
             grant_status,
             grant_code,
-            "Every active grant for the selected principal matches the current trusted policy." if grant_status == "pass" else "Active grants could not be proven ready under the current trusted policy.",
+            (
+                "Every active grant for the selected principal matches a supplied trusted policy."
+                if grant_status == "pass"
+                else "The selected principal has active serving grants on packages no supplied trusted policy allows."
+                if grant_code == "grants_outside_policy"
+                else "Active grants could not be proven ready under the supplied trusted policies."
+            ),
             selected_principal=effective_principal,
             active_grant_count=len(principal_grants),
             revoked_grant_count=len(revoked_principal_grants),
             matching_grant_count=len(matching_grants),
             unrelated_active_grant_count=len(principal_grants) - len(matching_grants),
             grant_mismatches=sorted(grant_mismatches),
+            grants_outside_policy=grants_outside_policy,
         )
     )
 
@@ -549,7 +629,7 @@ def run_doctor(
         "network_mode": "not_used",
         "request": {
             "principal_id": effective_principal,
-            "policy_supplied": policy_path is not None,
+            "policy_supplied": bool(policy_paths),
             "require_mcp": require_mcp,
         },
         "runtime": {

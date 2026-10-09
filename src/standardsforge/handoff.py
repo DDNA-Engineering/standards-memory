@@ -221,11 +221,43 @@ def _unresolved_issues(packet: dict[str, Any]) -> list[str]:
                     elif isinstance(issue, dict):
                         issues.add(json.dumps(issue, sort_keys=True, ensure_ascii=False))
         for relationship in structure.get("relationships", []):
-            if isinstance(relationship, dict) and relationship.get("status") not in {None, "resolved"}:
-                issues.add(
-                    f"relationship {relationship.get('type', 'unknown')} status: {relationship.get('status')}"
-                )
+            if isinstance(relationship, dict) and relationship.get("target_status") != "resolved":
+                issues.add(_relationship_issue(record, structure, relationship))
     return sorted(issues)
+
+
+def _relationship_issue(
+    record: dict[str, Any], structure: dict[str, Any], relationship: dict[str, Any]
+) -> str:
+    """Describe one structural relationship whose target is not resolved.
+
+    Pack relationships use ``relationship`` and ``target_status`` (see pack.py); a
+    missing status is reported rather than treated as resolved.
+    """
+
+    status = relationship.get("target_status")
+    issue = (
+        f"relationship {relationship.get('relationship') or 'unknown'} "
+        f"target_status: {status if isinstance(status, str) and status else 'missing'}"
+    )
+    facts: list[str] = []
+    if record.get("record_id"):
+        facts.append(f"source_record_id: {record['record_id']}")
+    if structure.get("logical_id"):
+        facts.append(f"source_logical_id: {structure['logical_id']}")
+    for key in ("target_logical_id", "target_locator"):
+        if relationship.get(key):
+            facts.append(f"{key}: {relationship[key]}")
+    candidates = relationship.get("candidate_logical_ids")
+    if isinstance(candidates, list) and candidates:
+        facts.append("candidate_logical_ids: " + ", ".join(str(item) for item in candidates))
+    if not facts:
+        return issue
+    described = f"{issue} ({'; '.join(facts)})"
+    if len(described) > 4096 and isinstance(candidates, list) and candidates:
+        facts[-1] = f"candidate_logical_ids: {len(candidates)} candidates"
+        described = f"{issue} ({'; '.join(facts)})"
+    return described if len(described) <= 4096 else issue
 
 
 def _build_handoff(
@@ -673,7 +705,7 @@ def export_engineering_handoff(
     candidate = validate_candidate_draft(_load_object(Path(candidate_path), "candidate draft"))
     output = Path(output_directory)
     require(not output.exists() and not output.is_symlink(), "output_exists", "Handoff output already exists.")
-    service = StandardsForgeService(Path(db_path), Path(object_store))
+    service = StandardsForgeService.open_read_only(Path(db_path), Path(object_store))
     packet = service.get_clause(
         package_digest,
         clause_reference,

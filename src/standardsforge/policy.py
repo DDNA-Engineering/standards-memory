@@ -41,6 +41,7 @@ def load_policy(path: str | Path) -> LocalPolicy:
 
     for key in ("policy_id", "principal_id"):
         require(isinstance(data.get(key), str) and bool(data[key].strip()), "invalid_policy", f"{key} is required.")
+    _require_exact_principal(data["principal_id"], "invalid_policy")
     for key in ("allow_admin_install", "allow_serve"):
         require(type(data.get(key)) is bool, "invalid_policy", f"{key} must be boolean.")
     for key in ("allowed_pack_ids", "allowed_content_classes"):
@@ -77,6 +78,15 @@ def authorize_install(policy: LocalPolicy, pack: ValidatedPack) -> None:
     )
 
 
+def _require_exact_principal(principal_id: str, code: str) -> None:
+    # Principals bind grants byte-exact; padding or non-UTF-8 text is rejected rather than normalized.
+    require(principal_id == principal_id.strip(), code, "principal_id must not have leading or trailing whitespace.")
+    try:
+        principal_id.encode("utf-8")
+    except UnicodeEncodeError as exc:
+        raise StandardsForgeError(code, "principal_id must be encodable UTF-8 text.") from exc
+
+
 def write_pack_policy(
     source: str | Path,
     output_path: str | Path,
@@ -92,12 +102,13 @@ def write_pack_policy(
         "invalid_policy",
         "principal_id must be a non-empty string.",
     )
+    _require_exact_principal(principal_id, "invalid_principal")
     require(
         isinstance(content_class, str) and bool(content_class.strip()),
         "invalid_policy",
         "content_class must be a non-empty string.",
     )
-    principal = principal_id.strip()
+    principal = principal_id
     expected_content_class = content_class.strip()
     destination = Path(output_path).resolve()
     require(not destination.exists(), "policy_output_exists", "The policy output already exists.", path=str(destination))
