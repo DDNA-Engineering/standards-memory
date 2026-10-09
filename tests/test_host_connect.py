@@ -62,7 +62,8 @@ class DefaultLocationTests(unittest.TestCase):
 class ConnectHostTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory(prefix="standardsforge-host-connect-")
-        self.root = Path(self.temporary.name)
+        # Windows temp paths may be 8.3 aliases; setup reports the resolved file it changed.
+        self.root = Path(self.temporary.name).resolve()
 
     def tearDown(self) -> None:
         self.temporary.cleanup()

@@ -51,7 +51,10 @@ class PreparedRuntimeTests(unittest.TestCase):
 
     def test_os_metadata_files_are_tolerated_but_other_extras_are_named(self) -> None:
         validate_bundle(self.root)
-        for relative in (".DS_Store", "wheel/._standardsforge.whl", "Thumbs.db", "provenance/desktop.ini", "Icon\r"):
+        names = [".DS_Store", "wheel/._standardsforge.whl", "Thumbs.db", "provenance/desktop.ini"]
+        if os.name != "nt":
+            names.append("Icon\r")  # macOS folder icon; Windows cannot create this name
+        for relative in names:
             (self.root / relative).write_bytes(b"shell metadata")
         validate_bundle(self.root)
         (self.root / "notes.txt").write_text("mine", encoding="utf-8")
