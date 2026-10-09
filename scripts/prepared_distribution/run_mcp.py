@@ -10,7 +10,7 @@ sys.dont_write_bytecode = True
 
 # -I excludes script directories; import only the adjacent distribution helper.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from prepared_runtime import PreparedSetupError, _clean_environment, _venv_python, validate_ready, validate_receipt
+from prepared_runtime import PreparedSetupError, _clean_environment, _venv_python, mcp_server_options, validate_ready, validate_receipt
 
 
 def main() -> int:
@@ -21,7 +21,7 @@ def main() -> int:
     try:
         manifest, digest = validate_ready(root)
         if validate_receipt(root, manifest, digest)["mcp_status"] != "ready":
-            raise PreparedSetupError("Run setup.py --mcp (Windows 3.12) or setup.py --mcp-online before connecting a model.")
+            raise PreparedSetupError("Run setup.py --mcp (Windows, Python 3.11-3.13) or setup.py --mcp-online before connecting a model.")
     except (PreparedSetupError, OSError) as exc:
         print(json.dumps({"ok": False, "error": {"code": "prepared_mcp_not_ready", "message": str(exc)}}), file=sys.stderr)
         return 1
@@ -29,7 +29,7 @@ def main() -> int:
     return subprocess.run(
         [str(_venv_python(root / ".venv")), "-I", "-m", "standardsforge.mcp_server",
          "--db", str(state / "memory.db"), "--store", str(state / "objects"),
-         "--principal", "local-user", "--result-mode", "structured_only"],
+         "--principal", "local-user", "--result-mode", "structured_only", *mcp_server_options(root, manifest)],
         cwd=root, env=_clean_environment(), shell=False,
     ).returncode
 

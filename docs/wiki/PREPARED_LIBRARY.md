@@ -12,7 +12,7 @@ Return to the [root quickstart](../../README.md#use-the-prepared-library-with-yo
 - CPython 3.11 or newer with `venv`/`ensurepip`; Debian/Ubuntu system Python may require its matching `python3-venv` package.
 - Windows PowerShell for the Windows examples, or a POSIX shell for the Linux and macOS wrappers.
 - A Python build whose SQLite includes FTS5.
-- Enough local space for the approximately 1 GB archive plus its extracted packs, virtual environment, object store, and index.
+- About 4 GB of free disk space: the 1.1 GB download, 1.1 GB once extracted, and about 1.9 GB for the local index and Python environment (measured for a7 on Linux). The ZIP can be deleted after extraction. First setup checks free space before it starts indexing and stops with the amount needed.
 
 A Git clone is not required.
 
@@ -22,7 +22,9 @@ A Git clone is not required.
 2. Optionally compare the archive with the published SHA-256 file.
 3. Extract the ZIP to a durable local directory.
 4. Open PowerShell or a POSIX shell in the extracted directory.
-5. For a model connection, double-click `setup.cmd` on Windows with Python 3.12, or run `sh setup.sh --mcp-online` on Linux/macOS. Setup prints generated host configuration with the actual paths. See [model integration](MODEL_INTEGRATION.md#connect-your-model-host).
+5. For a model connection, double-click `setup.cmd` on Windows with 64-bit Python 3.11, 3.12 or 3.13, or run `sh setup.sh --mcp-online` on Linux/macOS. Setup prints generated host configuration with the actual paths. Add `--connect claude-desktop`, `--connect cursor` or `--connect codex` to have setup add the entry for you; see [model integration](MODEL_INTEGRATION.md#connect-your-model-host).
+
+Do not add your own files to the extracted folder: setup checks that it contains exactly the released files and names any file that does not belong. Files that macOS Finder and Windows Explorer create on their own (`.DS_Store`, `._*`, `Thumbs.db`, `desktop.ini`) are ignored.
 
 For a terminal-only installation, use the offline core commands below.
 
@@ -103,11 +105,11 @@ Runtime state stays inside the extracted distribution. Keep the extracted direct
 
 ## MCP installation choices
 
-On Windows x64 CPython 3.12, double-click `setup.cmd` or run `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1`. One command installs the library and bundled MCP dependencies offline.
+On Windows x64 CPython 3.11, 3.12 or 3.13, double-click `setup.cmd` or run `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1`. One command installs the library and bundled MCP dependencies offline, choosing the hash lock that matches the prepared environment's Python version. `setup.ps1` also accepts `--connect <host>` and `--host-config <file>`.
 
 On Linux/macOS, run `sh ./setup.sh --mcp-online`. This explicit option downloads MCP dependencies for the bundled code wheel into the same owned environment. Standards queries remain offline.
 
-Both paths generate host configuration with the actual absolute paths and prove a real stdio query. See [model integration](MODEL_INTEGRATION.md#connect-your-model-host) for host configuration locations.
+Both paths generate host configuration with the actual absolute paths, install the bundled `o200k_base` token counter for `select_evidence` budgets, and prove a real stdio query, including a token-budgeted evidence selection. See [model integration](MODEL_INTEGRATION.md#connect-your-model-host) for host configuration locations.
 
 ## Snapshot scope
 

@@ -64,3 +64,9 @@ Future changes append a dated entry here in the same commit as the schema, gener
 - No instance schema changed. `contracts/mcp-tools.json` and `contracts/query-operations.json` now list every optional argument, default and enum of the eleven registered tools, and `get_source_pdfs` joins `read_operations`; `scripts/validate_contracts.py` fails on any drift between these machine contracts and the SDK-advertised tool schemas.
 - MCP tool arguments are strict and closed. Wrong types and undeclared arguments return the typed error envelope with code `invalid_argument` instead of unstructured text. `code` remains a free string in `error-response`.
 - Outline compiler 0.5.0 emits distinct `outline-v5` packages: a top-level numbered section is parented by its enclosing METHOD, APPENDIX or PART root, or has no parent, instead of the preceding clause. Logical and record identities are unchanged; `outline-v4` and earlier packages remain separately addressable and readable.
+
+### 2026-10-09 — prepared distribution 1.4 (0.1.0a8 candidate; unpublished)
+
+- `prepared-distribution` 1.4 replaces the single Windows CPython 3.12 MCP lock with three hash locks (`mcp_requirements_sha256` keyed by `3.11`, `3.12` and `3.13`, and `mcp_runtime_pythons`) over one shared, closed wheelhouse. `mcp_runtime_python` is removed. Each lock also pins `tiktoken==0.14.0` and its dependencies.
+- 1.4 adds the required `build.tokenizer` identity of the bundled `tokenizer/o200k_base.json` artifact, the optional `state.reference_bindings` pin of `references/reference-bindings.json`, and `qualified_packs` paths under `packs/reviewed/` and `qualification/reviewed/` beside the existing recovery paths.
+- 1.3 bundles (0.1.0a6 and 0.1.0a7) remain identifiable by their own shipped setup but are not accepted by the 1.4 setup path. No query, pack or response schema changed.

@@ -167,10 +167,14 @@ class StarterDistributionTests(unittest.TestCase):
         distribution = self._extract("consumer-negatives")
         setup = _load_module(distribution / "setup.py", "starter_setup_negatives")
         manifest, manifest_sha256 = setup.validate_bundle(distribution)
+        (distribution / ".DS_Store").write_bytes(b"finder")
+        (distribution / "Thumbs.db").write_bytes(b"explorer")
+        setup.validate_bundle(distribution)
         (distribution / "extra.txt").write_text("extra", encoding="utf-8")
-        with self.assertRaisesRegex(setup.StarterSetupError, "unlisted or missing"):
+        with self.assertRaisesRegex(setup.StarterSetupError, r"unlisted or missing immutable file \(not part of this bundle: extra\.txt\)"):
             setup.validate_bundle(distribution)
-        (distribution / "extra.txt").unlink()
+        for name in ("extra.txt", ".DS_Store", "Thumbs.db"):
+            (distribution / name).unlink()
 
         state = distribution / ".standardsforge"
         state.mkdir()

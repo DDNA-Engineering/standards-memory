@@ -36,13 +36,13 @@ The plugin supplies instructions, not a host-enforced tool restriction. A succes
 
 ## Start with the prepared release on Windows
 
-Download and extract [v0.1.0a7](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a7). Install 64-bit CPython 3.12 with its Python launcher, then double-click `setup.cmd`. Or run:
+Download and extract [v0.1.0a7](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a7). Install 64-bit CPython 3.11, 3.12 or 3.13 with its Python launcher, then double-click `setup.cmd`. Or run:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
-One setup installs the library and exact hash-locked MCP dependencies offline, verifies the evidence, and makes a real stdio query. Python 3.11 or 3.13 users can explicitly choose `python setup.py --mcp-online` for networked dependencies instead.
+One setup installs the library and exact hash-locked MCP dependencies offline for whichever of the three versions it finds, verifies the evidence, and makes a real stdio query. Users of another Python version can explicitly choose `python setup.py --mcp-online` for networked dependencies instead.
 
 ## Configure Linux or macOS against prepared state
 
@@ -55,6 +55,24 @@ sh ./setup.sh --mcp-online
 Only this explicit option downloads MCP dependencies. The verified code wheel and standards library remain bundled. Setup owns the local environment, verifies package consistency and runs a real stdio query before producing host configuration. Run `sh ./setup.sh` for offline terminal-only setup.
 
 ## Connect your model host
+
+### Let setup add it (optional)
+
+Name the host and setup adds the StandardsForge entry for you after the library and model connection pass their checks:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1 --connect claude-desktop
+```
+
+```sh
+sh ./setup.sh --mcp-online --connect cursor
+```
+
+`--connect` accepts `claude-desktop`, `cursor` or `codex` and may be repeated. Setup changes the host's per-user file only: Claude Desktop's documented file on Windows or macOS, `~/.cursor/mcp.json`, or Codex's `config.toml` in `CODEX_HOME` (default `~/.codex`). The host's settings folder must already exist. Use `--host-config <file>` with one `--connect` to change another file, such as a project `.cursor/mcp.json` or a Microsoft Store installation of Claude Desktop.
+
+Before writing, setup parses the existing file, keeps a byte-exact copy beside it (`<name>.standardsforge-backup-<UTC time>`), replaces only the `standardsforge` entry, re-parses the result, and writes it atomically. A symbolic link is followed so it survives. Invalid JSON or TOML, or a Codex definition written as inline or dotted keys, is left untouched and reported. Running setup again with the same paths reports `already_connected` and writes nothing. Restart the host afterwards. Without `--connect`, setup never touches host settings.
+
+### Merge the generated entry yourself
 
 Setup writes absolute, correctly escaped paths into `.standardsforge/mcp-config.json` and `.standardsforge/codex-mcp.toml`. Open those files and merge the StandardsForge entry into the appropriate host file:
 
@@ -87,7 +105,7 @@ The prepared launcher passes no reviewed reference bindings or tokenizer configu
 
 Extract upgrades into a new directory, run setup, replace only the StandardsForge host entry with the new generated one, then restart the connection. Do not copy an old `.venv` or database into the new archive. Keep the prior install until the new one works.
 
-If `python` is missing on Windows, install Python 3.12 with its launcher and use `setup.cmd`. If Linux reports missing `ensurepip`, install the matching `python3-venv` package. If setup fails, correct the reported cause and rerun the same command. If the host still lists seven tools, its process is using the old installation; check the configured executable and restart it. The optional `standardsforge-mcp.ps1` wrapper remains available for existing Windows host conventions.
+If `python` is missing on Windows, install 64-bit Python 3.11, 3.12 or 3.13 with its launcher and use `setup.cmd`. If setup reports files that are not part of the release, remove the files you added to the library folder or extract the ZIP again into a new folder. If Linux reports missing `ensurepip`, install the matching `python3-venv` package. If setup fails, correct the reported cause and rerun the same command. If the host still lists seven tools, its process is using the old installation; check the configured executable and restart it. The optional `standardsforge-mcp.ps1` wrapper remains available for existing Windows host conventions.
 
 ## Start the local stdio server
 

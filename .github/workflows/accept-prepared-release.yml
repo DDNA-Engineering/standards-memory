@@ -34,7 +34,7 @@ concurrency:
 
 jobs:
   native-prepared-acceptance:
-    name: ${{ matrix.os }} / CPython 3.12
+    name: ${{ matrix.os }} / CPython ${{ matrix.python-version }}
     # GitHub exposes draft releases only to callers with push access.
     permissions:
       contents: write
@@ -42,6 +42,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest, macos-15-intel]
+        python-version: ["3.12"]
+        include:
+          # Every Windows CPython version with a bundled offline MCP lock.
+          - os: windows-latest
+            python-version: "3.11"
+          - os: windows-latest
+            python-version: "3.13"
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     env:
@@ -53,7 +60,7 @@ jobs:
     steps:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
       - name: Download exact published assets and verify outer identity
         shell: pwsh
         env:
@@ -124,6 +131,9 @@ jobs:
           $env:PYTHONPATH = $null
           $env:PYTHONHOME = $null
           $env:VIRTUAL_ENV = $null
+          # Shell metadata that Finder and Explorer create on their own must not block setup.
+          Set-Content -LiteralPath (Join-Path $env:PREPARED_ROOT '.DS_Store') -Value 'finder'
+          Set-Content -LiteralPath (Join-Path $env:PREPARED_ROOT 'Thumbs.db') -Value 'explorer'
           Push-Location $env:RUNNER_TEMP
           try {
             for ($attempt = 1; $attempt -le 2; $attempt++) {
@@ -149,6 +159,9 @@ jobs:
             & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $env:PREPARED_ROOT 'setup.ps1')
             if ($LASTEXITCODE -ne 0) { throw "Offline MCP setup attempt $attempt failed." }
           }
+          # The environment created by core setup selects the offline lock; prove it is this leg's version.
+          & (Join-Path $env:PREPARED_ROOT '.venv\Scripts\python.exe') -I -c "import sys; raise SystemExit(0 if f'{sys.version_info[0]}.{sys.version_info[1]}' == '${{ matrix.python-version }}' else 1)"
+          if ($LASTEXITCODE -ne 0) { throw 'The prepared environment does not use this leg''s Python version.' }
       - name: Verify first and repeat explicit online MCP setup on POSIX
         if: runner.os != 'Windows'
         shell: pwsh
@@ -165,7 +178,9 @@ jobs:
           if ($entry.args.Count -ne 2 -or $entry.args[0] -ne '-I' -or $entry.args[1] -ne (Join-Path $env:PREPARED_ROOT 'run_mcp.py')) {
             throw 'Generated configuration does not select the exact prepared launcher.'
           }
-          & $entry.command -I (Join-Path $env:PREPARED_ROOT 'smoke_mcp.py') --launcher $entry.args[1] --db (Join-Path $env:PREPARED_ROOT '.standardsforge/memory.db') --store (Join-Path $env:PREPARED_ROOT '.standardsforge/objects') --principal local-user --query 'environmental testing'
+          $manifest = Get-Content -LiteralPath (Join-Path $env:PREPARED_ROOT 'bundle-manifest.json') -Raw | ConvertFrom-Json
+          $tokenizer = $manifest.build.tokenizer
+          & $entry.command -I (Join-Path $env:PREPARED_ROOT 'smoke_mcp.py') --launcher $entry.args[1] --db (Join-Path $env:PREPARED_ROOT '.standardsforge/memory.db') --store (Join-Path $env:PREPARED_ROOT '.standardsforge/objects') --principal local-user --query 'environmental testing' --tokenizer-artifact (Join-Path $env:PREPARED_ROOT $tokenizer.path) --tokenizer-sha256 $tokenizer.sha256
           if ($LASTEXITCODE -ne 0) { throw 'Generated host launcher failed its real MCP query.' }
       - name: Prove full doctor, exact resolve, search, and source evidence retrieval
         shell: pwsh

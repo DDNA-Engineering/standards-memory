@@ -26,6 +26,10 @@ from standardsforge.real_benchmark import validate_run  # noqa: E402
 
 FIXED_ZIP_TIME = (2026, 1, 1, 0, 0, 0)
 BUFFER_SIZE = 1024 * 1024
+OFFLINE_MCP_PYTHONS = ("3.11", "3.12", "3.13")
+TOKENIZER_DESTINATION = "tokenizer/o200k_base.json"
+REFERENCE_BINDINGS_DESTINATION = "references/reference-bindings.json"
+SLUG = re.compile(r"[a-z0-9-]+")
 ACQUISITION_SCOPE = (
     "Active MIL-STD records; current public components are leading notices plus "
     "the first substantive revision or incorporated change."
@@ -174,17 +178,32 @@ def _wheelhouse_inventory_digest(inventory: list[dict[str, object]]) -> str:
     return hashlib.sha256(b"".join(rows)).hexdigest()
 
 
+def mcp_requirements_name(python_version: str) -> str:
+    return f"mcp-wheelhouse-win-amd64-cp{python_version.replace('.', '')}.txt"
+
+
 def _validate_mcp_wheelhouse(
-    root: Path, requirements_path: Path
-) -> tuple[list[tuple[Path, str]], str, str]:
+    root: Path, requirements_paths: dict[str, Path]
+) -> tuple[list[tuple[Path, str]], str, dict[str, str]]:
+    """Validate one wheelhouse shared by per-Python hash locks.
+
+    Every wheel must be the exact artifact of at least one lock, and every lock entry
+    must be present, so the wheelhouse is closed over the union of the locks.
+    """
     root = root.resolve()
     if not root.is_dir() or root.is_symlink():
         raise ValueError("The MCP wheelhouse must be one real directory.")
     entries = sorted(root.iterdir(), key=lambda item: item.name)
     if not entries or any(not item.is_file() or item.is_symlink() or item.suffix != ".whl" for item in entries):
         raise ValueError("The MCP wheelhouse must contain only regular wheel files.")
-    requirements, requirements_sha256 = _load_mcp_requirements(requirements_path)
-    packages: dict[str, str] = {}
+    if not requirements_paths:
+        raise ValueError("At least one MCP requirements lock is required.")
+    locks: dict[str, dict[str, tuple[str, str]]] = {}
+    requirements_sha256: dict[str, str] = {}
+    for python_version, path in sorted(requirements_paths.items()):
+        locks[python_version], requirements_sha256[python_version] = _load_mcp_requirements(path)
+    locked = {(project, version, digest) for lock in locks.values() for project, (version, digest) in lock.items()}
+    digests: set[str] = set()
     inventory: list[dict[str, object]] = []
     payloads: list[tuple[Path, str]] = []
     for wheel in entries:
@@ -198,21 +217,42 @@ def _validate_mcp_wheelhouse(
             raise ValueError(f"The MCP wheel is invalid: {wheel.name}") from exc
         project = _normalize_project(metadata.get("Name", ""))
         version = metadata.get("Version", "")
-        if not project or not version or project in packages:
-            raise ValueError("The MCP wheelhouse contains missing or duplicate package identities.")
+        if not project or not version:
+            raise ValueError("The MCP wheelhouse contains missing package identities.")
         if project == "standardsforge":
             raise ValueError("The MCP wheelhouse cannot replace the separately verified StandardsForge wheel.")
         digest = _sha256(wheel)
-        expected = requirements.get(project)
-        if expected is None or expected != (version, digest):
+        if digest in digests:
+            raise ValueError(f"The MCP wheelhouse contains a duplicate artifact: {wheel.name}")
+        if (project, version, digest) not in locked:
             raise ValueError(f"The MCP wheel is not the exact locked artifact: {wheel.name}")
-        packages[project] = version
+        digests.add(digest)
         inventory.append({"path": wheel.name, "bytes": wheel.stat().st_size, "sha256": digest})
         payloads.append((wheel, f"wheelhouse/{wheel.name}"))
-    if set(packages) != set(requirements):
-        missing = sorted(set(requirements) - set(packages))
+    missing = sorted(f"{project}=={version}" for project, version, digest in locked if digest not in digests)
+    if missing:
         raise ValueError(f"The MCP wheelhouse is missing locked packages: {', '.join(missing)}")
     return payloads, _wheelhouse_inventory_digest(inventory), requirements_sha256
+
+
+def _validate_tokenizer(artifact: Path, lock_path: Path) -> dict:
+    """Bind the bundled tokenizer to its committed identity before distribution."""
+    lock = _load_json(lock_path)
+    if set(lock) != {"encoding", "sha256", "bytes", "implementation", "acquisition"} or lock["encoding"] != "o200k_base":
+        raise ValueError("The tokenizer lock is malformed.")
+    artifact = artifact.resolve()
+    if not artifact.is_file() or artifact.is_symlink():
+        raise ValueError("The tokenizer artifact must be one regular file.")
+    if artifact.stat().st_size != lock["bytes"] or _sha256(artifact) != lock["sha256"]:
+        raise ValueError("The tokenizer artifact does not match its committed lock.")
+    try:
+        payload = json.loads(artifact.read_bytes())
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("The tokenizer artifact is not JSON.") from exc
+    if not isinstance(payload, dict) or payload.get("name") != lock["encoding"] or payload.get("schema_version") != "0.1.0":
+        raise ValueError("The tokenizer artifact does not declare its locked encoding.")
+    return {"encoding": lock["encoding"], "path": TOKENIZER_DESTINATION, "sha256": lock["sha256"],
+            "bytes": lock["bytes"], "implementation": lock["implementation"]}
 
 
 def _load_wheel_provenance(path: Path, wheel: Path, version: str) -> tuple[dict, str]:
@@ -611,9 +651,11 @@ def _validate_built_distribution(archive_path: Path, prefix: str) -> None:
             scope = json.loads(archive.read(prefix + "provenance/source-baseline.json"))
             acquisition_bytes = archive.read(prefix + "provenance/acquisition-manifest.json")
             wheel_provenance_bytes = archive.read(prefix + "provenance/wheel-build.json")
-            mcp_requirements_bytes = archive.read(
-                prefix + "provenance/mcp-wheelhouse-win-amd64-cp312.txt"
-            )
+            mcp_requirements_bytes = {
+                version: archive.read(prefix + "provenance/" + mcp_requirements_name(version))
+                for version in manifest["build"]["mcp_requirements_sha256"]
+            }
+            tokenizer_bytes = archive.read(prefix + manifest["build"]["tokenizer"]["path"])
         except (KeyError, UnicodeDecodeError, json.JSONDecodeError) as exc:
             raise ValueError("The prepared distribution provenance is missing or invalid.") from exc
         schema = _load_json(REPOSITORY_ROOT / "contracts" / "distribution-scope.schema.json")
@@ -626,8 +668,10 @@ def _validate_built_distribution(archive_path: Path, prefix: str) -> None:
             raise ValueError("The bundled acquisition manifest does not match the source baseline.")
         if hashlib.sha256(wheel_provenance_bytes).hexdigest() != manifest["build"]["wheel_provenance_sha256"]:
             raise ValueError("The bundled wheel provenance does not match the distribution manifest.")
-        if hashlib.sha256(mcp_requirements_bytes).hexdigest() != manifest["build"]["mcp_requirements_sha256"]:
+        if {version: hashlib.sha256(value).hexdigest() for version, value in mcp_requirements_bytes.items()} != manifest["build"]["mcp_requirements_sha256"]:
             raise ValueError("The bundled MCP requirements do not match the distribution manifest.")
+        if hashlib.sha256(tokenizer_bytes).hexdigest() != manifest["build"]["tokenizer"]["sha256"]:
+            raise ValueError("The bundled tokenizer does not match the distribution manifest.")
         try:
             wheel_provenance = json.loads(wheel_provenance_bytes)
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -640,6 +684,74 @@ def _validate_built_distribution(archive_path: Path, prefix: str) -> None:
             raise ValueError("The bundled wheel provenance identifies a different wheel.")
 
 
+def _validate_reviewed_supplement(
+    root: Path, corpus_digests: set[str], runtime_sources: dict[str, str], included_digests: set[str],
+) -> tuple[list[dict], list[tuple[Path, str]], tuple[Path, str] | None]:
+    """Validate agent- or human-reviewed packs built by build_reviewed_supplement.py.
+
+    Each pack must derive from an included source package, carry an exact one-pack
+    policy, and pass its real-document suite against the exact wheel runtime.
+    """
+    supplement = _load_json(root / "supplement.json")
+    packs = supplement.get("packs")
+    if not isinstance(packs, list) or not packs:
+        raise ValueError("The reviewed supplement lists no packs.")
+    qualified: list[dict] = []
+    payloads: list[tuple[Path, str]] = []
+    slugs: set[str] = set()
+    for item in packs:
+        slug = item.get("slug") if isinstance(item, dict) else None
+        if not isinstance(slug, str) or SLUG.fullmatch(slug) is None or slug in slugs:
+            raise ValueError("Reviewed supplement slugs must be unique lowercase identifiers.")
+        slugs.add(slug)
+        archive = root / "packs" / f"{slug}.zip"
+        suite_path = root / "qualification" / f"{slug}-suite.json"
+        run_path = root / "qualification" / f"{slug}-run.json"
+        suite, run = _load_json(suite_path), _load_json(run_path)
+        validate_run(run, suite)
+        with open_validated_pack(archive) as pack:
+            if pack.package_digest != item.get("package_digest") or pack.manifest["pack_id"] != item.get("pack_id"):
+                raise ValueError(f"Reviewed pack identity differs from the supplement: {slug}")
+            if pack.package_digest in included_digests:
+                raise ValueError(f"Reviewed pack duplicates an included package: {slug}")
+            if item.get("source_package_digest") not in corpus_digests:
+                raise ValueError(f"Reviewed pack source is not an included corpus package: {slug}")
+            _validate_policy(root / "policies" / f"{slug}.json", {pack.manifest["pack_id"]}, "local-user")
+            if (suite["suite"]["package_digest"] != pack.package_digest or suite["suite"]["edition_id"] != pack.manifest["edition_id"]
+                    or not run["run"]["gate"]["passed"] or run["run"]["runtime_source_sha256"] != digest(runtime_sources)):
+                raise ValueError(f"Reviewed pack qualification must pass for the exact pack and wheel runtime: {slug}")
+            included_digests.add(pack.package_digest)
+            entry = {"path": f"packs/reviewed/{slug}.zip", "pack_id": pack.manifest["pack_id"], "package_digest": pack.package_digest,
+                     "suite_path": f"qualification/reviewed/{slug}-suite.json", "run_path": f"qualification/reviewed/{slug}-run.json"}
+        qualified.append(entry)
+        payloads.extend([(archive, entry["path"]), (suite_path, entry["suite_path"]), (run_path, entry["run_path"])])
+    reference = None
+    bindings_path = root / "reference-bindings.json"
+    if bindings_path.exists():
+        bindings = _load_json(bindings_path)
+        schema = _load_json(REPOSITORY_ROOT / "contracts" / "reference-bindings.schema.json")
+        validator_class = validator_for(schema)
+        validator_class.check_schema(schema)
+        validator_class(schema).validate(bindings)
+        bindings_sha256 = _sha256(bindings_path)
+        if supplement.get("reference_bindings_sha256") != bindings_sha256:
+            raise ValueError("Reference bindings differ from the reviewed supplement.")
+
+        def package_digests(value: object) -> set[str]:
+            if isinstance(value, dict):
+                found = {value["package_digest"]} if isinstance(value.get("package_digest"), str) else set()
+                return found.union(*(package_digests(child) for child in value.values()))
+            if isinstance(value, list):
+                return set().union(*(package_digests(child) for child in value))
+            return set()
+
+        missing = package_digests(bindings["binding_set"]["bindings"]) - included_digests - corpus_digests
+        if missing:
+            raise ValueError("Reference bindings name packages that are not in this distribution.")
+        reference = (bindings_path, bindings_sha256)
+    return qualified, payloads, reference
+
+
 def build_distribution(
     corpus_index: Path,
     acquisition_manifest: Path,
@@ -647,14 +759,18 @@ def build_distribution(
     wheel: Path,
     wheel_provenance: Path,
     mcp_wheelhouse: Path,
-    mcp_requirements: Path,
+    tokenizer_artifact: Path,
     output: Path,
     version: str,
     compresslevel: int,
     *,
+    mcp_requirements_directory: Path | None = None,
+    tokenizer_lock: Path | None = None,
     outline_policy_path: Path | None = None,
     qualification_directory: Path | None = None,
     recovery_directory: Path | None = None,
+    reviewed_directory: Path | None = None,
+    corpus_policy_path: Path | None = None,
 ) -> dict:
     corpus_index = corpus_index.resolve()
     acquisition_manifest = acquisition_manifest.resolve()
@@ -662,7 +778,13 @@ def build_distribution(
     wheel = wheel.resolve()
     wheel_provenance = wheel_provenance.resolve()
     mcp_wheelhouse = mcp_wheelhouse.resolve()
-    mcp_requirements = mcp_requirements.resolve()
+    static_root = REPOSITORY_ROOT / "scripts" / "prepared_distribution"
+    mcp_requirements_directory = mcp_requirements_directory or static_root
+    tokenizer_lock = tokenizer_lock or static_root / "tokenizer-lock.json"
+    mcp_requirements = {
+        python_version: (mcp_requirements_directory / mcp_requirements_name(python_version)).resolve()
+        for python_version in OFFLINE_MCP_PYTHONS
+    }
     output = output.resolve()
     checksum_path = output.with_suffix(output.suffix + ".sha256")
     if output.exists() or checksum_path.exists():
@@ -676,6 +798,7 @@ def build_distribution(
     mcp_payloads, mcp_wheelhouse_sha256, mcp_requirements_sha256 = _validate_mcp_wheelhouse(
         mcp_wheelhouse, mcp_requirements
     )
+    tokenizer_identity = _validate_tokenizer(tokenizer_artifact, tokenizer_lock)
 
     index, corpus_payloads = _validate_corpus(corpus_index)
     acquisition, acquisition_sha256 = _load_acquisition_snapshot(
@@ -686,7 +809,7 @@ def build_distribution(
     distribution_scope = _build_distribution_scope(
         acquisition, acquisition_sha256, index, outline
     )
-    corpus_policy = REPOSITORY_ROOT / ".standardsforge" / "policies" / "mil-std-corpus-local.json"
+    corpus_policy = corpus_policy_path or REPOSITORY_ROOT / ".standardsforge" / "policies" / "mil-std-corpus-local.json"
     outline_policy = outline_policy_path or REPOSITORY_ROOT / ".standardsforge" / "policies" / "mil-std-810h-derived-outline-local.json"
     _validate_policy(corpus_policy, {entry["pack_id"] for entry in entries}, "local-user")
     _validate_policy(outline_policy, {outline.manifest["pack_id"]}, "local-user")
@@ -752,7 +875,21 @@ def build_distribution(
                 raise ValueError("Recovery coverage differs from its exact source and semantic packages.")
             recovery_payloads.append((coverage_path, "qualification/recovery/coverage.json"))
 
-    static_root = REPOSITORY_ROOT / "scripts" / "prepared_distribution"
+    reference_payloads: list[tuple[Path, str]] = []
+    reference_bindings_state = None
+    if reviewed_directory is not None:
+        if qualification_directory is None:
+            raise ValueError("A reviewed supplement requires the base corpus qualification.")
+        reviewed_packs, reviewed_payloads, reference = _validate_reviewed_supplement(
+            reviewed_directory.resolve(), {entry["package_digest"] for entry in entries}, runtime_sources,
+            {item["package_digest"] for item in qualified_packs} | {outline.package_digest},
+        )
+        qualified_packs.extend(reviewed_packs)
+        recovery_payloads.extend(reviewed_payloads)
+        if reference is not None:
+            reference_payloads.append((reference[0], REFERENCE_BINDINGS_DESTINATION))
+            reference_bindings_state = {"path": REFERENCE_BINDINGS_DESTINATION, "sha256": reference[1]}
+
     static_files = [
         (static_root / "README.md", "README.md"),
         (static_root / "prepared_runtime.py", "prepared_runtime.py"),
@@ -767,11 +904,14 @@ def build_distribution(
         (static_root / "standardsforge-mcp.ps1", "standardsforge-mcp.ps1"),
         (static_root / "smoke_mcp.py", "smoke_mcp.py"),
         (static_root / "verify_mcp_environment.py", "verify_mcp_environment.py"),
+        (static_root / "host_connect.py", "host_connect.py"),
         (static_root / "CONTENT-NOTICE.md", "CONTENT-NOTICE.md"),
         (REPOSITORY_ROOT / "LICENSE", "LICENSE"),
         (acquisition_manifest, "provenance/acquisition-manifest.json"),
         (wheel_provenance, "provenance/wheel-build.json"),
-        (mcp_requirements, "provenance/mcp-wheelhouse-win-amd64-cp312.txt"),
+        *((path, f"provenance/{mcp_requirements_name(python_version)}") for python_version, path in mcp_requirements.items()),
+        (tokenizer_lock.resolve(), "provenance/tokenizer.json"),
+        (tokenizer_artifact.resolve(), TOKENIZER_DESTINATION),
         (corpus_index, "corpus/corpus.json"),
         (corpus_policy, "policies/mil-std-corpus-local.json"),
         (outline_policy, "policies/mil-std-810h-derived-outline-local.json"),
@@ -816,6 +956,7 @@ def build_distribution(
             *mcp_payloads,
             *qualification_payloads,
             *recovery_payloads,
+            *reference_payloads,
             (scope_path, "provenance/source-baseline.json"),
             (prepared_policy_path, "policies/prepared-local.json"),
             *corpus_payloads,
@@ -837,9 +978,10 @@ def build_distribution(
             "mil_std_810h_derived_package_digest": outline.package_digest,
             "source_baseline_id": distribution_scope["baseline_id"],
             **({"qualified_packs": qualified_packs} if qualified_packs else {}),
+            **({"reference_bindings": reference_bindings_state} if reference_bindings_state else {}),
         }
         manifest = {
-            "schema_version": "1.3",
+            "schema_version": "1.4",
             "product": "StandardsForge prepared distribution",
             "version": version,
             "build": {
@@ -860,8 +1002,9 @@ def build_distribution(
                     "macos_arm64",
                     "macos_x86_64",
                 ],
-                "mcp_runtime_python": "CPython 3.12",
                 "mcp_runtime_platform": "win_amd64",
+                "mcp_runtime_pythons": list(OFFLINE_MCP_PYTHONS),
+                "tokenizer": tokenizer_identity,
                 "corpus_compiler_version": index.get("compiler_version"),
             },
             "state": distribution_summary,
@@ -911,13 +1054,18 @@ def main() -> int:
     parser.add_argument("--wheel", required=True, type=Path)
     parser.add_argument("--wheel-provenance", required=True, type=Path)
     parser.add_argument("--mcp-wheelhouse", required=True, type=Path)
-    parser.add_argument("--mcp-requirements", required=True, type=Path)
+    parser.add_argument("--mcp-requirements-directory", type=Path,
+                        help="Directory holding the per-Python Windows MCP hash locks (default: the committed locks)")
+    parser.add_argument("--tokenizer-artifact", required=True, type=Path,
+                        help="o200k_base artifact written by `standardsforge export-tokenizer`; must match tokenizer-lock.json")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--version", required=True)
     parser.add_argument("--outline-policy", type=Path, required=True)
     parser.add_argument("--qualification-directory", type=Path, required=True, help="Coverage ledger, real-suite.json, and passing real-benchmark.json for the exact inputs")
     parser.add_argument("--compresslevel", type=int, choices=range(1, 10), default=9)
     parser.add_argument("--recovery-directory", type=Path, help="Qualified MIL-STD-1661 recovery supplement to install with the corpus")
+    parser.add_argument("--reviewed-directory", type=Path, help="Reviewed supplement written by scripts/build_reviewed_supplement.py")
+    parser.add_argument("--corpus-policy", type=Path, help="Exact corpus policy (default: .standardsforge/policies/mil-std-corpus-local.json)")
     args = parser.parse_args()
     result = build_distribution(
         args.corpus_index,
@@ -926,13 +1074,16 @@ def main() -> int:
         args.wheel,
         args.wheel_provenance,
         args.mcp_wheelhouse,
-        args.mcp_requirements,
+        args.tokenizer_artifact,
         args.output,
         args.version,
         args.compresslevel,
+        mcp_requirements_directory=args.mcp_requirements_directory,
         outline_policy_path=args.outline_policy,
         qualification_directory=args.qualification_directory,
         recovery_directory=args.recovery_directory,
+        reviewed_directory=args.reviewed_directory,
+        corpus_policy_path=args.corpus_policy,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0

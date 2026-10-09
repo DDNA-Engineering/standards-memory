@@ -10,3 +10,7 @@ Before republishing this bundle or its source PDFs, the distributor remains resp
 
 
 The a6 distribution includes two additional MIL-STD-1661 packs from the same acquisition-pinned source PDF: an 18-page agent-reviewed visual transcription and 41 reviewed semantic records. They preserve original PDF/raster evidence and qualification boundaries. They do not replace the acquisition baseline, grant rights, or establish independent corpus-wide interpretation. Their exact identities and regression inputs are listed in `bundle-manifest.json` under `state.qualified_packs`.
+
+## Bundled tokenizer data
+
+From 0.1.0a8, `tokenizer/o200k_base.json` holds the `o200k_base` byte-pair vocabulary that OpenAI publishes for its MIT-licensed `tiktoken` library, exported once with `tiktoken==0.14.0` and pinned by `provenance/tokenizer.json`. It is used only to count tokens for `select_evidence` budgets on this machine; it is not standards content, sends nothing anywhere, and grants no rights over the standards above. Its identity is checked at every model-connection start.

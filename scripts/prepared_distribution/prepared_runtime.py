@@ -22,7 +22,17 @@ PARTIAL_RELATIVE = ".standardsforge/prepared-setup-incomplete.json"
 VENV_MARKER = ".standardsforge-prepared-venv.json"
 DISCARDED_VENV = ".discarded-venv"
 RUNTIME_ROOTS = {".standardsforge", ".venv"}
+# Files that operating-system shells create on their own when a folder is opened
+# (macOS Finder, Windows Explorer). They are never read by setup or the runtime.
+OS_METADATA_NAMES = {".ds_store", "thumbs.db", "ehthumbs.db", "desktop.ini", "icon\r"}
 HEX64 = re.compile(r"[0-9a-f]{64}")
+# Windows x64 CPython versions with a bundled, hash-locked offline MCP closure.
+OFFLINE_MCP_PYTHONS = ("3.11", "3.12", "3.13")
+TOKENIZER_PATH = "tokenizer/o200k_base.json"
+
+
+def mcp_requirements_path(python_version: str) -> str:
+    return f"provenance/mcp-wheelhouse-win-amd64-cp{python_version.replace('.', '')}.txt"
 
 
 class PreparedSetupError(RuntimeError):
@@ -144,7 +154,7 @@ def _validate_manifest_identity(manifest: dict[str, Any]) -> None:
         set(manifest) == {"schema_version", "product", "version", "build", "state", "files"},
         "The prepared-distribution manifest has missing or unknown fields.",
     )
-    _require(manifest["schema_version"] == "1.3", "Unsupported prepared-distribution manifest version.")
+    _require(manifest["schema_version"] == "1.4", "Unsupported prepared-distribution manifest version.")
     _require(manifest["product"] == "StandardsForge prepared distribution", "Unexpected prepared product.")
     _require(isinstance(manifest["version"], str) and manifest["version"], "Prepared version is missing.")
     build = manifest["build"]
@@ -156,8 +166,8 @@ def _validate_manifest_identity(manifest: dict[str, Any]) -> None:
         "wheel_generator": "setuptools (84.0.0)",
         "mcp_requirement": "mcp==2.2.0",
         "core_runtime_python": "CPython >=3.11",
-        "mcp_runtime_python": "CPython 3.12",
         "mcp_runtime_platform": "win_amd64",
+        "mcp_runtime_pythons": list(OFFLINE_MCP_PYTHONS),
     }
     for key, value in expected.items():
         _require(build.get(key) == value, f"Unexpected prepared build field: {key}")
@@ -167,8 +177,24 @@ def _validate_manifest_identity(manifest: dict[str, Any]) -> None:
         "Prepared core runtime profiles are invalid.",
     )
     _require(_runtime_profile() in platforms, "This runtime is not supported by the prepared core.")
-    for key in ("wheel_sha256", "wheel_provenance_sha256", "mcp_wheelhouse_sha256", "mcp_requirements_sha256"):
+    for key in ("wheel_sha256", "wheel_provenance_sha256", "mcp_wheelhouse_sha256"):
         _require(isinstance(build.get(key), str) and HEX64.fullmatch(build[key]) is not None, f"Invalid {key}.")
+    locks = build.get("mcp_requirements_sha256")
+    _require(
+        isinstance(locks, dict) and set(locks) == set(OFFLINE_MCP_PYTHONS)
+        and all(isinstance(value, str) and HEX64.fullmatch(value) is not None for value in locks.values()),
+        "Invalid mcp_requirements_sha256.",
+    )
+    tokenizer = build.get("tokenizer")
+    _require(
+        isinstance(tokenizer, dict)
+        and set(tokenizer) == {"encoding", "path", "sha256", "bytes", "implementation"}
+        and tokenizer["encoding"] == "o200k_base" and tokenizer["path"] == TOKENIZER_PATH
+        and isinstance(tokenizer["sha256"], str) and HEX64.fullmatch(tokenizer["sha256"]) is not None
+        and type(tokenizer["bytes"]) is int and tokenizer["bytes"] > 0
+        and tokenizer["implementation"] == "tiktoken==0.14.0",
+        "Prepared tokenizer identity is invalid.",
+    )
     _require(type(build.get("mcp_wheel_count")) is int and build["mcp_wheel_count"] > 0, "Invalid MCP wheel count.")
     state = manifest["state"]
     _require(isinstance(state, dict) and state.get("principal_id") == "local-user", "Prepared state identity is invalid.")
@@ -182,13 +208,23 @@ def _validate_manifest_identity(manifest: dict[str, Any]) -> None:
                  and HEX64.fullmatch(item["package_digest"]) is not None, "Qualified pack identity is invalid.")
         _require(item["package_digest"] not in seen, "Duplicate qualified pack.")
         seen.add(item["package_digest"])
-        for key, prefix, suffix in (("path", "packs/recovery/", ".zip"), ("suite_path", "qualification/recovery/", "-suite.json"), ("run_path", "qualification/recovery/", "-run.json")):
+        kind = "reviewed" if isinstance(item["path"], str) and item["path"].startswith("packs/reviewed/") else "recovery"
+        for key, prefix, suffix in (("path", f"packs/{kind}/", ".zip"), ("suite_path", f"qualification/{kind}/", "-suite.json"), ("run_path", f"qualification/{kind}/", "-run.json")):
             value = item[key]
             _require(isinstance(value, str) and value.startswith(prefix) and value.endswith(suffix)
                      and re.fullmatch(r"[a-z0-9-]+", value[len(prefix):-len(suffix)]) is not None, "Qualified pack path is invalid.")
             _require(sum(f["path"] == value for f in manifest["files"]) == 1, "Qualified pack input must be inventoried exactly once.")
     if extras:
         _require(state.get("included_package_count") == state["corpus_package_count"] + 1 + len(extras), "Qualified pack count is inconsistent.")
+    bindings = state.get("reference_bindings")
+    if bindings is not None:
+        _require(
+            isinstance(bindings, dict) and set(bindings) == {"path", "sha256"}
+            and bindings["path"] == "references/reference-bindings.json"
+            and isinstance(bindings["sha256"], str) and HEX64.fullmatch(bindings["sha256"]) is not None
+            and sum(f["path"] == bindings["path"] and f["sha256"] == bindings["sha256"] for f in manifest["files"]) == 1,
+            "Reviewed reference bindings are not inventoried exactly once with their pinned digest.",
+        )
 
 
 def _disk_inventory(root: Path) -> set[str]:
@@ -210,6 +246,34 @@ def _disk_inventory(root: Path) -> set[str]:
             _require(target.is_file(), f"Bundle inventory member is not a regular file: {relative}")
             observed.add(relative)
     return observed
+
+
+def _is_os_metadata(relative: str) -> bool:
+    name = PurePosixPath(relative).name
+    return name.casefold() in OS_METADATA_NAMES or name.startswith("._")
+
+
+def _describe(paths: set[str], limit: int = 5) -> str:
+    ordered = sorted(paths)
+    shown = ", ".join(ordered[:limit])
+    return shown + (f" and {len(ordered) - limit} more" if len(ordered) > limit else "")
+
+
+def _require_closed_inventory(observed: set[str], expected: set[str]) -> None:
+    # OS metadata files are tolerated only when the inventory does not list that path;
+    # links and non-regular files were already rejected while walking.
+    unlisted = {path for path in observed - expected if not _is_os_metadata(path)}
+    missing = expected - observed
+    problems = []
+    if missing:
+        problems.append(f"missing: {_describe(missing)}")
+    if unlisted:
+        problems.append(f"not part of this release: {_describe(unlisted)}")
+    _require(
+        not problems,
+        "The prepared directory contains missing or unlisted files (" + "; ".join(problems) + "). "
+        "Remove files you added to the library folder, or extract the release ZIP again into a new folder.",
+    )
 
 
 def validate_bundle(root: Path) -> tuple[dict[str, Any], str]:
@@ -234,7 +298,7 @@ def validate_bundle(root: Path) -> tuple[dict[str, Any], str]:
         _require(target.stat().st_size == item["bytes"] and _sha256(target) == item["sha256"], f"Prepared inventory validation failed: {relative}")
         expected.add(relative)
         by_path[relative] = item
-    _require(_disk_inventory(root) == expected, "The prepared directory contains missing or unlisted files.")
+    _require_closed_inventory(_disk_inventory(root), expected)
 
     wheel_items = [item for path, item in by_path.items() if path.startswith("wheel/")]
     _require(len(wheel_items) == 1 and wheel_items[0]["sha256"] == manifest["build"]["wheel_sha256"], "Prepared wheel identity is inconsistent.")
@@ -253,8 +317,6 @@ def validate_bundle(root: Path) -> tuple[dict[str, Any], str]:
         and scope.get("acquisition", {}).get("manifest_sha256") == _sha256(acquisition),
         "The acquisition snapshot does not match the source baseline.",
     )
-    requirements = _safe_disk_path(root, "provenance/mcp-wheelhouse-win-amd64-cp312.txt")
-    _require(_sha256(requirements) == manifest["build"]["mcp_requirements_sha256"], "MCP requirements digest is inconsistent.")
     wheelhouse = sorted(
         (item for path, item in by_path.items() if path.startswith("wheelhouse/") and path.endswith(".whl")),
         key=lambda item: PurePosixPath(item["path"]).name,
@@ -265,7 +327,44 @@ def validate_bundle(root: Path) -> tuple[dict[str, Any], str]:
         and _sha256_bytes(rows) == manifest["build"]["mcp_wheelhouse_sha256"],
         "MCP wheelhouse identity is inconsistent.",
     )
+    locked: set[str] = set()
+    for python_version, expected_digest in manifest["build"]["mcp_requirements_sha256"].items():
+        requirements = _safe_disk_path(root, mcp_requirements_path(python_version))
+        _require(_sha256(requirements) == expected_digest, f"MCP requirements digest is inconsistent for Python {python_version}.")
+        for line in requirements.read_text(encoding="utf-8").splitlines():
+            match = re.fullmatch(r"[A-Za-z0-9_.-]+==[^\s]+ --hash=sha256:([0-9a-f]{64})", line)
+            _require(match is not None, f"MCP requirements for Python {python_version} contain a malformed entry.")
+            locked.add(match.group(1))
+    _require(locked == {item["sha256"] for item in wheelhouse}, "MCP wheelhouse does not exactly match its per-Python locks.")
+    tokenizer = manifest["build"]["tokenizer"]
+    tokenizer_item = by_path.get(TOKENIZER_PATH)
+    _require(
+        tokenizer_item is not None and tokenizer_item["sha256"] == tokenizer["sha256"] and tokenizer_item["bytes"] == tokenizer["bytes"],
+        "Prepared tokenizer artifact is inconsistent.",
+    )
     return manifest, _sha256_bytes(manifest_bytes)
+
+
+def required_install_bytes(manifest: dict[str, Any]) -> int:
+    """Free space a first setup needs beside the extracted files.
+
+    Measured for a7 on Linux: the installed index and object store took 1.68 times the
+    bytes of the bundled packs, and the environment with model dependencies 72 MB.
+    Twice the pack bytes plus 250 MB leaves margin for SQLite journals and pip caches.
+    """
+    pack_bytes = sum(item["bytes"] for item in manifest["files"] if item["path"].startswith(("corpus/", "packs/")))
+    return 2 * pack_bytes + 250 * 1000 * 1000
+
+
+def _require_free_space(root: Path, manifest: dict[str, Any]) -> None:
+    required = required_install_bytes(manifest)
+    available = shutil.disk_usage(root).free
+    _require(
+        available >= required,
+        f"Setup needs about {required / 1e9:.1f} GB of free disk space for the library index, but only "
+        f"{available / 1e9:.1f} GB is available on the drive holding {root}. Free up space, or extract the "
+        "release into a folder on a drive with more space, then run setup again.",
+    )
 
 
 def _clean_environment() -> dict[str, str]:
@@ -389,11 +488,27 @@ def _check_mcp_profile(mode: str | None) -> None:
     _require(mode in {None, "offline", "online"}, "Unknown MCP installation mode.")
     if mode == "offline":
         _require(
-            sys.platform == "win32" and sys.version_info[:2] == (3, 12)
+            sys.platform == "win32" and _python_version() in OFFLINE_MCP_PYTHONS
             and platform.machine().casefold() in {"amd64", "x86_64"},
-            "Offline MCP requires 64-bit CPython 3.12 on Windows. "
+            "Offline MCP requires 64-bit CPython 3.11, 3.12 or 3.13 on Windows. "
             "Use --mcp-online for an explicit networked dependency install on other supported runtimes.",
         )
+
+
+def _python_version() -> str:
+    return f"{sys.version_info[0]}.{sys.version_info[1]}"
+
+
+def mcp_server_options(root: Path, manifest: dict[str, Any]) -> list[str]:
+    """Trusted startup options for the bundled tokenizer and reviewed references."""
+    tokenizer = manifest["build"]["tokenizer"]
+    options = ["--tokenizer-artifact", str(root.joinpath(*PurePosixPath(tokenizer["path"]).parts)),
+               "--tokenizer-sha256", tokenizer["sha256"]]
+    bindings = manifest["state"].get("reference_bindings")
+    if bindings is not None:
+        options += ["--reference-bindings", str(root.joinpath(*PurePosixPath(bindings["path"]).parts)),
+                    "--reference-bindings-sha256", bindings["sha256"]]
+    return options
 
 
 def _mcp_command(root: Path) -> list[str]:
@@ -418,7 +533,16 @@ def _write_host_configuration(root: Path) -> dict[str, str]:
 
 def _prepare_mcp(root: Path, python: Path, wheel: Path, manifest: dict[str, Any], mode: str | None) -> None:
     if mode == "offline":
-        requirements = root / "provenance/mcp-wheelhouse-win-amd64-cp312.txt"
+        # Select the lock for the environment's interpreter, which an earlier setup may
+        # have created with a different supported Python than the one running now.
+        probe = _run([str(python), "-I", "-c", "import sys; print(f'{sys.version_info[0]}.{sys.version_info[1]}')"], root, capture=True)
+        environment_version = (probe.stdout or "").strip()
+        _require(
+            environment_version in OFFLINE_MCP_PYTHONS,
+            f"The prepared environment uses Python {environment_version or 'unknown'}, which has no offline MCP lock. "
+            f"Delete {root / '.venv'} and run setup again with Python 3.11, 3.12 or 3.13.",
+        )
+        requirements = root.joinpath(*PurePosixPath(mcp_requirements_path(environment_version)).parts)
         _run([str(python), "-I", "-m", "pip", "install", "--disable-pip-version-check", "--no-index",
               "--find-links", str(root / "wheelhouse"), "--require-hashes", "--no-deps",
               "--requirement", str(requirements)], root)
@@ -427,11 +551,11 @@ def _prepare_mcp(root: Path, python: Path, wheel: Path, manifest: dict[str, Any]
     elif mode == "online":
         # Only this explicitly selected administrative path may resolve dependencies online.
         # The core code still comes from the verified bundled wheel, never another release.
-        _run([str(python), "-I", "-m", "pip", "install", "--disable-pip-version-check", f"{wheel}[mcp]"], root, dependency_network=True)
+        _run([str(python), "-I", "-m", "pip", "install", "--disable-pip-version-check", f"{wheel}[mcp,tokens]"], root, dependency_network=True)
     _run([str(python), "-I", "-m", "pip", "check"], root)
     _run([str(python), "-I", str(root / "smoke_mcp.py"), "--db", str(root / ".standardsforge/memory.db"),
           "--store", str(root / ".standardsforge/objects"), "--principal", "local-user",
-          "--query", "environmental testing"], root)
+          "--query", "environmental testing", *mcp_server_options(root, manifest)], root)
 
 
 def _is_disposable_state(state: Path) -> bool:
@@ -502,9 +626,16 @@ def _clear_partial_state(state: Path, partial_path: Path) -> None:
                 ) from exc
 
 
-def setup_prepared(root: Path, *, quiet: bool = False, mcp_mode: str | None = None) -> dict[str, Any]:
+def setup_prepared(root: Path, *, quiet: bool = False, mcp_mode: str | None = None,
+                   connect: list[str] | None = None, host_config: Path | None = None) -> dict[str, Any]:
     _require(sys.implementation.name == "cpython" and sys.version_info >= (3, 11), "CPython 3.11 or newer is required.")
     _check_mcp_profile(mcp_mode)
+    connect = list(dict.fromkeys(connect or []))
+    _require(host_config is None or len(connect) == 1, "--host-config needs exactly one --connect host.")
+    _require(
+        not connect or mcp_mode is not None or (root / RECEIPT_RELATIVE).is_file(),
+        "--connect needs the model connection: add --mcp (Windows) or --mcp-online.",
+    )
     if not quiet:
         print("Checking the prepared library. First setup indexes the included packs and can take several minutes.", flush=True)
     try:
@@ -575,6 +706,9 @@ def setup_prepared(root: Path, *, quiet: bool = False, mcp_mode: str | None = No
         if discard_venv:
             _discard_owned_venv(venv_root, state)
         _clear_partial_state(state, partial_path)
+    if not existing_ready:
+        # Indexing a large library can take minutes; fail before it starts, not halfway.
+        _require_free_space(root, manifest)
     if existing_ready:
         # A failed revalidation must not leave an old ready receipt usable by launchers.
         _write_json_atomic(partial_path, {"bundle_manifest_sha256": manifest_sha256})
@@ -638,11 +772,35 @@ def setup_prepared(root: Path, *, quiet: bool = False, mcp_mode: str | None = No
     }
     _write_json_atomic(receipt_path, receipt)
     partial_path.unlink(missing_ok=True)
+    _require(mcp_ready or not connect, "--connect needs the model connection: add --mcp (Windows) or --mcp-online.")
+    connections = _connect_hosts(root, connect, host_config) if connect else []
     result = {"ok": True, "status": "already_ready" if existing_ready else "ready", "version": manifest["version"], "runtime_profile": _runtime_profile(), "network_dependency_resolution": "explicit_mcp_dependencies" if mcp_mode == "online" else "disabled"}
     if configuration is not None:
         result["host_configuration"] = configuration
+    if connections:
+        result["host_connections"] = connections
     if not quiet:
         print(json.dumps(result, indent=2, sort_keys=True))
-        if configuration is not None:
-            print("Model connection ready. Copy the generated configuration into your host, then restart its MCP connection.")
+        if connections:
+            for connection in connections:
+                print(f"Connected {connection['host']} ({connection['status']}): {connection['config_path']}. {connection['restart']}")
+        elif configuration is not None:
+            print("Model connection ready. Copy the generated configuration into your host, then restart its MCP connection, "
+                  "or run setup again with --connect claude-desktop, --connect cursor or --connect codex to add it for you.")
     return result
+
+
+def _connect_hosts(root: Path, hosts: list[str], host_config: Path | None) -> list[dict[str, Any]]:
+    from host_connect import HostConnectError, connect_host
+
+    command, *arguments = _mcp_command(root)
+    results = []
+    for host in hosts:
+        try:
+            results.append(connect_host(host, command, arguments, config_path=host_config))
+        except (HostConnectError, OSError) as exc:
+            raise PreparedSetupError(
+                f"The library and model connection are ready, but {host} was not configured: {exc} "
+                "You can copy the generated configuration from .standardsforge instead."
+            ) from exc
+    return results

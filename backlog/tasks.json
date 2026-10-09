@@ -1170,7 +1170,7 @@
     {
       "task_id": "TASK-060",
       "title": "Close verified correctness review gaps",
-      "status": "in_progress",
+      "status": "complete",
       "requirements": ["SM-FR-008", "SM-FR-010", "SM-FR-018", "SM-FR-019", "SM-FR-022", "SM-FR-052", "SM-FR-065", "SM-FR-067", "SM-FR-069", "SM-FR-075"],
       "acceptance": [
         "Report unresolved relationships in exported engineering handoffs rather than omitting them.",
@@ -1188,6 +1188,21 @@
         "PDF worker process groups are cleaned up, and source hashing uses a single read of the source bytes.",
         "Prepared setup can be retried after failure and decodes subprocess output as UTF-8.",
         "Every fix lands with its negative cases, and no runtime behavior is claimed before it is observed."
+      ]
+    },
+    {
+      "task_id": "TASK-061",
+      "title": "Make prepared installation robust across hosts and Python versions (0.1.0a8)",
+      "status": "in_progress",
+      "requirements": ["SM-FR-065", "SM-FR-067"],
+      "acceptance": [
+        "Prepared setup tolerates operating-system shell metadata files (.DS_Store, AppleDouble ._*, Thumbs.db, ehthumbs.db, desktop.ini, Icon\\r) without loosening any other inventory check, and names every other unexpected or missing file.",
+        "Windows offline MCP works with 64-bit CPython 3.11, 3.12 and 3.13 from one closed wheelhouse and one hash lock per version; the lock follows the interpreter of the prepared environment.",
+        "The prepared distribution bundles a pinned o200k_base tokenizer artifact and passes it to every model connection, so token-budgeted select_evidence works offline; a changed artifact fails startup.",
+        "Reviewed reference bindings, when bundled, are pinned in the manifest and passed to every launcher.",
+        "Setup adds StandardsForge to Claude Desktop, Cursor or Codex only when explicitly asked, after a byte-exact backup, changing only its own entry and failing closed on configuration it cannot rewrite safely.",
+        "First setup checks free disk space before indexing.",
+        "Native acceptance covers each Windows Python version, shell metadata files, and token-budget selection through the generated launcher before publication."
       ]
     }
   ]

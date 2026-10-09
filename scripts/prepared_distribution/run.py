@@ -8,13 +8,13 @@ from pathlib import Path
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from prepared_runtime import PreparedSetupError, _clean_environment, _venv_python, validate_bundle, validate_ready
+from prepared_runtime import PreparedSetupError, _clean_environment, _venv_python, mcp_server_options, validate_bundle, validate_ready, validate_receipt
 
 
 def main() -> int:
     root = Path(__file__).resolve().parent
     try:
-        validate_ready(root)
+        manifest, digest = validate_ready(root)
     except PreparedSetupError as ready_error:
         try:
             validate_bundle(root)
@@ -24,7 +24,12 @@ def main() -> int:
         print(json.dumps({"ok": False, "error": {"code": "prepared_not_ready", "message": f"{ready_error} Run setup.py explicitly before querying."}}), file=sys.stderr)
         return 1
     state = root / ".standardsforge"
-    command = [str(_venv_python(root / ".venv")), "-I", "-m", "standardsforge", "--db", str(state / "memory.db"), "--store", str(state / "objects"), *sys.argv[1:]]
+    # The tokenizer needs the optional dependencies installed with the model connection;
+    # a core-only installation keeps byte budgets and still follows reviewed references.
+    options = mcp_server_options(root, manifest)
+    if validate_receipt(root, manifest, digest)["mcp_status"] != "ready":
+        options = options[4:]
+    command = [str(_venv_python(root / ".venv")), "-I", "-m", "standardsforge", "--db", str(state / "memory.db"), "--store", str(state / "objects"), *options, *sys.argv[1:]]
     return subprocess.run(command, cwd=root, env=_clean_environment(), shell=False).returncode
 
 

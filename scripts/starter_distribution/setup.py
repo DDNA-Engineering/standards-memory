@@ -23,6 +23,9 @@ RECEIPT_RELATIVE = ".standardsforge/starter-receipt.json"
 PARTIAL_RELATIVE = ".standardsforge/starter-setup-incomplete.json"
 VENV_MARKER = ".standardsforge-starter-venv.json"
 RUNTIME_ROOTS = {".standardsforge", ".venv"}
+# Files that operating-system shells create on their own when a folder is opened
+# (macOS Finder, Windows Explorer). They are never read by setup or the runtime.
+OS_METADATA_NAMES = {".ds_store", "thumbs.db", "ehthumbs.db", "desktop.ini", "icon\r"}
 HEX64 = re.compile(r"[0-9a-f]{64}")
 
 
@@ -289,6 +292,23 @@ def _walk_immutable_files(root: Path) -> set[str]:
     return actual
 
 
+def _is_os_metadata(relative: str) -> bool:
+    name = PurePosixPath(relative).name
+    return name.casefold() in OS_METADATA_NAMES or name.startswith("._")
+
+
+def _require_closed_inventory(actual: set[str], expected: set[str]) -> None:
+    unlisted = sorted(path for path in actual - expected if not _is_os_metadata(path))
+    missing = sorted(expected - actual)
+    problems = []
+    if missing:
+        problems.append("missing: " + ", ".join(missing[:5]) + (f" and {len(missing) - 5} more" if len(missing) > 5 else ""))
+    if unlisted:
+        problems.append("not part of this bundle: " + ", ".join(unlisted[:5]) + (f" and {len(unlisted) - 5} more" if len(unlisted) > 5 else ""))
+    _require(not problems, "Bundle contains an unlisted or missing immutable file (" + "; ".join(problems) + "). "
+             "Remove files you added to the bundle folder, or extract the bundle again into a new folder.")
+
+
 def _require_no_links_tree(root: Path) -> None:
     for directory, names, files in os.walk(root, topdown=True, followlinks=False):
         directory_path = Path(directory)
@@ -335,7 +355,7 @@ def validate_bundle(root: Path) -> tuple[dict[str, Any], str]:
         _require(path.is_file() and path.stat().st_size == item["bytes"] and _sha256(path) == item["sha256"], f"Bundle file failed inventory validation: {relative}")
         expected.add(relative)
         casefolded.add(relative.casefold())
-    _require(_walk_immutable_files(root) == expected, "Bundle contains an unlisted or missing immutable file.")
+    _require_closed_inventory(_walk_immutable_files(root), expected)
     _validate_policy(root, manifest)
     for declaration in manifest["packages"]:
         _validate_pack(root, declaration)

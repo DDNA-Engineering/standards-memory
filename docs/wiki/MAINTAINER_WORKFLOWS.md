@@ -140,17 +140,48 @@ First build and retain the reproducible wheel:
   --output-dir build/prepared-wheel
 ```
 
-Acquire the pinned Windows MCP dependency closure into a dedicated wheelhouse. This is a maintainer build input; portable core setup and the Windows offline MCP setup never contact a package index:
+Acquire the pinned Windows MCP dependency closure into one shared wheelhouse. There is one hash lock per supported Windows CPython version (3.11, 3.12 and 3.13); pure-Python wheels are shared and each lock adds its own native wheels. This is a maintainer build input; portable core setup and the Windows offline MCP setup never contact a package index:
 
 ```powershell
-& $Python -m pip download `
-  --disable-pip-version-check `
-  --only-binary=:all: `
-  --require-hashes `
-  --no-deps `
-  --dest build/prepared-mcp-wheelhouse `
-  -r scripts/prepared_distribution/mcp-wheelhouse-win-amd64-cp312.txt
+foreach ($Tag in 'cp311', 'cp312', 'cp313') {
+  & $Python -m pip download `
+    --disable-pip-version-check `
+    --only-binary=:all: `
+    --require-hashes `
+    --no-deps `
+    --dest build/prepared-mcp-wheelhouse `
+    -r "scripts/prepared_distribution/mcp-wheelhouse-win-amd64-$Tag.txt"
+}
 ```
+
+Export the bundled token counter. The export explicitly acquires OpenAI's public `o200k_base` vocabulary through `tiktoken==0.14.0` and writes canonical JSON; the builder rejects any artifact whose bytes differ from `scripts/prepared_distribution/tokenizer-lock.json`:
+
+```powershell
+& $Python -m pip install 'tiktoken==0.14.0'
+& $Python -m standardsforge export-tokenizer o200k_base build/prepared-tokenizer/o200k_base.json
+```
+
+### Rebuild from the previous prepared release
+
+When only code, setup or bundled runtime inputs change, rebuild from the published previous archive instead of from local acquisition state. `scripts/rebuild_prepared_release.py` verifies the previous ZIP against its recorded SHA-256 and closed inventory, installs its unchanged corpus, outline and recovery packs into a fresh store with the new wheel, re-runs every real-document suite against that wheel (runs are bound to the exact runtime sources), adds an optional reviewed supplement, and then calls the builder below:
+
+```powershell
+$PreparedVersion = '<new-qualified-version>'
+& $Python scripts/rebuild_prepared_release.py `
+  --previous-archive standardsforge-ready-0.1.0a7.zip `
+  --previous-sha256 8555fcafa683c60186575193c7cc504331ca6d49c5d64b76bda431b83b1bda9b `
+  --wheel-dir build/prepared-wheel `
+  --mcp-wheelhouse build/prepared-mcp-wheelhouse `
+  --tokenizer-artifact build/prepared-tokenizer/o200k_base.json `
+  --reviewed-supplement build/reviewed-supplement `
+  --work-dir build/prepared-rebuild `
+  --output "build/standardsforge-ready-$PreparedVersion.zip" `
+  --version $PreparedVersion
+```
+
+Allow several minutes and about 4 GB of working space. The work directory must be new or empty.
+
+### Build from local acquisition state
 
 Then bind the completed corpus, acquisition snapshot, qualified outline, wheel, policy, and provenance. First update the project version and build a matching wheel for a **new** release; replace the placeholder below with that exact qualified version. The output name alone does not version the Python wheel or qualify the corpus:
 
@@ -167,12 +198,12 @@ $PreparedVersion = '<new-qualified-version>'
   --wheel "build/prepared-wheel/standardsforge-$PreparedVersion-py3-none-any.whl" `
   --wheel-provenance "build/prepared-wheel/standardsforge-$PreparedVersion-py3-none-any.whl.provenance.json" `
   --mcp-wheelhouse build/prepared-mcp-wheelhouse `
-  --mcp-requirements scripts/prepared_distribution/mcp-wheelhouse-win-amd64-cp312.txt `
+  --tokenizer-artifact build/prepared-tokenizer/o200k_base.json `
   --output "build/standardsforge-ready-$PreparedVersion.zip" `
   --version $PreparedVersion
 ```
 
-The builder must reject incomplete scope, mismatched acquisition identity, changed archives, duplicate packages, unauthorized policy scope, unqualified outline claims, wheel/source drift, a malformed or unpinned MCP wheelhouse, and an unclosed final archive. The wheelhouse is the fully offline Windows x64 CPython 3.12 MCP profile. The portable prepared core uses the bundled dependency-free wheel on each declared platform; POSIX MCP is installed later through the separate PyPI code channel and is not part of corpus acquisition or compilation.
+The builder must reject incomplete scope, mismatched acquisition identity, changed archives, duplicate packages, unauthorized policy scope, unqualified outline claims, wheel/source drift, a malformed or unpinned MCP wheelhouse, a tokenizer that differs from its lock, and an unclosed final archive. The wheelhouse is the fully offline Windows x64 CPython 3.11, 3.12 and 3.13 MCP profile. The portable prepared core uses the bundled dependency-free wheel on each declared platform; POSIX MCP is installed later through the separate PyPI code channel and is not part of corpus acquisition or compilation.
 
 ## Rights boundary
 

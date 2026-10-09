@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13"]
     runs-on: ${{ matrix.os }}
     env:
       PYTHONPATH: ${{ github.workspace }}/src
@@ -53,23 +53,17 @@ jobs:
           python scripts/validate_installed_wheel.py
           --build-tool-dir build/toolchain-cache
           --output-dir build/ci-wheel
-      - name: Acquire pinned MCP wheelhouse
-        if: runner.os == 'Windows' && matrix.python-version == '3.12'
-        run: >-
-          python -m pip download
-          --disable-pip-version-check
-          --require-hashes
-          --no-deps
-          --only-binary=:all:
-          --dest build/mcp-wheelhouse
-          --requirement scripts/prepared_distribution/mcp-wheelhouse-win-amd64-cp312.txt
-      - name: Validate prepared MCP runtime offline
-        if: runner.os == 'Windows' && matrix.python-version == '3.12'
-        run: >-
-          python scripts/validate_prepared_mcp_runtime.py
-          --wheel-dir build/ci-wheel
-          --wheelhouse build/mcp-wheelhouse
-          --requirements scripts/prepared_distribution/mcp-wheelhouse-win-amd64-cp312.txt
+      - name: Validate prepared offline MCP runtime and locked tokenizer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $lock = "scripts/prepared_distribution/mcp-wheelhouse-win-amd64-cp$('${{ matrix.python-version }}'.Replace('.', '')).txt"
+          python -m pip download --disable-pip-version-check --require-hashes --no-deps --only-binary=:all: --dest build/mcp-wheelhouse --requirement $lock
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned MCP wheelhouse acquisition failed.' }
+          python -m standardsforge export-tokenizer o200k_base build/tokenizer/o200k_base.json
+          if ($LASTEXITCODE -ne 0) { throw 'Tokenizer export failed.' }
+          python scripts/validate_prepared_mcp_runtime.py --wheel-dir build/ci-wheel --wheelhouse build/mcp-wheelhouse --requirements $lock --tokenizer-artifact build/tokenizer/o200k_base.json
+          if ($LASTEXITCODE -ne 0) { throw 'Offline MCP runtime validation failed.' }
       - name: Build deterministic synthetic starter bundle
         run: >-
           python scripts/build_starter_distribution.py
@@ -110,7 +104,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, macos-15-intel]
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13"]
     runs-on: ${{ matrix.os }}
     env:
       PYTHONPATH: ${{ github.workspace }}/src
