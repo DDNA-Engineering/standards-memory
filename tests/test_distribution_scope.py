@@ -211,29 +211,52 @@ class DistributionScopeTests(unittest.TestCase):
                 f"mcp==2.2.0 --hash=sha256:{mcp_digest}\n", encoding="utf-8"
             )
             payloads, digest, requirements_digest = _validate_mcp_wheelhouse(
-                wheelhouse, requirements
+                wheelhouse, {"3.12": requirements}
             )
             self.assertEqual(["wheelhouse/mcp-2.2.0-py3-none-any.whl"], [item[1] for item in payloads])
             self.assertEqual(64, len(digest))
-            self.assertEqual(hashlib.sha256(requirements.read_bytes()).hexdigest(), requirements_digest)
+            self.assertEqual({"3.12": hashlib.sha256(requirements.read_bytes()).hexdigest()}, requirements_digest)
+
+            # One wheelhouse serves several per-Python locks: shared pure wheels once,
+            # version-specific wheels per lock, and nothing outside their union.
+            native_311 = wheelhouse / "native-1.0-cp311-cp311-win_amd64.whl"
+            native_313 = wheelhouse / "native-1.0-cp313-cp313-win_amd64.whl"
+            digest_311 = write_wheel(native_311, "native", "1.0")
+            shutil.copyfile(native_311, native_313)
+            with zipfile.ZipFile(native_313, "a") as archive:
+                archive.writestr("native/_cp313.pyd", "binary")
+            digest_313 = hashlib.sha256(native_313.read_bytes()).hexdigest()
+            lock_311 = root / "lock-311.txt"
+            lock_313 = root / "lock-313.txt"
+            lock_311.write_text(f"mcp==2.2.0 --hash=sha256:{mcp_digest}\nnative==1.0 --hash=sha256:{digest_311}\n", encoding="utf-8")
+            lock_313.write_text(f"mcp==2.2.0 --hash=sha256:{mcp_digest}\nnative==1.0 --hash=sha256:{digest_313}\n", encoding="utf-8")
+            payloads, _, digests = _validate_mcp_wheelhouse(wheelhouse, {"3.11": lock_311, "3.13": lock_313})
+            self.assertEqual(3, len(payloads))
+            self.assertEqual({"3.11", "3.13"}, set(digests))
+            with self.assertRaisesRegex(ValueError, "exact locked artifact: native-1.0-cp313"):
+                _validate_mcp_wheelhouse(wheelhouse, {"3.11": lock_311})
+            native_313.unlink()
+            with self.assertRaisesRegex(ValueError, "missing locked packages: native==1.0"):
+                _validate_mcp_wheelhouse(wheelhouse, {"3.11": lock_311, "3.13": lock_313})
+            native_311.unlink()
 
             extra = wheelhouse / "mcp_types-2.2.0-py3-none-any.whl"
             write_wheel(extra, "mcp_types", "2.2.0")
             with self.assertRaisesRegex(ValueError, "exact locked artifact"):
-                _validate_mcp_wheelhouse(wheelhouse, requirements)
+                _validate_mcp_wheelhouse(wheelhouse, {"3.12": requirements})
             extra.unlink()
 
             duplicate = wheelhouse / "duplicate-2.2.0-py3-none-any.whl"
             write_wheel(duplicate, "mcp", "2.2.0")
             with self.assertRaisesRegex(ValueError, "duplicate"):
-                _validate_mcp_wheelhouse(wheelhouse, requirements)
+                _validate_mcp_wheelhouse(wheelhouse, {"3.12": requirements})
             duplicate.unlink()
 
             requirements.write_text(
                 f"mcp==2.2.0 --hash=sha256:{'0' * 64}\n", encoding="utf-8"
             )
             with self.assertRaisesRegex(ValueError, "exact locked artifact"):
-                _validate_mcp_wheelhouse(wheelhouse, requirements)
+                _validate_mcp_wheelhouse(wheelhouse, {"3.12": requirements})
 
             requirements.write_text(
                 f"mcp==2.2.0 --hash=sha256:{mcp_digest}\n"
@@ -241,7 +264,83 @@ class DistributionScopeTests(unittest.TestCase):
                 encoding="utf-8",
             )
             with self.assertRaisesRegex(ValueError, "missing locked packages"):
-                _validate_mcp_wheelhouse(wheelhouse, requirements)
+                _validate_mcp_wheelhouse(wheelhouse, {"3.12": requirements})
+
+    def test_reviewed_supplement_is_bound_to_corpus_runtime_and_bindings(self) -> None:
+        from contextlib import contextmanager
+
+        runtime_sources = {"service.py": "1" * 64}
+        runtime_digest = distribution_module.digest(runtime_sources)
+        with tempfile.TemporaryDirectory(prefix="standardsforge-reviewed-supplement-") as temporary:
+            root = Path(temporary)
+            for name in ("packs", "policies", "qualification"):
+                (root / name).mkdir()
+            pack = SimpleNamespace(package_digest="c" * 64, manifest={"pack_id": "reviewed.pack", "edition_id": "edition"})
+            supplement = {"packs": [{"slug": "mil-std-882e", "pack_id": "reviewed.pack", "package_digest": "c" * 64,
+                                     "source_package_digest": "a" * 64}]}
+            suite = {"suite": {"package_digest": "c" * 64, "edition_id": "edition"}}
+            run = {"run": {"gate": {"passed": True}, "runtime_source_sha256": runtime_digest}}
+
+            def write() -> None:
+                (root / "supplement.json").write_text(json.dumps(supplement), encoding="utf-8")
+                (root / "qualification" / "mil-std-882e-suite.json").write_text(json.dumps(suite), encoding="utf-8")
+                (root / "qualification" / "mil-std-882e-run.json").write_text(json.dumps(run), encoding="utf-8")
+
+            @contextmanager
+            def opened(_archive: Path):
+                yield pack
+
+            def validate(included: set[str] | None = None):
+                with patch.object(distribution_module, "validate_run"), patch.object(distribution_module, "_validate_policy"), \
+                        patch.object(distribution_module, "open_validated_pack", opened):
+                    return distribution_module._validate_reviewed_supplement(
+                        root, {"a" * 64}, runtime_sources, set(included or {"d" * 64}))
+
+            write()
+            qualified, payloads, reference = validate()
+            self.assertEqual("packs/reviewed/mil-std-882e.zip", qualified[0]["path"])
+            self.assertEqual("qualification/reviewed/mil-std-882e-run.json", qualified[0]["run_path"])
+            self.assertEqual(3, len(payloads))
+            self.assertIsNone(reference)
+            with self.assertRaisesRegex(ValueError, "duplicates an included package"):
+                validate({"c" * 64})
+
+            for change, message in (
+                (lambda: supplement["packs"][0].update(source_package_digest="b" * 64), "not an included corpus package"),
+                (lambda: supplement["packs"][0].update(slug="Bad Slug"), "unique lowercase"),
+                (lambda: supplement["packs"].append(dict(supplement["packs"][0])), "unique lowercase"),
+                (lambda: run["run"].update(runtime_source_sha256="0" * 64), "exact pack and wheel runtime"),
+                (lambda: run["run"]["gate"].update(passed=False), "exact pack and wheel runtime"),
+                (lambda: supplement["packs"][0].update(package_digest="e" * 64), "identity differs"),
+            ):
+                baseline = (copy.deepcopy(supplement), copy.deepcopy(run))
+                change()
+                write()
+                with self.assertRaisesRegex(ValueError, message):
+                    validate()
+                supplement, run = baseline
+            write()
+
+            bindings_path = root / "reference-bindings.json"
+            bindings = {"schema_version": "0.1.0", "binding_set": {"bindings": []}}
+            bindings_path.write_text(json.dumps(bindings), encoding="utf-8")
+            class Accepting:
+                @staticmethod
+                def check_schema(_schema): return None
+                def __init__(self, _schema): pass
+                def validate(self, _instance): return None
+            with patch.object(distribution_module, "validator_for", return_value=Accepting):
+                with self.assertRaisesRegex(ValueError, "differ from the reviewed supplement"):
+                    validate()
+                supplement["reference_bindings"] = {"path": "reference-bindings.json", "sha256": distribution_module._sha256(bindings_path)}
+                write()
+                self.assertEqual(bindings_path, validate()[2][0])
+                bindings["binding_set"]["bindings"] = [{"target": {"package_digest": "f" * 64}}]
+                bindings_path.write_text(json.dumps(bindings), encoding="utf-8")
+                supplement["reference_bindings"]["sha256"] = distribution_module._sha256(bindings_path)
+                write()
+                with self.assertRaisesRegex(ValueError, "not in this distribution"):
+                    validate()
 
     def test_prepared_mcp_launcher_rejects_all_overrides(self) -> None:
         launcher = (
@@ -262,7 +361,7 @@ class DistributionScopeTests(unittest.TestCase):
         self.assertIn("(Join-Path $PSScriptRoot 'setup.py') --mcp", setup)
         # Setup may replace .venv; Windows cannot delete a running interpreter,
         # so the prepared environment is only the last-resort interpreter.
-        self.assertLess(setup.index("'py', '-3.12'"), setup.index("$Candidates += ,@($Existing)"))
+        self.assertLess(setup.index("@('-3.12', '-3.13', '-3.11')"), setup.index("$Candidates += ,@($Existing)"))
         self.assertLess(setup.index("@('python')"), setup.index("$Candidates += ,@($Existing)"))
         posix_launcher = (
             ROOT / "scripts" / "prepared_distribution" / "standardsforge.sh"
@@ -281,12 +380,15 @@ class DistributionScopeTests(unittest.TestCase):
                 ("pip", "25.0"),
             ]
             verify_environment(requirements, "0.1.0a1", expected)
-            with self.assertRaisesRegex(RuntimeError, "differs from"):
-                verify_environment(
-                    requirements,
-                    "0.1.0a1",
-                    [*expected, ("injected-package", "1.0")],
-                )
+            # CPython 3.11 venvs also bootstrap setuptools from ensurepip.
+            verify_environment(requirements, "0.1.0a1", [*expected, ("setuptools", "65.5.0")])
+            for extra in ("injected-package", "wheel"):
+                with self.assertRaisesRegex(RuntimeError, "differs from"):
+                    verify_environment(
+                        requirements,
+                        "0.1.0a1",
+                        [*expected, (extra, "1.0")],
+                    )
             with self.assertRaisesRegex(RuntimeError, "differs from"):
                 verify_environment(
                     requirements,
@@ -328,9 +430,16 @@ class DistributionScopeTests(unittest.TestCase):
                 "standardsforge-mcp.ps1",
                 "smoke_mcp.py",
                 "verify_mcp_environment.py",
+                "host_connect.py",
                 "CONTENT-NOTICE.md",
             ):
                 (static_root / name).write_text(name + "\n", encoding="utf-8")
+            tokenizer_artifact = root / "o200k_base.json"
+            tokenizer_artifact.write_bytes(b'{"name":"o200k_base","schema_version":"0.1.0"}')
+            (static_root / "tokenizer-lock.json").write_text(json.dumps({
+                "acquisition": "synthetic", "bytes": tokenizer_artifact.stat().st_size, "encoding": "o200k_base",
+                "implementation": "tiktoken==0.14.0", "sha256": hashlib.sha256(tokenizer_artifact.read_bytes()).hexdigest(),
+            }), encoding="utf-8")
             for name, value in (
                 ("LICENSE", "test license\n"),
                 ("README.md", "test source readme\n"),
@@ -452,13 +561,15 @@ class DistributionScopeTests(unittest.TestCase):
                     "mcp-2.2.0.dist-info/WHEEL",
                     "Wheel-Version: 1.0\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
                 )
-            mcp_requirements = root / "mcp-requirements.txt"
+            mcp_requirements = static_root / "mcp-wheelhouse-win-amd64-cp312.txt"
             mcp_requirements.write_text(
                 "mcp==2.2.0 --hash=sha256:"
                 + hashlib.sha256(mcp_wheel.read_bytes()).hexdigest()
                 + "\n",
                 encoding="utf-8",
             )
+            for tag in ("cp311", "cp313"):
+                shutil.copyfile(mcp_requirements, static_root / f"mcp-wheelhouse-win-amd64-{tag}.txt")
             provenance_path = root / f"{wheel.name}.provenance.json"
             source_paths = [
                 repository / "build-toolchain.lock.json",
@@ -543,7 +654,7 @@ class DistributionScopeTests(unittest.TestCase):
                     wheel,
                     provenance_path,
                     mcp_wheelhouse,
-                    mcp_requirements,
+                    tokenizer_artifact,
                     output,
                     "test",
                     9,
@@ -581,12 +692,17 @@ class DistributionScopeTests(unittest.TestCase):
                         ["windows_x86_64", "linux_x86_64", "macos_arm64", "macos_x86_64"],
                         manifest["build"]["core_runtime_platforms"],
                     )
-                    self.assertEqual("CPython 3.12", manifest["build"]["mcp_runtime_python"])
+                    self.assertEqual(["3.11", "3.12", "3.13"], manifest["build"]["mcp_runtime_pythons"])
                     self.assertEqual("win_amd64", manifest["build"]["mcp_runtime_platform"])
                     self.assertEqual(
-                        hashlib.sha256(mcp_requirements.read_bytes()).hexdigest(),
+                        {version: hashlib.sha256(mcp_requirements.read_bytes()).hexdigest() for version in ("3.11", "3.12", "3.13")},
                         manifest["build"]["mcp_requirements_sha256"],
                     )
+                    for tag in ("cp311", "cp312", "cp313"):
+                        self.assertIn(f"provenance/mcp-wheelhouse-win-amd64-{tag}.txt", paths)
+                    self.assertEqual(tokenizer_artifact.read_bytes(), built.read(prefix + "tokenizer/o200k_base.json"))
+                    self.assertEqual(hashlib.sha256(tokenizer_artifact.read_bytes()).hexdigest(), manifest["build"]["tokenizer"]["sha256"])
+                    self.assertIn("provenance/tokenizer.json", paths)
 
                 second_output = root / "standardsforge-ready-test-second.zip"
                 build_distribution(
@@ -596,7 +712,7 @@ class DistributionScopeTests(unittest.TestCase):
                     wheel,
                     provenance_path,
                     mcp_wheelhouse,
-                    mcp_requirements,
+                    tokenizer_artifact,
                     second_output,
                     "test",
                     9,
@@ -618,6 +734,12 @@ class DistributionScopeTests(unittest.TestCase):
                         target_archive.writestr(info, payload)
                 with self.assertRaisesRegex(ValueError, "wheelhouse identity"):
                     _validate_built_distribution(tampered_output, prefix)
+
+                changed_tokenizer = root / "changed-tokenizer.json"
+                changed_tokenizer.write_bytes(tokenizer_artifact.read_bytes() + b" ")
+                with self.assertRaisesRegex(ValueError, "does not match its committed lock"):
+                    build_distribution(index_path, acquisition_path, outline_directory, wheel, provenance_path,
+                                       mcp_wheelhouse, changed_tokenizer, root / "rejected.zip", "test", 9)
 
                 with zipfile.ZipFile(output, "a") as built:
                     built.writestr(prefix + "unlisted.txt", "not inventoried")

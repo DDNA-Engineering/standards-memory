@@ -1,0 +1,3069 @@
+{
+ "suite": {
+  "suite_id": "mil-std-1472h-acoustic-noise-design-agent-self-review-2026-10",
+  "qualification": "bounded_real_document_regression",
+  "package_digest": "dca7e56307bf00a6ba8209312fd888be649d4453a8fa9468ea3e9981d7ccd408",
+  "edition_id": "dla:mil-std-ident:36903:composition:c66d36dbf80e317fbc5eed4ffac7247a1fec9e8c615a520d195ee5e90236e3f5",
+  "cases": [
+   {
+    "case_id": "review-1.1",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-d027ccdb5e830db95037ddcd"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-f5c93d654d9f55276c21715b"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-1.3",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-d668c8780e50ad9f82dd3710"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-f5c93d654d9f55276c21715b"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+      "Unless otherwise stated in specific provisions",
+      "for use b y both me n and wo men.",
+      "T his standard should be tailored by the Government as part of the\ncontract.",
+      "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+      "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.1",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-d7f7d11793deeace4fcf8fba"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-d7f7d11793deeace4fcf8fba",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-bad7b353e46599fa828c72e7",
+      "struct-524e9b96faa4a4c8b7164205"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-d7f7d11793deeace4fcf8fba",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "2c432f11bb780918d3b5eac18e1b32c60292a1d71fd9093405c9dc14f3e9b1d7"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "Apart from environmental considerations (such as annoyance to\nthe co mmunity at lar ge which lie outside the scope of this document)",
+      "T he acoustic al enviro nme nt shall not cause injur y, fatigue, interfere with voice or other audio\ncommunications, or degrade system effectiveness."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-d7f7d11793deeace4fcf8fba",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he acoustic al enviro nme nt",
+        "action": "cause injur y, fatigue, interfere with voice or other audio\ncommunications, or degrade system effectiveness",
+        "modality": "shall",
+        "polarity": "negative",
+        "exact_text": "T he acoustic al enviro nme nt shall not cause injur y, fatigue, interfere with voice or other audio\ncommunications, or degrade system effectiveness.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Apart from environmental considerations (such as annoyance to\nthe co mmunity at lar ge which lie outside the scope of this document)",
+         "span_indices": [
+          2,
+          3
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.2",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-bad7b353e46599fa828c72e7"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-bad7b353e46599fa828c72e7",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-d7f7d11793deeace4fcf8fba",
+      "struct-524e9b96faa4a4c8b7164205"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-bad7b353e46599fa828c72e7",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "56547364fa7c4f1d689d0ed14a0c8fab232b1497dfac8fe4752a097c91f86792"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "Equip me nt s hall not ge nerate noise in exce ss o f ma xi mum allo wable levels in\naccordance with MIL-ST D-1474."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-bad7b353e46599fa828c72e7",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Equip me nt",
+        "action": "ge nerate noise in exce ss o f ma xi mum allo wable levels",
+        "modality": "other",
+        "polarity": "negative",
+        "exact_text": "Equip me nt s hall not ge nerate noise in exce ss o f ma xi mum allo wable levels in\naccordance with MIL-ST D-1474.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.3/total-system-noise",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-7242c8b6c24f89b5aa0f7f01"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-7242c8b6c24f89b5aa0f7f01",
+      "struct-524e9b96faa4a4c8b7164205",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-5cd971251dba0988a1884376"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-7242c8b6c24f89b5aa0f7f01",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "4d2fe9cfca68ca7cea8f95b746860204d7df3e66ef661c4c29185753747f1eda"
+      },
+      {
+       "record_id": "struct-524e9b96faa4a4c8b7164205",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "70241c37ff002de9c20778ca06da88936226d5fb0b2b1b70b5f78dd9131f9dd7"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "T otal system noise shall be in accordance with MIL-STD-1474."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-7242c8b6c24f89b5aa0f7f01",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T otal system noise",
+        "action": "be in accordance with MIL-STD-1474",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T otal system noise shall be in accordance with MIL-STD-1474.",
+        "span_indices": [
+         0
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-524e9b96faa4a4c8b7164205",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.3/gfe-no-relief",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-5cd971251dba0988a1884376"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-5cd971251dba0988a1884376",
+      "struct-524e9b96faa4a4c8b7164205",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-7242c8b6c24f89b5aa0f7f01"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-5cd971251dba0988a1884376",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "8891c10a5c583974e887726479acc6068be5ad2ed76464fc640e9cfb8779b11c"
+      },
+      {
+       "record_id": "struct-524e9b96faa4a4c8b7164205",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "70241c37ff002de9c20778ca06da88936226d5fb0b2b1b70b5f78dd9131f9dd7"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "contributes to the overall noise may be Government-furni shed equip ment",
+      "T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment s hall not eliminate\nthe require me nt that the total syste m confor m to the criteria herein."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-5cd971251dba0988a1884376",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment",
+        "action": "eliminate\nthe require me nt that the total syste m confor m to the criteria herein",
+        "modality": "other",
+        "polarity": "negative",
+        "exact_text": "T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment s hall not eliminate\nthe require me nt that the total syste m confor m to the criteria herein.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "contributes to the overall noise may be Government-furni shed equip ment",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-524e9b96faa4a4c8b7164205",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.4.1",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-e059135e705ca14ee79fce04"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-e059135e705ca14ee79fce04",
+      "struct-e313e2d0659a84d45c8d1363",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-d970faf19bff9806f93fe4a8",
+      "struct-cbf18dd4648f2d5c40d1155e"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-e059135e705ca14ee79fce04",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "1e4ab01d001aa5d95c6c008f6fbb8b7bf02f222a73ac6283404da5ed1a7d1bbf"
+      },
+      {
+       "record_id": "struct-e313e2d0659a84d45c8d1363",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "fb484e8e1263858e77224b8257e1abc6ef0866f012e06aed98bcdb6574b222c3"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis",
+      "E nviro nme nt s and conditions i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis s hall be evaluated in accordance with MI L-ST D-1474 and the hearing conservation\npolicy o f the procuring activity."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-e059135e705ca14ee79fce04",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "E nviro nme nt s and conditions",
+        "action": "be evaluated in accordance with MI L-ST D-1474",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "E nviro nme nt s and conditions i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis s hall be evaluated in accordance with MI L-ST D-1474 and the hearing conservation\npolicy o f the procuring activity.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis",
+         "span_indices": [
+          0,
+          1,
+          2,
+          3
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.4.2",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-d970faf19bff9806f93fe4a8"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-d970faf19bff9806f93fe4a8",
+      "struct-e313e2d0659a84d45c8d1363",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-e059135e705ca14ee79fce04",
+      "struct-cbf18dd4648f2d5c40d1155e"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-d970faf19bff9806f93fe4a8",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "cfe3077cea11b1340fb83c3543b9388abfed330e69d9a769375767739652195f"
+      },
+      {
+       "record_id": "struct-e313e2d0659a84d45c8d1363",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "fb484e8e1263858e77224b8257e1abc6ef0866f012e06aed98bcdb6574b222c3"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "To reduce personnel noise exposure,",
+      "controls, displays, and workstations required to\nmo nitor equip ment sho uld be located in separate spaces that are acoustically isolated fro m the noise sources."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-d970faf19bff9806f93fe4a8",
+       "content_role": "prose",
+       "statement": {
+        "subject": "controls, displays, and workstations required to\nmo nitor equip ment",
+        "action": "be located in separate spaces",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "controls, displays, and workstations required to\nmo nitor equip ment sho uld be located in separate spaces that are acoustically isolated fro m the noise sources.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "To reduce personnel noise exposure,",
+         "span_indices": [
+          0
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.4.3.1/compatible-with-hearing-protection",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-c05da0a9a48dcf2538181fa2"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-c05da0a9a48dcf2538181fa2",
+      "struct-c48f2ae8660f27e9f27f4e80",
+      "struct-cbf18dd4648f2d5c40d1155e",
+      "struct-e313e2d0659a84d45c8d1363",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-73ac0278d1498447df79468d"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-c05da0a9a48dcf2538181fa2",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "9f1999be43c7827f9a732292532ea077326efeb7e40bc132f3aadb1e790f5233"
+      },
+      {
+       "record_id": "struct-c48f2ae8660f27e9f27f4e80",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "6c862863ba05a9cf244004746110b79976796e862f9948cc41a19319703196ad"
+      },
+      {
+       "record_id": "struct-cbf18dd4648f2d5c40d1155e",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "850bf37eccc185c1a34b8d95faa6fba08a282b51521c56daffa43d6c4b10a37d"
+      },
+      {
+       "record_id": "struct-e313e2d0659a84d45c8d1363",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "fb484e8e1263858e77224b8257e1abc6ef0866f012e06aed98bcdb6574b222c3"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "worn within the co ntext of  mission performance  and as specified by the procuring activity",
+      "T he system shall be co mpatible with personal hearing\nprotection worn within the co ntext of  mission performance  and as specified by the procuring activity (see 6.2)."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-c05da0a9a48dcf2538181fa2",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he system",
+        "action": "be co mpatible with personal hearing\nprotection",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T he system shall be co mpatible with personal hearing\nprotection worn within the co ntext of  mission performance  and as specified by the procuring activity (see 6.2).",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "worn within the co ntext of  mission performance  and as specified by the procuring activity",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-c48f2ae8660f27e9f27f4e80",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.4.3.1/accommodate-wearing",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-73ac0278d1498447df79468d"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-73ac0278d1498447df79468d",
+      "struct-c48f2ae8660f27e9f27f4e80",
+      "struct-cbf18dd4648f2d5c40d1155e",
+      "struct-e313e2d0659a84d45c8d1363",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-c05da0a9a48dcf2538181fa2"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-73ac0278d1498447df79468d",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "7e0f5fbf93adcbf0ab01f634b17fa9974e8176ba3f1dbe63beb93fa203a05108"
+      },
+      {
+       "record_id": "struct-c48f2ae8660f27e9f27f4e80",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "6c862863ba05a9cf244004746110b79976796e862f9948cc41a19319703196ad"
+      },
+      {
+       "record_id": "struct-cbf18dd4648f2d5c40d1155e",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "850bf37eccc185c1a34b8d95faa6fba08a282b51521c56daffa43d6c4b10a37d"
+      },
+      {
+       "record_id": "struct-e313e2d0659a84d45c8d1363",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "fb484e8e1263858e77224b8257e1abc6ef0866f012e06aed98bcdb6574b222c3"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "If\npersonal hearing protection devices are authorized for the design,",
+      "within the co ntext of mission activities.",
+      "If\npersonal hearing protection devices are authorized for the design, the system design shall accommodate the wearing\no f personal hearing protection devices within the co ntext of mission activities."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-73ac0278d1498447df79468d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "the system design",
+        "action": "accommodate the wearing",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "If\npersonal hearing protection devices are authorized for the design, the system design shall accommodate the wearing\no f personal hearing protection devices within the co ntext of mission activities.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "If\npersonal hearing protection devices are authorized for the design,",
+         "span_indices": [
+          0,
+          1
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "within the co ntext of mission activities.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-c48f2ae8660f27e9f27f4e80",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.4.3.2",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-8db6be08b02fb27642fed193"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-8db6be08b02fb27642fed193",
+      "struct-cbf18dd4648f2d5c40d1155e",
+      "struct-e313e2d0659a84d45c8d1363",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-c48f2ae8660f27e9f27f4e80",
+      "struct-c39e50ac824f7e2ffcfc5002"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-8db6be08b02fb27642fed193",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "af8cacef1b52d62c7d58465d1c9ee5ccc67536e118d571c381c0995d7a770aca"
+      },
+      {
+       "record_id": "struct-cbf18dd4648f2d5c40d1155e",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "850bf37eccc185c1a34b8d95faa6fba08a282b51521c56daffa43d6c4b10a37d"
+      },
+      {
+       "record_id": "struct-e313e2d0659a84d45c8d1363",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "fb484e8e1263858e77224b8257e1abc6ef0866f012e06aed98bcdb6574b222c3"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+      "Personal heari\nng protection devices shall reduce noise at\nthe ear reference point to a\nno n-\nhazardous level in accordance with s\ner vice polic y."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-8db6be08b02fb27642fed193",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Personal heari\nng protection devices",
+        "action": "reduce noise at\nthe ear reference point",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Personal heari\nng protection devices shall reduce noise at\nthe ear reference point to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3,
+         4,
+         5
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "acceptance_criterion",
+         "exact_text": "to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+         "span_indices": [
+          2,
+          3,
+          4,
+          5
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.4.3.3",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-c39e50ac824f7e2ffcfc5002"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-c39e50ac824f7e2ffcfc5002",
+      "struct-cbf18dd4648f2d5c40d1155e",
+      "struct-e313e2d0659a84d45c8d1363",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-c48f2ae8660f27e9f27f4e80",
+      "struct-8db6be08b02fb27642fed193"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-c39e50ac824f7e2ffcfc5002",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "e5f1f8ca6a5659d608bd8dbb9bff36b5b4bc226503e60ba0670fc94cf25c1b58"
+      },
+      {
+       "record_id": "struct-cbf18dd4648f2d5c40d1155e",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "850bf37eccc185c1a34b8d95faa6fba08a282b51521c56daffa43d6c4b10a37d"
+      },
+      {
+       "record_id": "struct-e313e2d0659a84d45c8d1363",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "fb484e8e1263858e77224b8257e1abc6ef0866f012e06aed98bcdb6574b222c3"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "T he selection of hearing protection shall be based on noise level,\nduration of expos ure, and mission requirements (such as co mmunicatio ns, so und localization, and co mfort)."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-c39e50ac824f7e2ffcfc5002",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he selection of hearing protection",
+        "action": "be based on noise level",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T he selection of hearing protection shall be based on noise level,\nduration of expos ure, and mission requirements (such as co mmunicatio ns, so und localization, and co mfort).",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.4.3.4.1",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-66a3ce6ca098ac844e5f1c43"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-66a3ce6ca098ac844e5f1c43",
+      "struct-b1485953193f91f14f5265aa",
+      "struct-cbf18dd4648f2d5c40d1155e",
+      "struct-e313e2d0659a84d45c8d1363",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-9eb5d0c3e47702accf1ceb82"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-66a3ce6ca098ac844e5f1c43",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "4ad297e82dce9c204b5c54d2935f545ba02672ac3f7908ae1c16e6481eda6812"
+      },
+      {
+       "record_id": "struct-b1485953193f91f14f5265aa",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "1424c5be9736816d19b5d7a1c5f48a312ca7bb01096e5231df9428864eab56c5"
+      },
+      {
+       "record_id": "struct-cbf18dd4648f2d5c40d1155e",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "850bf37eccc185c1a34b8d95faa6fba08a282b51521c56daffa43d6c4b10a37d"
+      },
+      {
+       "record_id": "struct-e313e2d0659a84d45c8d1363",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "fb484e8e1263858e77224b8257e1abc6ef0866f012e06aed98bcdb6574b222c3"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "if their noise reduction properties have been characterized in accor dance with the same\nstandards used to characterize hearing protectors.",
+      "Co mmunicat ion hea dsets, incl uding t hose ha vi ng active noi se\ncancelling, may be used if their noise reduction properties have been characterized in accor dance with the same\nstandards used to characterize hearing protectors."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-66a3ce6ca098ac844e5f1c43",
+       "content_role": "governing_condition",
+       "statement": {
+        "subject": "Co mmunicat ion hea dsets",
+        "action": "be used",
+        "modality": "may",
+        "polarity": "affirmative",
+        "exact_text": "Co mmunicat ion hea dsets, incl uding t hose ha vi ng active noi se\ncancelling, may be used if their noise reduction properties have been characterized in accor dance with the same\nstandards used to characterize hearing protectors.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "if their noise reduction properties have been characterized in accor dance with the same\nstandards used to characterize hearing protectors.",
+         "span_indices": [
+          2,
+          3
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-5.5.4.4.3.4.2",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-9eb5d0c3e47702accf1ceb82"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-9eb5d0c3e47702accf1ceb82",
+      "struct-b1485953193f91f14f5265aa",
+      "struct-cbf18dd4648f2d5c40d1155e",
+      "struct-e313e2d0659a84d45c8d1363",
+      "struct-f5c93d654d9f55276c21715b",
+      "struct-d668c8780e50ad9f82dd3710",
+      "struct-d027ccdb5e830db95037ddcd"
+     ],
+     "forbidden_record_ids": [
+      "struct-66a3ce6ca098ac844e5f1c43"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-9eb5d0c3e47702accf1ceb82",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "1fa013ff2567b76df664a5f3228ded36ee015026da992e8da8fd4709fcf2d53e"
+      },
+      {
+       "record_id": "struct-b1485953193f91f14f5265aa",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "1424c5be9736816d19b5d7a1c5f48a312ca7bb01096e5231df9428864eab56c5"
+      },
+      {
+       "record_id": "struct-cbf18dd4648f2d5c40d1155e",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "850bf37eccc185c1a34b8d95faa6fba08a282b51521c56daffa43d6c4b10a37d"
+      },
+      {
+       "record_id": "struct-e313e2d0659a84d45c8d1363",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "fb484e8e1263858e77224b8257e1abc6ef0866f012e06aed98bcdb6574b222c3"
+      },
+      {
+       "record_id": "struct-f5c93d654d9f55276c21715b",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bba3c4d988109621b28fda19f36bbcd42a14dee17b39dd16b578c3219a12c0d3"
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "bc21b161d96adac7e3dee4bc7df0e26f55a8bf29a9c34446179b48608cb41d59"
+      }
+     ],
+     "critical_facts": [
+      "Where both earplugs and co mmunicatio ns are required,",
+      "communication signal must be able to pass through earplugs\n."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-9eb5d0c3e47702accf1ceb82",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "communication signal",
+        "action": "be able to pass through earplugs",
+        "modality": "must",
+        "polarity": "affirmative",
+        "exact_text": "communication signal must be able to pass through earplugs\n.",
+        "span_indices": [
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "Where both earplugs and co mmunicatio ns are required,",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "is applicable to the design of all syste ms",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard is applicable to the design of all syste ms, subsyste ms, equipme nt, a nd facilities,\nexcept where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "except where provisio ns relating to aircraft design conflict with crew system design requirements or guidelines o f\nJSSG-2010.",
+         "span_indices": [
+          2,
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Unless otherwise stated in specific provisions",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "source_applicability",
+         "exact_text": "for use b y both me n and wo men.",
+         "span_indices": [
+          4
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "T his standard should be tailored by the Government as part of the\ncontract.",
+         "span_indices": [
+          6,
+          7
+         ]
+        },
+        {
+         "kind": "tailoring_instruction",
+         "exact_text": "If it is not tailored by the Go vernme nt, the contractor should deter mine any appropriate tailoring for the\napplicability to the syste m a nd recomme nd tailoring to the G overnment for approval.",
+         "span_indices": [
+          7,
+          8
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-d027ccdb5e830db95037ddcd",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "T his standard",
+        "action": "esta blishe s ge neral human e ngine ering design criteria",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "T his standard esta blishe s ge neral human e ngine ering design criteria for milita ry syste ms,\nsubsyste ms, equip me nt, a nd fa cilities.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-5.5.4",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "5.5.4",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-d7f7d11793deeace4fcf8fba",
+      "struct-bad7b353e46599fa828c72e7",
+      "struct-7242c8b6c24f89b5aa0f7f01",
+      "struct-5cd971251dba0988a1884376",
+      "struct-e059135e705ca14ee79fce04",
+      "struct-c05da0a9a48dcf2538181fa2",
+      "struct-73ac0278d1498447df79468d",
+      "struct-8db6be08b02fb27642fed193",
+      "struct-c39e50ac824f7e2ffcfc5002",
+      "struct-9eb5d0c3e47702accf1ceb82"
+     ],
+     "forbidden_record_ids": [],
+     "citations": [
+      {
+       "record_id": "struct-d7f7d11793deeace4fcf8fba",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "2c432f11bb780918d3b5eac18e1b32c60292a1d71fd9093405c9dc14f3e9b1d7"
+      },
+      {
+       "record_id": "struct-bad7b353e46599fa828c72e7",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "56547364fa7c4f1d689d0ed14a0c8fab232b1497dfac8fe4752a097c91f86792"
+      },
+      {
+       "record_id": "struct-7242c8b6c24f89b5aa0f7f01",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "4d2fe9cfca68ca7cea8f95b746860204d7df3e66ef661c4c29185753747f1eda"
+      },
+      {
+       "record_id": "struct-5cd971251dba0988a1884376",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "8891c10a5c583974e887726479acc6068be5ad2ed76464fc640e9cfb8779b11c"
+      },
+      {
+       "record_id": "struct-e059135e705ca14ee79fce04",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "1e4ab01d001aa5d95c6c008f6fbb8b7bf02f222a73ac6283404da5ed1a7d1bbf"
+      },
+      {
+       "record_id": "struct-c05da0a9a48dcf2538181fa2",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "9f1999be43c7827f9a732292532ea077326efeb7e40bc132f3aadb1e790f5233"
+      },
+      {
+       "record_id": "struct-73ac0278d1498447df79468d",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "7e0f5fbf93adcbf0ab01f634b17fa9974e8176ba3f1dbe63beb93fa203a05108"
+      },
+      {
+       "record_id": "struct-8db6be08b02fb27642fed193",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "af8cacef1b52d62c7d58465d1c9ee5ccc67536e118d571c381c0995d7a770aca"
+      },
+      {
+       "record_id": "struct-c39e50ac824f7e2ffcfc5002",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "e5f1f8ca6a5659d608bd8dbb9bff36b5b4bc226503e60ba0670fc94cf25c1b58"
+      },
+      {
+       "record_id": "struct-9eb5d0c3e47702accf1ceb82",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "1fa013ff2567b76df664a5f3228ded36ee015026da992e8da8fd4709fcf2d53e"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-d7f7d11793deeace4fcf8fba",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he acoustic al enviro nme nt",
+        "action": "cause injur y, fatigue, interfere with voice or other audio\ncommunications, or degrade system effectiveness",
+        "modality": "shall",
+        "polarity": "negative",
+        "exact_text": "T he acoustic al enviro nme nt shall not cause injur y, fatigue, interfere with voice or other audio\ncommunications, or degrade system effectiveness.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Apart from environmental considerations (such as annoyance to\nthe co mmunity at lar ge which lie outside the scope of this document)",
+         "span_indices": [
+          2,
+          3
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-bad7b353e46599fa828c72e7",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Equip me nt",
+        "action": "ge nerate noise in exce ss o f ma xi mum allo wable levels",
+        "modality": "other",
+        "polarity": "negative",
+        "exact_text": "Equip me nt s hall not ge nerate noise in exce ss o f ma xi mum allo wable levels in\naccordance with MIL-ST D-1474.",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-7242c8b6c24f89b5aa0f7f01",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T otal system noise",
+        "action": "be in accordance with MIL-STD-1474",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T otal system noise shall be in accordance with MIL-STD-1474.",
+        "span_indices": [
+         0
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5cd971251dba0988a1884376",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment",
+        "action": "eliminate\nthe require me nt that the total syste m confor m to the criteria herein",
+        "modality": "other",
+        "polarity": "negative",
+        "exact_text": "T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment s hall not eliminate\nthe require me nt that the total syste m confor m to the criteria herein.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "contributes to the overall noise may be Government-furni shed equip ment",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-e059135e705ca14ee79fce04",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "E nviro nme nt s and conditions",
+        "action": "be evaluated in accordance with MI L-ST D-1474",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "E nviro nme nt s and conditions i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis s hall be evaluated in accordance with MI L-ST D-1474 and the hearing conservation\npolicy o f the procuring activity.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis",
+         "span_indices": [
+          0,
+          1,
+          2,
+          3
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-c05da0a9a48dcf2538181fa2",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he system",
+        "action": "be co mpatible with personal hearing\nprotection",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T he system shall be co mpatible with personal hearing\nprotection worn within the co ntext of  mission performance  and as specified by the procuring activity (see 6.2).",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "worn within the co ntext of  mission performance  and as specified by the procuring activity",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-73ac0278d1498447df79468d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "the system design",
+        "action": "accommodate the wearing",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "If\npersonal hearing protection devices are authorized for the design, the system design shall accommodate the wearing\no f personal hearing protection devices within the co ntext of mission activities.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "If\npersonal hearing protection devices are authorized for the design,",
+         "span_indices": [
+          0,
+          1
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "within the co ntext of mission activities.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-8db6be08b02fb27642fed193",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Personal heari\nng protection devices",
+        "action": "reduce noise at\nthe ear reference point",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Personal heari\nng protection devices shall reduce noise at\nthe ear reference point to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3,
+         4,
+         5
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "acceptance_criterion",
+         "exact_text": "to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+         "span_indices": [
+          2,
+          3,
+          4,
+          5
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-c39e50ac824f7e2ffcfc5002",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he selection of hearing protection",
+        "action": "be based on noise level",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T he selection of hearing protection shall be based on noise level,\nduration of expos ure, and mission requirements (such as co mmunicatio ns, so und localization, and co mfort).",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-9eb5d0c3e47702accf1ceb82",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "communication signal",
+        "action": "be able to pass through earplugs",
+        "modality": "must",
+        "polarity": "affirmative",
+        "exact_text": "communication signal must be able to pass through earplugs\n.",
+        "span_indices": [
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "Where both earplugs and co mmunicatio ns are required,",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-5.5.4.3",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "5.5.4.3",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-7242c8b6c24f89b5aa0f7f01",
+      "struct-5cd971251dba0988a1884376"
+     ],
+     "forbidden_record_ids": [
+      "struct-d7f7d11793deeace4fcf8fba",
+      "struct-bad7b353e46599fa828c72e7",
+      "struct-e059135e705ca14ee79fce04"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-7242c8b6c24f89b5aa0f7f01",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "4d2fe9cfca68ca7cea8f95b746860204d7df3e66ef661c4c29185753747f1eda"
+      },
+      {
+       "record_id": "struct-5cd971251dba0988a1884376",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "8891c10a5c583974e887726479acc6068be5ad2ed76464fc640e9cfb8779b11c"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-7242c8b6c24f89b5aa0f7f01",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T otal system noise",
+        "action": "be in accordance with MIL-STD-1474",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T otal system noise shall be in accordance with MIL-STD-1474.",
+        "span_indices": [
+         0
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5cd971251dba0988a1884376",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment",
+        "action": "eliminate\nthe require me nt that the total syste m confor m to the criteria herein",
+        "modality": "other",
+        "polarity": "negative",
+        "exact_text": "T he fact\nthat a co mpone nt t hat\ncontributes to the overall noise may be Government-furni shed equip ment s hall not eliminate\nthe require me nt that the total syste m confor m to the criteria herein.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "contributes to the overall noise may be Government-furni shed equip ment",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-5.5.4.4",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "5.5.4.4",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-e059135e705ca14ee79fce04",
+      "struct-c05da0a9a48dcf2538181fa2",
+      "struct-73ac0278d1498447df79468d",
+      "struct-8db6be08b02fb27642fed193",
+      "struct-c39e50ac824f7e2ffcfc5002",
+      "struct-9eb5d0c3e47702accf1ceb82"
+     ],
+     "forbidden_record_ids": [
+      "struct-d7f7d11793deeace4fcf8fba",
+      "struct-bad7b353e46599fa828c72e7",
+      "struct-7242c8b6c24f89b5aa0f7f01"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-e059135e705ca14ee79fce04",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "1e4ab01d001aa5d95c6c008f6fbb8b7bf02f222a73ac6283404da5ed1a7d1bbf"
+      },
+      {
+       "record_id": "struct-c05da0a9a48dcf2538181fa2",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "9f1999be43c7827f9a732292532ea077326efeb7e40bc132f3aadb1e790f5233"
+      },
+      {
+       "record_id": "struct-73ac0278d1498447df79468d",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "7e0f5fbf93adcbf0ab01f634b17fa9974e8176ba3f1dbe63beb93fa203a05108"
+      },
+      {
+       "record_id": "struct-8db6be08b02fb27642fed193",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "af8cacef1b52d62c7d58465d1c9ee5ccc67536e118d571c381c0995d7a770aca"
+      },
+      {
+       "record_id": "struct-c39e50ac824f7e2ffcfc5002",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "e5f1f8ca6a5659d608bd8dbb9bff36b5b4bc226503e60ba0670fc94cf25c1b58"
+      },
+      {
+       "record_id": "struct-9eb5d0c3e47702accf1ceb82",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "1fa013ff2567b76df664a5f3228ded36ee015026da992e8da8fd4709fcf2d53e"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-e059135e705ca14ee79fce04",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "E nviro nme nt s and conditions",
+        "action": "be evaluated in accordance with MI L-ST D-1474",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "E nviro nme nt s and conditions i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis s hall be evaluated in accordance with MI L-ST D-1474 and the hearing conservation\npolicy o f the procuring activity.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "i n whic h SP Ls eq ual or exceed\n85 dBA and 140\ndBP\neven on a n i nter mittent basis",
+         "span_indices": [
+          0,
+          1,
+          2,
+          3
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-c05da0a9a48dcf2538181fa2",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he system",
+        "action": "be co mpatible with personal hearing\nprotection",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T he system shall be co mpatible with personal hearing\nprotection worn within the co ntext of  mission performance  and as specified by the procuring activity (see 6.2).",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "worn within the co ntext of  mission performance  and as specified by the procuring activity",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-73ac0278d1498447df79468d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "the system design",
+        "action": "accommodate the wearing",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "If\npersonal hearing protection devices are authorized for the design, the system design shall accommodate the wearing\no f personal hearing protection devices within the co ntext of mission activities.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "If\npersonal hearing protection devices are authorized for the design,",
+         "span_indices": [
+          0,
+          1
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "within the co ntext of mission activities.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-8db6be08b02fb27642fed193",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Personal heari\nng protection devices",
+        "action": "reduce noise at\nthe ear reference point",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Personal heari\nng protection devices shall reduce noise at\nthe ear reference point to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3,
+         4,
+         5
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "acceptance_criterion",
+         "exact_text": "to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+         "span_indices": [
+          2,
+          3,
+          4,
+          5
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-c39e50ac824f7e2ffcfc5002",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he selection of hearing protection",
+        "action": "be based on noise level",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T he selection of hearing protection shall be based on noise level,\nduration of expos ure, and mission requirements (such as co mmunicatio ns, so und localization, and co mfort).",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-9eb5d0c3e47702accf1ceb82",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "communication signal",
+        "action": "be able to pass through earplugs",
+        "modality": "must",
+        "polarity": "affirmative",
+        "exact_text": "communication signal must be able to pass through earplugs\n.",
+        "span_indices": [
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "Where both earplugs and co mmunicatio ns are required,",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-5.5.4.4.3",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "5.5.4.4.3",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-c05da0a9a48dcf2538181fa2",
+      "struct-73ac0278d1498447df79468d",
+      "struct-8db6be08b02fb27642fed193",
+      "struct-c39e50ac824f7e2ffcfc5002",
+      "struct-9eb5d0c3e47702accf1ceb82"
+     ],
+     "forbidden_record_ids": [
+      "struct-d7f7d11793deeace4fcf8fba",
+      "struct-bad7b353e46599fa828c72e7",
+      "struct-7242c8b6c24f89b5aa0f7f01"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-c05da0a9a48dcf2538181fa2",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "9f1999be43c7827f9a732292532ea077326efeb7e40bc132f3aadb1e790f5233"
+      },
+      {
+       "record_id": "struct-73ac0278d1498447df79468d",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "7e0f5fbf93adcbf0ab01f634b17fa9974e8176ba3f1dbe63beb93fa203a05108"
+      },
+      {
+       "record_id": "struct-8db6be08b02fb27642fed193",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "af8cacef1b52d62c7d58465d1c9ee5ccc67536e118d571c381c0995d7a770aca"
+      },
+      {
+       "record_id": "struct-c39e50ac824f7e2ffcfc5002",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "e5f1f8ca6a5659d608bd8dbb9bff36b5b4bc226503e60ba0670fc94cf25c1b58"
+      },
+      {
+       "record_id": "struct-9eb5d0c3e47702accf1ceb82",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "1fa013ff2567b76df664a5f3228ded36ee015026da992e8da8fd4709fcf2d53e"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-c05da0a9a48dcf2538181fa2",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he system",
+        "action": "be co mpatible with personal hearing\nprotection",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T he system shall be co mpatible with personal hearing\nprotection worn within the co ntext of  mission performance  and as specified by the procuring activity (see 6.2).",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "worn within the co ntext of  mission performance  and as specified by the procuring activity",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-73ac0278d1498447df79468d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "the system design",
+        "action": "accommodate the wearing",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "If\npersonal hearing protection devices are authorized for the design, the system design shall accommodate the wearing\no f personal hearing protection devices within the co ntext of mission activities.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "If\npersonal hearing protection devices are authorized for the design,",
+         "span_indices": [
+          0,
+          1
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "within the co ntext of mission activities.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-8db6be08b02fb27642fed193",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Personal heari\nng protection devices",
+        "action": "reduce noise at\nthe ear reference point",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Personal heari\nng protection devices shall reduce noise at\nthe ear reference point to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3,
+         4,
+         5
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "acceptance_criterion",
+         "exact_text": "to a\nno n-\nhazardous level in accordance with s\ner vice polic y.",
+         "span_indices": [
+          2,
+          3,
+          4,
+          5
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-c39e50ac824f7e2ffcfc5002",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he selection of hearing protection",
+        "action": "be based on noise level",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T he selection of hearing protection shall be based on noise level,\nduration of expos ure, and mission requirements (such as co mmunicatio ns, so und localization, and co mfort).",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-9eb5d0c3e47702accf1ceb82",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "communication signal",
+        "action": "be able to pass through earplugs",
+        "modality": "must",
+        "polarity": "affirmative",
+        "exact_text": "communication signal must be able to pass through earplugs\n.",
+        "span_indices": [
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "Where both earplugs and co mmunicatio ns are required,",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-5.5.4.4.3.1",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "5.5.4.4.3.1",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-c05da0a9a48dcf2538181fa2",
+      "struct-73ac0278d1498447df79468d"
+     ],
+     "forbidden_record_ids": [
+      "struct-d7f7d11793deeace4fcf8fba",
+      "struct-bad7b353e46599fa828c72e7",
+      "struct-7242c8b6c24f89b5aa0f7f01"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-c05da0a9a48dcf2538181fa2",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "9f1999be43c7827f9a732292532ea077326efeb7e40bc132f3aadb1e790f5233"
+      },
+      {
+       "record_id": "struct-73ac0278d1498447df79468d",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "7e0f5fbf93adcbf0ab01f634b17fa9974e8176ba3f1dbe63beb93fa203a05108"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-c05da0a9a48dcf2538181fa2",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "T he system",
+        "action": "be co mpatible with personal hearing\nprotection",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "T he system shall be co mpatible with personal hearing\nprotection worn within the co ntext of  mission performance  and as specified by the procuring activity (see 6.2).",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "worn within the co ntext of  mission performance  and as specified by the procuring activity",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-73ac0278d1498447df79468d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "the system design",
+        "action": "accommodate the wearing",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "If\npersonal hearing protection devices are authorized for the design, the system design shall accommodate the wearing\no f personal hearing protection devices within the co ntext of mission activities.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "If\npersonal hearing protection devices are authorized for the design,",
+         "span_indices": [
+          0,
+          1
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "within the co ntext of mission activities.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "search-earplugs",
+    "operation": "search",
+    "request": {
+     "query": "earplugs",
+     "query_mode": "all_terms",
+     "limit": 20
+    },
+    "expected": {
+     "record_ids": [
+      "struct-9eb5d0c3e47702accf1ceb82"
+     ],
+     "forbidden_record_ids": [],
+     "citations": [
+      {
+       "record_id": "struct-9eb5d0c3e47702accf1ceb82",
+       "page": 182,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "1fa013ff2567b76df664a5f3228ded36ee015026da992e8da8fd4709fcf2d53e"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": null
+    }
+   },
+   {
+    "case_id": "search-crew-system-conflict",
+    "operation": "search",
+    "request": {
+     "query": "aircraft design conflict crew",
+     "query_mode": "all_terms",
+     "limit": 20
+    },
+    "expected": {
+     "record_ids": [
+      "struct-d668c8780e50ad9f82dd3710"
+     ],
+     "forbidden_record_ids": [],
+     "citations": [
+      {
+       "record_id": "struct-d668c8780e50ad9f82dd3710",
+       "page": 18,
+       "source_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090",
+       "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": null
+    }
+   }
+  ]
+ },
+ "review": {
+  "kind": "agent",
+  "identity": "Claude Code agent self-review (independence_claim: self_review): the same agent authored the review annotations and these expectations from them; no human review or independent adjudication",
+  "reviewed_at": "2026-10-09T00:00:00Z",
+  "suite_sha256": "54d6d112cf75b3f8750be5514df9b0fac892a86e6122e238def5d69052b8267d"
+ }
+}

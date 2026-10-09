@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "standardsforge"
-version = "0.1.0a7"
+version = "0.1.0a8"
 description = "Offline-first standards pack compiler and evidence engine"
 readme = "README.md"
 license = "Apache-2.0"
@@ -18,7 +18,8 @@ classifiers = [
   "Operating System :: POSIX :: Linux",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12"
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13"
 ]
 
 [project.urls]

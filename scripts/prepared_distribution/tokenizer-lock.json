@@ -1,0 +1,7 @@
+{
+  "acquisition": "standardsforge export-tokenizer o200k_base <destination> with tiktoken==0.14.0; output is canonical JSON and reproduced byte-identically by two independent exports",
+  "bytes": 4414372,
+  "encoding": "o200k_base",
+  "implementation": "tiktoken==0.14.0",
+  "sha256": "6c41d106375d7d241ee4fef5775478e49263a1719f5b9e623b4fd75cc8178dd2"
+}

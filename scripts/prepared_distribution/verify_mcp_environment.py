@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 
 
+BOOTSTRAP_PACKAGES = {"pip", "setuptools"}
 LOCK_PATTERN = re.compile(
     r"^(?P<name>[A-Za-z0-9_.-]+)==(?P<version>[^\s]+) --hash=sha256:[0-9a-f]{64}$"
 )
@@ -51,7 +52,9 @@ def verify_environment(
         for name, version in expected.items()
         if observed.get(name) != version
     }
-    extras = sorted(set(observed) - set(expected) - {"pip"})
+    # venv bootstraps pip (and, on CPython 3.11, setuptools) from the interpreter's own
+    # ensurepip with package indexes disabled; they are not part of the runtime lock.
+    extras = sorted(set(observed) - set(expected) - BOOTSTRAP_PACKAGES)
     if missing_or_wrong or extras:
         raise RuntimeError(
             f"The prepared environment differs from its exact runtime lock; "

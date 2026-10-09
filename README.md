@@ -6,55 +6,55 @@
 
 **Defense engineering standards, ready for offline search.**
 
-Search a precompiled MIL-STD library from your terminal or model host. The **441-package release** preserves exact source evidence, edition identities, and review status in a local library.
+Search a precompiled MIL-STD library from your terminal or model host. The **447-package release** preserves exact source evidence, edition identities, and review status in a local library.
 
-[![Release: 0.1.0a7 alpha](https://img.shields.io/badge/release-0.1.0a7_alpha-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a7)
+[![Release: 0.1.0a8 alpha](https://img.shields.io/badge/release-0.1.0a8_alpha-253247?style=flat-square)](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a8)
 [![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square)](pyproject.toml)
 [![Queries: offline](https://img.shields.io/badge/queries-offline-253247?style=flat-square)](docs/wiki/ARCHITECTURE_AND_TRUST.md)
-[![Library: 441 packages](https://img.shields.io/badge/library-441_packages-EA6A23?style=flat-square)](#what-is-included)
+[![Library: 447 packages](https://img.shields.io/badge/library-447_packages-EA6A23?style=flat-square)](#what-is-included)
 
-[Download library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a7/standardsforge-ready-0.1.0a7.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a7/standardsforge-ready-0.1.0a7.zip.sha256) · [Install CLI](#install-the-code-cli-only) · [Release evidence](docs/RELEASE_0.1.0a7.md) · [Documentation](docs/wiki/README.md)
+[Download library](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a8/standardsforge-ready-0.1.0a8.zip) · [SHA-256](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a8/standardsforge-ready-0.1.0a8.zip.sha256) · [Install CLI](#install-the-code-cli-only) · [Release evidence](docs/RELEASE_0.1.0a8.md) · [Documentation](docs/wiki/README.md)
 
 </div>
 
 ---
 
-The a7 runtime includes **eleven read-only model tools**, including original PDF delivery, structural browsing, evidence selection and reviewed-reference navigation. The prepared library retains the qualified 441-package source baseline. See [knowledge access](docs/KNOWLEDGE_ACCESS.md) for representation and coverage limits.
+The runtime includes **eleven read-only model tools**, including original PDF delivery, structural browsing, evidence selection and reviewed-reference navigation. The a8 library keeps the qualified 441-package source baseline and adds six bounded, **agent-reviewed** requirement scopes (MIL-STD-882E, 461H, 464D, 704F, 1474E and 1472H) with 23 reviewed cross-standard references. See [knowledge access](docs/KNOWLEDGE_ACCESS.md) for representation and coverage limits.
 
-**Prepared-install limitation:** the prepared a7 launcher configures no reviewed reference bindings or tokenizer, and none are bundled. There, `follow_references` returns `reference_bindings_not_configured` and `select_evidence` token budgets return `tokenizer_unavailable`; byte budgets work. See [known limitations](docs/RELEASE_0.1.0a7.md#known-limitations).
+**Review status:** the six reviewed scopes are agent self-review of extracted page text, not human or independent review, and they cover 40,830 of 7,289,021 text bytes in those six documents. Everything else remains unreviewed page text or automated outline. Reviewed references resolve only between those scopes; other citations are reported as unresolved. See the [review record](docs/AGENT_REVIEW_2026-10.md).
 
 <a id="use-the-prepared-library-with-your-model"></a>
 
 ## Install and connect your model
 
-1. Download and extract [StandardsForge ready 0.1.0a7](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a7/standardsforge-ready-0.1.0a7.zip) to a permanent folder.
+1. Download and extract [StandardsForge ready 0.1.0a8](https://github.com/DDNA-Engineering/standards-memory/releases/download/v0.1.0a8/standardsforge-ready-0.1.0a8.zip) to a permanent folder.
 2. Run setup below. It installs the already-compiled library and checks the model connection.
-3. Copy the generated configuration into your model host and restart its MCP connection.
+3. Add `--connect <host>` to let setup add StandardsForge to your model host, or copy the generated configuration yourself. Restart the host.
 
-No Git clone, standards download, PDF compilation or manual database paths are needed. Allow several minutes for the first local indexing pass and enough disk space for the approximately **1.08 GB download**, extracted packs and installed library.
+No Git clone, standards download, PDF compilation or manual database paths are needed. Allow a few minutes for the first local indexing pass and about **4 GB of free disk space**: the 1.1 GB download, 1.1 GB extracted and about 1.9 GB for the local index and Python environment. You can delete the ZIP after extracting. Setup checks the space before it starts.
 
-**Windows — install 64-bit [Python 3.12](https://www.python.org/downloads/) with the Python launcher, then double-click `setup.cmd`.** Everything needed for the library and MCP is bundled for this profile. Terminal equivalent:
+**Windows — install 64-bit [Python](https://www.python.org/downloads/) 3.11, 3.12 or 3.13 with the Python launcher, then double-click `setup.cmd`.** Everything needed for the library and MCP is bundled for these versions. Terminal equivalent, here also connecting Claude Desktop:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1 --connect claude-desktop
 ```
 
 **Linux or macOS — install Python 3.11+ with `venv`, open a terminal in the extracted folder, then run:**
 
 ```sh
-sh ./setup.sh --mcp-online
+sh ./setup.sh --mcp-online --connect cursor
 ```
 
-This option explicitly downloads MCP dependencies. Standards content and core code come from the archive; queries run locally. On Debian/Ubuntu, install `python3-venv` if Python reports that `ensurepip` is unavailable. See [platform requirements](docs/wiki/PREPARED_LIBRARY.md#requirements).
+`--mcp-online` explicitly downloads MCP dependencies. Standards content and core code come from the archive; queries run locally. On Debian/Ubuntu, install `python3-venv` if Python reports that `ensurepip` is unavailable. See [platform requirements](docs/wiki/PREPARED_LIBRARY.md#requirements).
 
-Setup prints the paths to these ready-to-copy files, with your actual installation paths already filled in:
+`--connect` accepts `claude-desktop`, `cursor` or `codex` and can be repeated. Setup keeps a byte-exact backup of the host file, changes only the `standardsforge` entry, and leaves files it cannot safely rewrite untouched. Without `--connect`, setup never edits host settings. Either way it writes ready-to-copy files with your actual paths:
 
 | Model host | Generated configuration |
 |---|---|
 | Claude Desktop or Cursor | `.standardsforge/mcp-config.json` — merge its `standardsforge` entry into the host's `mcpServers` configuration |
 | Codex | `.standardsforge/codex-mcp.toml` — append its section to your Codex `config.toml` |
 
-Keep your other server entries. [Host locations and CLI registration commands](docs/wiki/MODEL_INTEGRATION.md#connect-your-model-host) are in the integration guide. Setup does not edit host settings for you.
+[Host locations, `--host-config` and CLI registration commands](docs/wiki/MODEL_INTEGRATION.md#connect-your-model-host) are in the integration guide. Don't add your own files to the library folder; setup names any file that is not part of the release. Files that Finder or Explorer create on their own are ignored.
 
 Try: “List the installed MIL-STD-810 editions, find the low-pressure section, and retrieve its exact evidence with the original PDF, source pages and coverage limits.”
 
@@ -69,33 +69,34 @@ python setup.py
 python run.py search "environmental testing" --principal local-user --query-mode natural_language --limit 5
 ```
 
-Use `python3` on Linux/macOS. Core setup never uses a package index. Setup verifies all **441 packages** and replays **52 bounded real-document checks** before reporting readiness. Repeat the same setup command to revalidate. For an upgrade, extract the new version into a new folder and use its generated host configuration; keep the old folder until the new connection works.
+Use `python3` on Linux/macOS. Core setup never uses a package index. Token budgets for `select_evidence` need the model-connection setup above; byte budgets always work. Setup verifies all **447 packages** and replays **294 bounded real-document checks** before reporting readiness. Repeat the same setup command to revalidate. For an upgrade, extract the new version into a new folder and use its generated host configuration; keep the old folder until the new connection works.
 
 ## Install the code CLI only
 
 ```sh
-python -m pip install "standardsforge==0.1.0a7"
+python -m pip install "standardsforge==0.1.0a8"
 standardsforge --help
 ```
 
-The [PyPI package](https://pypi.org/project/standardsforge/0.1.0a7/) contains the CLI and library code. Standards content comes from the prepared archive above or packs you install separately. The prepared archive already includes this same code wheel.
+The [PyPI package](https://pypi.org/project/standardsforge/0.1.0a8/) contains the CLI and library code. Standards content comes from the prepared archive above or packs you install separately. The prepared archive already includes this same code wheel.
 
 ## What is included
 
-The **October 8, 2026 a7 release** contains:
+The **0.1.0a8 release** contains:
 
 | Content | Packages | Scope |
 |---|---:|---|
 | MIL-STD source library | 438 | 912 verified PDFs; 35,218 page-text records across 35,235 physical pages |
 | MIL-STD-810H outline-v3 | 1 | 8,319 automated, unreviewed structural records |
 | MIL-STD-1661 scan recovery | 2 | 18 transcribed pages with raster evidence and 41 semantic records, including five separate 4.2.4 directives; bounded agent review |
-| **Total** | **441** | Additional representations preserve the same source documents |
+| Agent-reviewed requirement scopes | 6 | 232 records (123 obligation records) from bounded sections of MIL-STD-882E, 461H, 464D, 704F, 1474E and 1472H, plus 23 reviewed cross-standard references; agent self-review |
+| **Total** | **447** | Additional representations preserve the same source documents |
 
-The archive also includes the dependency-free core wheel, one-command setup, CLI/MCP launchers, generated host configuration, local policies, checksums, build provenance, qualification records, and the Windows offline MCP dependencies. New runtime tools operate on this existing evidence; corpus-wide semantic review and newer outline representations are separate work.
+The archive also includes the dependency-free core wheel, one-command setup, CLI/MCP launchers, generated host configuration, local policies, checksums, build provenance, qualification records, the Windows offline MCP dependencies for Python 3.11–3.13, and the pinned `o200k_base` token counter. Corpus-wide semantic review and newer outline representations are separate work.
 
 ## Validation and evidence limits
 
-Release acceptance covers first and repeated installation on **Windows, Linux, Intel macOS, and Apple silicon macOS**, source CI, 52 bounded real-document cases, MCP connectivity and public artifact identity. See the [a7 release evidence](docs/RELEASE_0.1.0a7.md) for observed results, exact hashes and qualification scope.
+Before publication, release acceptance must cover first and repeated installation on **Windows (Python 3.11, 3.12 and 3.13), Linux, Intel macOS, and Apple silicon macOS**, source CI, 294 bounded real-document cases, MCP connectivity with token-budgeted selection, and public artifact identity. See the [a8 release record](docs/RELEASE_0.1.0a8.md) for what has been observed so far, exact hashes and qualification scope.
 
 This is an **alpha release**. Source-linked page text, automated outlines, and reviewed records retain their distinct coverage and review status. The bounded checks do not establish corpus-wide visual or semantic completeness or globally optimal compression. Applicability, project baselines, and compliance decisions remain with the responsible engineering authorities.
 
@@ -564,7 +565,7 @@ Evidence packets retain exact edition and package identity, source citations, an
 | Connect a local model through read-only MCP | [Model integration](docs/wiki/MODEL_INTEGRATION.md) |
 | Acquire sources and rebuild packs or releases | [Maintainer workflows](docs/wiki/MAINTAINER_WORKFLOWS.md) |
 | Understand authorization, integrity, rights, and evidence layers | [Architecture and trust](docs/wiki/ARCHITECTURE_AND_TRUST.md) |
-| Check the published a7 artifacts and acceptance results | [Release evidence](docs/RELEASE_0.1.0a7.md) |
+| Check the a8 artifacts and acceptance results | [Release evidence](docs/RELEASE_0.1.0a8.md) |
 | Run qualification and release gates | [Validation and releases](docs/wiki/VALIDATION_AND_RELEASES.md) |
 | Browse all documentation | [StandardsForge wiki](docs/wiki/README.md) |
 

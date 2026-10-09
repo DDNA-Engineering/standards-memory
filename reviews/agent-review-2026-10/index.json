@@ -1,0 +1,128 @@
+{
+  "schema_version": "0.1.0",
+  "batch_id": "agent-review-2026-10",
+  "review": {
+    "kind": "agent",
+    "independence_claim": "self_review",
+    "attestation": "extraction_review_not_project_applicability_or_approval"
+  },
+  "corpus": {
+    "corpus_id": "dla-active-mil-std-current-page-text",
+    "acquisition_manifest_sha256": "d02fc379a0bd9c6268b8f05cec558be9eda452f845300376910fa018ffcb7aea",
+    "compiler_version": "0.3.0"
+  },
+  "packs": [
+    {
+      "slug": "mil-std-882e-system-safety-requirements",
+      "content_class": "public_government_standard",
+      "annotations": "mil-std-882e-system-safety-requirements/annotations.json",
+      "annotations_sha256": "194d2b6bf111f7ece2e428eddbfd9947313402f6d8cf8b079dd41bc629d9f146",
+      "suite": "../../benchmarks/real/mil-std-882e-system-safety-requirements.json",
+      "suite_sha256": "5efd988015dc0408505b5b7de82722cd3cff98193696c28a5f9b9ee0704f30c5",
+      "expected_package_digest": "e3f0f5879d47ba78558102a2d67948952345c6f00fbc3a1165092ede046f9e75",
+      "source": {
+        "ident_number": "36027",
+        "document_id": "MIL-STD-882E(1) NOT 1",
+        "edition_id": "dla:mil-std-ident:36027:composition:430c683e94b29b06dd30c319ef1a4a0113e0ba71ed69a2fef00b0d8c993d7ee9",
+        "package_digest": "0e3b5644b32602a4a7fe561fc25a30f1d6680ed09ae5c7477b7800b52e74bfa1",
+        "archive_path": "packs/36027-430c683e94b29b06.zip",
+        "archive_sha256": "0ea93cc07ab6750d0d0fde0622418a566ce1ba15fd5870a4f6bf29cff265c506",
+        "source_pdf_sha256": "cd10e1740e61044765d616d66216a093e75343697ada43465b5bd45417b9ea99"
+      }
+    },
+    {
+      "slug": "mil-std-461h-general-requirements",
+      "content_class": "public_government_standard",
+      "annotations": "mil-std-461h-general-requirements/annotations.json",
+      "annotations_sha256": "878c71643c93787344d472b7176761cdcae1ba6f8270a405679e84d973217549",
+      "suite": "../../benchmarks/real/mil-std-461h-general-requirements.json",
+      "suite_sha256": "b39b2efe00aef0612a91e130745bf196464a361efadf1fc642a7bccd5a605a17",
+      "expected_package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+      "source": {
+        "ident_number": "35789",
+        "document_id": "MIL-STD-461H",
+        "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+        "package_digest": "1475e7e0d9a7cf4c1b4343df821c30987b05e1093a706493d391cea560efa89c",
+        "archive_path": "packs/35789-e827df9a289c1c4f.zip",
+        "archive_sha256": "693fa15f56a8ac199d1ffcd66562113be77505e6fd0de7cb58ee17887a648dab",
+        "source_pdf_sha256": "e7a9cfdafa128544945b78652baf5df1258297408d7c7b69f70c916a24f35007"
+      }
+    },
+    {
+      "slug": "mil-std-464d-e3-general-and-emi",
+      "content_class": "public_government_standard",
+      "annotations": "mil-std-464d-e3-general-and-emi/annotations.json",
+      "annotations_sha256": "f3e1cf29095baa07f63fcdcbb0db3ccf9bcd2e024daa6d82dc14914d5761cd5e",
+      "suite": "../../benchmarks/real/mil-std-464d-e3-general-and-emi.json",
+      "suite_sha256": "ea68a290ef976edb4884a542eca35f3f2fdc003f73fac8c319e11fb8bd682abe",
+      "expected_package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+      "source": {
+        "ident_number": "35794",
+        "document_id": "MIL-STD-464D NOT 1",
+        "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+        "package_digest": "d49276c251efac4e7288a7cf1437162b62a727dadf4640c147b9045a7067a41e",
+        "archive_path": "packs/35794-0dfe1899f3fa76de.zip",
+        "archive_sha256": "cd0b78ee048bc37f52507c98c87e11579bfc3f575ebc424be27e829bfcd7c86d",
+        "source_pdf_sha256": "5db46d502cdc92352fe9964a9cf843f8e78d4056d208ace8edfeb1fa117b2ed9"
+      }
+    },
+    {
+      "slug": "mil-std-704f-general-requirements",
+      "content_class": "public_government_standard",
+      "annotations": "mil-std-704f-general-requirements/annotations.json",
+      "annotations_sha256": "517afdfccb271d5785673042ab8a13cf2ef3b89998f76dcfeee2bc93fd32b3fe",
+      "suite": "../../benchmarks/real/mil-std-704f-general-requirements.json",
+      "suite_sha256": "e55108be00095567d32ed6d3f8f87bc0f0e0d07c2001c934f6534c8204e620f7",
+      "expected_package_digest": "53b5328639ac4008654e2a65f49f9b204dce660e6b06c597196b974a401867e6",
+      "source": {
+        "ident_number": "35901",
+        "document_id": "MIL-STD-704F(1) NOT 4",
+        "edition_id": "dla:mil-std-ident:35901:composition:e9e1b9d671aa021ac3ab5feb8c5a3db59e2f7a24245d088f8cee1b46f3ae5c71",
+        "package_digest": "bb7f4efed264b9f71efc4cef53fff4ce571953cb51d7e2d2adf9605d57f7ab4f",
+        "archive_path": "packs/35901-e9e1b9d671aa021a.zip",
+        "archive_sha256": "6f15e17b35842d9370b8f6e34bdf993d727ae64f3e45edba65be90f94990a47d",
+        "source_pdf_sha256": "cba6cd7db90e00ee138ab12930fe7f754fa96e8472e86b849b7b5c7054837fc4"
+      }
+    },
+    {
+      "slug": "mil-std-1474e-noise-general-requirements",
+      "content_class": "public_government_standard",
+      "annotations": "mil-std-1474e-noise-general-requirements/annotations.json",
+      "annotations_sha256": "5e39455d66b52964ff3cb2cee24397688df261b1395d136b4ef8772e6e0fa5bd",
+      "suite": "../../benchmarks/real/mil-std-1474e-noise-general-requirements.json",
+      "suite_sha256": "32cd9afd560f7dc1ac4f90f8c16d56e50a6b35a73f0c42df7823c9d339a37ce6",
+      "expected_package_digest": "a352f44a109946ca369cebe3a710fb40be2cf4806072a54750f78b0e4c2d803a",
+      "source": {
+        "ident_number": "36905",
+        "document_id": "MIL-STD-1474E NOT 2",
+        "edition_id": "dla:mil-std-ident:36905:composition:a6ec79c021c2d883f638959760ae716d07fca6de68862ebfd74c289a22667c38",
+        "package_digest": "b1222ef5a45473d98d6c78b2f9c924c436f81cd69b95e73927f625a21ee7e22c",
+        "archive_path": "packs/36905-a6ec79c021c2d883.zip",
+        "archive_sha256": "0c48537910dafaf2a06fe02db2b64fa2ab187c507ecf6caa68b82e369591a636",
+        "source_pdf_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729"
+      }
+    },
+    {
+      "slug": "mil-std-1472h-acoustic-noise-design",
+      "content_class": "public_government_standard",
+      "annotations": "mil-std-1472h-acoustic-noise-design/annotations.json",
+      "annotations_sha256": "e7bb2c1b9e80a09b5a493c43a0d09b655bf1ebc02e995f257f54bc9cc44cf3f6",
+      "suite": "../../benchmarks/real/mil-std-1472h-acoustic-noise-design.json",
+      "suite_sha256": "d543333dc881d178020c7f62f0ffa54df653800153369f2a94afea15c3189b57",
+      "expected_package_digest": "dca7e56307bf00a6ba8209312fd888be649d4453a8fa9468ea3e9981d7ccd408",
+      "source": {
+        "ident_number": "36903",
+        "document_id": "MIL-STD-1472H NOT 1",
+        "edition_id": "dla:mil-std-ident:36903:composition:c66d36dbf80e317fbc5eed4ffac7247a1fec9e8c615a520d195ee5e90236e3f5",
+        "package_digest": "6d4092d718dbf40571bac8ba1470f70f5c84554be679609a57df742eef856f90",
+        "archive_path": "packs/36903-c66d36dbf80e317f.zip",
+        "archive_sha256": "5bb9973c107e5e2041433e22fcf2a086577b71c447087b2d0a037f2e26db3575",
+        "source_pdf_sha256": "69f2a4cad0f11393e2ba1ce36189a2b9a10497040159b343597a662b465ef090"
+      }
+    }
+  ],
+  "reference_bindings": {
+    "path": "reference-bindings.json",
+    "sha256": "051f756fec1c4a2542fc67275b084aeb687eda396265330314d41f377ef776d3"
+  }
+}

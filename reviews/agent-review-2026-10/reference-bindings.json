@@ -1,0 +1,623 @@
+{
+ "schema_version": "0.1.0",
+ "binding_set": {
+  "binding_set_id": "agent-review-2026-10-reference-bindings",
+  "bindings": [
+   {
+    "binding_id": "461h-a41-mil-std-464-first",
+    "source": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-0e9baf70e01bd53aa6b51d5e",
+     "quote_sha256": "6df4eec4012746d6e55ed73ebfe1495e5b2925d245fdfe6b3cdb6b376ab399ed"
+    },
+    "reference": {
+     "start_byte": 117,
+     "end_byte": 128,
+     "exact_text": "MIL-STD-464"
+    },
+    "target": {
+     "package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+     "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+     "record_id": "struct-03c13044841cf08da18b853f",
+     "quote_sha256": "032bcc2c004de675c10124dd0dd4b24b1f5f4ff36a878c5bb7c9328cf0c877f5"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Non-contractual Appendix A discussion names MIL-STD-464 as containing system-level integration requirements; navigates to the reviewed MIL-STD-464D 1.1 Purpose. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "1c2c2e64fafc19e8de3b9c66e89109fc75379be2bdae2c0d03d8849e398197aa"
+    }
+   },
+   {
+    "binding_id": "461h-a41-mil-std-464-second",
+    "source": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-0e9baf70e01bd53aa6b51d5e",
+     "quote_sha256": "6df4eec4012746d6e55ed73ebfe1495e5b2925d245fdfe6b3cdb6b376ab399ed"
+    },
+    "reference": {
+     "start_byte": 169,
+     "end_byte": 182,
+     "exact_text": "MIL\n-ST D-464"
+    },
+    "target": {
+     "package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+     "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+     "record_id": "struct-03c13044841cf08da18b853f",
+     "quote_sha256": "032bcc2c004de675c10124dd0dd4b24b1f5f4ff36a878c5bb7c9328cf0c877f5"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Second occurrence in the same discussion (text layer splits it as 'MIL / -ST D-464') describing MIL-STD-464 requirement areas; navigates to the reviewed MIL-STD-464D 1.1 Purpose. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "7018d4c3587e0b5114dd57d9a8f3230e50999d196da9bed93395588af50592cf"
+    }
+   },
+   {
+    "binding_id": "461h-a41-mil-std-188-125-1",
+    "source": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-0e9baf70e01bd53aa6b51d5e",
+     "quote_sha256": "6df4eec4012746d6e55ed73ebfe1495e5b2925d245fdfe6b3cdb6b376ab399ed"
+    },
+    "reference": {
+     "start_byte": 130,
+     "end_byte": 148,
+     "exact_text": "MIL-STD-188-\n125-1"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "MIL-STD-188-125-1 is cited without revision; the a7 corpus contains MIL-STD-188-125-1A page text but no reviewed scope, so no target record is selected.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "46b113b2c5846e7d605e2100f01af07f895d3e1e8c8d569b68c09c24bab874c7"
+    }
+   },
+   {
+    "binding_id": "461h-a41-mil-std-3023",
+    "source": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-0e9baf70e01bd53aa6b51d5e",
+     "quote_sha256": "6df4eec4012746d6e55ed73ebfe1495e5b2925d245fdfe6b3cdb6b376ab399ed"
+    },
+    "reference": {
+     "start_byte": 153,
+     "end_byte": 166,
+     "exact_text": "MIL-\nSTD-3023"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "MIL-STD-3023 is not in the a7 MIL-STD page-text corpus; the target is unresolved.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "6bae1f2b0d0a8c2c66b961fb3f7589c8bfd9598309d14d3835a341f98631eb6a"
+    }
+   },
+   {
+    "binding_id": "461h-a426-mil-std-704",
+    "source": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-b12f3194129502806b7ba5e5",
+     "quote_sha256": "7512c663f9a9b8970179f2d2aef72ad8cee75b40fe9935e0de839886e0ad83b1"
+    },
+    "reference": {
+     "start_byte": 24,
+     "end_byte": 36,
+     "exact_text": "MIL-\nSTD-704"
+    },
+    "target": {
+     "package_digest": "53b5328639ac4008654e2a65f49f9b204dce660e6b06c597196b974a401867e6",
+     "edition_id": "dla:mil-std-ident:35901:composition:e9e1b9d671aa021ac3ab5feb8c5a3db59e2f7a24245d088f8cee1b46f3ae5c71",
+     "record_id": "struct-60ba68c271064c2708600403",
+     "quote_sha256": "735c859f1b11620272c6741ce1ede0eb5d9c323be22939e2001519d576479fba"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Non-contractual Appendix A discussion of 4.2.6 states MIL-STD-704 imposes system-level transient controls; navigates to the reviewed MIL-STD-704F (with Change 1) 1.1 Scope. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "9d80cab92a83807a7000d3f83ed58355710c0b408a54df0868aa2204564274e8"
+    }
+   },
+   {
+    "binding_id": "461h-a426-mil-std-464",
+    "source": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-b12f3194129502806b7ba5e5",
+     "quote_sha256": "7512c663f9a9b8970179f2d2aef72ad8cee75b40fe9935e0de839886e0ad83b1"
+    },
+    "reference": {
+     "start_byte": 38,
+     "end_byte": 49,
+     "exact_text": "MIL-STD-464"
+    },
+    "target": {
+     "package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+     "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+     "record_id": "struct-03c13044841cf08da18b853f",
+     "quote_sha256": "032bcc2c004de675c10124dd0dd4b24b1f5f4ff36a878c5bb7c9328cf0c877f5"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Same discussion states MIL-STD-464 imposes system-level transient controls; navigates to the reviewed MIL-STD-464D 1.1 Purpose. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "aab45f1f025e9b835e1a8b970b0012b9586f036dddbedecde9b09fb5831da537"
+    }
+   },
+   {
+    "binding_id": "461h-a426-mil-std-1399-300-1",
+    "source": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-b12f3194129502806b7ba5e5",
+     "quote_sha256": "7512c663f9a9b8970179f2d2aef72ad8cee75b40fe9935e0de839886e0ad83b1"
+    },
+    "reference": {
+     "start_byte": 55,
+     "end_byte": 76,
+     "exact_text": "MIL-\nSTD-1399-\n300-\n1"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "MIL-STD-1399-300-1 page text is in the a7 corpus, but no reviewed target scope exists in this batch; not bound.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "66aa958e01616ae155dc737df2f72ea0d6dbd637cb4b04a666f638eb02f3eed5"
+    }
+   },
+   {
+    "binding_id": "461h-4.2.4-sd-2",
+    "source": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-6be98357379b885b8bdff910",
+     "quote_sha256": "37b64635ea36bdf1728b16bf3a82423ad6ef50167d9c4da299a2fb8b8a51837f"
+    },
+    "reference": {
+     "start_byte": 86,
+     "end_byte": 90,
+     "exact_text": "SD-2"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "SD-2 guidance is not in the a7 MIL-STD page-text corpus; the target is unresolved.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "f22e43aeada2c39bc47a09ce96f9bdec485895aeb8c3f0319bd8278acc8282ba"
+    }
+   },
+   {
+    "binding_id": "464d-5.7-mil-std-461-requirements",
+    "source": {
+     "package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+     "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+     "record_id": "struct-279ae40399854a72f3f601d9",
+     "quote_sha256": "830532f55103b8ab67fc0eda09233b958802e7c0305e7addcc31e51f54303739"
+    },
+    "reference": {
+     "start_byte": 206,
+     "end_byte": 219,
+     "exact_text": "MIL-ST D -461"
+    },
+    "target": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-a13db21865ef604e93e31a99",
+     "quote_sha256": "7fe78c10bf69511ed78ad4edaecb5c26cdab298b063ff04710f0dd56378d9b8c"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Example citation ('such as ... requirements of MIL-STD-461') of subsystem and equipment interface control requirements; navigates to the reviewed MIL-STD-461H 1.1 Purpose. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "69a44a1ce7a16887df2ec7d3a946e66886b406b53433968e3ed56e6d27fe9aef"
+    }
+   },
+   {
+    "binding_id": "464d-5.7-mil-std-461-verification",
+    "source": {
+     "package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+     "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+     "record_id": "struct-ac6051481ae751f69406aeeb",
+     "quote_sha256": "26245941fb5b39676d1b7a8dd4e419a406ab0ff38be66b01064715eeeb605179"
+    },
+    "reference": {
+     "start_byte": 126,
+     "end_byte": 137,
+     "exact_text": "MIL-STD-461"
+    },
+    "target": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-7b3cb7cfacef6258f278bbb2",
+     "quote_sha256": "a1a4e7ffdb2d6ddf3470d9578de8c91a790f2f1595b20d1525f615e17b0e6e81"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Example citation ('such as testing in accordance with MIL-STD-461') in the verification directive; navigates to the reviewed MIL-STD-461H 4.3 Verification requirements. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "e0540bdf7cccadf42c72e78f51b5696c552dfed15254187f84cff7deadba844e"
+    }
+   },
+   {
+    "binding_id": "464d-5.7.1-mil-std-461-safety-critical",
+    "source": {
+     "package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+     "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+     "record_id": "struct-fda5cd253975bb341727cca0",
+     "quote_sha256": "7ba5833827eaf06ea00660603a91d7a7afc7b96d0858b60b7ec416238851ed2a"
+    },
+    "reference": {
+     "start_byte": 355,
+     "end_byte": 368,
+     "exact_text": "MIL-ST D -461"
+    },
+    "target": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-a13db21865ef604e93e31a99",
+     "quote_sha256": "7fe78c10bf69511ed78ad4edaecb5c26cdab298b063ff04710f0dd56378d9b8c"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Safety-critical PED requirements cite emissions and susceptibility requirements 'such as those defined in MIL-STD-461'; navigates to the reviewed MIL-STD-461H 1.1 Purpose. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "859785bbfe75e7f301f3172dd1c292b4fb12b124b337581996dc9938505929fa"
+    }
+   },
+   {
+    "binding_id": "464d-5.7.1-mil-std-461-non-safety-critical",
+    "source": {
+     "package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+     "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+     "record_id": "struct-fda5cd253975bb341727cca0",
+     "quote_sha256": "7ba5833827eaf06ea00660603a91d7a7afc7b96d0858b60b7ec416238851ed2a"
+    },
+    "reference": {
+     "start_byte": 502,
+     "end_byte": 515,
+     "exact_text": "MIL\n-\nSTD-461"
+    },
+    "target": {
+     "package_digest": "8c6b1e291f1dbb667567281fbb055edf78d451de241fd9f5e93101f752c177fd",
+     "edition_id": "dla:mil-std-ident:35789:composition:e827df9a289c1c4fed8fd65c26f83c97da6568ee614fa6803689238e2ff67043",
+     "record_id": "struct-a13db21865ef604e93e31a99",
+     "quote_sha256": "7fe78c10bf69511ed78ad4edaecb5c26cdab298b063ff04710f0dd56378d9b8c"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Non-safety-critical PED requirements cite emissions requirements 'such as those defined in MIL-STD-461' (text layer splits the identifier across lines); navigates to the reviewed MIL-STD-461H 1.1 Purpose. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "ef243585e970c74086889da2cd322fa426f7a329bd9d91fe842497d9402e972c"
+    }
+   },
+   {
+    "binding_id": "464d-5.7.1-mil-std-461-ce106",
+    "source": {
+     "package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+     "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+     "record_id": "struct-4cecb641134b058759f8e0da",
+     "quote_sha256": "08496d84fed08b8c278c9056569fb936689851959fb08716c75968685999dd75"
+    },
+    "reference": {
+     "start_byte": 188,
+     "end_byte": 217,
+     "exact_text": "MIL-STD-461 Test Method CE106"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "The reference is to a specific test method (CE106); MIL-STD-461H is installed but its CE106 method is outside every reviewed scope, so no target record is selected.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "065fd730d087b8e258f2be35cf446f6aa5bac6cf73c892f70e73df894494c844"
+    }
+   },
+   {
+    "binding_id": "464d-5.6-mil-std-2169",
+    "source": {
+     "package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+     "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+     "record_id": "struct-2183f2ed1e336c16f2c569f5",
+     "quote_sha256": "e1117cce21094de52522fc0adb22de69a2f6332dfa8871d1c24099302c0e97d2"
+    },
+    "reference": {
+     "start_byte": 169,
+     "end_byte": 182,
+     "exact_text": "MIL-STD -2169"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "MIL-STD-2169 is cited without revision as defining a classified environment; the a7 corpus contains MIL-STD-2169D page text but no reviewed scope; not bound.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "ee4ef8da2b2f75bc3b5f320f2539459d87f36f7aeddf67334e9ab2bb2c31ebc2"
+    }
+   },
+   {
+    "binding_id": "464d-5.7.3-dod-std-1399-070-1",
+    "source": {
+     "package_digest": "410ec32ebe9b79e1ff57f43dec9075fb4e916172ba51d9f6a48b6be85989cb8c",
+     "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+     "record_id": "struct-f3badae32c941bb42ff7825c",
+     "quote_sha256": "bbf1988eace148ce35df65af4dff3861efe6613d7207258e65b48d9b033d2794"
+    },
+    "reference": {
+     "start_byte": 130,
+     "end_byte": 156,
+     "exact_text": "DOD-STD-1399-\n070-1 (NAVY)"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "DOD-STD-1399-070-1 is not in the a7 MIL-STD page-text corpus; the target is unresolved.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "109ebc4a46eb0509cca6046b0417be589b9624f0b2c182519c46eeccb3c7c5d0"
+    }
+   },
+   {
+    "binding_id": "704f-1.1-mil-hdbk-704",
+    "source": {
+     "package_digest": "53b5328639ac4008654e2a65f49f9b204dce660e6b06c597196b974a401867e6",
+     "edition_id": "dla:mil-std-ident:35901:composition:e9e1b9d671aa021ac3ab5feb8c5a3db59e2f7a24245d088f8cee1b46f3ae5c71",
+     "record_id": "struct-60ba68c271064c2708600403",
+     "quote_sha256": "735c859f1b11620272c6741ce1ede0eb5d9c323be22939e2001519d576479fba"
+    },
+    "reference": {
+     "start_byte": 169,
+     "end_byte": 196,
+     "exact_text": "M IL-HD BK-704-1 through-\n8"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "MIL-HDBK-704-1 through -8 are handbooks not in the a7 MIL-STD page-text corpus; the target is unresolved.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "9914220ee6fe31bf6810e168b06d5a9e3bfcbc4f84aae270eb3035a31b6cd4c5"
+    }
+   },
+   {
+    "binding_id": "882e-4.3.7-dodi-5000",
+    "source": {
+     "package_digest": "e3f0f5879d47ba78558102a2d67948952345c6f00fbc3a1165092ede046f9e75",
+     "edition_id": "dla:mil-std-ident:36027:composition:430c683e94b29b06dd30c319ef1a4a0113e0ba71ed69a2fef00b0d8c993d7ee9",
+     "record_id": "struct-cb21dd09e5b0cd6ae8e6a7af",
+     "quote_sha256": "28f26213db084913a9c0b8c50f3927a35b6037a9c22ac8f529830db654c94353"
+    },
+    "reference": {
+     "start_byte": 172,
+     "end_byte": 189,
+     "exact_text": "DoDI 5000 s eries"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "The DoDI 5000 series is DoD instruction policy, not in the a7 MIL-STD page-text corpus; the risk acceptance authority target is unresolved.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "2522e855f3a84deb5df9e4372b8232d47aae32b17db2bad8034fdb611d92b895"
+    }
+   },
+   {
+    "binding_id": "1474e-4.1-mil-std-882",
+    "source": {
+     "package_digest": "a352f44a109946ca369cebe3a710fb40be2cf4806072a54750f78b0e4c2d803a",
+     "edition_id": "dla:mil-std-ident:36905:composition:a6ec79c021c2d883f638959760ae716d07fca6de68862ebfd74c289a22667c38",
+     "record_id": "struct-5a5f3de7abf62097ab689901",
+     "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+    },
+    "reference": {
+     "start_byte": 110,
+     "end_byte": 121,
+     "exact_text": "MIL-STD-882"
+    },
+    "target": {
+     "package_digest": "e3f0f5879d47ba78558102a2d67948952345c6f00fbc3a1165092ede046f9e75",
+     "edition_id": "dla:mil-std-ident:36027:composition:430c683e94b29b06dd30c319ef1a4a0113e0ba71ed69a2fef00b0d8c993d7ee9",
+     "record_id": "struct-d3f134cc0c030c86ed0d1fdb",
+     "quote_sha256": "33db69f6058ca8dcdebed2dc8124a49bf4236cc73346b8c9ce7102f3eec81300"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "4.1 requires procurement using 'the design order of precedence in MIL-STD-882'; navigates to the reviewed MIL-STD-882E (with Change 1) 4.3.4 record that introduces the system safety design order of precedence (steps 4.3.4.a through e are separate records). The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "4b9d723ddbdbfa112199e96b02a0f2a01d791216bec704dee488f82f495cb43d"
+    }
+   },
+   {
+    "binding_id": "1474e-4.2.2-mil-hdbk-1473",
+    "source": {
+     "package_digest": "a352f44a109946ca369cebe3a710fb40be2cf4806072a54750f78b0e4c2d803a",
+     "edition_id": "dla:mil-std-ident:36905:composition:a6ec79c021c2d883f638959760ae716d07fca6de68862ebfd74c289a22667c38",
+     "record_id": "struct-c0d376b8677fe535366cf24f",
+     "quote_sha256": "cf78ab14fb393a774165067cb35c4b62e66e76955edb28d3ae8695cf69f15790"
+    },
+    "reference": {
+     "start_byte": 155,
+     "end_byte": 168,
+     "exact_text": "MIL-HDBK-1473"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "MIL-HDBK-1473 is a handbook not in the a7 MIL-STD page-text corpus; the target is unresolved.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "bed4260c80de99f0d29dbd59e5c1f7eceec264b3b98580f3cef54636668993d0"
+    }
+   },
+   {
+    "binding_id": "1472h-5.5.4.2-mil-std-1474",
+    "source": {
+     "package_digest": "dca7e56307bf00a6ba8209312fd888be649d4453a8fa9468ea3e9981d7ccd408",
+     "edition_id": "dla:mil-std-ident:36903:composition:c66d36dbf80e317fbc5eed4ffac7247a1fec9e8c615a520d195ee5e90236e3f5",
+     "record_id": "struct-bad7b353e46599fa828c72e7",
+     "quote_sha256": "56547364fa7c4f1d689d0ed14a0c8fab232b1497dfac8fe4752a097c91f86792"
+    },
+    "reference": {
+     "start_byte": 130,
+     "end_byte": 143,
+     "exact_text": "MIL-ST D-1474"
+    },
+    "target": {
+     "package_digest": "a352f44a109946ca369cebe3a710fb40be2cf4806072a54750f78b0e4c2d803a",
+     "edition_id": "dla:mil-std-ident:36905:composition:a6ec79c021c2d883f638959760ae716d07fca6de68862ebfd74c289a22667c38",
+     "record_id": "struct-7e8059eb10538c7f70875fb8",
+     "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Equipment noise limits 'in accordance with MIL-STD-1474'; navigates to the reviewed MIL-STD-1474E 1.1 Scope. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "8a2e8add2b2094ae9b1049874828538bc20a87a876eae9a60271ad409b78bd98"
+    }
+   },
+   {
+    "binding_id": "1472h-5.5.4.3-mil-std-1474",
+    "source": {
+     "package_digest": "dca7e56307bf00a6ba8209312fd888be649d4453a8fa9468ea3e9981d7ccd408",
+     "edition_id": "dla:mil-std-ident:36903:composition:c66d36dbf80e317fbc5eed4ffac7247a1fec9e8c615a520d195ee5e90236e3f5",
+     "record_id": "struct-7242c8b6c24f89b5aa0f7f01",
+     "quote_sha256": "4d2fe9cfca68ca7cea8f95b746860204d7df3e66ef661c4c29185753747f1eda"
+    },
+    "reference": {
+     "start_byte": 48,
+     "end_byte": 60,
+     "exact_text": "MIL-STD-1474"
+    },
+    "target": {
+     "package_digest": "a352f44a109946ca369cebe3a710fb40be2cf4806072a54750f78b0e4c2d803a",
+     "edition_id": "dla:mil-std-ident:36905:composition:a6ec79c021c2d883f638959760ae716d07fca6de68862ebfd74c289a22667c38",
+     "record_id": "struct-fabe33f76071ea3023a92ad2",
+     "quote_sha256": "31f976f2486773a79c145b2a710d17a35cf81ef4f7e6bcb2a97bab00f566d20b"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Total system noise 'in accordance with MIL-STD-1474'; navigates to the reviewed MIL-STD-1474E 4.1.1 Total system noise. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "54c080b71a3cd56d48f20b3efe193f382ceb9f49965c6e29bb3200197022d83c"
+    }
+   },
+   {
+    "binding_id": "1472h-5.5.4.4.1-mil-std-1474",
+    "source": {
+     "package_digest": "dca7e56307bf00a6ba8209312fd888be649d4453a8fa9468ea3e9981d7ccd408",
+     "edition_id": "dla:mil-std-ident:36903:composition:c66d36dbf80e317fbc5eed4ffac7247a1fec9e8c615a520d195ee5e90236e3f5",
+     "record_id": "struct-e059135e705ca14ee79fce04",
+     "quote_sha256": "1e4ab01d001aa5d95c6c008f6fbb8b7bf02f222a73ac6283404da5ed1a7d1bbf"
+    },
+    "reference": {
+     "start_byte": 188,
+     "end_byte": 202,
+     "exact_text": "MI L-ST D-1474"
+    },
+    "target": {
+     "package_digest": "a352f44a109946ca369cebe3a710fb40be2cf4806072a54750f78b0e4c2d803a",
+     "edition_id": "dla:mil-std-ident:36905:composition:a6ec79c021c2d883f638959760ae716d07fca6de68862ebfd74c289a22667c38",
+     "record_id": "struct-32e1fe7444b98e76aa62df62",
+     "quote_sha256": "5172e5ca511fec3b2c15fa9ef81f526bba4152dea1839fbcd024f46fd7e27248"
+    },
+    "status": "resolved",
+    "edition_basis": "reviewer_selected_navigation_edition",
+    "rationale": "Environments at or above 85 dBA / 140 dBP are evaluated 'in accordance with MIL-STD-1474'; navigates to the reviewed MIL-STD-1474E 4.2.1 Protection from hazardous noise. The source cites the document without a revision letter, so the installed edition is a reviewer-selected navigation edition, not a source-mandated or project-approved edition.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "6631fc720449542cb3cf1f0ebd4eaef3af81d029a7cf82e36d66ce879e7a36c9"
+    }
+   },
+   {
+    "binding_id": "1472h-1.3-jssg-2010",
+    "source": {
+     "package_digest": "dca7e56307bf00a6ba8209312fd888be649d4453a8fa9468ea3e9981d7ccd408",
+     "edition_id": "dla:mil-std-ident:36903:composition:c66d36dbf80e317fbc5eed4ffac7247a1fec9e8c615a520d195ee5e90236e3f5",
+     "record_id": "struct-d668c8780e50ad9f82dd3710",
+     "quote_sha256": "30658bc379b9514c28fda3c0dc1a97027eec2ce801eb39aad4bc73e57bc79ed3"
+    },
+    "reference": {
+     "start_byte": 239,
+     "end_byte": 248,
+     "exact_text": "JSSG-2010"
+    },
+    "target": null,
+    "status": "unresolved",
+    "edition_basis": "unresolved",
+    "rationale": "JSSG-2010 is a joint service specification guide not in the a7 MIL-STD page-text corpus; the target is unresolved.",
+    "review": {
+     "kind": "agent",
+     "identity": "Claude Code agent self-review (independence_claim: self_review); same agent that authored the reviewed scopes; no human review or independent adjudication",
+     "reviewed_at": "2026-10-09T00:00:00Z",
+     "binding_sha256": "9fde1768321492607003750d9d28d283f98e1e11a01cb2c754628e7787223b37"
+    }
+   }
+  ],
+  "scope": "reviewed_navigation_only",
+  "project_applicability": "not_decided"
+ },
+ "binding_set_sha256": "811167413571fb65aacb83fc0983278812ee1b07e6bd8a095f0531c49c3b0165"
+}

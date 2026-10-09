@@ -2,7 +2,7 @@
 
 StandardsForge returns source-linked evidence. It does not decide whether a document applies to a project or whether a design complies. A model using the tools should follow this sequence.
 
-The published `v0.1.0a7` prepared archive contains 441 packages, including the automated MIL-STD-810H `outline-v3` and the separately qualified 1661 recovery packs; its content baseline is unchanged from a6. The a7 runtime exposes eleven read tools, including structural navigation, measured evidence selection, reviewed-reference navigation and original PDF delivery; see [knowledge access](KNOWLEDGE_ACCESS.md). Corpus-wide `outline-v4` packages remain unpublished. A verified citation establishes an exact source match, not a reviewed interpretation or complete requirements graph.
+The published `v0.1.0a7` prepared archive contains 441 packages, including the automated MIL-STD-810H `outline-v3` and the separately qualified 1661 recovery packs; its content baseline is unchanged from a6. The `0.1.0a8` archive adds six bounded agent-reviewed requirement scopes (447 packages); treat their records as agent self-review, not human approval. The a7 runtime exposes eleven read tools, including structural navigation, measured evidence selection, reviewed-reference navigation and original PDF delivery; see [knowledge access](KNOWLEDGE_ACCESS.md). Corpus-wide `outline-v4` packages remain unpublished. A verified citation establishes an exact source match, not a reviewed interpretation or complete requirements graph.
 
 ## Connect a prepared Windows distribution
 

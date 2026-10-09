@@ -1,0 +1,3732 @@
+{
+  "schema_version": "0.6.0",
+  "document_id": "MIL-STD-464D NOT 1",
+  "edition_id": "dla:mil-std-ident:35794:composition:0dfe1899f3fa76de4e4a2c585d27f9363a537b7d484fb72324fef303595113eb",
+  "source_pdf_sha256": "5db46d502cdc92352fe9964a9cf843f8e78d4056d208ace8edfeb1fa117b2ed9",
+  "source_page_pack_digest": "d49276c251efac4e7288a7cf1437162b62a727dadf4640c147b9045a7067a41e",
+  "compiler": {
+    "name": "verified_page_pack",
+    "version": "0.1.0"
+  },
+  "extraction_mode": "verified_page_text",
+  "text_encoding": "UTF-8",
+  "offset_convention": "half_open_utf8_byte_offsets_per_physical_page",
+  "review": {
+    "reviewer_id": "claude-code-agent-self-review-2026-10",
+    "reviewer_type": "agent",
+    "reviewed_at": "2026-10-09T00:00:00Z",
+    "method": "Agent self-review (Claude Code) of exact page-text spans from the a7 page-text package against the printed clause structure visible in the text layer; conditions, exceptions, tailoring permissions and applicability limits typed as qualifiers; cross-document citations recorded as unresolved relationships; no visual PDF inspection.",
+    "tool": {
+      "name": "Claude Code agent session",
+      "version": "not recorded",
+      "configuration_sha256": null
+    },
+    "unresolved_issues": [
+      "Agent self-review only: the reviewing agent authored and checked these annotations; no human or independent review was performed.",
+      "Review used the exact verified pypdf layout text layer of component 5db46d502cdc (the standard body) from the a7 corpus package; the separate notice component is not reviewed; PDF pages were not rendered or visually inspected, so text-layer artifacts are preserved verbatim.",
+      "Only the selected scope (1.1, 1.2, 4.1, 5.1, 5.2 paragraph text, 5.6, 5.7, 5.7.1 through 5.7.3) is reviewed; 5.2.1 through 5.5, 5.8 onward, appendices, and all other pages remain unreviewed.",
+      "Compound clauses are decomposed into derived child records whose identities are authored, not printed source numbering; obligation record counts are not atomic-requirement counts."
+    ],
+    "attestation": "extraction_review_not_project_applicability_or_approval"
+  },
+  "nodes": [
+    {
+      "logical_id": "1.1",
+      "kind": "clause",
+      "ordinal": 1,
+      "clause_reference": "1.1",
+      "heading": "1.1 Purpose",
+      "statement_role": "governing_note",
+      "exact_text": "1.1\nPurpose.\nThis standard establishes electromagnetic environmental effects (E3) interface requirements and\nverification criteria for airborne, sea, space, and ground systems, including associated ordnance.",
+      "content_sha256": "032bcc2c004de675c10124dd0dd4b24b1f5f4ff36a878c5bb7c9328cf0c877f5",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 210,
+          "end_byte": 213
+        },
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 275,
+          "end_byte": 283
+        },
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 284,
+          "end_byte": 379
+        },
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 380,
+          "end_byte": 478
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "applicability_statement",
+        "normativity": "normative",
+        "statement": {
+          "subject": "This standard",
+          "action": "establishes electromagnetic environmental effects (E3) interface requirements",
+          "modality": "other",
+          "polarity": "affirmative",
+          "exact_text": "This standard establishes electromagnetic environmental effects (E3) interface requirements and\nverification criteria for airborne, sea, space, and ground systems, including associated ordnance.",
+          "span_indices": [
+            2,
+            3
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "source_applicability",
+            "exact_text": "for airborne, sea, space, and ground systems, including associated ordnance.",
+            "span_indices": [
+              3
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "1.2",
+      "kind": "clause",
+      "ordinal": 2,
+      "clause_reference": "1.2",
+      "heading": "1.2 Application",
+      "statement_role": "governing_note",
+      "exact_text": "1.2\nApplication.\nThis standard is applicable for complete systems, both new and modified.",
+      "content_sha256": "512379959b8f271bdee9f3eeccfc9c72f9972bb15fb9323bccb70c702863b321",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 479,
+          "end_byte": 482
+        },
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 544,
+          "end_byte": 556
+        },
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 557,
+          "end_byte": 629
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "applicability_statement",
+        "normativity": "normative",
+        "statement": {
+          "subject": "This standard",
+          "action": "is applicable for complete systems",
+          "modality": "other",
+          "polarity": "affirmative",
+          "exact_text": "This standard is applicable for complete systems, both new and modified.",
+          "span_indices": [
+            2
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "source_applicability",
+            "exact_text": "both new and modified.",
+            "span_indices": [
+              2
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "4",
+      "kind": "section",
+      "ordinal": 3,
+      "clause_reference": "4",
+      "heading": "4. General requirements",
+      "statement_role": "informative",
+      "exact_text": "4.\nGENERAL REQUIREMENTS",
+      "content_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb",
+      "source_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 90,
+          "end_byte": 92
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 148,
+          "end_byte": 168
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      }
+    },
+    {
+      "logical_id": "4.1",
+      "kind": "clause",
+      "ordinal": 4,
+      "clause_reference": "4.1",
+      "heading": "4.1 General",
+      "statement_role": "governing_note",
+      "exact_text": "4.1\nGeneral.\nEach\nsystem shall be electromagnetically compatible in its operational electromagnetic\nenvironment such that the operational performance requirements are met.  This standard\nidentifies baseline design requirements and verification to address E3 issues.  Requirements and\nverification approaches may be tailored based on engineering justification derived from the\nsystem’s operational requirements and engineering analysis.\nDesign techniques used to achieve\nelectromagnetic compatibility shall be verifiable, maintainable, and effective over the rated life\ncycle of the system.  Design margins shall be established based on system criticality, hardware\ntolerances, and uncertainties involved in verification of system-level design requirements.\nVerification shall address all life cycle aspects of the system, including (as applicable) normal in-\nservice operation, checkout, storage, transportation, handling, packaging, loading, unloading,\nlaunch, and the normal operating procedures associated with each aspect.  T h e\nData Item\nDescription (DID) called out in the standard provide a means for establishing an overall integrated\nE3 design and verification approach to identify areas of concern early in the program, mitigate\nrisk,  and document test  results.",
+      "content_sha256": "ebab0122118f7b0f1aa393dce7b24a162632d48000fa08950ee07f01cc062dd9",
+      "source_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 169,
+          "end_byte": 172
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 234,
+          "end_byte": 242
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 243,
+          "end_byte": 247
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 256,
+          "end_byte": 337
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 338,
+          "end_byte": 424
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 425,
+          "end_byte": 521
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 522,
+          "end_byte": 613
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 614,
+          "end_byte": 675
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 715,
+          "end_byte": 748
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 749,
+          "end_byte": 847
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 848,
+          "end_byte": 943
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 944,
+          "end_byte": 1035
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1036,
+          "end_byte": 1137
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1138,
+          "end_byte": 1232
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1233,
+          "end_byte": 1312
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1342,
+          "end_byte": 1351
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1352,
+          "end_byte": 1451
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1452,
+          "end_byte": 1547
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1548,
+          "end_byte": 1582
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "4",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": null,
+        "qualifiers": [
+          {
+            "kind": "tailoring_instruction",
+            "exact_text": "Requirements and\nverification approaches may be tailored based on engineering justification derived from the\nsystem’s operational requirements and engineering analysis.",
+            "span_indices": [
+              5,
+              6,
+              7
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [
+          "The clause's four directives are reviewed separately as derived child records; the DID sentence is informative."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "4.1/emc-in-operational-environment",
+      "kind": "paragraph",
+      "ordinal": 5,
+      "clause_reference": "4.1.derived-emc-in-operational-environment",
+      "heading": "4.1: system electromagnetically compatible in its operational EME",
+      "statement_role": "obligation",
+      "exact_text": "Each\nsystem shall be electromagnetically compatible in its operational electromagnetic\nenvironment such that the operational performance requirements are met.",
+      "content_sha256": "5f4b95e288139ce68f4ca5049033ccb2c2ff63e4f2cbb2b82e1afc3f55444fc9",
+      "source_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 243,
+          "end_byte": 247
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 256,
+          "end_byte": 337
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 338,
+          "end_byte": 409
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "4.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Each\nsystem",
+          "action": "be electromagnetically compatible in its operational electromagnetic\nenvironment",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Each\nsystem shall be electromagnetically compatible in its operational electromagnetic\nenvironment such that the operational performance requirements are met.",
+          "span_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "acceptance_criterion",
+            "exact_text": "such that the operational performance requirements are met.",
+            "span_indices": [
+              2
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "4.1/design-techniques",
+      "kind": "paragraph",
+      "ordinal": 6,
+      "clause_reference": "4.1.derived-design-techniques",
+      "heading": "4.1: EMC design techniques verifiable, maintainable and effective",
+      "statement_role": "obligation",
+      "exact_text": "Design techniques used to achieve\nelectromagnetic compatibility shall be verifiable, maintainable, and effective over the rated life\ncycle of the system.",
+      "content_sha256": "bc0059cbb644d0f1e9fda4edecf2cf43921bf6d47688510a5aed8f1c84c9a763",
+      "source_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 715,
+          "end_byte": 748
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 749,
+          "end_byte": 847
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 848,
+          "end_byte": 868
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "4.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Design techniques used to achieve\nelectromagnetic compatibility",
+          "action": "be verifiable, maintainable, and effective",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Design techniques used to achieve\nelectromagnetic compatibility shall be verifiable, maintainable, and effective over the rated life\ncycle of the system.",
+          "span_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "over the rated life\ncycle of the system.",
+            "span_indices": [
+              1,
+              2
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "4.1/design-margins",
+      "kind": "paragraph",
+      "ordinal": 7,
+      "clause_reference": "4.1.derived-design-margins",
+      "heading": "4.1: design margins established",
+      "statement_role": "obligation",
+      "exact_text": "Design margins shall be established based on system criticality, hardware\ntolerances, and uncertainties involved in verification of system-level design requirements.",
+      "content_sha256": "b1834d58af1ac2e2af7add1cc8a6c165d01271a7513275bfc8c1d06b4f308640",
+      "source_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 870,
+          "end_byte": 943
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 944,
+          "end_byte": 1035
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "4.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Design margins",
+          "action": "be established",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Design margins shall be established based on system criticality, hardware\ntolerances, and uncertainties involved in verification of system-level design requirements.",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "based on system criticality, hardware\ntolerances, and uncertainties involved in verification of system-level design requirements.",
+            "span_indices": [
+              0,
+              1
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "4.1/verification-life-cycle",
+      "kind": "paragraph",
+      "ordinal": 8,
+      "clause_reference": "4.1.derived-verification-life-cycle",
+      "heading": "4.1: verification addresses all life cycle aspects",
+      "statement_role": "obligation",
+      "exact_text": "Verification shall address all life cycle aspects of the system, including (as applicable) normal in-\nservice operation, checkout, storage, transportation, handling, packaging, loading, unloading,\nlaunch, and the normal operating procedures associated with each aspect.",
+      "content_sha256": "1dfedbab5fdff920035916fed6ed54fecde9cf47cca14026dee2842c841dc960",
+      "source_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1036,
+          "end_byte": 1137
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1138,
+          "end_byte": 1232
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1233,
+          "end_byte": 1305
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "4.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Verification",
+          "action": "address all life cycle aspects of the system",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Verification shall address all life cycle aspects of the system, including (as applicable) normal in-\nservice operation, checkout, storage, transportation, handling, packaging, loading, unloading,\nlaunch, and the normal operating procedures associated with each aspect.",
+          "span_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "(as applicable)",
+            "span_indices": [
+              0
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5",
+      "kind": "section",
+      "ordinal": 9,
+      "clause_reference": "5",
+      "heading": "5. Detailed requirements",
+      "statement_role": "informative",
+      "exact_text": "5.\nDETAILED REQUIREMENTS",
+      "content_sha256": "54a44aba0557f339362254c980139d370939298361b683e84213d31afc5aeb09",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 72,
+          "end_byte": 74
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 130,
+          "end_byte": 151
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      }
+    },
+    {
+      "logical_id": "5.1",
+      "kind": "clause",
+      "ordinal": 10,
+      "clause_reference": "5.1",
+      "heading": "5.1 Margins",
+      "statement_role": "governing_note",
+      "exact_text": "5.1\nMargins.\nMargins shall be established for safety and mission critical subsystems/equipment within the\nsystem.  Margins shall be no less than 6 dB for safety critical subsystems/equipment, unless\notherwise stated in the detailed requirements of this standard.  Compliance shall be verified by\ntest, analysis, or a combination thereof.",
+      "content_sha256": "94f0a1788198451786b99a6f0fb4970d2cf00b0d486feaf4a7c58b240d7c01f5",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 152,
+          "end_byte": 155
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 217,
+          "end_byte": 225
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 226,
+          "end_byte": 318
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 319,
+          "end_byte": 411
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 412,
+          "end_byte": 508
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 509,
+          "end_byte": 550
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": null,
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [
+          "The clause's three directives are reviewed separately as derived child records."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.1/margins-established",
+      "kind": "paragraph",
+      "ordinal": 11,
+      "clause_reference": "5.1.derived-margins-established",
+      "heading": "5.1: margins established for safety and mission critical items",
+      "statement_role": "obligation",
+      "exact_text": "Margins shall be established for safety and mission critical subsystems/equipment within the\nsystem.",
+      "content_sha256": "5ce5bd0acd0458c920ca88b6f1adfe1f415b68ff57fab1496194b489e2adbede",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 226,
+          "end_byte": 318
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 319,
+          "end_byte": 326
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Margins",
+          "action": "be established",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Margins shall be established for safety and mission critical subsystems/equipment within the\nsystem.",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "source_applicability",
+            "exact_text": "for safety and mission critical subsystems/equipment within the\nsystem.",
+            "span_indices": [
+              0,
+              1
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.1/minimum-safety-margin",
+      "kind": "paragraph",
+      "ordinal": 12,
+      "clause_reference": "5.1.derived-minimum-safety-margin",
+      "heading": "5.1: minimum 6 dB margin for safety critical items",
+      "statement_role": "obligation",
+      "exact_text": "Margins shall be no less than 6 dB for safety critical subsystems/equipment, unless\notherwise stated in the detailed requirements of this standard.",
+      "content_sha256": "167cfadbd7cc0d4033f9dfb5b9b8894c520f17a6306b44a02b857c6bde3060de",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 328,
+          "end_byte": 411
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 412,
+          "end_byte": 475
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Margins",
+          "action": "be no less than 6 dB",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Margins shall be no less than 6 dB for safety critical subsystems/equipment, unless\notherwise stated in the detailed requirements of this standard.",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "source_applicability",
+            "exact_text": "for safety critical subsystems/equipment",
+            "span_indices": [
+              0
+            ]
+          },
+          {
+            "kind": "exception",
+            "exact_text": "unless\notherwise stated in the detailed requirements of this standard.",
+            "span_indices": [
+              0,
+              1
+            ]
+          }
+        ],
+        "quantities": [
+          {
+            "raw": "6 dB",
+            "value": "6",
+            "unit": "dB",
+            "tolerance": null,
+            "span_indices": [
+              0
+            ]
+          }
+        ],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.1/verification",
+      "kind": "paragraph",
+      "ordinal": 13,
+      "clause_reference": "5.1.derived-verification",
+      "heading": "5.1: compliance verification",
+      "statement_role": "obligation",
+      "exact_text": "Compliance shall be verified by\ntest, analysis, or a combination thereof.",
+      "content_sha256": "1e7f62a8708658995027482a8d5220f682d811ff0fe651077fd818a43e84b5df",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 477,
+          "end_byte": 508
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 509,
+          "end_byte": 550
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Compliance",
+          "action": "be verified",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Compliance shall be verified by\ntest, analysis, or a combination thereof.",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.2",
+      "kind": "clause",
+      "ordinal": 14,
+      "clause_reference": "5.2",
+      "heading": "5.2 Intra-system electromagnetic compatibility (EMC)",
+      "statement_role": "governing_note",
+      "exact_text": "5.2\nIntra-system electromagnetic compatibility (EMC).\nThe system shall be electromagnetically compatible within itself such that system operational\nperformance requirements are met.  Compliance shall be verified by system-\nlevel test, analysis,\nor a combination thereof.  This includes permanent, temporary, and portable electronic\nequipment.",
+      "content_sha256": "838d638b3e48359561651a6196d88c4dc92c0b20f7a6d8e5a47d558e23f47049",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 551,
+          "end_byte": 554
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 616,
+          "end_byte": 665
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 666,
+          "end_byte": 759
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 760,
+          "end_byte": 834
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 874,
+          "end_byte": 895
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 896,
+          "end_byte": 982
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 983,
+          "end_byte": 993
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": null,
+        "qualifiers": [
+          {
+            "kind": "source_applicability",
+            "exact_text": "This includes permanent, temporary, and portable electronic\nequipment.",
+            "span_indices": [
+              5,
+              6
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [
+          "The clause's two directives are reviewed separately as derived child records; 5.2.1 and 5.2.2 are outside this bounded scope."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.2/emc-within-itself",
+      "kind": "paragraph",
+      "ordinal": 15,
+      "clause_reference": "5.2.derived-emc-within-itself",
+      "heading": "5.2: system electromagnetically compatible within itself",
+      "statement_role": "obligation",
+      "exact_text": "The system shall be electromagnetically compatible within itself such that system operational\nperformance requirements are met.",
+      "content_sha256": "4115a6e758b7a4476256bfce92e0ea99e10438180abea3314e9958e0a170d960",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 666,
+          "end_byte": 759
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 760,
+          "end_byte": 793
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.2",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "The system",
+          "action": "be electromagnetically compatible within itself",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "The system shall be electromagnetically compatible within itself such that system operational\nperformance requirements are met.",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "acceptance_criterion",
+            "exact_text": "such that system operational\nperformance requirements are met.",
+            "span_indices": [
+              0,
+              1
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.2/verification",
+      "kind": "paragraph",
+      "ordinal": 16,
+      "clause_reference": "5.2.derived-verification",
+      "heading": "5.2: compliance verification",
+      "statement_role": "obligation",
+      "exact_text": "Compliance shall be verified by system-\nlevel test, analysis,\nor a combination thereof.",
+      "content_sha256": "e001e8f5cc22d7f3fdd2de75265bd3ef331ee9c54ed8634cfc7d800a647103e3",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 795,
+          "end_byte": 834
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 874,
+          "end_byte": 895
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 896,
+          "end_byte": 921
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.2",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Compliance",
+          "action": "be verified",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Compliance shall be verified by system-\nlevel test, analysis,\nor a combination thereof.",
+          "span_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.6",
+      "kind": "clause",
+      "ordinal": 17,
+      "clause_reference": "5.6",
+      "heading": "5.6 Electromagnetic pulse (EMP)",
+      "statement_role": "governing_note",
+      "exact_text": "5.6\nElectromagnetic pulse (EMP).\nThe system shall meet its operational performance requirements after being subjected to the\nEMP environment.  This environment is classified and is currently defined in MIL-STD -2169.\nThis\nrequirement  is applicable only if invoked by\nthe procuring activity.  Compliance shall be verified\nby system, subsystem, and equipment level tests, analysis, or a combination thereof.",
+      "content_sha256": "717f39c05aaaef5d0a6decd5f11277db7023629eaef4059e3c46aba9e653126c",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 639,
+          "end_byte": 642
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 703,
+          "end_byte": 731
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 732,
+          "end_byte": 823
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 824,
+          "end_byte": 915
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 918,
+          "end_byte": 922
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 923,
+          "end_byte": 968
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 983,
+          "end_byte": 1036
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1037,
+          "end_byte": 1121
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": null,
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "This\nrequirement  is applicable only if invoked by\nthe procuring activity.",
+            "span_indices": [
+              4,
+              5,
+              6
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [
+          "The source states the EMP environment is classified and defined in MIL-STD-2169 (no revision cited); the a7 corpus contains MIL-STD-2169D page text, which is not reviewed in this batch."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.6/operational-after-emp",
+      "kind": "paragraph",
+      "ordinal": 18,
+      "clause_reference": "5.6.derived-operational-after-emp",
+      "heading": "5.6: meet operational performance after EMP environment",
+      "statement_role": "obligation",
+      "exact_text": "The system shall meet its operational performance requirements after being subjected to the\nEMP environment.  This environment is classified and is currently defined in MIL-STD -2169.\nThis\nrequirement  is applicable only if invoked by\nthe procuring activity.",
+      "content_sha256": "e1117cce21094de52522fc0adb22de69a2f6332dfa8871d1c24099302c0e97d2",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 732,
+          "end_byte": 823
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 824,
+          "end_byte": 915
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 918,
+          "end_byte": 922
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 923,
+          "end_byte": 968
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 983,
+          "end_byte": 1006
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.6",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "The system",
+          "action": "meet its operational performance requirements after being subjected to the\nEMP environment",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "The system shall meet its operational performance requirements after being subjected to the\nEMP environment.",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "This\nrequirement  is applicable only if invoked by\nthe procuring activity.",
+            "span_indices": [
+              2,
+              3,
+              4
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.6/verification",
+      "kind": "paragraph",
+      "ordinal": 19,
+      "clause_reference": "5.6.derived-verification",
+      "heading": "5.6: compliance verification",
+      "statement_role": "obligation",
+      "exact_text": "Compliance shall be verified\nby system, subsystem, and equipment level tests, analysis, or a combination thereof.",
+      "content_sha256": "201a138577a92ecfd679db1b47093e4378e82eb26d6ab022f0cfd9ba4257c92f",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1008,
+          "end_byte": 1036
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1037,
+          "end_byte": 1121
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.6",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Compliance",
+          "action": "be verified",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Compliance shall be verified\nby system, subsystem, and equipment level tests, analysis, or a combination thereof.",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7",
+      "kind": "clause",
+      "ordinal": 20,
+      "clause_reference": "5.7",
+      "heading": "5.7 Subsystems and equipment electromagnetic interference (EMI)",
+      "statement_role": "governing_note",
+      "exact_text": "5.7\nSubsystems and equipment electromagnetic interference (EMI).\nIndividual  subsystems and equipment shall meet interference control requirements (such as the\nconducted emissions, radiated emissions, conducted susceptibility, and radiated susceptibility\nrequirements of MIL-ST D -461) so that the overall system complies with all applicable\nrequirements of this standard.  This includes permanent, temporary, and portable electronic\nequipment.  Compliance shall be verified by tests that are consistent with the individual\nrequirement (such as testing in accordance with MIL-STD-461).",
+      "content_sha256": "c3281054cec20da474c06b837a4884a3069b25754aa6a421c309e227ed3417d6",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1122,
+          "end_byte": 1125
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1186,
+          "end_byte": 1246
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1247,
+          "end_byte": 1341
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1342,
+          "end_byte": 1436
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1437,
+          "end_byte": 1523
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1524,
+          "end_byte": 1615
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1616,
+          "end_byte": 1705
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1706,
+          "end_byte": 1767
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": null,
+        "qualifiers": [
+          {
+            "kind": "source_applicability",
+            "exact_text": "This includes permanent, temporary, and portable electronic\nequipment.",
+            "span_indices": [
+              5,
+              6
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [
+          "The clause's two directives are reviewed separately as derived child records."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7/emi-control-requirements",
+      "kind": "paragraph",
+      "ordinal": 21,
+      "clause_reference": "5.7.derived-emi-control-requirements",
+      "heading": "5.7: subsystems and equipment meet interference control requirements",
+      "statement_role": "obligation",
+      "exact_text": "Individual  subsystems and equipment shall meet interference control requirements (such as the\nconducted emissions, radiated emissions, conducted susceptibility, and radiated susceptibility\nrequirements of MIL-ST D -461) so that the overall system complies with all applicable\nrequirements of this standard.",
+      "content_sha256": "830532f55103b8ab67fc0eda09233b958802e7c0305e7addcc31e51f54303739",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1247,
+          "end_byte": 1341
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1342,
+          "end_byte": 1436
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1437,
+          "end_byte": 1523
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1524,
+          "end_byte": 1554
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Individual  subsystems and equipment",
+          "action": "meet interference control requirements",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Individual  subsystems and equipment shall meet interference control requirements (such as the\nconducted emissions, radiated emissions, conducted susceptibility, and radiated susceptibility\nrequirements of MIL-ST D -461) so that the overall system complies with all applicable\nrequirements of this standard.",
+          "span_indices": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "acceptance_criterion",
+            "exact_text": "so that the overall system complies with all applicable\nrequirements of this standard.",
+            "span_indices": [
+              2,
+              3
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [
+          "The parenthetical MIL-STD-461 citation is an example ('such as'), not an edition-specific mandate; the cited document has no revision letter."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7/verification",
+      "kind": "paragraph",
+      "ordinal": 22,
+      "clause_reference": "5.7.derived-verification",
+      "heading": "5.7: compliance verification by tests consistent with the requirement",
+      "statement_role": "obligation",
+      "exact_text": "Compliance shall be verified by tests that are consistent with the individual\nrequirement (such as testing in accordance with MIL-STD-461).",
+      "content_sha256": "26245941fb5b39676d1b7a8dd4e419a406ab0ff38be66b01064715eeeb605179",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1628,
+          "end_byte": 1705
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1706,
+          "end_byte": 1767
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Compliance",
+          "action": "be verified by tests that are consistent with the individual",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Compliance shall be verified by tests that are consistent with the individual\nrequirement (such as testing in accordance with MIL-STD-461).",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.1",
+      "kind": "clause",
+      "ordinal": 23,
+      "clause_reference": "5.7.1",
+      "heading": "5.7.1 Portable electronic devices and carry-on equipment requirements",
+      "statement_role": "governing_note",
+      "exact_text": "5.7.1\nPortable Electronic Devices and Carry-O n Equ i pmen t  Requirements.\nPortable electronic devices and carry-on equipment containing electronics which are not\npermanently installed or integrated into platforms and require airworthiness certification shall\nmeet,  as  a minimum, the following EMI interface control requirements:\nSafety Critical:\nAll platform emissions and susceptibility requirements (such as those\ndefined in MIL-ST D -461) that are defined for safety critical equipment.\nNon-Safety Critical:  All platform emissions requirements (such as those defined in MIL\n-\nSTD-461).\nIf any part of the portable electronic device/carry-on equipment contains radio frequency\ntransmission capability, then transmitter emissions characteristics shall be measured (such as in\nMIL-STD-461 Test Method CE106), in addition to the applicable requirements stated above.  An\naircraft EMC evaluation per 5.2 shall also be required to demonstrate platform compatibility of\nthe portable electronic devices/carry-on equipment which have radio frequency transmitting\ncapability.\nIf any part of the portable electronic device/carry-on equipment contains ordnance or is\nintegrated into an ordnance system, then the HERO requirements stated within this standard\nshall also be met.  Compliance shall be verified by test per the applicable requirements.",
+      "content_sha256": "5dc14f363226d3fc6b04bd74a2b9b1f6bf0c4c41c03a0e151a205e38f81dafb2",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1768,
+          "end_byte": 1773
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1825,
+          "end_byte": 1894
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1895,
+          "end_byte": 1982
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1983,
+          "end_byte": 2079
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2080,
+          "end_byte": 2151
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2162,
+          "end_byte": 2178
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2185,
+          "end_byte": 2254
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2265,
+          "end_byte": 2338
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2349,
+          "end_byte": 2436
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2450,
+          "end_byte": 2451
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2462,
+          "end_byte": 2471
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2472,
+          "end_byte": 2561
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2562,
+          "end_byte": 2659
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2660,
+          "end_byte": 2752
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2753,
+          "end_byte": 2848
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2849,
+          "end_byte": 2939
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2940,
+          "end_byte": 2951
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2952,
+          "end_byte": 3040
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 3041,
+          "end_byte": 3131
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 3132,
+          "end_byte": 3221
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": null,
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [
+          "The clause's five directives are reviewed separately as derived child records."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.1/minimum-emi-requirements",
+      "kind": "paragraph",
+      "ordinal": 24,
+      "clause_reference": "5.7.1.derived-minimum-emi-requirements",
+      "heading": "5.7.1: minimum EMI interface control requirements for PEDs",
+      "statement_role": "obligation",
+      "exact_text": "Portable electronic devices and carry-on equipment containing electronics which are not\npermanently installed or integrated into platforms and require airworthiness certification shall\nmeet,  as  a minimum, the following EMI interface control requirements:\nSafety Critical:\nAll platform emissions and susceptibility requirements (such as those\ndefined in MIL-ST D -461) that are defined for safety critical equipment.\nNon-Safety Critical:  All platform emissions requirements (such as those defined in MIL\n-\nSTD-461).",
+      "content_sha256": "7ba5833827eaf06ea00660603a91d7a7afc7b96d0858b60b7ec416238851ed2a",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1895,
+          "end_byte": 1982
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1983,
+          "end_byte": 2079
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2080,
+          "end_byte": 2151
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2162,
+          "end_byte": 2178
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2185,
+          "end_byte": 2254
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2265,
+          "end_byte": 2338
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2349,
+          "end_byte": 2436
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2450,
+          "end_byte": 2451
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2462,
+          "end_byte": 2471
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Portable electronic devices and carry-on equipment",
+          "action": "meet,  as  a minimum, the following EMI interface control requirements",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Portable electronic devices and carry-on equipment containing electronics which are not\npermanently installed or integrated into platforms and require airworthiness certification shall\nmeet,  as  a minimum, the following EMI interface control requirements:\nSafety Critical:\nAll platform emissions and susceptibility requirements (such as those\ndefined in MIL-ST D -461) that are defined for safety critical equipment.\nNon-Safety Critical:  All platform emissions requirements (such as those defined in MIL\n-\nSTD-461).",
+          "span_indices": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "source_applicability",
+            "exact_text": "containing electronics which are not\npermanently installed or integrated into platforms and require airworthiness certification",
+            "span_indices": [
+              0,
+              1
+            ]
+          },
+          {
+            "kind": "condition",
+            "exact_text": "Safety Critical:\nAll platform emissions and susceptibility requirements (such as those\ndefined in MIL-ST D -461) that are defined for safety critical equipment.",
+            "span_indices": [
+              3,
+              4,
+              5
+            ]
+          },
+          {
+            "kind": "condition",
+            "exact_text": "Non-Safety Critical:  All platform emissions requirements (such as those defined in MIL\n-\nSTD-461).",
+            "span_indices": [
+              6,
+              7,
+              8
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.1/transmitter-emissions",
+      "kind": "paragraph",
+      "ordinal": 25,
+      "clause_reference": "5.7.1.derived-transmitter-emissions",
+      "heading": "5.7.1: measure transmitter emissions of RF-transmitting PEDs",
+      "statement_role": "obligation",
+      "exact_text": "If any part of the portable electronic device/carry-on equipment contains radio frequency\ntransmission capability, then transmitter emissions characteristics shall be measured (such as in\nMIL-STD-461 Test Method CE106), in addition to the applicable requirements stated above.",
+      "content_sha256": "08496d84fed08b8c278c9056569fb936689851959fb08716c75968685999dd75",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2472,
+          "end_byte": 2561
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2562,
+          "end_byte": 2659
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2660,
+          "end_byte": 2748
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "transmitter emissions characteristics",
+          "action": "be measured",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "If any part of the portable electronic device/carry-on equipment contains radio frequency\ntransmission capability, then transmitter emissions characteristics shall be measured (such as in\nMIL-STD-461 Test Method CE106), in addition to the applicable requirements stated above.",
+          "span_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "If any part of the portable electronic device/carry-on equipment contains radio frequency\ntransmission capability",
+            "span_indices": [
+              0,
+              1
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.1/aircraft-emc-evaluation",
+      "kind": "paragraph",
+      "ordinal": 26,
+      "clause_reference": "5.7.1.derived-aircraft-emc-evaluation",
+      "heading": "5.7.1: aircraft EMC evaluation for RF-transmitting PEDs",
+      "statement_role": "obligation",
+      "exact_text": "An\naircraft EMC evaluation per 5.2 shall also be required to demonstrate platform compatibility of\nthe portable electronic devices/carry-on equipment which have radio frequency transmitting\ncapability.",
+      "content_sha256": "4d1f8695246ff48653aea0b80b61f5202a23f5cdf935b435ce5295f6ec9c5ad8",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2750,
+          "end_byte": 2752
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2753,
+          "end_byte": 2848
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2849,
+          "end_byte": 2939
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2940,
+          "end_byte": 2951
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "aircraft EMC evaluation per 5.2",
+          "action": "be required",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "An\naircraft EMC evaluation per 5.2 shall also be required to demonstrate platform compatibility of\nthe portable electronic devices/carry-on equipment which have radio frequency transmitting\ncapability.",
+          "span_indices": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "source_applicability",
+            "exact_text": "which have radio frequency transmitting\ncapability.",
+            "span_indices": [
+              2,
+              3
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.1/hero",
+      "kind": "paragraph",
+      "ordinal": 27,
+      "clause_reference": "5.7.1.derived-hero",
+      "heading": "5.7.1: HERO requirements for PEDs containing ordnance",
+      "statement_role": "obligation",
+      "exact_text": "If any part of the portable electronic device/carry-on equipment contains ordnance or is\nintegrated into an ordnance system, then the HERO requirements stated within this standard\nshall also be met.",
+      "content_sha256": "ffb05cfb6a6528948419517483a334bf66113cdd2e29a5d82a95f41d0f06a530",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2952,
+          "end_byte": 3040
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 3041,
+          "end_byte": 3131
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 3132,
+          "end_byte": 3150
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "the HERO requirements stated within this standard",
+          "action": "be met",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "If any part of the portable electronic device/carry-on equipment contains ordnance or is\nintegrated into an ordnance system, then the HERO requirements stated within this standard\nshall also be met.",
+          "span_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "If any part of the portable electronic device/carry-on equipment contains ordnance or is\nintegrated into an ordnance system",
+            "span_indices": [
+              0,
+              1
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.1/verification",
+      "kind": "paragraph",
+      "ordinal": 28,
+      "clause_reference": "5.7.1.derived-verification",
+      "heading": "5.7.1: compliance verification",
+      "statement_role": "obligation",
+      "exact_text": "Compliance shall be verified by test per the applicable requirements.",
+      "content_sha256": "b7546f0e85b291e00c9f1b3c595fd862d0a2f466b6d0953473a6f00cf824a9fa",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 3152,
+          "end_byte": 3221
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7.1",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Compliance",
+          "action": "be verified",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Compliance shall be verified by test per the applicable requirements.",
+          "span_indices": [
+            0
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.2",
+      "kind": "clause",
+      "ordinal": 29,
+      "clause_reference": "5.7.2",
+      "heading": "5.7.2 Non-developmental items (NDI) and commercial items",
+      "statement_role": "governing_note",
+      "exact_text": "5.7.2\nNon-developmental items (NDI) and commercial items.\nNDI and commercial items shall meet EMI interface control requirements suitable for ensuring\nthat system operational performance requirements are met.  Compliance shall\nbe  verified by test,\nanalysis, or a combination thereof.",
+      "content_sha256": "5e767710d74a34bbe5198ad057b5713f5b8543326661809c4d5a7c83d1045921",
+      "source_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 74,
+          "end_byte": 79
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 132,
+          "end_byte": 183
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 184,
+          "end_byte": 276
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 277,
+          "end_byte": 352
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 415,
+          "end_byte": 436
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 437,
+          "end_byte": 472
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": null,
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [
+          "The clause's two directives are reviewed separately as derived child records."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.2/emi-control-requirements",
+      "kind": "paragraph",
+      "ordinal": 30,
+      "clause_reference": "5.7.2.derived-emi-control-requirements",
+      "heading": "5.7.2: NDI and commercial items meet suitable EMI requirements",
+      "statement_role": "obligation",
+      "exact_text": "NDI and commercial items shall meet EMI interface control requirements suitable for ensuring\nthat system operational performance requirements are met.",
+      "content_sha256": "d4ae003818d0c4a2bbc90c1a46df3b97ddf5bdb4eac029c0d70bf21e1c8deef2",
+      "source_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 184,
+          "end_byte": 276
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 277,
+          "end_byte": 334
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7.2",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "NDI and commercial items",
+          "action": "meet EMI interface control requirements",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "NDI and commercial items shall meet EMI interface control requirements suitable for ensuring\nthat system operational performance requirements are met.",
+          "span_indices": [
+            0,
+            1
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "acceptance_criterion",
+            "exact_text": "suitable for ensuring\nthat system operational performance requirements are met.",
+            "span_indices": [
+              0,
+              1
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.2/verification",
+      "kind": "paragraph",
+      "ordinal": 31,
+      "clause_reference": "5.7.2.derived-verification",
+      "heading": "5.7.2: compliance verification",
+      "statement_role": "obligation",
+      "exact_text": "Compliance shall\nbe  verified by test,\nanalysis, or a combination thereof.",
+      "content_sha256": "0f90f9fd13c252bd3b64af0b02878cd857e709755a0376f0e8cbc68134dc9b37",
+      "source_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 336,
+          "end_byte": 352
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 415,
+          "end_byte": 436
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 437,
+          "end_byte": 472
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7.2",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Compliance",
+          "action": "be  verified",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Compliance shall\nbe  verified by test,\nanalysis, or a combination thereof.",
+          "span_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.3",
+      "kind": "clause",
+      "ordinal": 32,
+      "clause_reference": "5.7.3",
+      "heading": "5.7.3 Shipboard DC magnetic field environment",
+      "statement_role": "governing_note",
+      "exact_text": "5.7.3\nShipboard DC magnetic field environment.\nSubsystems and equipment used aboard ships shall not be degraded when exposed to its\noperational DC magnetic environment (such as DOD-STD-1399-\n070-1 (NAVY)).  Compliance shall\nbe verified by test,\nanalysis, or a combination thereof.",
+      "content_sha256": "f96127730d87d4a1dc691078d437c3334c2bfb8d61bd96ff4a3fd9d37333ef10",
+      "source_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 473,
+          "end_byte": 478
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 530,
+          "end_byte": 570
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 571,
+          "end_byte": 655
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 656,
+          "end_byte": 714
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 768,
+          "end_byte": 800
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 801,
+          "end_byte": 821
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 840,
+          "end_byte": 875
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "governing_condition",
+        "normativity": "normative",
+        "statement": null,
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [
+          "The clause's two directives are reviewed separately as derived child records."
+        ],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.3/not-degraded",
+      "kind": "paragraph",
+      "ordinal": 33,
+      "clause_reference": "5.7.3.derived-not-degraded",
+      "heading": "5.7.3: shipboard items not degraded by DC magnetic environment",
+      "statement_role": "obligation",
+      "exact_text": "Subsystems and equipment used aboard ships shall not be degraded when exposed to its\noperational DC magnetic environment (such as DOD-STD-1399-\n070-1 (NAVY)).",
+      "content_sha256": "bbf1988eace148ce35df65af4dff3861efe6613d7207258e65b48d9b033d2794",
+      "source_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 571,
+          "end_byte": 655
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 656,
+          "end_byte": 714
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 768,
+          "end_byte": 782
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7.3",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Subsystems and equipment used aboard ships",
+          "action": "be degraded",
+          "modality": "shall",
+          "polarity": "negative",
+          "exact_text": "Subsystems and equipment used aboard ships shall not be degraded when exposed to its\noperational DC magnetic environment (such as DOD-STD-1399-\n070-1 (NAVY)).",
+          "span_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        "qualifiers": [
+          {
+            "kind": "condition",
+            "exact_text": "when exposed to its\noperational DC magnetic environment",
+            "span_indices": [
+              0,
+              1
+            ]
+          },
+          {
+            "kind": "source_applicability",
+            "exact_text": "used aboard ships",
+            "span_indices": [
+              0
+            ]
+          }
+        ],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    },
+    {
+      "logical_id": "5.7.3/verification",
+      "kind": "paragraph",
+      "ordinal": 34,
+      "clause_reference": "5.7.3.derived-verification",
+      "heading": "5.7.3: compliance verification",
+      "statement_role": "obligation",
+      "exact_text": "Compliance shall\nbe verified by test,\nanalysis, or a combination thereof.",
+      "content_sha256": "c41da188717c26140070eb909a8615925870a23c18f0e15a40314e467f83e4c7",
+      "source_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 784,
+          "end_byte": 800
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 801,
+          "end_byte": 821
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 840,
+          "end_byte": 875
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review of exact verified page-text byte spans; layout fragments separated by three or more spaces or a line break are joined with one LF; no PDF raster inspection",
+        "review_status": "agent_reviewed"
+      },
+      "parent_logical_id": "5.7.3",
+      "semantics": {
+        "schema_version": "0.1.0",
+        "content_role": "requirement_candidate",
+        "normativity": "normative",
+        "statement": {
+          "subject": "Compliance",
+          "action": "be verified",
+          "modality": "shall",
+          "polarity": "affirmative",
+          "exact_text": "Compliance shall\nbe verified by test,\nanalysis, or a combination thereof.",
+          "span_indices": [
+            0,
+            1,
+            2
+          ]
+        },
+        "qualifiers": [],
+        "quantities": [],
+        "unresolved_issues": [],
+        "project_applicability": "not_decided"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "source_logical_id": "1.2",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 479,
+          "end_byte": 482
+        },
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 210,
+          "end_byte": 213
+        }
+      ],
+      "target_logical_id": "1.1"
+    },
+    {
+      "source_logical_id": "4.1",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 169,
+          "end_byte": 172
+        },
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 479,
+          "end_byte": 482
+        }
+      ],
+      "target_logical_id": "1.2"
+    },
+    {
+      "source_logical_id": "4.1/emc-in-operational-environment",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 243,
+          "end_byte": 247
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 169,
+          "end_byte": 172
+        }
+      ],
+      "target_logical_id": "4.1"
+    },
+    {
+      "source_logical_id": "4.1/design-techniques",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 715,
+          "end_byte": 748
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 169,
+          "end_byte": 172
+        }
+      ],
+      "target_logical_id": "4.1"
+    },
+    {
+      "source_logical_id": "4.1/design-margins",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 870,
+          "end_byte": 943
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 169,
+          "end_byte": 172
+        }
+      ],
+      "target_logical_id": "4.1"
+    },
+    {
+      "source_logical_id": "4.1/verification-life-cycle",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1036,
+          "end_byte": 1137
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 169,
+          "end_byte": 172
+        }
+      ],
+      "target_logical_id": "4.1"
+    },
+    {
+      "source_logical_id": "5",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 72,
+          "end_byte": 74
+        },
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 169,
+          "end_byte": 172
+        }
+      ],
+      "target_logical_id": "4.1"
+    },
+    {
+      "source_logical_id": "5.1",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 152,
+          "end_byte": 155
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 72,
+          "end_byte": 74
+        }
+      ],
+      "target_logical_id": "5"
+    },
+    {
+      "source_logical_id": "5.1/verification",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 477,
+          "end_byte": 508
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 152,
+          "end_byte": 155
+        }
+      ],
+      "target_logical_id": "5.1"
+    },
+    {
+      "source_logical_id": "5.1/margins-established",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 226,
+          "end_byte": 318
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 152,
+          "end_byte": 155
+        }
+      ],
+      "target_logical_id": "5.1"
+    },
+    {
+      "source_logical_id": "5.1/minimum-safety-margin",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 328,
+          "end_byte": 411
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 152,
+          "end_byte": 155
+        }
+      ],
+      "target_logical_id": "5.1"
+    },
+    {
+      "source_logical_id": "5.2",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 551,
+          "end_byte": 554
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 72,
+          "end_byte": 74
+        }
+      ],
+      "target_logical_id": "5"
+    },
+    {
+      "source_logical_id": "5.2/emc-within-itself",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 666,
+          "end_byte": 759
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 551,
+          "end_byte": 554
+        }
+      ],
+      "target_logical_id": "5.2"
+    },
+    {
+      "source_logical_id": "5.2/verification",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 795,
+          "end_byte": 834
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 551,
+          "end_byte": 554
+        }
+      ],
+      "target_logical_id": "5.2"
+    },
+    {
+      "source_logical_id": "5.6",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 639,
+          "end_byte": 642
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 72,
+          "end_byte": 74
+        }
+      ],
+      "target_logical_id": "5"
+    },
+    {
+      "source_logical_id": "5.6/operational-after-emp",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 732,
+          "end_byte": 823
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 639,
+          "end_byte": 642
+        }
+      ],
+      "target_logical_id": "5.6"
+    },
+    {
+      "source_logical_id": "5.6/verification",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1008,
+          "end_byte": 1036
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 639,
+          "end_byte": 642
+        }
+      ],
+      "target_logical_id": "5.6"
+    },
+    {
+      "source_logical_id": "5.7",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1122,
+          "end_byte": 1125
+        },
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 72,
+          "end_byte": 74
+        }
+      ],
+      "target_logical_id": "5"
+    },
+    {
+      "source_logical_id": "5.7/emi-control-requirements",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1247,
+          "end_byte": 1341
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1122,
+          "end_byte": 1125
+        }
+      ],
+      "target_logical_id": "5.7"
+    },
+    {
+      "source_logical_id": "5.7/verification",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1628,
+          "end_byte": 1705
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1122,
+          "end_byte": 1125
+        }
+      ],
+      "target_logical_id": "5.7"
+    },
+    {
+      "source_logical_id": "5.7.1",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1768,
+          "end_byte": 1773
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1122,
+          "end_byte": 1125
+        }
+      ],
+      "target_logical_id": "5.7"
+    },
+    {
+      "source_logical_id": "5.7.1/minimum-emi-requirements",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1895,
+          "end_byte": 1982
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1768,
+          "end_byte": 1773
+        }
+      ],
+      "target_logical_id": "5.7.1"
+    },
+    {
+      "source_logical_id": "5.7.1/transmitter-emissions",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2472,
+          "end_byte": 2561
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1768,
+          "end_byte": 1773
+        }
+      ],
+      "target_logical_id": "5.7.1"
+    },
+    {
+      "source_logical_id": "5.7.1/aircraft-emc-evaluation",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2750,
+          "end_byte": 2752
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1768,
+          "end_byte": 1773
+        }
+      ],
+      "target_logical_id": "5.7.1"
+    },
+    {
+      "source_logical_id": "5.7.1/hero",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2952,
+          "end_byte": 3040
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1768,
+          "end_byte": 1773
+        }
+      ],
+      "target_logical_id": "5.7.1"
+    },
+    {
+      "source_logical_id": "5.7.1/verification",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 3152,
+          "end_byte": 3221
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1768,
+          "end_byte": 1773
+        }
+      ],
+      "target_logical_id": "5.7.1"
+    },
+    {
+      "source_logical_id": "5.7.2",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 74,
+          "end_byte": 79
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1122,
+          "end_byte": 1125
+        }
+      ],
+      "target_logical_id": "5.7"
+    },
+    {
+      "source_logical_id": "5.7.2/emi-control-requirements",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 184,
+          "end_byte": 276
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 74,
+          "end_byte": 79
+        }
+      ],
+      "target_logical_id": "5.7.2"
+    },
+    {
+      "source_logical_id": "5.7.2/verification",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 336,
+          "end_byte": 352
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 74,
+          "end_byte": 79
+        }
+      ],
+      "target_logical_id": "5.7.2"
+    },
+    {
+      "source_logical_id": "5.7.3",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 473,
+          "end_byte": 478
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1122,
+          "end_byte": 1125
+        }
+      ],
+      "target_logical_id": "5.7"
+    },
+    {
+      "source_logical_id": "5.7.3/not-degraded",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 571,
+          "end_byte": 655
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 473,
+          "end_byte": 478
+        }
+      ],
+      "target_logical_id": "5.7.3"
+    },
+    {
+      "source_logical_id": "5.7.3/verification",
+      "relationship_type": "governed_by",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 784,
+          "end_byte": 800
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 473,
+          "end_byte": 478
+        }
+      ],
+      "target_logical_id": "5.7.3"
+    },
+    {
+      "source_logical_id": "5.6/operational-after-emp",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 901,
+          "end_byte": 914
+        }
+      ],
+      "target_reference": "MIL-STD-2169 (no revision cited; source states the EMP environment is classified; the a7 corpus contains MIL-STD-2169D page text, which is not reviewed in this batch)"
+    },
+    {
+      "source_logical_id": "5.7/emi-control-requirements",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1453,
+          "end_byte": 1466
+        }
+      ],
+      "target_reference": "MIL-STD-461 (example citation, no revision; see reviewed cross-package binding)"
+    },
+    {
+      "source_logical_id": "5.7/verification",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 1754,
+          "end_byte": 1765
+        }
+      ],
+      "target_reference": "MIL-STD-461 (example citation, no revision; see reviewed cross-package binding)"
+    },
+    {
+      "source_logical_id": "5.7.1/minimum-emi-requirements",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2276,
+          "end_byte": 2289
+        }
+      ],
+      "target_reference": "MIL-STD-461 (example citation, no revision; see reviewed cross-package binding)"
+    },
+    {
+      "source_logical_id": "5.7.1/minimum-emi-requirements",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2433,
+          "end_byte": 2436
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2450,
+          "end_byte": 2451
+        },
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2462,
+          "end_byte": 2469
+        }
+      ],
+      "target_reference": "MIL-STD-461 (example citation, no revision; see reviewed cross-package binding)"
+    },
+    {
+      "source_logical_id": "5.7.1/transmitter-emissions",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2660,
+          "end_byte": 2689
+        }
+      ],
+      "target_reference": "MIL-STD-461 Test Method CE106 (example citation; method not in a reviewed scope)"
+    },
+    {
+      "source_logical_id": "5.7.1/aircraft-emc-evaluation",
+      "relationship_type": "references",
+      "target_status": "resolved",
+      "required": true,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 2777,
+          "end_byte": 2784
+        }
+      ],
+      "target_logical_id": "5.2"
+    },
+    {
+      "source_logical_id": "5.7.1/hero",
+      "relationship_type": "references",
+      "target_status": "out_of_scope",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 3082,
+          "end_byte": 3131
+        }
+      ],
+      "target_reference": "MIL-STD-464D HERO requirements (outside the reviewed scope)"
+    },
+    {
+      "source_logical_id": "5.7.3/not-degraded",
+      "relationship_type": "references",
+      "target_status": "unresolved",
+      "required": false,
+      "derivation": {
+        "method": "agent self-review of an explicit textual relationship in the exact page text",
+        "review_status": "agent_reviewed"
+      },
+      "evidence_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 701,
+          "end_byte": 714
+        },
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 768,
+          "end_byte": 780
+        }
+      ],
+      "target_reference": "DOD-STD-1399-070-1 (NAVY) (example citation; not in the a7 MIL-STD page-text corpus)"
+    }
+  ],
+  "unsupported_regions": [
+    {
+      "region_id": "page-0010-unreviewed-01",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 132,
+          "end_byte": 144
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0010-unreviewed-02",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 145,
+          "end_byte": 209
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0010-unreviewed-03",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 630,
+          "end_byte": 1787
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0010-unreviewed-04",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 1812,
+          "end_byte": 1823
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0010-unreviewed-05",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 2280,
+          "end_byte": 2732
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0010-unreviewed-06",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 2786,
+          "end_byte": 2787
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0010-unreviewed-07",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 3072,
+          "end_byte": 3459
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0010-unreviewed-08",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 3484,
+          "end_byte": 3496
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0010-unreviewed-09",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 3938,
+          "end_byte": 5610
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0010-unreviewed-10",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 10,
+          "page_text_sha256": "cb45ce4252c6e410d779f5f8f403458e4c646fb75a22d1398d8b363820d1ae19",
+          "start_byte": 5765,
+          "end_byte": 6043
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0019-unreviewed-01",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 77,
+          "end_byte": 89
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0019-unreviewed-02",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 19,
+          "page_text_sha256": "09542700209d312d9a1f42dd9c3f199b1360fc59b49589b8d9671c362b3a7a44",
+          "start_byte": 1671,
+          "end_byte": 1891
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0020-unreviewed-01",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 59,
+          "end_byte": 71
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0020-unreviewed-02",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 994,
+          "end_byte": 2990
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0020-unreviewed-03",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 20,
+          "page_text_sha256": "147b1ee1d8ee42ca8f9165f4d1b1af14607a339e29b8e23f7d7667b8d68c4798",
+          "start_byte": 3059,
+          "end_byte": 3260
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0031-unreviewed-01",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 59,
+          "end_byte": 71
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0031-unreviewed-02",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 83,
+          "end_byte": 638
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0031-unreviewed-03",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 31,
+          "page_text_sha256": "d03c8e8d51b5fa5326a2cc024459dc7c4edbd33740c6015d8ec45f3f3c15d8cb",
+          "start_byte": 3290,
+          "end_byte": 3491
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0032-unreviewed-01",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 61,
+          "end_byte": 73
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    },
+    {
+      "region_id": "page-0032-unreviewed-02",
+      "reason_code": "outside_selected_scope",
+      "source_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 876,
+          "end_byte": 3639
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Page text outside the selected bounded semantic scope; not reviewed in this batch."
+    },
+    {
+      "region_id": "page-0032-unreviewed-03",
+      "reason_code": "other",
+      "source_spans": [
+        {
+          "physical_page": 32,
+          "page_text_sha256": "dd4e6761ec32a198bf3e988372391a1de7a31a26b576eca84343ece98566d4d6",
+          "start_byte": 3710,
+          "end_byte": 3912
+        }
+      ],
+      "derivation": {
+        "method": "agent self-review disposition of page text outside the selected semantic scope",
+        "review_status": "agent_reviewed"
+      },
+      "description": "Running header, footer, page number, or download banner; not semantic content of the reviewed scope."
+    }
+  ]
+}

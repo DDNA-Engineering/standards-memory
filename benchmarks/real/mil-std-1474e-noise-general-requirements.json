@@ -1,0 +1,5134 @@
+{
+ "suite": {
+  "suite_id": "mil-std-1474e-noise-general-requirements-agent-self-review-2026-10",
+  "qualification": "bounded_real_document_regression",
+  "package_digest": "a352f44a109946ca369cebe3a710fb40be2cf4806072a54750f78b0e4c2d803a",
+  "edition_id": "dla:mil-std-ident:36905:composition:a6ec79c021c2d883f638959760ae716d07fca6de68862ebfd74c289a22667c38",
+  "cases": [
+   {
+    "case_id": "review-1.1",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-7e8059eb10538c7f70875fb8"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-ec39dd3d592f9efb64739a6e"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+      "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-1.2",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-5c8c5f9e2f55ff4e42ad45af"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-ec39dd3d592f9efb64739a6e",
+      "struct-45c7606dd5fe653e9d524cba"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "that emit acoustic noise or contain sources of noise.",
+      "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+      "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-1.3",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-ec39dd3d592f9efb64739a6e"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-ec39dd3d592f9efb64739a6e",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-45c7606dd5fe653e9d524cba"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-ec39dd3d592f9efb64739a6e",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5de1ff7ecde7acb554407254ca9ea12cbc8c8813077cd0221750c15bf6e1e9c1"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "This standard provides criteria for designing materiel having noise levels\nthat:"
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-ec39dd3d592f9efb64739a6e",
+       "content_role": "prose",
+       "statement": {
+        "subject": "This standard",
+        "action": "provides criteria for designing materiel",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard provides criteria for designing materiel having noise levels\nthat:",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.1",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-5a5f3de7abf62097ab689901"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-d35165183f79707c2e84c379"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Systems and subsystems",
+        "action": "be procured using the\ndesign order of precedence in MIL-STD-882",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.1.1",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-fabe33f76071ea3023a92ad2"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-fabe33f76071ea3023a92ad2",
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-ece06e96532130b3f8bf9933",
+      "struct-7f661d48b186a03cb70628d3"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-fabe33f76071ea3023a92ad2",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "31f976f2486773a79c145b2a710d17a35cf81ef4f7e6bcb2a97bab00f566d20b"
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "in such a manner that noise produced by the entire system does\nnot exceed the requirements of this standard.",
+      "Subsystems, sets, groups, and units including such items as\nair conditioners, heaters, input/output devices, printers, and auxiliary equipment, shall be\nselected, integrated, and installed in such a manner that noise produced by the entire system does\nnot exceed the requirements of this standard."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-fabe33f76071ea3023a92ad2",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Subsystems, sets, groups, and units",
+        "action": "be\nselected, integrated, and installed",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Subsystems, sets, groups, and units including such items as\nair conditioners, heaters, input/output devices, printers, and auxiliary equipment, shall be\nselected, integrated, and installed in such a manner that noise produced by the entire system does\nnot exceed the requirements of this standard.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "acceptance_criterion",
+         "exact_text": "in such a manner that noise produced by the entire system does\nnot exceed the requirements of this standard.",
+         "span_indices": [
+          3,
+          4
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Systems and subsystems",
+        "action": "be procured using the\ndesign order of precedence in MIL-STD-882",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.1.2/noise-control-design",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-09cb3013e853716daef08047"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-09cb3013e853716daef08047",
+      "struct-ece06e96532130b3f8bf9933",
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-4e639fa46ff76fb4ef93a990",
+      "struct-345ad0d2e830b96793de879d"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-09cb3013e853716daef08047",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "7089d0740926a343f2f8624280f9e12c5f90e584339aa4173ca2852dbcc1cb30"
+      },
+      {
+       "record_id": "struct-ece06e96532130b3f8bf9933",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "d0041084ad2e8b7b5661e578cd4cb1e636de3295017e46474f407d86b9480537"
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "Both individual equipment and components shall be selected\nand designed for noise control."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-09cb3013e853716daef08047",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Both individual equipment and components",
+        "action": "be selected\nand designed for noise control",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Both individual equipment and components shall be selected\nand designed for noise control.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-ece06e96532130b3f8bf9933",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Systems and subsystems",
+        "action": "be procured using the\ndesign order of precedence in MIL-STD-882",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.1.2/component-criteria",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-4e639fa46ff76fb4ef93a990"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-4e639fa46ff76fb4ef93a990",
+      "struct-ece06e96532130b3f8bf9933",
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-09cb3013e853716daef08047",
+      "struct-345ad0d2e830b96793de879d"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-4e639fa46ff76fb4ef93a990",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "3df6f5b21bb6e94b11a8d6adca1ceae9c47ce1a43a5bb88bedd80bd8480a99bc"
+      },
+      {
+       "record_id": "struct-ece06e96532130b3f8bf9933",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "d0041084ad2e8b7b5661e578cd4cb1e636de3295017e46474f407d86b9480537"
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "Selection and design criteria for specific system components or\n“stand-alone” products shall specify acceptable levels or preferred ranges of noise for\ncomponents (e.g., pumps, fans, compressors, generators)."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-4e639fa46ff76fb4ef93a990",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Selection and design criteria for specific system components",
+        "action": "specify acceptable levels or preferred ranges of noise",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Selection and design criteria for specific system components or\n“stand-alone” products shall specify acceptable levels or preferred ranges of noise for\ncomponents (e.g., pumps, fans, compressors, generators).",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-ece06e96532130b3f8bf9933",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Systems and subsystems",
+        "action": "be procured using the\ndesign order of precedence in MIL-STD-882",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.1.2/specification-basis",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-345ad0d2e830b96793de879d"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-345ad0d2e830b96793de879d",
+      "struct-ece06e96532130b3f8bf9933",
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-09cb3013e853716daef08047",
+      "struct-4e639fa46ff76fb4ef93a990"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-345ad0d2e830b96793de879d",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "acece82d19e16b11c06ce8dd50f6b85cccd72b3fd1ee4f6948ca38a787419be5"
+      },
+      {
+       "record_id": "struct-ece06e96532130b3f8bf9933",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "d0041084ad2e8b7b5661e578cd4cb1e636de3295017e46474f407d86b9480537"
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "These shall be specified as noise\nlevels measured under standard conditions or sound power levels, estimated from noise\nmeasurements."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-345ad0d2e830b96793de879d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "These",
+        "action": "be specified as noise\nlevels measured under standard conditions or sound power levels",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "These shall be specified as noise\nlevels measured under standard conditions or sound power levels, estimated from noise\nmeasurements.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-ece06e96532130b3f8bf9933",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Systems and subsystems",
+        "action": "be procured using the\ndesign order of precedence in MIL-STD-882",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.1.2/procurement-evaluation",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-28c318c65f69793289b504ac"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-28c318c65f69793289b504ac",
+      "struct-ece06e96532130b3f8bf9933",
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-09cb3013e853716daef08047",
+      "struct-4e639fa46ff76fb4ef93a990"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-28c318c65f69793289b504ac",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5b3ff050eba1ddba3152d4720d87c03b6d0505148381702a2f5cf66691a3e09b"
+      },
+      {
+       "record_id": "struct-ece06e96532130b3f8bf9933",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "d0041084ad2e8b7b5661e578cd4cb1e636de3295017e46474f407d86b9480537"
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "where the system may create hazardous exposure to\nnoise.",
+      "Procurement evaluation criteria shall include the contribution of noise as a\nselection criterion in purchase decisions where the system may create hazardous exposure to\nnoise."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-28c318c65f69793289b504ac",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Procurement evaluation criteria",
+        "action": "include the contribution of noise as a\nselection criterion",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Procurement evaluation criteria shall include the contribution of noise as a\nselection criterion in purchase decisions where the system may create hazardous exposure to\nnoise.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "where the system may create hazardous exposure to\nnoise.",
+         "span_indices": [
+          1,
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-ece06e96532130b3f8bf9933",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Systems and subsystems",
+        "action": "be procured using the\ndesign order of precedence in MIL-STD-882",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.1.3/total-system-conformance",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-e47303226b4e6dcd51f8f791"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-e47303226b4e6dcd51f8f791",
+      "struct-7f661d48b186a03cb70628d3",
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-4e42da64e2c42e3b25fd3af1"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-e47303226b4e6dcd51f8f791",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "3882a447d1e03924b094fa2378f74c9e72a7f87b2d234e670956d3cc804ca1f3"
+      },
+      {
+       "record_id": "struct-7f661d48b186a03cb70628d3",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "19ddd2fc901d3173c9c7d204199a9cadfab215524cf4011ccd68ac7f6610499c"
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "The use of GFE shall not eliminate the\nrequirement that the total system conform to this standard."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-e47303226b4e6dcd51f8f791",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "The use of GFE",
+        "action": "eliminate the\nrequirement that the total system conform to this standard",
+        "modality": "shall",
+        "polarity": "negative",
+        "exact_text": "The use of GFE shall not eliminate the\nrequirement that the total system conform to this standard.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-7f661d48b186a03cb70628d3",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Systems and subsystems",
+        "action": "be procured using the\ndesign order of precedence in MIL-STD-882",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.1.3/report-exceeding-gfe",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-4e42da64e2c42e3b25fd3af1"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-4e42da64e2c42e3b25fd3af1",
+      "struct-7f661d48b186a03cb70628d3",
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-e47303226b4e6dcd51f8f791"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-4e42da64e2c42e3b25fd3af1",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "34d868d1e9a383e07e68bedb2e1a0da9af0a86869a4d0498f8bc34792acb070d"
+      },
+      {
+       "record_id": "struct-7f661d48b186a03cb70628d3",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "19ddd2fc901d3173c9c7d204199a9cadfab215524cf4011ccd68ac7f6610499c"
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "causing the total system noise to\nexceed permissible levels",
+      "GFE causing the total system noise to\nexceed permissible levels shall be brought to the attention of the procuring activity."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-4e42da64e2c42e3b25fd3af1",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "GFE causing the total system noise to",
+        "action": "be brought to the attention of the procuring activity",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "GFE causing the total system noise to\nexceed permissible levels shall be brought to the attention of the procuring activity.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "causing the total system noise to\nexceed permissible levels",
+         "span_indices": [
+          0,
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7f661d48b186a03cb70628d3",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Systems and subsystems",
+        "action": "be procured using the\ndesign order of precedence in MIL-STD-882",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.1/source-noise-reduction-primary",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-a949d855d481a85e496e93e8"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-a949d855d481a85e496e93e8",
+      "struct-32e1fe7444b98e76aa62df62",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-0f5605a1208e4fc921c837eb",
+      "struct-24e9b6b39c488e01e61eb4c4"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-a949d855d481a85e496e93e8",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "ff0875368330a5f1075215a74b750fbb0a42107bb7fa7f95e2bf084ad470c5a6"
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5172e5ca511fec3b2c15fa9ef81f526bba4152dea1839fbcd024f46fd7e27248"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "Source noise reduction shall be the primary\nmeans to protect personnel from hazardous noise."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-a949d855d481a85e496e93e8",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Source noise reduction",
+        "action": "be the primary\nmeans to protect personnel from hazardous noise",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Source noise reduction shall be the primary\nmeans to protect personnel from hazardous noise.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.1/no-sole-reliance-on-protectors",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-0f5605a1208e4fc921c837eb"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-0f5605a1208e4fc921c837eb",
+      "struct-32e1fe7444b98e76aa62df62",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-a949d855d481a85e496e93e8",
+      "struct-24e9b6b39c488e01e61eb4c4"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-0f5605a1208e4fc921c837eb",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5e6cd929310d053553ee8ec061cb3b10321622fe187e3d54aa5f9985808c5bfe"
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5172e5ca511fec3b2c15fa9ef81f526bba4152dea1839fbcd024f46fd7e27248"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "unless all noise reduction design\napproaches have been pursued.",
+      "Hearing protectors and administrative\nmeasures such as warning signs shall not be solely relied upon, unless all noise reduction design\napproaches have been pursued."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-0f5605a1208e4fc921c837eb",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Hearing protectors and administrative\nmeasures such as warning signs",
+        "action": "be solely relied upon",
+        "modality": "shall",
+        "polarity": "negative",
+        "exact_text": "Hearing protectors and administrative\nmeasures such as warning signs shall not be solely relied upon, unless all noise reduction design\napproaches have been pursued.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "unless all noise reduction design\napproaches have been pursued.",
+         "span_indices": [
+          1,
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.1/steady-state-and-impulse-limits",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-24e9b6b39c488e01e61eb4c4"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-24e9b6b39c488e01e61eb4c4",
+      "struct-32e1fe7444b98e76aa62df62",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-a949d855d481a85e496e93e8",
+      "struct-0f5605a1208e4fc921c837eb"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-24e9b6b39c488e01e61eb4c4",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "469e86a519405e397d9c7326398081ec7f458d770b9e9964f4377f663b0adfd8"
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5172e5ca511fec3b2c15fa9ef81f526bba4152dea1839fbcd024f46fd7e27248"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "at the ear (protected or\nunprotected)",
+      "at all personnel locations during normal operations.",
+      "Steady-state levels shall be less than 85 decibels A-weighted\n(dBA) and peak-pressure levels of impulsive noise less than 140 dBP, at the ear (protected or\nunprotected), at all personnel locations during normal operations."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-24e9b6b39c488e01e61eb4c4",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Steady-state levels",
+        "action": "be less than 85 decibels A-weighted",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Steady-state levels shall be less than 85 decibels A-weighted\n(dBA) and peak-pressure levels of impulsive noise less than 140 dBP, at the ear (protected or\nunprotected), at all personnel locations during normal operations.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "at the ear (protected or\nunprotected)",
+         "span_indices": [
+          1,
+          2
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "at all personnel locations during normal operations.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.1.1/effective-exposure-method",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-c4457fde835b73e70cfb9671"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-c4457fde835b73e70cfb9671",
+      "struct-6ca1603dd7013ce8dfc4ae16",
+      "struct-32e1fe7444b98e76aa62df62",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-baabb094daea92fe6050601f",
+      "struct-c854531e86856e0203d79d1b"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-c4457fde835b73e70cfb9671",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e35c9d73f6809ec8a506bf468d9dae6ebc05aa44a8401f3446e81a286f507adc"
+      },
+      {
+       "record_id": "struct-6ca1603dd7013ce8dfc4ae16",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "d382f12c923db4480c1810c1f02680d2611548f6379c5020e76086f95f66b7fb"
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5172e5ca511fec3b2c15fa9ef81f526bba4152dea1839fbcd024f46fd7e27248"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "Where personal protective equipment is used to\nprovide noise reduction,",
+      "Where personal protective equipment is used to\nprovide noise reduction, the method specified in ANSI/ASA S12.68 or equivalent shall be used\nto compute the effective noise exposure using attenuation measured in accordance with\nANSI/ASA S12.6 and ANSI/ASA S12.42."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-c4457fde835b73e70cfb9671",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "the method specified in ANSI/ASA S12.68 or equivalent",
+        "action": "be used\nto compute the effective noise exposure",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Where personal protective equipment is used to\nprovide noise reduction, the method specified in ANSI/ASA S12.68 or equivalent shall be used\nto compute the effective noise exposure using attenuation measured in accordance with\nANSI/ASA S12.6 and ANSI/ASA S12.42.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "Where personal protective equipment is used to\nprovide noise reduction,",
+         "span_indices": [
+          0,
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-6ca1603dd7013ce8dfc4ae16",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.1.1/document-method",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-baabb094daea92fe6050601f"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-baabb094daea92fe6050601f",
+      "struct-6ca1603dd7013ce8dfc4ae16",
+      "struct-32e1fe7444b98e76aa62df62",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-c4457fde835b73e70cfb9671",
+      "struct-c854531e86856e0203d79d1b"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-baabb094daea92fe6050601f",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "4cbb4c70a27c1ca95e90da887e23a2fc106e82bad33b27fe56dd1aabd77c985b"
+      },
+      {
+       "record_id": "struct-6ca1603dd7013ce8dfc4ae16",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "d382f12c923db4480c1810c1f02680d2611548f6379c5020e76086f95f66b7fb"
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5172e5ca511fec3b2c15fa9ef81f526bba4152dea1839fbcd024f46fd7e27248"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "The method(s) used shall be documented."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-baabb094daea92fe6050601f",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "The method(s) used",
+        "action": "be documented",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "The method(s) used shall be documented.",
+        "span_indices": [
+         0
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-6ca1603dd7013ce8dfc4ae16",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.1.1/fit-testing",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-c854531e86856e0203d79d1b"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-c854531e86856e0203d79d1b",
+      "struct-6ca1603dd7013ce8dfc4ae16",
+      "struct-32e1fe7444b98e76aa62df62",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-c4457fde835b73e70cfb9671",
+      "struct-baabb094daea92fe6050601f"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-c854531e86856e0203d79d1b",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "915a28664030b2c671eba350c8c0e0fc0e6688bb1a29bfbbb3d1bfd2f56f673b"
+      },
+      {
+       "record_id": "struct-6ca1603dd7013ce8dfc4ae16",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "d382f12c923db4480c1810c1f02680d2611548f6379c5020e76086f95f66b7fb"
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5172e5ca511fec3b2c15fa9ef81f526bba4152dea1839fbcd024f46fd7e27248"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "where feasible.",
+      "Fit testing\nof the hearing protection device should be performed, where feasible."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-c854531e86856e0203d79d1b",
+       "content_role": "prose",
+       "statement": {
+        "subject": "Fit testing\nof the hearing protection device",
+        "action": "be performed",
+        "modality": "should",
+        "polarity": "affirmative",
+        "exact_text": "Fit testing\nof the hearing protection device should be performed, where feasible.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "where feasible.",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-6ca1603dd7013ce8dfc4ae16",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.1.2",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-4c004bfcf589730d93e4e694"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-4c004bfcf589730d93e4e694",
+      "struct-32e1fe7444b98e76aa62df62",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-a949d855d481a85e496e93e8",
+      "struct-0f5605a1208e4fc921c837eb"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-4c004bfcf589730d93e4e694",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "41f75517a87dd9d7b7ea0188850b070dc2496984d1e3f9356120c50f3fb731bb"
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5172e5ca511fec3b2c15fa9ef81f526bba4152dea1839fbcd024f46fd7e27248"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "when assessing noise levels at the ear",
+      "provided attenuation of these devices have been measured in accordance with ANSI/ASA S12.6\nand ANSI/ASA S12.42, as required.",
+      "Noise attenuation properties of helmets\nand communication headsets should be considered when assessing noise levels at the ear\nprovided attenuation of these devices have been measured in accordance with ANSI/ASA S12.6\nand ANSI/ASA S12.42, as required."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-4c004bfcf589730d93e4e694",
+       "content_role": "prose",
+       "statement": {
+        "subject": "Noise attenuation properties of helmets\nand communication headsets",
+        "action": "be considered",
+        "modality": "should",
+        "polarity": "affirmative",
+        "exact_text": "Noise attenuation properties of helmets\nand communication headsets should be considered when assessing noise levels at the ear\nprovided attenuation of these devices have been measured in accordance with ANSI/ASA S12.6\nand ANSI/ASA S12.42, as required.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "when assessing noise levels at the ear",
+         "span_indices": [
+          2
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "provided attenuation of these devices have been measured in accordance with ANSI/ASA S12.6\nand ANSI/ASA S12.42, as required.",
+         "span_indices": [
+          3,
+          4
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-32e1fe7444b98e76aa62df62",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.2",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-e143567f0fc20fa88a5af0a9"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-e143567f0fc20fa88a5af0a9",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-32e1fe7444b98e76aa62df62"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e6287f40b5c156a2cb4b3c6c0a338638c006feb005afdd257ff13313acaf2ba5"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "This provision shall not apply to the exteriors of military combat equipment."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "This provision shall not apply to the exteriors of military combat equipment.",
+         "span_indices": [
+          6
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.2/sign-conformance",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-c0d376b8677fe535366cf24f"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-c0d376b8677fe535366cf24f",
+      "struct-e143567f0fc20fa88a5af0a9",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-b21e0915a4ff85e68d3e0ae6",
+      "struct-6d6af6cd7c2ccdee0fbc120a"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-c0d376b8677fe535366cf24f",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "cf78ab14fb393a774165067cb35c4b62e66e76955edb28d3ae8695cf69f15790"
+      },
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e6287f40b5c156a2cb4b3c6c0a338638c006feb005afdd257ff13313acaf2ba5"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "Where individual requirements specify posting of noise\nhazard areas,",
+      "as applicable",
+      "Where individual requirements specify posting of noise\nhazard areas, signs should conform to ANSI/ASHRAE Standard 62.1, and the danger signs\nprovisions in MIL-HDBK-1473, as applicable (see Figure 1)."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-c0d376b8677fe535366cf24f",
+       "content_role": "prose",
+       "statement": {
+        "subject": "signs",
+        "action": "conform to ANSI/ASHRAE Standard 62.1",
+        "modality": "should",
+        "polarity": "affirmative",
+        "exact_text": "Where individual requirements specify posting of noise\nhazard areas, signs should conform to ANSI/ASHRAE Standard 62.1, and the danger signs\nprovisions in MIL-HDBK-1473, as applicable (see Figure 1).",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "Where individual requirements specify posting of noise\nhazard areas,",
+         "span_indices": [
+          0,
+          1
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "as applicable",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "This provision shall not apply to the exteriors of military combat equipment.",
+         "span_indices": [
+          6
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.2/visible-and-legible",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-b21e0915a4ff85e68d3e0ae6"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-b21e0915a4ff85e68d3e0ae6",
+      "struct-e143567f0fc20fa88a5af0a9",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-c0d376b8677fe535366cf24f",
+      "struct-6d6af6cd7c2ccdee0fbc120a"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-b21e0915a4ff85e68d3e0ae6",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "bd885b4ac6413a89d84ea13dd4e9603abd6f09676183db024779059d4d477b05"
+      },
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e6287f40b5c156a2cb4b3c6c0a338638c006feb005afdd257ff13313acaf2ba5"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "to all personnel that might be exposed to the hazard, to include crew and passengers.",
+      "This provision shall not apply to the exteriors of military combat equipment.",
+      "They shall be clearly visible and\nlegible to all personnel that might be exposed to the hazard, to include crew and passengers."
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-b21e0915a4ff85e68d3e0ae6",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "They",
+        "action": "be clearly visible and\nlegible",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "They shall be clearly visible and\nlegible to all personnel that might be exposed to the hazard, to include crew and passengers.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "to all personnel that might be exposed to the hazard, to include crew and passengers.",
+         "span_indices": [
+          1
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "This provision shall not apply to the exteriors of military combat equipment.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "This provision shall not apply to the exteriors of military combat equipment.",
+         "span_indices": [
+          6
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.2.1",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-6d6af6cd7c2ccdee0fbc120a"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-6d6af6cd7c2ccdee0fbc120a",
+      "struct-e143567f0fc20fa88a5af0a9",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-c0d376b8677fe535366cf24f",
+      "struct-b21e0915a4ff85e68d3e0ae6"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-6d6af6cd7c2ccdee0fbc120a",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "a4befc3c6a211cb98b2b6a44e7a5a989ba4a723e06a958f9131825e4eb8ad0da"
+      },
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e6287f40b5c156a2cb4b3c6c0a338638c006feb005afdd257ff13313acaf2ba5"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "equal to or above 85 dBA",
+      "Areas with levels equal to or above 85 dBA shall be\nposted with noise hazard signs;"
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-6d6af6cd7c2ccdee0fbc120a",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Areas with levels equal to or above 85 dBA",
+        "action": "be\nposted with noise hazard signs",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Areas with levels equal to or above 85 dBA shall be\nposted with noise hazard signs;",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "equal to or above 85 dBA",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "This provision shall not apply to the exteriors of military combat equipment.",
+         "span_indices": [
+          6
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "review-4.2.2.2",
+    "operation": "get_clause",
+    "request": {
+     "record_id": "struct-fb323d35a19e80fe2201267d"
+    },
+    "expected": {
+     "record_ids": [
+      "struct-fb323d35a19e80fe2201267d",
+      "struct-e143567f0fc20fa88a5af0a9",
+      "struct-d35165183f79707c2e84c379",
+      "struct-45c7606dd5fe653e9d524cba",
+      "struct-5c8c5f9e2f55ff4e42ad45af",
+      "struct-7e8059eb10538c7f70875fb8"
+     ],
+     "forbidden_record_ids": [
+      "struct-c0d376b8677fe535366cf24f",
+      "struct-b21e0915a4ff85e68d3e0ae6"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-fb323d35a19e80fe2201267d",
+       "page": 15,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "206433a84372448ecab485f6507240f3a23a7040ebc1327713ffba8d6d272112"
+      },
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e6287f40b5c156a2cb4b3c6c0a338638c006feb005afdd257ff13313acaf2ba5"
+      },
+      {
+       "record_id": "struct-d35165183f79707c2e84c379",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "2c3e54ba830545834fe4464209ac3da339a34760031cab79a9d3d77de3483137"
+      },
+      {
+       "record_id": "struct-45c7606dd5fe653e9d524cba",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e2e56165771a2f2fc2aaa7a8630d1ee62e61f568f4f559c6b26a32ede6d2d2fb"
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fdbd0f2714ef1198f097c555b28368f9cdbfce2abadbc413c9547a2f98dd99da"
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "page": 7,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e7a54ee45f8528e54ea7e724211ab241f4f3135dc184946dd6f011bb0e8bac09"
+      }
+     ],
+     "critical_facts": [
+      "equal to or above 140 dBP",
+      "Areas with impulsive levels equal to or above 140 dBP\nshall be posted with noise hazard signs;"
+     ],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-fb323d35a19e80fe2201267d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Areas with impulsive levels equal to or above 140 dBP",
+        "action": "be posted with noise hazard signs",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Areas with impulsive levels equal to or above 140 dBP\nshall be posted with noise hazard signs;",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "equal to or above 140 dBP",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "content_role": "governing_condition",
+       "statement": null,
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "This provision shall not apply to the exteriors of military combat equipment.",
+         "span_indices": [
+          6
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-5c8c5f9e2f55ff4e42ad45af",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "applies to the acquisition and product improvement",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard applies to the acquisition and product improvement of\nall designed or purchased (non-developmental items) facilities, systems, subsystems, and\nequipment that emit acoustic noise or contain sources of noise.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "that emit acoustic noise or contain sources of noise.",
+         "span_indices": [
+          3
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "Fixed physical plant facilities, such as real estate and\nimprovements thereto, and permanent habitable real property structures are covered under other\nDoD policy and standards.",
+         "span_indices": [
+          7,
+          8,
+          9
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-7e8059eb10538c7f70875fb8",
+       "content_role": "applicability_statement",
+       "statement": {
+        "subject": "This standard",
+        "action": "establishes acoustic noise limits",
+        "modality": "other",
+        "polarity": "affirmative",
+        "exact_text": "This standard establishes acoustic noise limits and prescribes testing\nrequirements and measurement procedures for determining conformance to the noise limits\nstated herein.",
+        "span_indices": [
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "Acoustical noise limits for determining conformance to community annoyance\nrequirements are beyond the scope of this standard.",
+         "span_indices": [
+          5,
+          6
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-4",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "4",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-fabe33f76071ea3023a92ad2",
+      "struct-09cb3013e853716daef08047",
+      "struct-4e639fa46ff76fb4ef93a990",
+      "struct-345ad0d2e830b96793de879d",
+      "struct-28c318c65f69793289b504ac",
+      "struct-e47303226b4e6dcd51f8f791",
+      "struct-4e42da64e2c42e3b25fd3af1",
+      "struct-a949d855d481a85e496e93e8",
+      "struct-0f5605a1208e4fc921c837eb",
+      "struct-24e9b6b39c488e01e61eb4c4",
+      "struct-c4457fde835b73e70cfb9671",
+      "struct-baabb094daea92fe6050601f",
+      "struct-b21e0915a4ff85e68d3e0ae6",
+      "struct-6d6af6cd7c2ccdee0fbc120a",
+      "struct-fb323d35a19e80fe2201267d"
+     ],
+     "forbidden_record_ids": [],
+     "citations": [
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+      },
+      {
+       "record_id": "struct-fabe33f76071ea3023a92ad2",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "31f976f2486773a79c145b2a710d17a35cf81ef4f7e6bcb2a97bab00f566d20b"
+      },
+      {
+       "record_id": "struct-09cb3013e853716daef08047",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "7089d0740926a343f2f8624280f9e12c5f90e584339aa4173ca2852dbcc1cb30"
+      },
+      {
+       "record_id": "struct-4e639fa46ff76fb4ef93a990",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "3df6f5b21bb6e94b11a8d6adca1ceae9c47ce1a43a5bb88bedd80bd8480a99bc"
+      },
+      {
+       "record_id": "struct-345ad0d2e830b96793de879d",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "acece82d19e16b11c06ce8dd50f6b85cccd72b3fd1ee4f6948ca38a787419be5"
+      },
+      {
+       "record_id": "struct-28c318c65f69793289b504ac",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5b3ff050eba1ddba3152d4720d87c03b6d0505148381702a2f5cf66691a3e09b"
+      },
+      {
+       "record_id": "struct-e47303226b4e6dcd51f8f791",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "3882a447d1e03924b094fa2378f74c9e72a7f87b2d234e670956d3cc804ca1f3"
+      },
+      {
+       "record_id": "struct-4e42da64e2c42e3b25fd3af1",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "34d868d1e9a383e07e68bedb2e1a0da9af0a86869a4d0498f8bc34792acb070d"
+      },
+      {
+       "record_id": "struct-a949d855d481a85e496e93e8",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "ff0875368330a5f1075215a74b750fbb0a42107bb7fa7f95e2bf084ad470c5a6"
+      },
+      {
+       "record_id": "struct-0f5605a1208e4fc921c837eb",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5e6cd929310d053553ee8ec061cb3b10321622fe187e3d54aa5f9985808c5bfe"
+      },
+      {
+       "record_id": "struct-24e9b6b39c488e01e61eb4c4",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "469e86a519405e397d9c7326398081ec7f458d770b9e9964f4377f663b0adfd8"
+      },
+      {
+       "record_id": "struct-c4457fde835b73e70cfb9671",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e35c9d73f6809ec8a506bf468d9dae6ebc05aa44a8401f3446e81a286f507adc"
+      },
+      {
+       "record_id": "struct-baabb094daea92fe6050601f",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "4cbb4c70a27c1ca95e90da887e23a2fc106e82bad33b27fe56dd1aabd77c985b"
+      },
+      {
+       "record_id": "struct-b21e0915a4ff85e68d3e0ae6",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "bd885b4ac6413a89d84ea13dd4e9603abd6f09676183db024779059d4d477b05"
+      },
+      {
+       "record_id": "struct-6d6af6cd7c2ccdee0fbc120a",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "a4befc3c6a211cb98b2b6a44e7a5a989ba4a723e06a958f9131825e4eb8ad0da"
+      },
+      {
+       "record_id": "struct-fb323d35a19e80fe2201267d",
+       "page": 15,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "206433a84372448ecab485f6507240f3a23a7040ebc1327713ffba8d6d272112"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Systems and subsystems",
+        "action": "be procured using the\ndesign order of precedence in MIL-STD-882",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-fabe33f76071ea3023a92ad2",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Subsystems, sets, groups, and units",
+        "action": "be\nselected, integrated, and installed",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Subsystems, sets, groups, and units including such items as\nair conditioners, heaters, input/output devices, printers, and auxiliary equipment, shall be\nselected, integrated, and installed in such a manner that noise produced by the entire system does\nnot exceed the requirements of this standard.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "acceptance_criterion",
+         "exact_text": "in such a manner that noise produced by the entire system does\nnot exceed the requirements of this standard.",
+         "span_indices": [
+          3,
+          4
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-09cb3013e853716daef08047",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Both individual equipment and components",
+        "action": "be selected\nand designed for noise control",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Both individual equipment and components shall be selected\nand designed for noise control.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-4e639fa46ff76fb4ef93a990",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Selection and design criteria for specific system components",
+        "action": "specify acceptable levels or preferred ranges of noise",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Selection and design criteria for specific system components or\n“stand-alone” products shall specify acceptable levels or preferred ranges of noise for\ncomponents (e.g., pumps, fans, compressors, generators).",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-345ad0d2e830b96793de879d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "These",
+        "action": "be specified as noise\nlevels measured under standard conditions or sound power levels",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "These shall be specified as noise\nlevels measured under standard conditions or sound power levels, estimated from noise\nmeasurements.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-28c318c65f69793289b504ac",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Procurement evaluation criteria",
+        "action": "include the contribution of noise as a\nselection criterion",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Procurement evaluation criteria shall include the contribution of noise as a\nselection criterion in purchase decisions where the system may create hazardous exposure to\nnoise.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "where the system may create hazardous exposure to\nnoise.",
+         "span_indices": [
+          1,
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-e47303226b4e6dcd51f8f791",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "The use of GFE",
+        "action": "eliminate the\nrequirement that the total system conform to this standard",
+        "modality": "shall",
+        "polarity": "negative",
+        "exact_text": "The use of GFE shall not eliminate the\nrequirement that the total system conform to this standard.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-4e42da64e2c42e3b25fd3af1",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "GFE causing the total system noise to",
+        "action": "be brought to the attention of the procuring activity",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "GFE causing the total system noise to\nexceed permissible levels shall be brought to the attention of the procuring activity.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "causing the total system noise to\nexceed permissible levels",
+         "span_indices": [
+          0,
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-a949d855d481a85e496e93e8",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Source noise reduction",
+        "action": "be the primary\nmeans to protect personnel from hazardous noise",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Source noise reduction shall be the primary\nmeans to protect personnel from hazardous noise.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-0f5605a1208e4fc921c837eb",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Hearing protectors and administrative\nmeasures such as warning signs",
+        "action": "be solely relied upon",
+        "modality": "shall",
+        "polarity": "negative",
+        "exact_text": "Hearing protectors and administrative\nmeasures such as warning signs shall not be solely relied upon, unless all noise reduction design\napproaches have been pursued.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "unless all noise reduction design\napproaches have been pursued.",
+         "span_indices": [
+          1,
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-24e9b6b39c488e01e61eb4c4",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Steady-state levels",
+        "action": "be less than 85 decibels A-weighted",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Steady-state levels shall be less than 85 decibels A-weighted\n(dBA) and peak-pressure levels of impulsive noise less than 140 dBP, at the ear (protected or\nunprotected), at all personnel locations during normal operations.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "at the ear (protected or\nunprotected)",
+         "span_indices": [
+          1,
+          2
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "at all personnel locations during normal operations.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-c4457fde835b73e70cfb9671",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "the method specified in ANSI/ASA S12.68 or equivalent",
+        "action": "be used\nto compute the effective noise exposure",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Where personal protective equipment is used to\nprovide noise reduction, the method specified in ANSI/ASA S12.68 or equivalent shall be used\nto compute the effective noise exposure using attenuation measured in accordance with\nANSI/ASA S12.6 and ANSI/ASA S12.42.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "Where personal protective equipment is used to\nprovide noise reduction,",
+         "span_indices": [
+          0,
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-baabb094daea92fe6050601f",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "The method(s) used",
+        "action": "be documented",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "The method(s) used shall be documented.",
+        "span_indices": [
+         0
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-b21e0915a4ff85e68d3e0ae6",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "They",
+        "action": "be clearly visible and\nlegible",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "They shall be clearly visible and\nlegible to all personnel that might be exposed to the hazard, to include crew and passengers.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "to all personnel that might be exposed to the hazard, to include crew and passengers.",
+         "span_indices": [
+          1
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "This provision shall not apply to the exteriors of military combat equipment.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-6d6af6cd7c2ccdee0fbc120a",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Areas with levels equal to or above 85 dBA",
+        "action": "be\nposted with noise hazard signs",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Areas with levels equal to or above 85 dBA shall be\nposted with noise hazard signs;",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "equal to or above 85 dBA",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-fb323d35a19e80fe2201267d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Areas with impulsive levels equal to or above 140 dBP",
+        "action": "be posted with noise hazard signs",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Areas with impulsive levels equal to or above 140 dBP\nshall be posted with noise hazard signs;",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "equal to or above 140 dBP",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-4.1",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "4.1",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-fabe33f76071ea3023a92ad2",
+      "struct-09cb3013e853716daef08047",
+      "struct-4e639fa46ff76fb4ef93a990",
+      "struct-345ad0d2e830b96793de879d",
+      "struct-28c318c65f69793289b504ac",
+      "struct-e47303226b4e6dcd51f8f791",
+      "struct-4e42da64e2c42e3b25fd3af1"
+     ],
+     "forbidden_record_ids": [
+      "struct-a949d855d481a85e496e93e8",
+      "struct-0f5605a1208e4fc921c837eb",
+      "struct-24e9b6b39c488e01e61eb4c4"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "fccc691e2ec9206af937af7efaacf80e4bdbe5ac9fb1cbea1646ec9713392614"
+      },
+      {
+       "record_id": "struct-fabe33f76071ea3023a92ad2",
+       "page": 13,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "31f976f2486773a79c145b2a710d17a35cf81ef4f7e6bcb2a97bab00f566d20b"
+      },
+      {
+       "record_id": "struct-09cb3013e853716daef08047",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "7089d0740926a343f2f8624280f9e12c5f90e584339aa4173ca2852dbcc1cb30"
+      },
+      {
+       "record_id": "struct-4e639fa46ff76fb4ef93a990",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "3df6f5b21bb6e94b11a8d6adca1ceae9c47ce1a43a5bb88bedd80bd8480a99bc"
+      },
+      {
+       "record_id": "struct-345ad0d2e830b96793de879d",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "acece82d19e16b11c06ce8dd50f6b85cccd72b3fd1ee4f6948ca38a787419be5"
+      },
+      {
+       "record_id": "struct-28c318c65f69793289b504ac",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5b3ff050eba1ddba3152d4720d87c03b6d0505148381702a2f5cf66691a3e09b"
+      },
+      {
+       "record_id": "struct-e47303226b4e6dcd51f8f791",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "3882a447d1e03924b094fa2378f74c9e72a7f87b2d234e670956d3cc804ca1f3"
+      },
+      {
+       "record_id": "struct-4e42da64e2c42e3b25fd3af1",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "34d868d1e9a383e07e68bedb2e1a0da9af0a86869a4d0498f8bc34792acb070d"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-5a5f3de7abf62097ab689901",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Systems and subsystems",
+        "action": "be procured using the\ndesign order of precedence in MIL-STD-882",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Systems and subsystems shall be procured using the\ndesign order of precedence in MIL-STD-882 by eliminating hazards through design selection,\nincorporating safety devices, providing warning devices, and developing procedures and\ntraining.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-fabe33f76071ea3023a92ad2",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Subsystems, sets, groups, and units",
+        "action": "be\nselected, integrated, and installed",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Subsystems, sets, groups, and units including such items as\nair conditioners, heaters, input/output devices, printers, and auxiliary equipment, shall be\nselected, integrated, and installed in such a manner that noise produced by the entire system does\nnot exceed the requirements of this standard.",
+        "span_indices": [
+         1,
+         2,
+         3,
+         4
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "acceptance_criterion",
+         "exact_text": "in such a manner that noise produced by the entire system does\nnot exceed the requirements of this standard.",
+         "span_indices": [
+          3,
+          4
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-09cb3013e853716daef08047",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Both individual equipment and components",
+        "action": "be selected\nand designed for noise control",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Both individual equipment and components shall be selected\nand designed for noise control.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-4e639fa46ff76fb4ef93a990",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Selection and design criteria for specific system components",
+        "action": "specify acceptable levels or preferred ranges of noise",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Selection and design criteria for specific system components or\n“stand-alone” products shall specify acceptable levels or preferred ranges of noise for\ncomponents (e.g., pumps, fans, compressors, generators).",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-345ad0d2e830b96793de879d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "These",
+        "action": "be specified as noise\nlevels measured under standard conditions or sound power levels",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "These shall be specified as noise\nlevels measured under standard conditions or sound power levels, estimated from noise\nmeasurements.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-28c318c65f69793289b504ac",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Procurement evaluation criteria",
+        "action": "include the contribution of noise as a\nselection criterion",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Procurement evaluation criteria shall include the contribution of noise as a\nselection criterion in purchase decisions where the system may create hazardous exposure to\nnoise.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "where the system may create hazardous exposure to\nnoise.",
+         "span_indices": [
+          1,
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-e47303226b4e6dcd51f8f791",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "The use of GFE",
+        "action": "eliminate the\nrequirement that the total system conform to this standard",
+        "modality": "shall",
+        "polarity": "negative",
+        "exact_text": "The use of GFE shall not eliminate the\nrequirement that the total system conform to this standard.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-4e42da64e2c42e3b25fd3af1",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "GFE causing the total system noise to",
+        "action": "be brought to the attention of the procuring activity",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "GFE causing the total system noise to\nexceed permissible levels shall be brought to the attention of the procuring activity.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "causing the total system noise to\nexceed permissible levels",
+         "span_indices": [
+          0,
+          1
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-4.1.2",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "4.1.2",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-09cb3013e853716daef08047",
+      "struct-4e639fa46ff76fb4ef93a990",
+      "struct-345ad0d2e830b96793de879d",
+      "struct-28c318c65f69793289b504ac"
+     ],
+     "forbidden_record_ids": [
+      "struct-fabe33f76071ea3023a92ad2",
+      "struct-e47303226b4e6dcd51f8f791",
+      "struct-4e42da64e2c42e3b25fd3af1"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-09cb3013e853716daef08047",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "7089d0740926a343f2f8624280f9e12c5f90e584339aa4173ca2852dbcc1cb30"
+      },
+      {
+       "record_id": "struct-4e639fa46ff76fb4ef93a990",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "3df6f5b21bb6e94b11a8d6adca1ceae9c47ce1a43a5bb88bedd80bd8480a99bc"
+      },
+      {
+       "record_id": "struct-345ad0d2e830b96793de879d",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "acece82d19e16b11c06ce8dd50f6b85cccd72b3fd1ee4f6948ca38a787419be5"
+      },
+      {
+       "record_id": "struct-28c318c65f69793289b504ac",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5b3ff050eba1ddba3152d4720d87c03b6d0505148381702a2f5cf66691a3e09b"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-09cb3013e853716daef08047",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Both individual equipment and components",
+        "action": "be selected\nand designed for noise control",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Both individual equipment and components shall be selected\nand designed for noise control.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-4e639fa46ff76fb4ef93a990",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Selection and design criteria for specific system components",
+        "action": "specify acceptable levels or preferred ranges of noise",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Selection and design criteria for specific system components or\n“stand-alone” products shall specify acceptable levels or preferred ranges of noise for\ncomponents (e.g., pumps, fans, compressors, generators).",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-345ad0d2e830b96793de879d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "These",
+        "action": "be specified as noise\nlevels measured under standard conditions or sound power levels",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "These shall be specified as noise\nlevels measured under standard conditions or sound power levels, estimated from noise\nmeasurements.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-28c318c65f69793289b504ac",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Procurement evaluation criteria",
+        "action": "include the contribution of noise as a\nselection criterion",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Procurement evaluation criteria shall include the contribution of noise as a\nselection criterion in purchase decisions where the system may create hazardous exposure to\nnoise.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "where the system may create hazardous exposure to\nnoise.",
+         "span_indices": [
+          1,
+          2
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-4.1.3",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "4.1.3",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-e47303226b4e6dcd51f8f791",
+      "struct-4e42da64e2c42e3b25fd3af1"
+     ],
+     "forbidden_record_ids": [
+      "struct-fabe33f76071ea3023a92ad2",
+      "struct-09cb3013e853716daef08047",
+      "struct-4e639fa46ff76fb4ef93a990"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-e47303226b4e6dcd51f8f791",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "3882a447d1e03924b094fa2378f74c9e72a7f87b2d234e670956d3cc804ca1f3"
+      },
+      {
+       "record_id": "struct-4e42da64e2c42e3b25fd3af1",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "34d868d1e9a383e07e68bedb2e1a0da9af0a86869a4d0498f8bc34792acb070d"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-e47303226b4e6dcd51f8f791",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "The use of GFE",
+        "action": "eliminate the\nrequirement that the total system conform to this standard",
+        "modality": "shall",
+        "polarity": "negative",
+        "exact_text": "The use of GFE shall not eliminate the\nrequirement that the total system conform to this standard.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-4e42da64e2c42e3b25fd3af1",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "GFE causing the total system noise to",
+        "action": "be brought to the attention of the procuring activity",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "GFE causing the total system noise to\nexceed permissible levels shall be brought to the attention of the procuring activity.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "causing the total system noise to\nexceed permissible levels",
+         "span_indices": [
+          0,
+          1
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-4.2",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "4.2",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-a949d855d481a85e496e93e8",
+      "struct-0f5605a1208e4fc921c837eb",
+      "struct-24e9b6b39c488e01e61eb4c4",
+      "struct-c4457fde835b73e70cfb9671",
+      "struct-baabb094daea92fe6050601f",
+      "struct-b21e0915a4ff85e68d3e0ae6",
+      "struct-6d6af6cd7c2ccdee0fbc120a",
+      "struct-fb323d35a19e80fe2201267d"
+     ],
+     "forbidden_record_ids": [
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-fabe33f76071ea3023a92ad2",
+      "struct-09cb3013e853716daef08047"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-a949d855d481a85e496e93e8",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "ff0875368330a5f1075215a74b750fbb0a42107bb7fa7f95e2bf084ad470c5a6"
+      },
+      {
+       "record_id": "struct-0f5605a1208e4fc921c837eb",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5e6cd929310d053553ee8ec061cb3b10321622fe187e3d54aa5f9985808c5bfe"
+      },
+      {
+       "record_id": "struct-24e9b6b39c488e01e61eb4c4",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "469e86a519405e397d9c7326398081ec7f458d770b9e9964f4377f663b0adfd8"
+      },
+      {
+       "record_id": "struct-c4457fde835b73e70cfb9671",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e35c9d73f6809ec8a506bf468d9dae6ebc05aa44a8401f3446e81a286f507adc"
+      },
+      {
+       "record_id": "struct-baabb094daea92fe6050601f",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "4cbb4c70a27c1ca95e90da887e23a2fc106e82bad33b27fe56dd1aabd77c985b"
+      },
+      {
+       "record_id": "struct-b21e0915a4ff85e68d3e0ae6",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "bd885b4ac6413a89d84ea13dd4e9603abd6f09676183db024779059d4d477b05"
+      },
+      {
+       "record_id": "struct-6d6af6cd7c2ccdee0fbc120a",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "a4befc3c6a211cb98b2b6a44e7a5a989ba4a723e06a958f9131825e4eb8ad0da"
+      },
+      {
+       "record_id": "struct-fb323d35a19e80fe2201267d",
+       "page": 15,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "206433a84372448ecab485f6507240f3a23a7040ebc1327713ffba8d6d272112"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-a949d855d481a85e496e93e8",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Source noise reduction",
+        "action": "be the primary\nmeans to protect personnel from hazardous noise",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Source noise reduction shall be the primary\nmeans to protect personnel from hazardous noise.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-0f5605a1208e4fc921c837eb",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Hearing protectors and administrative\nmeasures such as warning signs",
+        "action": "be solely relied upon",
+        "modality": "shall",
+        "polarity": "negative",
+        "exact_text": "Hearing protectors and administrative\nmeasures such as warning signs shall not be solely relied upon, unless all noise reduction design\napproaches have been pursued.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "unless all noise reduction design\napproaches have been pursued.",
+         "span_indices": [
+          1,
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-24e9b6b39c488e01e61eb4c4",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Steady-state levels",
+        "action": "be less than 85 decibels A-weighted",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Steady-state levels shall be less than 85 decibels A-weighted\n(dBA) and peak-pressure levels of impulsive noise less than 140 dBP, at the ear (protected or\nunprotected), at all personnel locations during normal operations.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "at the ear (protected or\nunprotected)",
+         "span_indices": [
+          1,
+          2
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "at all personnel locations during normal operations.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-c4457fde835b73e70cfb9671",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "the method specified in ANSI/ASA S12.68 or equivalent",
+        "action": "be used\nto compute the effective noise exposure",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Where personal protective equipment is used to\nprovide noise reduction, the method specified in ANSI/ASA S12.68 or equivalent shall be used\nto compute the effective noise exposure using attenuation measured in accordance with\nANSI/ASA S12.6 and ANSI/ASA S12.42.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "Where personal protective equipment is used to\nprovide noise reduction,",
+         "span_indices": [
+          0,
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-baabb094daea92fe6050601f",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "The method(s) used",
+        "action": "be documented",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "The method(s) used shall be documented.",
+        "span_indices": [
+         0
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-b21e0915a4ff85e68d3e0ae6",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "They",
+        "action": "be clearly visible and\nlegible",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "They shall be clearly visible and\nlegible to all personnel that might be exposed to the hazard, to include crew and passengers.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "to all personnel that might be exposed to the hazard, to include crew and passengers.",
+         "span_indices": [
+          1
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "This provision shall not apply to the exteriors of military combat equipment.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-6d6af6cd7c2ccdee0fbc120a",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Areas with levels equal to or above 85 dBA",
+        "action": "be\nposted with noise hazard signs",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Areas with levels equal to or above 85 dBA shall be\nposted with noise hazard signs;",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "equal to or above 85 dBA",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-fb323d35a19e80fe2201267d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Areas with impulsive levels equal to or above 140 dBP",
+        "action": "be posted with noise hazard signs",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Areas with impulsive levels equal to or above 140 dBP\nshall be posted with noise hazard signs;",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "equal to or above 140 dBP",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-4.2.1",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "4.2.1",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-a949d855d481a85e496e93e8",
+      "struct-0f5605a1208e4fc921c837eb",
+      "struct-24e9b6b39c488e01e61eb4c4",
+      "struct-c4457fde835b73e70cfb9671",
+      "struct-baabb094daea92fe6050601f"
+     ],
+     "forbidden_record_ids": [
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-fabe33f76071ea3023a92ad2",
+      "struct-09cb3013e853716daef08047"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-a949d855d481a85e496e93e8",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "ff0875368330a5f1075215a74b750fbb0a42107bb7fa7f95e2bf084ad470c5a6"
+      },
+      {
+       "record_id": "struct-0f5605a1208e4fc921c837eb",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5e6cd929310d053553ee8ec061cb3b10321622fe187e3d54aa5f9985808c5bfe"
+      },
+      {
+       "record_id": "struct-24e9b6b39c488e01e61eb4c4",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "469e86a519405e397d9c7326398081ec7f458d770b9e9964f4377f663b0adfd8"
+      },
+      {
+       "record_id": "struct-c4457fde835b73e70cfb9671",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e35c9d73f6809ec8a506bf468d9dae6ebc05aa44a8401f3446e81a286f507adc"
+      },
+      {
+       "record_id": "struct-baabb094daea92fe6050601f",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "4cbb4c70a27c1ca95e90da887e23a2fc106e82bad33b27fe56dd1aabd77c985b"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-a949d855d481a85e496e93e8",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Source noise reduction",
+        "action": "be the primary\nmeans to protect personnel from hazardous noise",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Source noise reduction shall be the primary\nmeans to protect personnel from hazardous noise.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": []
+      },
+      {
+       "record_id": "struct-0f5605a1208e4fc921c837eb",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Hearing protectors and administrative\nmeasures such as warning signs",
+        "action": "be solely relied upon",
+        "modality": "shall",
+        "polarity": "negative",
+        "exact_text": "Hearing protectors and administrative\nmeasures such as warning signs shall not be solely relied upon, unless all noise reduction design\napproaches have been pursued.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "exception",
+         "exact_text": "unless all noise reduction design\napproaches have been pursued.",
+         "span_indices": [
+          1,
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-24e9b6b39c488e01e61eb4c4",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Steady-state levels",
+        "action": "be less than 85 decibels A-weighted",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Steady-state levels shall be less than 85 decibels A-weighted\n(dBA) and peak-pressure levels of impulsive noise less than 140 dBP, at the ear (protected or\nunprotected), at all personnel locations during normal operations.",
+        "span_indices": [
+         0,
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "at the ear (protected or\nunprotected)",
+         "span_indices": [
+          1,
+          2
+         ]
+        },
+        {
+         "kind": "condition",
+         "exact_text": "at all personnel locations during normal operations.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-c4457fde835b73e70cfb9671",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "the method specified in ANSI/ASA S12.68 or equivalent",
+        "action": "be used\nto compute the effective noise exposure",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Where personal protective equipment is used to\nprovide noise reduction, the method specified in ANSI/ASA S12.68 or equivalent shall be used\nto compute the effective noise exposure using attenuation measured in accordance with\nANSI/ASA S12.6 and ANSI/ASA S12.42.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "Where personal protective equipment is used to\nprovide noise reduction,",
+         "span_indices": [
+          0,
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-baabb094daea92fe6050601f",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "The method(s) used",
+        "action": "be documented",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "The method(s) used shall be documented.",
+        "span_indices": [
+         0
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-4.2.1.1",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "4.2.1.1",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-c4457fde835b73e70cfb9671",
+      "struct-baabb094daea92fe6050601f"
+     ],
+     "forbidden_record_ids": [
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-fabe33f76071ea3023a92ad2",
+      "struct-09cb3013e853716daef08047"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-c4457fde835b73e70cfb9671",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e35c9d73f6809ec8a506bf468d9dae6ebc05aa44a8401f3446e81a286f507adc"
+      },
+      {
+       "record_id": "struct-baabb094daea92fe6050601f",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "4cbb4c70a27c1ca95e90da887e23a2fc106e82bad33b27fe56dd1aabd77c985b"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-c4457fde835b73e70cfb9671",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "the method specified in ANSI/ASA S12.68 or equivalent",
+        "action": "be used\nto compute the effective noise exposure",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Where personal protective equipment is used to\nprovide noise reduction, the method specified in ANSI/ASA S12.68 or equivalent shall be used\nto compute the effective noise exposure using attenuation measured in accordance with\nANSI/ASA S12.6 and ANSI/ASA S12.42.",
+        "span_indices": [
+         0,
+         1,
+         2,
+         3
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "Where personal protective equipment is used to\nprovide noise reduction,",
+         "span_indices": [
+          0,
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-baabb094daea92fe6050601f",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "The method(s) used",
+        "action": "be documented",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "The method(s) used shall be documented.",
+        "span_indices": [
+         0
+        ]
+       },
+       "qualifiers": []
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "enumerate-4.2.2",
+    "operation": "enumerate_obligations",
+    "request": {
+     "scope_prefix": "4.2.2",
+     "limit": 100
+    },
+    "expected": {
+     "record_ids": [
+      "struct-b21e0915a4ff85e68d3e0ae6",
+      "struct-6d6af6cd7c2ccdee0fbc120a",
+      "struct-fb323d35a19e80fe2201267d"
+     ],
+     "forbidden_record_ids": [
+      "struct-5a5f3de7abf62097ab689901",
+      "struct-fabe33f76071ea3023a92ad2",
+      "struct-09cb3013e853716daef08047"
+     ],
+     "citations": [
+      {
+       "record_id": "struct-b21e0915a4ff85e68d3e0ae6",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "bd885b4ac6413a89d84ea13dd4e9603abd6f09676183db024779059d4d477b05"
+      },
+      {
+       "record_id": "struct-6d6af6cd7c2ccdee0fbc120a",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "a4befc3c6a211cb98b2b6a44e7a5a989ba4a723e06a958f9131825e4eb8ad0da"
+      },
+      {
+       "record_id": "struct-fb323d35a19e80fe2201267d",
+       "page": 15,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "206433a84372448ecab485f6507240f3a23a7040ebc1327713ffba8d6d272112"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": false,
+     "semantic_assertions": [
+      {
+       "record_id": "struct-b21e0915a4ff85e68d3e0ae6",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "They",
+        "action": "be clearly visible and\nlegible",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "They shall be clearly visible and\nlegible to all personnel that might be exposed to the hazard, to include crew and passengers.",
+        "span_indices": [
+         0,
+         1
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "source_applicability",
+         "exact_text": "to all personnel that might be exposed to the hazard, to include crew and passengers.",
+         "span_indices": [
+          1
+         ]
+        },
+        {
+         "kind": "exception",
+         "exact_text": "This provision shall not apply to the exteriors of military combat equipment.",
+         "span_indices": [
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-6d6af6cd7c2ccdee0fbc120a",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Areas with levels equal to or above 85 dBA",
+        "action": "be\nposted with noise hazard signs",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Areas with levels equal to or above 85 dBA shall be\nposted with noise hazard signs;",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "equal to or above 85 dBA",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      },
+      {
+       "record_id": "struct-fb323d35a19e80fe2201267d",
+       "content_role": "requirement_candidate",
+       "statement": {
+        "subject": "Areas with impulsive levels equal to or above 140 dBP",
+        "action": "be posted with noise hazard signs",
+        "modality": "shall",
+        "polarity": "affirmative",
+        "exact_text": "Areas with impulsive levels equal to or above 140 dBP\nshall be posted with noise hazard signs;",
+        "span_indices": [
+         1,
+         2
+        ]
+       },
+       "qualifiers": [
+        {
+         "kind": "condition",
+         "exact_text": "equal to or above 140 dBP",
+         "span_indices": [
+          1
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   },
+   {
+    "case_id": "search-combat-exteriors",
+    "operation": "search",
+    "request": {
+     "query": "exteriors military combat equipment",
+     "query_mode": "all_terms",
+     "limit": 20
+    },
+    "expected": {
+     "record_ids": [
+      "struct-e143567f0fc20fa88a5af0a9"
+     ],
+     "forbidden_record_ids": [],
+     "citations": [
+      {
+       "record_id": "struct-e143567f0fc20fa88a5af0a9",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "e6287f40b5c156a2cb4b3c6c0a338638c006feb005afdd257ff13313acaf2ba5"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": null
+    }
+   },
+   {
+    "case_id": "search-solely-relied",
+    "operation": "search",
+    "request": {
+     "query": "solely relied",
+     "query_mode": "all_terms",
+     "limit": 20
+    },
+    "expected": {
+     "record_ids": [
+      "struct-0f5605a1208e4fc921c837eb"
+     ],
+     "forbidden_record_ids": [],
+     "citations": [
+      {
+       "record_id": "struct-0f5605a1208e4fc921c837eb",
+       "page": 14,
+       "source_sha256": "ae2e97fd3ee8260d57072963cc4c7a3a376f10c88749df7e2cec57d73f60b729",
+       "quote_sha256": "5e6cd929310d053553ee8ec061cb3b10321622fe187e3d54aa5f9985808c5bfe"
+      }
+     ],
+     "critical_facts": [],
+     "complete_for_requested_scope": null
+    }
+   }
+  ]
+ },
+ "review": {
+  "kind": "agent",
+  "identity": "Claude Code agent self-review (independence_claim: self_review): the same agent authored the review annotations and these expectations from them; no human review or independent adjudication",
+  "reviewed_at": "2026-10-09T00:00:00Z",
+  "suite_sha256": "a03ca3606375cb61d5b47c9273ac2d97589fd217dce28b0d9075f6946b2bac4e"
+ }
+}

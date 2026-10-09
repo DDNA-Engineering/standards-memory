@@ -1,6 +1,6 @@
 # Reviewed references and answer qualification
 
-The runtime and contracts described here were published in [0.1.0a7](RELEASE_0.1.0a7.md). The reviewed packs, `reference-bindings.json` and answer-review artifacts in the dated local evidence below remain local and unpublished; the a7 prepared library does not include them, so its launcher returns `reference_bindings_not_configured` for `follow_references` (see [known limitations](RELEASE_0.1.0a7.md#known-limitations)).
+The runtime and contracts described here were published in [0.1.0a7](RELEASE_0.1.0a7.md). The reviewed packs, `reference-bindings.json` and answer-review artifacts in the dated local evidence below remain local and unpublished; the a7 prepared library does not include them, so its launcher returns `reference_bindings_not_configured` for `follow_references` (see [known limitations](RELEASE_0.1.0a7.md#known-limitations)). The a8 prepared archive bundles a separate, later agent-reviewed binding set; see [agent review 2026-10](AGENT_REVIEW_2026-10.md).
 
 ## Exact cross-standard navigation
 

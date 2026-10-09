@@ -16,7 +16,7 @@ codex plugin list --marketplace standardsforge --json
 
 For a local source checkout, replace the first command with `codex plugin marketplace add .` from the repository root. The marketplace stores only this small skill plugin in the plugin cache; it does not copy the repository's local corpus or database. The plugin reuses an existing `standardsforge` or `standardsforge-local` MCP connection. It has no bundled MCP server, credentials, machine-specific paths, network fallback or installation hook. Installing it does not install or upgrade the runtime or standards content.
 
-Plugin 0.1.4 includes original PDF links in standards answers. The a7 runtime supplies `get_source_pdfs` and all eleven read tools. Upgrade by installing the a7 prepared archive into a new folder, then use its generated host configuration and restart the MCP connection. Updating the plugin alone does not update the runtime.
+Plugin 0.1.4 includes original PDF links in standards answers. The a7 and later runtimes supply `get_source_pdfs` and all eleven read tools. Upgrade by installing the newest prepared archive into a new folder, then use its generated host configuration and restart the MCP connection. Updating the plugin alone does not update the runtime.
 
 Start a new chat after installation. In Codex CLI or the IDE extension, use `/skills` to select **StandardsForge**. Codex qualifies the skill name with its plugin name, so the explicit invocation is:
 
@@ -36,13 +36,13 @@ The plugin supplies instructions, not a host-enforced tool restriction. A succes
 
 ## Start with the prepared release on Windows
 
-Download and extract [v0.1.0a7](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a7). Install 64-bit CPython 3.12 with its Python launcher, then double-click `setup.cmd`. Or run:
+Download and extract [v0.1.0a7](https://github.com/DDNA-Engineering/standards-memory/releases/tag/v0.1.0a7). Install 64-bit CPython 3.11, 3.12 or 3.13 with its Python launcher, then double-click `setup.cmd`. Or run:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1
 ```
 
-One setup installs the library and exact hash-locked MCP dependencies offline, verifies the evidence, and makes a real stdio query. Python 3.11 or 3.13 users can explicitly choose `python setup.py --mcp-online` for networked dependencies instead.
+One setup installs the library and exact hash-locked MCP dependencies offline for whichever of the three versions it finds, verifies the evidence, and makes a real stdio query. Users of another Python version can explicitly choose `python setup.py --mcp-online` for networked dependencies instead.
 
 ## Configure Linux or macOS against prepared state
 
@@ -55,6 +55,24 @@ sh ./setup.sh --mcp-online
 Only this explicit option downloads MCP dependencies. The verified code wheel and standards library remain bundled. Setup owns the local environment, verifies package consistency and runs a real stdio query before producing host configuration. Run `sh ./setup.sh` for offline terminal-only setup.
 
 ## Connect your model host
+
+### Let setup add it (optional)
+
+Name the host and setup adds the StandardsForge entry for you after the library and model connection pass their checks:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup.ps1 --connect claude-desktop
+```
+
+```sh
+sh ./setup.sh --mcp-online --connect cursor
+```
+
+`--connect` accepts `claude-desktop`, `cursor` or `codex` and may be repeated. Setup changes the host's per-user file only: Claude Desktop's documented file on Windows or macOS, `~/.cursor/mcp.json`, or Codex's `config.toml` in `CODEX_HOME` (default `~/.codex`). The host's settings folder must already exist. Use `--host-config <file>` with one `--connect` to change another file, such as a project `.cursor/mcp.json` or a Microsoft Store installation of Claude Desktop.
+
+Before writing, setup parses the existing file, keeps a byte-exact copy beside it (`<name>.standardsforge-backup-<UTC time>`), replaces only the `standardsforge` entry, re-parses the result, and writes it atomically. A symbolic link is followed so it survives. Invalid JSON or TOML, or a Codex definition written as inline or dotted keys, is left untouched and reported. Running setup again with the same paths reports `already_connected` and writes nothing. Restart the host afterwards. Without `--connect`, setup never touches host settings.
+
+### Merge the generated entry yourself
 
 Setup writes absolute, correctly escaped paths into `.standardsforge/mcp-config.json` and `.standardsforge/codex-mcp.toml`. Open those files and merge the StandardsForge entry into the appropriate host file:
 
@@ -81,13 +99,13 @@ codex mcp add standardsforge -- "$PWD/.venv/bin/python" -I "$PWD/run_mcp.py"
 
 Ask the host to list installed MIL-STD-810 editions, find the low-pressure section and retrieve exact source evidence and its original PDF. The connected a7 server advertises eleven tools. Search results are candidates; retrieve an exact record before relying on its text.
 
-The prepared launcher passes no reviewed reference bindings or tokenizer configuration and accepts no overrides; the archive bundles neither. In a prepared a7 installation, `follow_references` returns `reference_bindings_not_configured` and `select_evidence` with `max_tokens` returns `tokenizer_unavailable`; byte budgets work. See [known limitations](../RELEASE_0.1.0a7.md#known-limitations).
+From a8, the prepared launcher passes the bundled, hash-pinned `o200k_base` tokenizer and the bundled agent-reviewed reference bindings, and still accepts no overrides. `select_evidence` with `max_tokens` therefore works, and `follow_references` follows the 23 reviewed references among the six reviewed scopes; records outside those scopes have no reviewed bindings. A changed tokenizer or binding file stops the server from starting. In a prepared a7 installation, `follow_references` returns `reference_bindings_not_configured` and `select_evidence` with `max_tokens` returns `tokenizer_unavailable`; see [a7 known limitations](../RELEASE_0.1.0a7.md#known-limitations).
 
 ## Upgrade or troubleshoot
 
 Extract upgrades into a new directory, run setup, replace only the StandardsForge host entry with the new generated one, then restart the connection. Do not copy an old `.venv` or database into the new archive. Keep the prior install until the new one works.
 
-If `python` is missing on Windows, install Python 3.12 with its launcher and use `setup.cmd`. If Linux reports missing `ensurepip`, install the matching `python3-venv` package. If setup fails, correct the reported cause and rerun the same command. If the host still lists seven tools, its process is using the old installation; check the configured executable and restart it. The optional `standardsforge-mcp.ps1` wrapper remains available for existing Windows host conventions.
+If `python` is missing on Windows, install 64-bit Python 3.11, 3.12 or 3.13 with its launcher and use `setup.cmd`. If setup reports files that are not part of the release, remove the files you added to the library folder or extract the ZIP again into a new folder. If Linux reports missing `ensurepip`, install the matching `python3-venv` package. If setup fails, correct the reported cause and rerun the same command. If the host still lists seven tools, its process is using the old installation; check the configured executable and restart it. The optional `standardsforge-mcp.ps1` wrapper remains available for existing Windows host conventions.
 
 ## Start the local stdio server
 

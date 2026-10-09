@@ -14,7 +14,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "1.3"
+      "const": "1.4"
     },
     "product": {
       "const": "StandardsForge prepared distribution"
@@ -39,8 +39,9 @@
         "mcp_requirements_sha256",
         "core_runtime_python",
         "core_runtime_platforms",
-        "mcp_runtime_python",
         "mcp_runtime_platform",
+        "mcp_runtime_pythons",
+        "tokenizer",
         "corpus_compiler_version"
       ],
       "properties": {
@@ -76,8 +77,27 @@
           "pattern": "^[0-9a-f]{64}$"
         },
         "mcp_requirements_sha256": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "3.11",
+            "3.12",
+            "3.13"
+          ],
+          "properties": {
+            "3.11": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "3.12": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "3.13": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
         },
         "core_runtime_python": {
           "const": "CPython >=3.11"
@@ -90,11 +110,45 @@
             "macos_x86_64"
           ]
         },
-        "mcp_runtime_python": {
-          "const": "CPython 3.12"
-        },
         "mcp_runtime_platform": {
           "const": "win_amd64"
+        },
+        "mcp_runtime_pythons": {
+          "const": [
+            "3.11",
+            "3.12",
+            "3.13"
+          ]
+        },
+        "tokenizer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "encoding",
+            "path",
+            "sha256",
+            "bytes",
+            "implementation"
+          ],
+          "properties": {
+            "encoding": {
+              "const": "o200k_base"
+            },
+            "path": {
+              "const": "tokenizer/o200k_base.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "implementation": {
+              "const": "tiktoken==0.14.0"
+            }
+          }
         },
         "corpus_compiler_version": {
           "type": "string",
@@ -168,7 +222,7 @@
             "properties": {
               "path": {
                 "type": "string",
-                "pattern": "^packs/recovery/[a-z0-9-]+\\.zip$"
+                "pattern": "^packs/(recovery|reviewed)/[a-z0-9-]+\\.zip$"
               },
               "pack_id": {
                 "type": "string",
@@ -180,12 +234,29 @@
               },
               "suite_path": {
                 "type": "string",
-                "pattern": "^qualification/recovery/[a-z0-9-]+-suite\\.json$"
+                "pattern": "^qualification/(recovery|reviewed)/[a-z0-9-]+-suite\\.json$"
               },
               "run_path": {
                 "type": "string",
-                "pattern": "^qualification/recovery/[a-z0-9-]+-run\\.json$"
+                "pattern": "^qualification/(recovery|reviewed)/[a-z0-9-]+-run\\.json$"
               }
+            }
+          }
+        },
+        "reference_bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "const": "references/reference-bindings.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             }
           }
         }

@@ -27,6 +27,8 @@ from prepared_runtime import (  # noqa: E402
     validate_bundle,
     validate_receipt,
     _check_mcp_profile,
+    mcp_server_options,
+    required_install_bytes,
     _write_host_configuration,
     _venv_python,
     VENV_MARKER,
@@ -46,6 +48,83 @@ class PreparedRuntimeTests(unittest.TestCase):
         self.assertFalse((self.root / ".venv").exists())
         self.assertFalse((self.root / ".standardsforge").exists())
         _check_mcp_profile("online")
+
+    def test_os_metadata_files_are_tolerated_but_other_extras_are_named(self) -> None:
+        validate_bundle(self.root)
+        names = [".DS_Store", "wheel/._standardsforge.whl", "Thumbs.db", "provenance/desktop.ini"]
+        if os.name != "nt":
+            names.append("Icon\r")  # macOS folder icon; Windows cannot create this name
+        for relative in names:
+            (self.root / relative).write_bytes(b"shell metadata")
+        validate_bundle(self.root)
+        (self.root / "notes.txt").write_text("mine", encoding="utf-8")
+        with self.assertRaisesRegex(PreparedSetupError, r"missing or unlisted files \(not part of this release: notes\.txt\)"):
+            validate_bundle(self.root)
+
+    @unittest.skipIf(os.name == "nt", "symbolic links need privileges on Windows")
+    def test_os_metadata_name_does_not_excuse_a_link(self) -> None:
+        (self.root / ".DS_Store").symlink_to(self.root / "setup.py")
+        with self.assertRaisesRegex(PreparedSetupError, "symbolic link"):
+            validate_bundle(self.root)
+
+    def test_per_python_locks_and_tokenizer_are_bound_to_the_manifest(self) -> None:
+        validate_bundle(self.root)
+        for change, message in (
+            (lambda m: m["build"]["mcp_requirements_sha256"].pop("3.13"), "mcp_requirements_sha256"),
+            (lambda m: m["build"]["mcp_requirements_sha256"].update({"3.11": "0" * 64}), "digest is inconsistent for Python 3.11"),
+            (lambda m: m["build"]["tokenizer"].update(sha256="0" * 64), "tokenizer artifact is inconsistent"),
+            (lambda m: m["build"]["tokenizer"].update(implementation="tiktoken==0.13.0"), "tokenizer identity is invalid"),
+            (lambda m: m["build"].update(mcp_runtime_pythons=["3.12"]), "mcp_runtime_pythons"),
+        ):
+            baseline = copy.deepcopy(self.manifest)
+            change(self.manifest)
+            self._write_manifest()
+            with self.assertRaisesRegex(PreparedSetupError, message):
+                validate_bundle(self.root)
+            self.manifest = baseline
+            self._write_manifest()
+
+    def test_lock_entries_must_close_over_the_wheelhouse(self) -> None:
+        lock = self.root / "provenance/mcp-wheelhouse-win-amd64-cp313.txt"
+        changed = f"mcp==2.2.0 --hash=sha256:{'1' * 64}\n".encode()
+        lock.write_bytes(changed)
+        for item in self.manifest["files"]:
+            if item["path"] == "provenance/mcp-wheelhouse-win-amd64-cp313.txt":
+                item.update(bytes=len(changed), sha256=_sha256(changed))
+        self.manifest["build"]["mcp_requirements_sha256"]["3.13"] = _sha256(changed)
+        self._write_manifest()
+        with self.assertRaisesRegex(PreparedSetupError, "does not exactly match its per-Python locks"):
+            validate_bundle(self.root)
+
+    def test_launch_options_pin_tokenizer_and_optional_reference_bindings(self) -> None:
+        manifest, _ = validate_bundle(self.root)
+        options = mcp_server_options(self.root, manifest)
+        self.assertEqual(["--tokenizer-artifact", str(self.root / "tokenizer" / "o200k_base.json"),
+                          "--tokenizer-sha256", manifest["build"]["tokenizer"]["sha256"]], options)
+        manifest["state"]["reference_bindings"] = {"path": "references/reference-bindings.json", "sha256": "b" * 64}
+        self.assertEqual(["--reference-bindings", str(self.root / "references" / "reference-bindings.json"),
+                          "--reference-bindings-sha256", "b" * 64], mcp_server_options(self.root, manifest)[4:])
+
+    def test_offline_mcp_accepts_each_locked_windows_python(self) -> None:
+        for version, accepted in (((3, 10), False), ((3, 11), True), ((3, 12), True), ((3, 13), True), ((3, 14), False)):
+            with (patch("prepared_runtime.sys.platform", "win32"), patch("prepared_runtime.platform.machine", return_value="AMD64"),
+                  patch("prepared_runtime.sys.version_info", (*version, 0, "final", 0))):
+                if accepted:
+                    _check_mcp_profile("offline")
+                else:
+                    with self.assertRaisesRegex(PreparedSetupError, "3.11, 3.12 or 3.13"):
+                        _check_mcp_profile("offline")
+
+    def test_first_setup_stops_before_indexing_when_disk_space_is_short(self) -> None:
+        manifest, _ = validate_bundle(self.root)
+        self.assertEqual(250 * 1000 * 1000, required_install_bytes(manifest))
+        manifest["files"].append({"path": "corpus/a.zip", "bytes": 10**9, "sha256": "0" * 64})
+        self.assertEqual(2 * 10**9 + 250 * 1000 * 1000, required_install_bytes(manifest))
+        with patch("prepared_runtime.shutil.disk_usage", return_value=shutil._ntuple_diskusage(10**12, 10**12 - 10**8, 10**8)):
+            with self.assertRaisesRegex(PreparedSetupError, r"needs about 0\.2 GB of free disk space .* only 0\.1 GB"):
+                setup_prepared(self.root, quiet=True)
+        self.assertFalse((self.root / ".venv").exists())
+        self.assertFalse((self.root / ".standardsforge").exists())
 
     def test_only_explicit_dependency_install_enables_package_index(self) -> None:
         with patch("prepared_runtime.subprocess.run", return_value=subprocess.CompletedProcess([], 0)) as run:
@@ -168,13 +247,17 @@ class PreparedRuntimeTests(unittest.TestCase):
         mcp_name = "mcp-2.2.0-py3-none-any.whl"
         mcp_bytes = b"qualified mcp wheel"
         requirements = f"mcp==2.2.0 --hash=sha256:{_sha256(mcp_bytes)}\n".encode()
+        tokenizer_bytes = b'{"name":"o200k_base","schema_version":"0.1.0"}'
         payloads = {
             f"wheel/{wheel_name}": wheel_bytes,
             f"wheelhouse/{mcp_name}": mcp_bytes,
             "provenance/acquisition-manifest.json": acquisition_bytes,
             "provenance/source-baseline.json": (json.dumps(source_baseline) + "\n").encode(),
             "provenance/wheel-build.json": (json.dumps(wheel_provenance) + "\n").encode(),
+            "provenance/mcp-wheelhouse-win-amd64-cp311.txt": requirements,
             "provenance/mcp-wheelhouse-win-amd64-cp312.txt": requirements,
+            "provenance/mcp-wheelhouse-win-amd64-cp313.txt": requirements,
+            "tokenizer/o200k_base.json": tokenizer_bytes,
             "prepared_runtime.py": (ROOT / "scripts/prepared_distribution/prepared_runtime.py").read_bytes(),
             "run.py": (ROOT / "scripts/prepared_distribution/run.py").read_bytes(),
             "setup.py": b"print('verified setup placeholder')\n",
@@ -185,7 +268,7 @@ class PreparedRuntimeTests(unittest.TestCase):
             target.write_bytes(value)
         wheelhouse_row = f"{_sha256(mcp_bytes)} {len(mcp_bytes)} {mcp_name}\n".encode()
         self.manifest = {
-            "schema_version": "1.3",
+            "schema_version": "1.4",
             "product": "StandardsForge prepared distribution",
             "version": "0.1.0a5",
             "build": {
@@ -198,11 +281,13 @@ class PreparedRuntimeTests(unittest.TestCase):
                 "mcp_requirement": "mcp==2.2.0",
                 "mcp_wheel_count": 1,
                 "mcp_wheelhouse_sha256": _sha256(wheelhouse_row),
-                "mcp_requirements_sha256": _sha256(requirements),
+                "mcp_requirements_sha256": {version: _sha256(requirements) for version in ("3.11", "3.12", "3.13")},
                 "core_runtime_python": "CPython >=3.11",
                 "core_runtime_platforms": ["windows_x86_64", "linux_x86_64", "macos_arm64", "macos_x86_64"],
-                "mcp_runtime_python": "CPython 3.12",
                 "mcp_runtime_platform": "win_amd64",
+                "mcp_runtime_pythons": ["3.11", "3.12", "3.13"],
+                "tokenizer": {"encoding": "o200k_base", "path": "tokenizer/o200k_base.json", "sha256": _sha256(tokenizer_bytes),
+                              "bytes": len(tokenizer_bytes), "implementation": "tiktoken==0.14.0"},
                 "corpus_compiler_version": "0.3.0",
             },
             "state": {"principal_id": "local-user", "corpus_package_count": 438},
@@ -237,6 +322,30 @@ class PreparedRuntimeTests(unittest.TestCase):
                        lambda m: m["state"].update(included_package_count=439),
                        lambda m: m["state"]["qualified_packs"].append(copy.deepcopy(entry)),
                        lambda m: m["files"].pop()):
+            self.manifest = copy.deepcopy(baseline)
+            change(self.manifest)
+            self._write_manifest()
+            with self.assertRaises(PreparedSetupError):
+                validate_bundle(self.root)
+
+    def test_reviewed_packs_and_reference_bindings_are_closed_and_pinned(self) -> None:
+        entry = {"path": "packs/reviewed/mil-std-882e.zip", "suite_path": "qualification/reviewed/mil-std-882e-suite.json",
+                 "run_path": "qualification/reviewed/mil-std-882e-run.json", "pack_id": "reviewed", "package_digest": "c" * 64}
+        bindings = b'{"binding_set": {}}'
+        for relative, value in ((entry["path"], b"fixture"), (entry["suite_path"], b"fixture"), (entry["run_path"], b"fixture"),
+                                ("references/reference-bindings.json", bindings)):
+            target = self.root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(value)
+            self.manifest["files"].append({"path": relative, "bytes": len(value), "sha256": _sha256(value)})
+        self.manifest["state"].update(qualified_packs=[entry], included_package_count=440,
+                                      reference_bindings={"path": "references/reference-bindings.json", "sha256": _sha256(bindings)})
+        self._write_manifest()
+        validate_bundle(self.root)
+        baseline = copy.deepcopy(self.manifest)
+        for change in (lambda m: m["state"]["qualified_packs"][0].update(suite_path="qualification/recovery/mil-std-882e-suite.json"),
+                       lambda m: m["state"]["reference_bindings"].update(sha256="0" * 64),
+                       lambda m: m["state"]["reference_bindings"].update(path="references/other.json")):
             self.manifest = copy.deepcopy(baseline)
             change(self.manifest)
             self._write_manifest()
@@ -278,11 +387,12 @@ class PreparedRuntimeTests(unittest.TestCase):
             validate_bundle(self.root)
 
     def test_rejects_unsupported_manifest_and_unsafe_link(self) -> None:
-        self.manifest["schema_version"] = "1.2"
-        self._write_manifest()
-        with self.assertRaisesRegex(PreparedSetupError, "Unsupported"):
-            validate_bundle(self.root)
-        self.manifest["schema_version"] = "1.3"
+        for unsupported in ("1.2", "1.3"):
+            self.manifest["schema_version"] = unsupported
+            self._write_manifest()
+            with self.assertRaisesRegex(PreparedSetupError, "Unsupported"):
+                validate_bundle(self.root)
+        self.manifest["schema_version"] = "1.4"
         self._write_manifest()
 
         link = self.root / "linked"

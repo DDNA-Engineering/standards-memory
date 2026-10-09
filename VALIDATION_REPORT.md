@@ -1,5 +1,9 @@
 # Validation report
 
+## 0.1.0a8 candidate (recorded 2026-10-09; unpublished)
+
+A local candidate of `0.1.0a8` was rebuilt reproducibly from the published a7 archive with a reviewed supplement of six agent-reviewed scopes. Local Linux validation, exact identities and what is still unobserved are in the [a8 release record](docs/RELEASE_0.1.0a8.md). It has no native Windows/macOS acceptance, CI on its branch, or publication yet; `v0.1.0a7` below remains the current published release.
+
 ## Current status — 0.1.0a7 (recorded 2026-10-09)
 
 The current published release is `v0.1.0a7`, with eleven read operations through the CLI and stdio MCP. Its exact identities, observed CI, native prepared acceptance, PyPI publication, public readback and [known limitations](docs/RELEASE_0.1.0a7.md#known-limitations) are in the [a7 release evidence](docs/RELEASE_0.1.0a7.md). Everything below is the dated record from earlier snapshots (through the a6 publication) and retains its original scope, identities and status wording.
