@@ -180,7 +180,7 @@ jobs:
           }
           $manifest = Get-Content -LiteralPath (Join-Path $env:PREPARED_ROOT 'bundle-manifest.json') -Raw | ConvertFrom-Json
           $tokenizer = $manifest.build.tokenizer
-          & $entry.command -I (Join-Path $env:PREPARED_ROOT 'smoke_mcp.py') --launcher $entry.args[1] --db (Join-Path $env:PREPARED_ROOT '.standardsforge/memory.db') --store (Join-Path $env:PREPARED_ROOT '.standardsforge/objects') --principal local-user --query 'environmental testing' --tokenizer-artifact (Join-Path $env:PREPARED_ROOT $tokenizer.path) --tokenizer-sha256 $tokenizer.sha256
+          & $entry.command -I (Join-Path $env:PREPARED_ROOT 'smoke_mcp.py') --launcher $entry.args[1] --db (Join-Path $env:PREPARED_ROOT '.standardsforge/memory.db') --store (Join-Path $env:PREPARED_ROOT '.standardsforge/objects') --principal local-user --query 'environmental testing' --tokenizer-artifact (Join-Path $env:PREPARED_ROOT $tokenizer.path) --tokenizer-sha256 $tokenizer.sha256 --reference-bindings (Join-Path $env:PREPARED_ROOT $manifest.state.reference_bindings.path) --reference-bindings-sha256 $manifest.state.reference_bindings.sha256
           if ($LASTEXITCODE -ne 0) { throw 'Generated host launcher failed its real MCP query.' }
       - name: Prove full doctor, exact resolve, search, and source evidence retrieval
         shell: pwsh

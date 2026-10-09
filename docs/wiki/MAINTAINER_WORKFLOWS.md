@@ -179,7 +179,13 @@ $PreparedVersion = '<new-qualified-version>'
   --version $PreparedVersion
 ```
 
-Allow several minutes and about 4 GB of working space. The work directory must be new or empty.
+Build the reviewed supplement first from the committed review inputs and the previous release's extracted `corpus/` directory; it fails closed on any changed source, stale annotation or failing suite, and writes nothing on failure:
+
+```powershell
+& $Python scripts/build_reviewed_supplement.py --corpus <extracted-previous-release>/corpus --output build/reviewed-supplement
+```
+
+Allow several minutes and about 4 GB of working space for the rebuild. The work directory must be new or empty. See [agent review 2026-10](../AGENT_REVIEW_2026-10.md) for what the supplement contains and its limits.
 
 ### Build from local acquisition state
 
